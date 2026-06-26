@@ -1,0 +1,28 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# ABAP source files
+*.abap text eol=lf
+
+# Python
+*.py text eol=lf
+
+# JavaScript
+*.js text eol=lf
+*.json text eol=lf
+
+# Markdown / docs
+*.md text eol=lf
+
+# Shell scripts
+*.sh text eol=lf
+
+# YAML
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Binary
+*.nugg binary
+*.zip binary
+*.png binary
+*.jpg binary

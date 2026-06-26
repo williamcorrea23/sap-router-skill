@@ -1,0 +1,128 @@
+{
+  "mcpServers": {
+    "hermes-crewai": {
+      "type": "stdio",
+      "command": "hermes-mcp-server",
+      "args": [],
+      "env": {},
+      "description": "SAP ABAP/CPI/CrewAI multi-agent Hermes MCP — ABAP lint, ADT CLI, BAPI calls, HANA queries, CPI lint, transport gate, knowledge bases, skills search"
+    },
+    "sap-cpi": {
+      "type": "stdio",
+      "command": "sap-cpi-mcp-server",
+      "args": [],
+      "env": {},
+      "description": "SAP CPI tenant live connection — list/deploy/undeploy artifacts, failed messages, trace logs, keystore/credential management"
+    },
+    "arc-1": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["arc-1"],
+      "env": {
+        "ARC_SAP_URL": "${ARC_SAP_URL}",
+        "ARC_SAP_USER": "${ARC_SAP_USER}",
+        "ARC_SAP_PASSWORD": "${ARC_SAP_PASSWORD}",
+        "ARC_SAP_CLIENT": "${ARC_SAP_CLIENT}"
+      },
+      "description": "ARC-1 enterprise SAP ADT MCP — 12 intent-based tools: SAPRead, SAPWrite, SAPSearch, SAPActivate, SAPNavigate, SAPQuery, SAPTransport, SAPGit, SAPContext, SAPLint, SAPDiagnose, SAPManage. 3,474 tests. npm package. Safe by default (read-only)."
+    },
+    "aibap": {
+      "type": "stdio",
+      "command": "aibap-mcp",
+      "args": [],
+      "env": {},
+      "description": "aibap.mcp Go binary — 69 ABAP development tools: source editing, code intelligence, objects/packages, version history, locking/activation, testing/ATC, messages, ST22 dumps, transport, BAdIs, DEBUGGING (10 tools), export, system management. Requires SAP NetWeaver 7.40+ with ADT active."
+    },
+    "mcp-abap-adt": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["dist/index.js"],
+      "env": {
+        "SAP_URL": "${SAP_URL}",
+        "SAP_USERNAME": "${SAP_USERNAME}",
+        "SAP_PASSWORD": "${SAP_PASSWORD}",
+        "SAP_CLIENT": "${SAP_CLIENT}"
+      },
+      "description": "TypeScript SAP ADT MCP — 13 tools: GetProgram, GetClass, GetFunctionGroup, GetFunction, GetStructure, GetTable, GetTableContents, GetPackage, GetTypeInfo, GetInclude, SearchObject, GetInterface, GetTransaction. MIT license."
+    },
+    "mcp-sap-notes": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["dist/index.js"],
+      "env": {
+        "SAP_USERNAME": "${SAP_USERNAME}",
+        "SAP_PASSWORD": "${SAP_PASSWORD}"
+      },
+      "description": "SAP Notes MCP — search and fetch SAP Notes from me.sap.com. Supports enriched metadata, correction details, ABAP object references. Archived repo — moved to marianfoo/sap-mcp-servers."
+    },
+    "btp-mcp": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["dist/index.js"],
+      "env": {},
+      "description": "SAP BTP MCP — 7 entity sets: GlobalAccount, Subaccounts, Directories, Assignments, AllowedDataCenters, EnvironmentInstances, AvailableEnvironments. OData-based via btp-admin-api-config.json. Built on odata-mcp-proxy."
+    },
+    "odata-mcp-proxy": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["dist/index.js"],
+      "env": {},
+      "description": "SAP Cloud Integration OData MCP — 32 entity sets: IntegrationPackages, IntegrationDesigntimeArtifacts, MessageProcessingLogs, DataStoreEntries, KeystoreEntries, UserCredentials, OAuth2ClientCredentials, Partners, etc. npm package. Config-driven OData→MCP bridge. MIT license."
+    },
+    "btp-sap-odata-to-mcp": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["dist/index.js"],
+      "env": {},
+      "description": "BTP OData MCP — 3 progressive-discovery tools (discover-sap-data, get-entity-metadata, execute-sap-operation) instead of 200+ entity tools. S/4HANA/ECC via BTP Destination + Principal Propagation. Token-optimized."
+    },
+    "sap-crew-local": {
+      "type": "stdio",
+      "command": "python",
+      "args": [
+        "C:\\Users\\William Correa\\Documents\\GitHub\\sap-crew-agent\\sap-crew-agent\\sap_crew_mcp_bridge.py"
+      ],
+      "env": {},
+      "description": "Local SAP CrewAI — 7 agents (ABAP, HANA, CPI, CAP, UI5, Security, Architect), 13 tools, 4-phase pipeline (Analysis → Design → Code → Review). Runs entirely on local machine via CrewAI. Use for deep ABAP analysis, code debugging, security audits, and improvement suggestions."
+    },
+    "plugin:azure:azure": {
+      "type": "plugin",
+      "description": "Full Azure service suite — compute, storage, AKS, SQL, Cosmos, networking, monitor, deploy, IaC (Bicep/Terraform)"
+    },
+    "plugin:desktop-commander:desktop-commander": {
+      "type": "plugin",
+      "description": "Persistent shells, REPLs, long-running processes, filesystem access, structured files (.xlsx/.docx/.pdf), ripgrep search"
+    },
+    "plugin:ui5:ui5-mcp-server": {
+      "type": "plugin",
+      "description": "UI5/SAPUI5/OpenUI5 app creation, API reference, linter, manifest validation, TypeScript conversion"
+    },
+    "plugin:sap-fiori-mcp-server:fiori-mcp": {
+      "type": "plugin",
+      "description": "SAP Fiori app generation (CAP/RAP), OData metadata download, app modification, documentation search"
+    },
+    "plugin:mdk-mcp:mdk-mcp": {
+      "type": "plugin",
+      "description": "SAP MDK (Mobile Development Kit) project creation, page/action/i18n generation, build/deploy"
+    },
+    "plugin:cds-mcp:cds-mcp": {
+      "type": "plugin",
+      "description": "SAP CAP CDS model search, documentation, code snippets"
+    },
+    "mobile-webapp-crew": {
+      "type": "stdio",
+      "command": "mobile-webapp-crew-mcp-server",
+      "args": [],
+      "env": {},
+      "description": "Flutter/Android/web multi-agent crew — adb, gradle, npm, Dart CLI, Flutter CLI, project read/write"
+    }
+  },
+  "notes": {
+    "arc-1_npm": "npm i -g arc-1",
+    "arc-1_mcpb": "Download .mcpb from GitHub releases for Claude Desktop one-click install",
+    "aibap_install": "go install github.com/Hochfrequenz/aibap.mcp/cmd/aibap-mcp@latest",
+    "mcp_abap_adt_install": "git clone + npm install + npm run build + configure .env",
+    "all_servers_readonly": "All servers support read-only mode. Write/transport tools gated behind capability flags.",
+    "comparison_repos": "See COMPARISON.md for full 50+ repo analysis"
+  }
+}

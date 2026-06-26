@@ -1,0 +1,262 @@
+{
+  "name": "sap-router-orchestrator",
+  "version": "2.0.0",
+  "description": "SAP Router Orchestrator — ABAP dispatch framework with 53 skills, 16 MCPs, 5 CLIs, and abaplint peer review pipeline",
+  "private": true,
+  "scripts": {
+    "abap:lint": "abaplint templates/**/*.abap",
+    "abap:lint:fix": "abaplint --fix templates/**/*.abap",
+    "abap:lint:ci": "abaplint --format json templates/**/*.abap > abaplint-report.json",
+    "abap:lint:watch": "abaplint --watch templates/",
+    "abap:review": "npm run abap:lint && npm run abap:review:security && npm run abap:review:clean",
+    "abap:review:security": "abaplint --outformat json templates/**/*.abap | node scripts/abap-review-gate.js --mode security",
+    "abap:review:clean": "abaplint --outformat json templates/**/*.abap | node scripts/abap-review-gate.js --mode clean",
+    "abap:review:report": "abaplint --format html templates/**/*.abap > abap-review-report.html && echo 'Report: abap-review-report.html'",
+    "abap:review:ci": "npm run abap:lint:ci && npm run abap:review:report",
+    "driver": "python .claude/skills/run-sap-router-orchestrator/driver.py",
+    "router": "python scripts/sap_router.py route --action",
+    "template": "python scripts/xls_to_bapi.py template",
+    "convert": "python scripts/xls_to_bapi.py convert",
+    "seed": "python scripts/template_repo.py seed",
+    "serialize": "python scripts/abap_serializer.py"
+  },
+  "devDependencies": {
+    "@abaplint/cli": "^2.7.0",
+    "@abaplint/rules": "^2.7.0",
+    "@abaplint/database-sqlite": "^2.7.0"
+  },
+  "abaplint": {
+    "global": {
+      "files": "templates/**/*.abap",
+      "skipGenerated": true,
+      "skipGeneratedPersistent": true,
+      "skipGeneratedGateway": true,
+      "skipGeneratedProxy": false,
+      "skipGeneratedFunctionModule": false
+    },
+    "dependencies": [],
+    "syntax": {
+      "version": "v757",
+      "errorNamespace": "^(Z|Y|/.*/)"
+    },
+    "rules": {
+      "7bit_ascii": {
+        "enabled": true,
+        "exclude": []
+      },
+      "check_abstract": {
+        "enabled": true
+      },
+      "check_comments": {
+        "enabled": true
+      },
+      "check_ddic": {
+        "enabled": true
+      },
+      "check_obsolete": {
+        "enabled": true
+      },
+      "check_syntax": {
+        "enabled": true
+      },
+      "class_visibility": {
+        "enabled": true
+      },
+      "clean_code": {
+        "enabled": true,
+        "maxLineLength": 200,
+        "maxLines": 2000
+      },
+      "colon_missing_space": {
+        "enabled": true
+      },
+      "contains_tab": {
+        "enabled": true
+      },
+      "cyclomatic_complexity": {
+        "enabled": true,
+        "max": 20
+      },
+      "db_operation_in_loop": {
+        "enabled": true
+      },
+      "empty_line_in_statement": {
+        "enabled": true
+      },
+      "empty_statement": {
+        "enabled": true
+      },
+      "exporting": {
+        "enabled": true
+      },
+      "form_tables_obsolete": {
+        "enabled": true
+      },
+      "fully_type_itabs": {
+        "enabled": true
+      },
+      "function_pool": {
+        "enabled": true
+      },
+      "global_class_def": {
+        "enabled": true,
+        "exclude": []
+      },
+      "if_in_if": {
+        "enabled": true,
+        "maxDepth": 3
+      },
+      "implement_methods": {
+        "enabled": true
+      },
+      "indent": {
+        "enabled": true,
+        "ignoreExceptions": false,
+        "spaces": 2
+      },
+      "inline_data_old_versions": {
+        "enabled": true
+      },
+      "in_statement_indentation": {
+        "enabled": true,
+        "spaces": 2
+      },
+      "keep_single_comment_on_one_line": {
+        "enabled": true
+      },
+      "keyword_case": {
+        "enabled": true,
+        "style": "upper"
+      },
+      "line_break_multiple_parameters": {
+        "enabled": true
+      },
+      "line_only_punc": {
+        "enabled": true
+      },
+      "local_testclass_location": {
+        "enabled": true
+      },
+      "main_file_contents": {
+        "enabled": true
+      },
+      "max_job_submit_lines": {
+        "enabled": true
+      },
+      "message_coding_standards": {
+        "enabled": true
+      },
+      "method_length": {
+        "enabled": true,
+        "maxLines": 100,
+        "maxStatements": 50
+      },
+      "method_visibility": {
+        "enabled": true
+      },
+      "mix_returning": {
+        "enabled": true
+      },
+      "msag_required": {
+        "enabled": true
+      },
+      "nesting": {
+        "enabled": true,
+        "maxDepth": 5
+      },
+      "no_public_attributes": {
+        "enabled": true
+      },
+      "obsolete_statement": {
+        "enabled": true
+      },
+      "omit_receiving": {
+        "enabled": true,
+        "exceptMethods": []
+      },
+      "parser_missing_space": {
+        "enabled": true
+      },
+      "parser_too_many_spaces": {
+        "enabled": true
+      },
+      "prefer_inline": {
+        "enabled": false
+      },
+      "release_idoc": {
+        "enabled": true
+      },
+      "remove_descriptions": {
+        "enabled": true
+      },
+      "rfc_error_handling": {
+        "enabled": true
+      },
+      "select_add_order_by": {
+        "enabled": true
+      },
+      "select_performance": {
+        "enabled": true
+      },
+      "sequential_blank": {
+        "enabled": true,
+        "lines": 4
+      },
+      "short_case": {
+        "enabled": false
+      },
+      "space_before_colon": {
+        "enabled": true
+      },
+      "space_before_dot": {
+        "enabled": true
+      },
+      "sql_escape_host_variables": {
+        "enabled": true
+      },
+      "sql_parameter_name": {
+        "enabled": true
+      },
+      "start_at_tab": {
+        "enabled": true
+      },
+      "superclass_final": {
+        "enabled": true
+      },
+      "tabl_enhancement_category": {
+        "enabled": true
+      },
+      "try_without_catch": {
+        "enabled": true
+      },
+      "type_form_parameters": {
+        "enabled": true
+      },
+      "unreachable_code": {
+        "enabled": true
+      },
+      "unused_methods": {
+        "enabled": true
+      },
+      "unused_types": {
+        "enabled": true
+      },
+      "unused_variables": {
+        "enabled": true,
+        "skipNames": ["lv_result", "lv_dummy"]
+      },
+      "use_bom": {
+        "enabled": true
+      },
+      "use_new": {
+        "enabled": true
+      },
+      "when_others_last": {
+        "enabled": true
+      },
+      "whitespace_end": {
+        "enabled": true
+      }
+    }
+  }
+}
