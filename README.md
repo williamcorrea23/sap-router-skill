@@ -30,11 +30,6 @@ You type **"create material FERT with these fields"** in VS Code chat. The route
 `#ai-agent` `#low-code` `#self-learning` `#sap-integration` `#abaplint`
 `#orchestrator` `#routing` `#code-review` `#sap-transport` `#sap-s4hana`
 
-<style>
-  display: none;
-  sap development | abap ide | sap vscode extension | sap automation tool | sap bapi framework | sap code generator | sap claude ai agent | abap code review | sap transport management | sap btp deployment | sap gui scripting | sap cloud integration | sap fiori generator | sap hana tools | sap api management | sap testing framework | sap security audit | clean abap | sap devops pipeline | sap spec to code | sap csv to bapi | abap serializer | sap self-learning agent | sap mcp server | sap model context protocol | sap routing engine | sap rfc wrapper | sap skills
-</style>
-
 ---
 
 ## Quick Overview
@@ -160,7 +155,7 @@ flowchart LR
         HC["npm run hc<br/>probes 19 MCPs + .env"]
         HCP["npm run hc:prompt<br/>interactive setup"]
     end
-    subgraph Route["Routing"]
+    subgraph Routes["Routing"]
         RT["npm run router<br/>route any action"]
         RG["npm run router:gui<br/>force GUI fallback"]
         RC["npm run router:caveman<br/>check delegation"]
@@ -169,7 +164,7 @@ flowchart LR
         PL["npm run pipeline<br/>8-stage spec→transport"]
         PF["npm run pipeline:fast<br/>skip deep analysis"]
     end
-    subgraph Learn["Self-Learn"]
+    subgraph SelfLearn["Self-Learn"]
         LM["npm run learn:mcp<br/>record MCP outcome"]
         LR["npm run learn:route<br/>track routing success"]
         LC["npm run learn:ctx<br/>inject context"]
@@ -280,7 +275,7 @@ flowchart TB
         H10["sap-sac-custom-widget — custom widgets"]
     end
 
-    subgraph V4["v4.0 NEW — 5 skills"]
+    subgraph VNEW["v4.0 NEW — 5 skills"]
         V1["karpathy-guidelines — Think→Simplify→Surgical→Verify"]
         V2["sap-gui-scripting — SAP GUI automation, BDC, ALV"]
         V3["sap-gui-web-enrich — web-search for missing nav data"]
@@ -330,7 +325,7 @@ flowchart TB
         SF["sf-mcp<br/>SuccessFactors OData<br/>Employee data, org structure"]
     end
 
-    subgraph BTP["BTP / OData"]
+    subgraph BTP2["BTP / OData"]
         BT["btp-mcp<br/>7 entity sets<br/>OData-based"]
         OD1["odata-mcp-proxy<br/>32 entities<br/>config-driven"]
         OD2["btp-sap-odata-to-mcp<br/>3 progressive tools<br/>token-optimized"]
@@ -637,8 +632,20 @@ Key integrations:
 ## Contributing
 
 PRs and issues welcome. See [SKILL.md](SKILL.md) for the full dispatch table and
-75-skill reference. MIT licensed — use freely.
+78-skill reference. MIT licensed — use freely.
 
 ---
+
+<sub>
+**Also known as:** sap development environment, abap ide for vscode, sap vscode extension,
+sap automation tool, sap bapi framework, sap code generator, sap claude ai agent,
+abap code review tool, sap transport management, sap btp deployment, sap gui scripting,
+sap cloud integration, sap fiori generator, sap hana tools, sap api management,
+sap testing framework, sap security audit, clean abap, sap devops pipeline,
+sap spec to code, sap csv to bapi, abap serializer, sap self-learning agent,
+sap mcp server, sap model context protocol, sap routing engine, sap rfc wrapper,
+sap skills collection, sap development platform, sap low code platform,
+sap ai development tool, sap orchestration framework
+</sub>
 
 *Not affiliated with or endorsed by SAP SE. MIT licensed.*
