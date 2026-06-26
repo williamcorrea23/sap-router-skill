@@ -3,7 +3,7 @@ name: sap-router-skill
 description: >-
   SAP development orchestrator v4.0 — Karpathy command format (Think→Simplify→
   Surgical→Verify), healthcheck guardian, self-learning router, caveman-compressed
-  output default. 78 skills, 22 MCPs (3 GUI + 3 RAG + CPI + CF + APIM + sf-mcp + sap-rfc + 4 plugins), 10 CLIs. Routes: ADT →
+  output default. 78 skills, 30 MCPs (all SAP domains covered), 10 CLIs. Routes: ADT →
   GUI (immediate) → RFC → Pipeline. RAG-ready: Pinecone, Supabase, Azure.
   Use for any SAP task.
 ---
@@ -29,7 +29,7 @@ Before ANY operation, verify:
    → If missing: prompt user for ARC_SAP_URL, ARC_SAP_USER, ARC_SAP_PASSWORD, ARC_SAP_CLIENT
    → Show: `cp .env.template .env` + edit instructions
 
-2. **MCPs connected**: probes all 22 MCPs
+2. **MCPs connected**: probes all 30 MCPs
    → HIGH criticality: arc-1, aibap (block on failure)
    → MEDIUM: mcp-abap-adt, mcp-sap-gui, btp-sap-odata-to-mcp (warn)
    → OPTIONAL: RAG connectors (Pinecone, Supabase, Azure) — pre-ready, activate later
@@ -236,7 +236,7 @@ npm run learn:ctx
 
 **Bold** = NEW v4.0 (6 added: abap-code-review, btp-cloud-foundry, karpathy-guidelines, sap-gui-web-enrich, sap-self-learn, sap-transport-gate)
 
-### MCPs (22 — v4.0)
+### MCPs (30 — v4.0)
 
 **Core (HIGH):** `arc-1` `aibap`
 **ADT (MEDIUM):** `mcp-abap-adt`
@@ -248,8 +248,15 @@ npm run learn:ctx
 **HCM:** `sf-mcp` (SuccessFactors OData)
 **BTP/OData:** `btp-mcp` `odata-mcp-proxy` `btp-sap-odata-to-mcp`
 **Docs:** `mcp-sap-notes`
-**Plugins:** `ui5` `fiori-mcp` `mdk-mcp` `cds-mcp`
-**RAG (v4.0, pre-ready):** `pinecone-rag` `supabase-rag` `azure-ai-search`
+**PI/PO:** `sap-pi-mcp` (legacy PI/PO integration)
+**BW:** `bw-modeling-mcp` (BW/4HANA modeling)
+**ERPL:** `erpl-adt` (ERPL ADT bridge)
+**Datasphere:** `datasphere-mcp` (spaces, views, federation)
+**Steampunk:** `steampunk-mcp` (ABAP Cloud released APIs)
+**ALM:** `cloud-alm-itsm` (Cloud ALM ITSM)
+**Sapient:** `sapient-mcp` (faster alternative AI orchestrator)
+**Plugins:** `ui5` `fiori-mcp` `mdk-mcp` `cds-mcp` `odata-mcp-go`
+**RAG (pre-ready):** `pinecone-rag` `supabase-rag` `azure-ai-search`
 
 ### CLIs (10 — v4.0)
 

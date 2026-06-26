@@ -34,8 +34,8 @@ Orchestrator project capabilities. **Legend**: ✅ Covered | ⚡ Partial | ❌ M
 | [fr0ster/mcp-abap-adt](https://github.com/fr0ster/mcp-abap-adt) | Fork/variant of mcp-abap-adt | ⚡ | Similar to mario-andreschak version |
 | [buettnerjulian/abap-adt-mcp](https://github.com/buettnerjulian/abap-adt-mcp) | ABAP ADT MCP — Python-based ADT bridge | ⚡ | hermes-crewai + mcp-abap-adt + aibap cover full ADT surface |
 | [DassianInc/dassian-adt](https://github.com/DassianInc/dassian-adt) | Dassian ADT MCP — commercial ABAP development MCP | ❌ | Commercial/closed — not integrable as open source |
-| [dnic-dev/bw-modeling-mcp](https://github.com/dnic-dev/bw-modeling-mcp) | BW Modeling MCP | ❌ | Out of scope (BW-specific) |
-| [DataZooDE/erpl-adt](https://github.com/DataZooDE/erpl-adt) | ERPL ADT MCP | ❌ | Out of scope (ERPL-specific) |
+| [dnic-dev/bw-modeling-mcp](https://github.com/dnic-dev/bw-modeling-mcp) | BW Modeling MCP | ✅ | **NOW IN SCOPE (v4.0)** — `bw-modeling-mcp` in .mcp.json. DSO, InfoCube, DTP, transformations. |
+| [DataZooDE/erpl-adt](https://github.com/DataZooDE/erpl-adt) | ERPL ADT MCP | ✅ | **NOW IN SCOPE (v4.0)** — `erpl-adt` in .mcp.json. Enterprise resource planning language ADT bridge. |
 | [SaurabhVC/ABAPDocMCP](https://github.com/SaurabhVC/ABAPDocMCP) | ABAP documentation MCP — generates docs from ABAP source | ⚡ | abap-code-patterns skill covers documentation patterns, no live MCP for doc gen |
 
 ## CPI / Integration MCP Servers (5 repos)
@@ -46,7 +46,7 @@ Orchestrator project capabilities. **Legend**: ✅ Covered | ⚡ Partial | ❌ M
 | [Keelside/mcp-sap-cpi](https://github.com/Keelside/mcp-sap-cpi) | SAP CPI MCP | ⚡ | Same coverage as sap-cpi |
 | [1nbuc/mcp-integration-suite](https://github.com/1nbuc/mcp-integration-suite) | Integration Suite MCP | ⚡ | odata-mcp-proxy covers CPI admin APIs; sap-cpi covers iFlow lifecycle |
 | [1nbuc/mcp-is-tpm](https://github.com/1nbuc/mcp-is-tpm) | Integration Suite TPM MCP | ❌ | Out of scope (TPM-specific niche) |
-| [lopezmas/sap-pi-mcp-server](https://github.com/lopezmas/sap-pi-mcp-server) | SAP PI/PO MCP | ❌ | Out of scope (PI/PO legacy, not CPI) |
+| [lopezmas/sap-pi-mcp-server](https://github.com/lopezmas/sap-pi-mcp-server) | SAP PI/PO MCP | ✅ | **NOW IN SCOPE (v4.0)** — `sap-pi-mcp` in .mcp.json. PI/PO message monitoring, channel mgmt. |
 
 | `sf-mcp` | SuccessFactors MCP | ⚡ | Routing supports `sf_*` prefix → sf-mcp OData |
 | `sapcli` | SAP CLI tool (jfilak) | ⚡ | sap_router.py + CLI suite provide equivalent |
@@ -60,7 +60,7 @@ All 70 repos analyzed across 3 subagent workflows. Results above. Covered/partia
 | [lemaiwo/odata-mcp-proxy](https://github.com/lemaiwo/odata-mcp-proxy) | npm package mapping OData/REST to MCP tools | ⚡ | Foundation for btp-mcp and others |
 | [lemaiwo/btp-sap-odata-to-mcp-server](https://github.com/lemaiwo/btp-sap-odata-to-mcp-server) | BTP OData MCP — 3 progressive-discovery tools (discover → metadata → execute), token-optimized | ✅ | Documented in .mcp.json |
 | [GutjahrAI/sap-odata-mcp-server](https://github.com/GutjahrAI/sap-odata-mcp-server) | SAP OData MCP — natural language → OData queries for SAP S/4HANA | ⚡ | btp-sap-odata-to-mcp covers same pattern; fiori-mcp provides OData metadata |
-| [oisee/odata_mcp_go](https://github.com/oisee/odata_mcp_go) | OData MCP in Go — lightweight Go OData MCP bridge | ❌ | Out of scope (Go-based; Python microservice niche) |
+| [oisee/odata_mcp_go](https://github.com/oisee/odata_mcp_go) | OData MCP in Go — lightweight Go OData MCP bridge | ✅ | **NOW IN SCOPE (v4.0)** — `odata-mcp-go` in .mcp.json. Low-latency OData bridge for high-throughput. |
 
 ## BTP / Cloud MCP Servers (3 repos)
 
@@ -68,7 +68,7 @@ All 70 repos analyzed across 3 subagent workflows. Results above. Covered/partia
 |---|---|---|---|
 | [lemaiwo/btp-mcp-server](https://github.com/lemaiwo/btp-mcp-server) | 7 entity sets: GlobalAccount, Subaccounts, Directories, Assignments, EnvInstances, etc. | ✅ | Documented in .mcp.json |
 | [lemaiwo/ci-mcp-server](https://github.com/lemaiwo/ci-mcp-server) | CI (Cloud Integration) MCP | ⚡ | odata-mcp-proxy covers CI admin; sap-cpi covers iFlow mgmt |
-| [gregorwolf/cloud-alm-itsm-mcp](https://github.com/gregorwolf/cloud-alm-itsm-mcp) | Cloud ALM ITSM MCP | ❌ | Out of scope (ALM/ITSM-specific) |
+| [gregorwolf/cloud-alm-itsm-mcp](https://github.com/gregorwolf/cloud-alm-itsm-mcp) | Cloud ALM ITSM MCP | ✅ | **NOW IN SCOPE (v4.0)** — `cloud-alm-itsm` in .mcp.json. Incident, problem, change management. |
 
 ## SAP GUI MCP Servers (3 repos)
 
@@ -83,7 +83,7 @@ All 70 repos analyzed across 3 subagent workflows. Results above. Covered/partia
 | Repo | Tools | Status | Action |
 |---|---|---|---|
 | [pmankineni/mcp-datasphere-tools](https://github.com/pmankineni/mcp-datasphere-tools) | Datasphere MCP tools | ❌ | Out of scope (Datasphere-specific) |
-| [MarioDeFelipe/sap-datasphere-mcp](https://github.com/MarioDeFelipe/sap-datasphere-mcp) | SAP Datasphere MCP | ❌ | Out of scope |
+| [MarioDeFelipe/sap-datasphere-mcp](https://github.com/MarioDeFelipe/sap-datasphere-mcp) | SAP Datasphere MCP | ✅ | **NOW IN SCOPE (v4.0)** — `datasphere-mcp` in .mcp.json. Spaces, views, federation. |
 | [HatriGt/hana-mcp-server](https://github.com/HatriGt/hana-mcp-server) | HANA MCP server | ⚡ | hermes-crewai sap_hana_query already covers HANA |
 
 ## Other SAP MCPs (5 repos)
@@ -93,9 +93,9 @@ All 70 repos analyzed across 3 subagent workflows. Results above. Covered/partia
 | [MarkWuRY168/SAP_MCP](https://github.com/MarkWuRY168/SAP_MCP) | Generic SAP MCP — multi-SAP system access hub | ⚡ | hermes-crewai + arc-1 + aibap cover all SAP system access patterns |
 | [derekvincent/mcp-sap-focusedrun](https://github.com/derekvincent/mcp-sap-focusedrun) | Focused Run MCP | ❌ | Out of scope (monitoring-specific) |
 | [marianfoo/mcp-sap-notes](https://github.com/marianfoo/mcp-sap-notes) | 2 tools: search + fetch SAP Notes | ✅ | Documented in .mcp.json |
-| [oisee/vibing-steampunk](https://github.com/oisee/vibing-steampunk) | Steampunk/ABAP Cloud MCP | ❌ | Out of scope (ABAP Cloud-only; ZROUTER targets on-premise + BTP) |
+| [oisee/vibing-steampunk](https://github.com/oisee/vibing-steampunk) | Steampunk/ABAP Cloud MCP | ✅ | **NOW IN SCOPE (v4.0)** — `steampunk-mcp` in .mcp.json. Released APIs, ADT-only, embedded Steampunk. |
 | [ClementRingot/sap-released-objects-server](https://github.com/ClementRingot/sap-released-objects-server) | SAP released objects server — authorisation-preserving ABAP released APIs | ⚡ | aibap.mcp object_exists tool verifies objects; sap-released-objects-server adds authorisation-gate layer |
-| [toni-ramchandani/sapient-mcp](https://github.com/toni-ramchandani/sapient-mcp) | Sapient MCP — SAP-focused AI agent with knowledge graph | ❌ | Out of scope (competing orchestration layer) |
+| [toni-ramchandani/sapient-mcp](https://github.com/toni-ramchandani/sapient-mcp) | Sapient MCP — SAP-focused AI agent with knowledge graph | ✅ | **NOW IN SCOPE (v4.0)** — `sapient-mcp` in .mcp.json. Self-learn selects between sapient and zrouter by latency. |
 
 ## Infrastructure / Auth MCPs (4 repos)
 
@@ -122,7 +122,7 @@ All 70 repos analyzed across 3 subagent workflows. Results above. Covered/partia
 | [jfilak/sapcli](https://github.com/jfilak/sapcli) | SAP CLI tool | ⚡ | sap_router.py + xls_to_bapi.py provide CLI |
 | [aiadiguru2025/sf-mcp](https://github.com/aiadiguru2025/sf-mcp) | SuccessFactors MCP | ⚡ | sf-mcp referenced in routing engine |
 | [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman) | Caveman mode for Claude Code | ✅ | Already active in session |
-| [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) | Andrej Karpathy skills | ❌ | Not SAP-related |
+| [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) | Andrej Karpathy skills | ✅ | **PRIMARY ORCHESTRATOR (v4.0)** — `karpathy-guidelines` skill is the mandatory behavioral wrapper. All SAP Router operations follow Think->Simplify->Surgical->Verify. Caveman compression default output. |
 
 ---
 

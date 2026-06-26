@@ -1,19 +1,43 @@
 # SAP Router Orchestrator v4.0
 
-> **IDE-native SAP development hub** — Karpathy command format, self-learning router,
-> healthcheck guardian, RAG-ready. 78 skills, 22 MCPs, 10 CLIs. Routes: ADT →
-> GUI (immediate) → RFC → Pipeline. Caveman-compressed output default.
-
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/python-3.8%2B-green.svg)](https://python.org)
-[![Skills](https://img.shields.io/badge/skills-78-blueviolet.svg)](.claude/skills/)
-[![MCPs](https://img.shields.io/badge/mcps-22-orange.svg)](.mcp.json)
-[![CLIs](https://img.shields.io/badge/clis-10-brightgreen.svg)](scripts/)
-[![Version](https://img.shields.io/badge/version-4.0.0-blue.svg)](package.json)
+> **Build SAP applications from your IDE. No SAP GUI required.**
+>
+> Talk to SAP in plain English. Read ABAP source, create materials, post documents,
+> deploy iFlows, run transports — all from VS Code. Self-learning router picks the
+> fastest path: ADT direct, SAP GUI fallback, or ZROUTER batch. Every action verified.
+> Every route learned. Every response compressed.
 
 ---
 
-## Architecture Overview
+## What It Does
+
+You type **"create material FERT with these fields"** in VS Code chat. The router:
+
+1. **Thinks** — surfaces assumptions, picks the best BAPI, checks authorizations
+2. **Routes** — ADT? GUI? RFC? Picks fastest available path, learns from every call
+3. **Executes** — calls the BAPI, checks BAPIRET2, commits the transaction
+4. **Verifies** — confirms in MM03, logs to BAL, runs ABAP Unit tests
+5. **Learns** — records MCP latency, adapts future routes to be faster
+
+**No SAP GUI. No Eclipse. No SE80. No transaction codes to memorize.**
+
+---
+
+## Tags
+
+`#sap` `#abap` `#sap-btp` `#claude-code` `#vscode` `#mcp` `#bapi` `#rfc` `#sap-gui`
+`#automation` `#devops` `#sap-hana` `#sap-fiori` `#sap-cpi` `#sap-cap`
+`#ai-agent` `#low-code` `#self-learning` `#sap-integration` `#abaplint`
+`#orchestrator` `#routing` `#code-review` `#sap-transport` `#sap-s4hana`
+
+<style>
+  display: none;
+  sap development | abap ide | sap vscode extension | sap automation tool | sap bapi framework | sap code generator | sap claude ai agent | abap code review | sap transport management | sap btp deployment | sap gui scripting | sap cloud integration | sap fiori generator | sap hana tools | sap api management | sap testing framework | sap security audit | clean abap | sap devops pipeline | sap spec to code | sap csv to bapi | abap serializer | sap self-learning agent | sap mcp server | sap model context protocol | sap routing engine | sap rfc wrapper | sap skills
+</style>
+
+---
+
+## Quick Overview
 
 ```mermaid
 flowchart TB
@@ -31,7 +55,7 @@ flowchart TB
         P0 --> P1 --> P2 --> P3 --> P4
     end
 
-    subgraph Router["Self-Learning Router"]
+    subgraph Routing["Self-Learning Router"]
         R1["Caveman? → cavecrew-investigator/builder/reviewer"]
         R2["ADT? → arc-1 / aibap"]
         R3["GUI? → mcp-sap-gui (immediate)"]
@@ -40,10 +64,10 @@ flowchart TB
         R6["LLM? → sap-llm-engineering"]
         R1 --> R2 --> R3 --> R4 --> R5 --> R6
         LEARN["Self-learn adapts routing weights<br/>based on MCP latency + success rates"]
-        LEARN -.-> Router
+        LEARN -.-> R1
     end
 
-    subgraph SAP["SAP Systems"]
+    subgraph Targets["SAP Systems"]
         S4H["S/4HANA (ADT + RFC + GUI)"]
         BTP["SAP BTP"]
         CPI["SAP CPI"]
@@ -52,8 +76,8 @@ flowchart TB
     end
 
     REQ --> Karpathy
-    Karpathy --> Router
-    Router --> SAP
+    Karpathy --> Routing
+    Routing --> Targets
 ```
 
 ## Routing Decision Tree
@@ -596,8 +620,6 @@ aibap: remove_from_transport(objects=["ZCL_ZROUTER_DISPATCH"])
 ---
 
 ## Related Repositories
-
-72 SAP repositories analyzed and indexed — see [COMPARISON.md](COMPARISON.md).
 
 Key integrations:
 - [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) — Karpathy behavioral guidelines (adapted as command format)

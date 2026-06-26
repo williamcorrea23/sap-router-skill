@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 SAP Router Healthcheck — MCP connectivity probe, .env guardian, credential validator.
-v4.0: Probes all 22 MCPs + ZROUTER, verifies .env completeness, prompts user for missing data.
+v4.0: Probes all 30 MCPs + ZROUTER, verifies .env completeness, prompts user for missing data.
 Andrej-style: "eval first, then act" — diagnose before routing.
 """
 import os
@@ -159,6 +159,54 @@ MCP_HEALTHCHECK_SPEC = {
         "criticality": "LOW",
         "description": "CAP CDS model search, code snippets (plugin)",
     },
+    "sap-pi-mcp": {
+        "env_vars": ["PI_HOST", "PI_USER", "PI_PASSWORD"],
+        "probe_command": None,
+        "criticality": "LOW",
+        "description": "SAP PI/PO - legacy integration, channel mgmt",
+    },
+    "bw-modeling-mcp": {
+        "env_vars": ["BW_HOST", "BW_USER", "BW_PASSWORD"],
+        "probe_command": None,
+        "criticality": "LOW",
+        "description": "BW Modeling - DSO, InfoCube, DTP, transformations",
+    },
+    "erpl-adt": {
+        "env_vars": ["ERPL_URL", "ERPL_USER", "ERPL_PASSWORD"],
+        "probe_command": None,
+        "criticality": "LOW",
+        "description": "ERPL ADT bridge - enterprise resource planning",
+    },
+    "odata-mcp-go": {
+        "env_vars": [],
+        "probe_command": "odata-mcp-go --help",
+        "criticality": "LOW",
+        "description": "OData MCP in Go - lightweight low-latency bridge",
+    },
+    "cloud-alm-itsm": {
+        "env_vars": ["ALM_HOST", "ALM_USER", "ALM_PASSWORD"],
+        "probe_command": None,
+        "criticality": "LOW",
+        "description": "Cloud ALM ITSM - incident, problem, change mgmt",
+    },
+    "datasphere-mcp": {
+        "env_vars": ["DSPHERE_HOST", "DSPHERE_USER", "DSPHERE_PASSWORD"],
+        "probe_command": None,
+        "criticality": "LOW",
+        "description": "SAP Datasphere - spaces, views, remote tables",
+    },
+    "steampunk-mcp": {
+        "env_vars": ["STMPNK_HOST", "STMPNK_USER", "STMPNK_PASSWORD"],
+        "probe_command": None,
+        "criticality": "LOW",
+        "description": "Steampunk/ABAP Cloud - released APIs, ADT-only",
+    },
+    "sapient-mcp": {
+        "env_vars": ["SAPIENT_HOST", "SAPIENT_KEY"],
+        "probe_command": None,
+        "criticality": "LOW",
+        "description": "Sapient AI agent - faster alternative orchestrator",
+    },
 }
 
 REQUIRED_ENV_FILE_VARS = [
@@ -172,6 +220,13 @@ OPTIONAL_ENV_FILE_VARS = [
     "CF_API", "CF_USER", "CF_PASSWORD",
     "CPI_HOST", "CPI_USER", "CPI_PASSWORD",
     "APIM_HOST", "APIM_USER", "APIM_PASSWORD",
+    "PI_HOST", "PI_USER", "PI_PASSWORD",
+    "BW_HOST", "BW_USER", "BW_PASSWORD",
+    "ERPL_URL", "ERPL_USER", "ERPL_PASSWORD",
+    "ALM_HOST", "ALM_USER", "ALM_PASSWORD",
+    "DSPHERE_HOST", "DSPHERE_USER", "DSPHERE_PASSWORD",
+    "STMPNK_HOST", "STMPNK_USER", "STMPNK_PASSWORD",
+    "SAPIENT_HOST", "SAPIENT_KEY",
     "PINECONE_API_KEY", "PINECONE_INDEX", "PINECONE_ENVIRONMENT",
     "SUPABASE_URL", "SUPABASE_SERVICE_KEY",
     "AZURE_SEARCH_ENDPOINT", "AZURE_SEARCH_KEY", "AZURE_SEARCH_INDEX",

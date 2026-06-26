@@ -161,6 +161,89 @@
       },
       "description": "Azure AI Search RAG connector. Enterprise semantic search. Ready for production."
     },
+    "sap-pi-mcp": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["dist/index.js"],
+      "env": {
+        "PI_HOST": "${PI_HOST}",
+        "PI_USER": "${PI_USER}",
+        "PI_PASSWORD": "${PI_PASSWORD}"
+      },
+      "description": "SAP PI/PO MCP (lopezmas/sap-pi-mcp-server) - legacy PI/PO integration. Message monitoring, channel management, adapter engine. Use for PI/PO migrations to CPI or dual-stack landscapes."
+    },
+    "bw-modeling-mcp": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["dist/index.js"],
+      "env": {
+        "BW_HOST": "${BW_HOST}",
+        "BW_USER": "${BW_USER}",
+        "BW_PASSWORD": "${BW_PASSWORD}"
+      },
+      "description": "BW Modeling MCP (dnic-dev/bw-modeling-mcp) - BW/4HANA modeling. DSO, InfoCube, DTP, transformation management. Use for BW data modeling and ETL pipeline operations."
+    },
+    "erpl-adt": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["dist/index.js"],
+      "env": {
+        "ERPL_URL": "${ERPL_URL}",
+        "ERPL_USER": "${ERPL_USER}",
+        "ERPL_PASSWORD": "${ERPL_PASSWORD}"
+      },
+      "description": "ERPL ADT MCP (DataZooDE/erpl-adt) - enterprise resource planning language ADT bridge. Specialized ERPL development operations."
+    },
+    "odata-mcp-go": {
+      "type": "stdio",
+      "command": "odata-mcp-go",
+      "args": [],
+      "env": {},
+      "description": "OData MCP in Go (oisee/odata_mcp_go) - lightweight Go-based OData bridge. Low-latency alternative to Node.js OData MCPs. Use for high-throughput OData query scenarios."
+    },
+    "cloud-alm-itsm": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["dist/index.js"],
+      "env": {
+        "ALM_HOST": "${ALM_HOST}",
+        "ALM_USER": "${ALM_USER}",
+        "ALM_PASSWORD": "${ALM_PASSWORD}"
+      },
+      "description": "Cloud ALM ITSM MCP (gregorwolf/cloud-alm-itsm-mcp) - SAP Cloud ALM IT Service Management. Incident, problem, change management via ALM APIs. Use for ALM operations and ITSM workflows."
+    },
+    "datasphere-mcp": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["dist/index.js"],
+      "env": {
+        "DSPHERE_HOST": "${DSPHERE_HOST}",
+        "DSPHERE_USER": "${DSPHERE_USER}",
+        "DSPHERE_PASSWORD": "${DSPHERE_PASSWORD}"
+      },
+      "description": "SAP Datasphere MCP (MarioDeFelipe/sap-datasphere-mcp) - Datasphere data modeling, spaces, views, remote tables. Use for Datasphere analytics and data federation operations."
+    },
+    "steampunk-mcp": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["dist/index.js"],
+      "env": {
+        "STMPNK_HOST": "${STMPNK_HOST}",
+        "STMPNK_USER": "${STMPNK_USER}",
+        "STMPNK_PASSWORD": "${STMPNK_PASSWORD}"
+      },
+      "description": "Steampunk/ABAP Cloud MCP (oisee/vibing-steampunk) - ABAP Cloud development. Released APIs only, ADT-only, embedded Steampunk in S/4HANA. Use alongside abap-cloud skill for cloud-ready ABAP."
+    },
+    "sapient-mcp": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["dist/index.js"],
+      "env": {
+        "SAPIENT_HOST": "${SAPIENT_HOST}",
+        "SAPIENT_KEY": "${SAPIENT_KEY}"
+      },
+      "description": "Sapient MCP (toni-ramchandani/sapient-mcp) - SAP-focused AI agent with knowledge graph for faster lookups. Alternative orchestration path when speed priority over depth. Use when latency-critical: self-learn selects between sapient and zrouter paths based on MCP response times."
+    },
     "sap-cpi": {
       "type": "stdio",
       "command": "node",
@@ -226,7 +309,7 @@
     "gui_fallback_requires": "SAP GUI installed locally + RZ11 sapgui/user_scripting=TRUE + SAPLogon connection configured",
     "gui_web_enrich": "Auto-searches web for missing navigation data: field IDs, screen numbers, BDC sequences",
     "rag_connectors": "Pinecone, Supabase pgvector, Azure AI Search — pre-ready, activate via .env",
-    "healthcheck": "python scripts/healthcheck.py — verifies all 22 MCPs + .env completeness",
+    "healthcheck": "python scripts/healthcheck.py — verifies all 30 MCPs + .env completeness",
     "self_learn": "python scripts/self_learn.py — Hermes-style context adaptation, auto-optimizes routing",
     "karpathy_format": "All operations follow Think→Simplify→Surgical→Verify. Caveman compression default.",
     "comparison_repos": "See COMPARISON.md for full 70+ repo analysis"
