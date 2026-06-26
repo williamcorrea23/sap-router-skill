@@ -1,19 +1,5 @@
 {
   "mcpServers": {
-    "hermes-crewai": {
-      "type": "stdio",
-      "command": "hermes-mcp-server",
-      "args": [],
-      "env": {},
-      "description": "SAP ABAP/CPI/CrewAI multi-agent Hermes MCP — ABAP lint, ADT CLI, BAPI calls, HANA queries, CPI lint, transport gate, knowledge bases, skills search"
-    },
-    "sap-cpi": {
-      "type": "stdio",
-      "command": "sap-cpi-mcp-server",
-      "args": [],
-      "env": {},
-      "description": "SAP CPI tenant live connection — list/deploy/undeploy artifacts, failed messages, trace logs, keystore/credential management"
-    },
     "arc-1": {
       "type": "stdio",
       "command": "npx",
@@ -76,23 +62,6 @@
       "env": {},
       "description": "BTP OData MCP — 3 progressive-discovery tools (discover-sap-data, get-entity-metadata, execute-sap-operation) instead of 200+ entity tools. S/4HANA/ECC via BTP Destination + Principal Propagation. Token-optimized."
     },
-    "sap-crew-local": {
-      "type": "stdio",
-      "command": "python",
-      "args": [
-        "C:\\Users\\William Correa\\Documents\\GitHub\\sap-crew-agent\\sap-crew-agent\\sap_crew_mcp_bridge.py"
-      ],
-      "env": {},
-      "description": "Local SAP CrewAI — 7 agents (ABAP, HANA, CPI, CAP, UI5, Security, Architect), 13 tools, 4-phase pipeline (Analysis → Design → Code → Review). Runs entirely on local machine via CrewAI. Use for deep ABAP analysis, code debugging, security audits, and improvement suggestions."
-    },
-    "plugin:azure:azure": {
-      "type": "plugin",
-      "description": "Full Azure service suite — compute, storage, AKS, SQL, Cosmos, networking, monitor, deploy, IaC (Bicep/Terraform)"
-    },
-    "plugin:desktop-commander:desktop-commander": {
-      "type": "plugin",
-      "description": "Persistent shells, REPLs, long-running processes, filesystem access, structured files (.xlsx/.docx/.pdf), ripgrep search"
-    },
     "plugin:ui5:ui5-mcp-server": {
       "type": "plugin",
       "description": "UI5/SAPUI5/OpenUI5 app creation, API reference, linter, manifest validation, TypeScript conversion"
@@ -108,13 +77,6 @@
     "plugin:cds-mcp:cds-mcp": {
       "type": "plugin",
       "description": "SAP CAP CDS model search, documentation, code snippets"
-    },
-    "mobile-webapp-crew": {
-      "type": "stdio",
-      "command": "mobile-webapp-crew-mcp-server",
-      "args": [],
-      "env": {},
-      "description": "Flutter/Android/web multi-agent crew — adb, gradle, npm, Dart CLI, Flutter CLI, project read/write"
     }
   },
   "notes": {

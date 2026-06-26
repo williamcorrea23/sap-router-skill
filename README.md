@@ -7,10 +7,10 @@
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8%2B-green.svg)](https://python.org)
 [![Tests](https://img.shields.io/badge/tests-50%2F50-brightgreen.svg)](.claude/skills/run-sap-router-skill/driver.py)
-[![Skills](https://img.shields.io/badge/skills-54-blueviolet.svg)](.claude/skills/)
-[![MCPs](https://img.shields.io/badge/mcps-16-orange.svg)](.mcp.json)
+[![Skills](https://img.shields.io/badge/skills-68-blueviolet.svg)](.claude/skills/)
+[![MCPs](https://img.shields.io/badge/mcps-11-orange.svg)](.mcp.json)
 
-**54 skills · 6 CLIs · 16 MCPs · 4 ABAP templates** — ABAP, RAP, CDS, BTP,
+**68 skills · 6 CLIs · 11 public SAP MCPs · 4 ABAP templates** — ABAP, RAP, CDS, BTP,
 CPI, CAP, UI5, Fiori, HANA, Datasphere, SAC, AI Core.
 
 ---

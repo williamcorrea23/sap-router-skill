@@ -2,7 +2,7 @@
 name: sap-router-skill
 description: >-
   Master orchestrator for SAP ABAP/BTP development. Routes actions across
-  55 domain skills, 6 Python CLIs, 17 MCP servers, and 4 ABAP templates.
+  68 domain skills, 6 Python CLIs, 11 public SAP MCP servers, and 4 ABAP templates.
   Covers ABAP, RAP, CDS, BTP, CPI, CAP, UI5, Fiori, HANA, Datasphere,
   SAC, AI Core, and security. Use for any SAP development task — this
   skill dispatches to the correct sub-skill, MCP, or CLI automatically.
