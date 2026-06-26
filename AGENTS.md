@@ -1,19 +1,19 @@
 # SAP Router Skill — Multi-IDE Agent Instructions
 
-> **68 skills mirrored across 4 IDEs — same SKILL.md content in each.**
+> **78 skills mirrored across 4 IDEs — same SKILL.md content in each.**
 >
 > | IDE | Skill Directory | Entry Point |
 > |---|---|---|
-> | **Claude Code** | `.claude/skills/` (68 skills) | `.claude/skills/run-sap-router-skill/SKILL.md` |
-> | **Antigravity (Gemini)** | `.gemini/skills/` (68 skills) | `.gemini/skills/run-sap-router-skill/SKILL.md` |
-> | **Codex / OpenAI** | `.codex/skills/` (68 skills) | `.codex/AGENTS.md` |
-> | **Cursor** | `.cursor/skills/` (68 skills) | `.cursor/skills/run-sap-router-skill/SKILL.md` |
+> | **Claude Code** | `.claude/skills/` (78 skills) | `.claude/skills/run-sap-router-skill/SKILL.md` |
+> | **Antigravity (Gemini)** | `.gemini/skills/` (78 skills) | `.gemini/skills/run-sap-router-skill/SKILL.md` |
+> | **Codex / OpenAI** | `.codex/skills/` (78 skills) | `.codex/AGENTS.md` |
+> | **Cursor** | `.cursor/skills/` (78 skills) | `.cursor/skills/run-sap-router-skill/SKILL.md` |
 >
 > All skills auto-trigger by file context and keyword. See SKILL.md for master dispatch.
 
 ## What this project is
 
-Six standalone Python 3 CLIs — no live SAP system, no network, no
+Ten standalone Python 3 CLIs + one Node.js review gate — no live SAP system required
 credentials required. Everything runs offline:
 
 | Script | Purpose |
@@ -35,12 +35,24 @@ python .claude/skills/run-sap-router-skill/driver.py
 Requires Python 3.8+. No packages needed for CSV; `pip install openpyxl`
 for XLSX support only.
 
-## Routing rules
+## Routing rules (v3.0 — ADT-first, GUI-fallback, caveman-optimized)
+
+Decision tree:
+1. CAVEMAN DELEGATION? (fix/find/review, 1-2 files) → cavecrew-investigator/builder/reviewer
+2. ADT AVAILABLE? (read_source, search, activate...) → ARC-1 / aibap / mcp-abap-adt
+3. GUI FALLBACK? (SPRO, SM30, SU01, MM01, VA01...) → mcp-sap-gui (25 transactions)
+4. ZROUTER RFC? (BAPI batch) → ZROUTER_DISPATCH_FM
+5. SPEC→PIPELINE? → sap_router.py pipeline (8 stages)
 
 | Action contains | Destination |
 |---|---|
-| `code_search`, `read_source`, `search_object`, `syntax_check`, `where_used`, `get_deps` | ARC-1 ADT |
+| `fix`, `edit`, `rename`, `typo` | cavecrew-builder (1-2 files only) |
+| `find`, `search`, `locate`, `where is` | cavecrew-investigator (60% token savings) |
+| `review`, `audit`, `code review` | cavecrew-reviewer (severity-tagged) |
+| `code_search`, `read_source`, `syntax_check`, `where_used`, `get_deps` | ARC-1 ADT |
 | `sf_*` prefix | sf-mcp (OData) |
+| `SPRO`, `SM30`, `SU01`, `PFCG`, `MM01`, `VA01`, `FB01`, etc. | SAP GUI Scripting (mcp-sap-gui) |
+| `pipeline`, `spec`, `implement specification` | sap_router.py pipeline → 8 stages |
 | anything else | ZROUTER RFC (ZROUTER_DISPATCH_FM) |
 
 ## Memory session commands

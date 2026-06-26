@@ -17,12 +17,10 @@ Usage:
     python scripts/template_repo.py list     # List all templates
 """
 
-import os
-import re
 import json
+import re
 import sys
 import uuid
-import csv
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -536,8 +534,6 @@ def cmd_seed(args):
 
 
 def main():
-    import shlex
-
     if len(sys.argv) < 2:
         print(__doc__)
         return 1

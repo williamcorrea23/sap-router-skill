@@ -339,21 +339,91 @@ class XlsToBapi:
     def generate_excel_template(self, output_path):
         if not HAS_OPENPYXL:
             raise ImportError("openpyxl is not installed. Please use CSV template generator.")
-        
+
         wb = openpyxl.Workbook()
         ws = wb.active
         ws.title = f"Template_{self.action_name}"
-        
+
         for idx, field in enumerate(self.fields, start=1):
             cell_header = ws.cell(row=1, column=idx, value=field["name"])
             cell_header.font = openpyxl.styles.Font(bold=True)
             ws.cell(row=2, column=idx, value=field["description"])
-            
+
         wb.save(output_path)
+
+    def validate_csv_bapi_mapping(self, filepath):
+        """Validate CSV against BAPI field requirements.
+
+        Returns dict with:
+          - field_map: CSV column -> BAPI parameter mapping
+          - missing_required: BAPI fields not found in CSV
+          - extra_csv_cols: CSV columns with no BAPI mapping
+          - valid_rows: row count that passed validation
+          - generated_payload: JSON payload ready for BAPI call
+        """
+        import re as _re
+        results = {"field_map": {}, "missing_required": [],
+                   "extra_csv_cols": [], "valid_rows": 0,
+                   "errors": [], "generated_payload": [],
+                   "bapi_name": self.action_name,
+                   "module": self.module}
+
+        # Read CSV headers
+        with open(filepath, mode='r', encoding='utf-8-sig') as f:
+            reader = csv.DictReader(f)
+            csv_headers = [h.strip().lower() for h in (reader.fieldnames or [])]
+            reader.fieldnames = csv_headers
+
+        # Build field_map: csv_header -> BAPI field
+        bapi_fields_lower = {f["name"].lower(): f for f in self.fields}
+
+        for csv_h in csv_headers:
+            if csv_h in bapi_fields_lower:
+                results["field_map"][csv_h] = bapi_fields_lower[csv_h]["name"]
+            else:
+                # Fuzzy match: try substring
+                matched = False
+                for bapi_name, bapi_field in bapi_fields_lower.items():
+                    if csv_h in bapi_name or bapi_name in csv_h:
+                        results["field_map"][csv_h] = bapi_field["name"]
+                        matched = True
+                        break
+                if not matched:
+                    results["extra_csv_cols"].append(csv_h)
+
+        # Check missing required BAPI fields
+        mapped_bapi = set(results["field_map"].values())
+        for field in self.fields:
+            if field["required"] and field["name"] not in mapped_bapi:
+                results["missing_required"].append({
+                    "bapi_field": field["name"],
+                    "description": field["description"],
+                    "fix": f"Add column '{field['name']}' to CSV with values for: {field['description']}"
+                })
+
+        # Validate rows (skip header row, DictReader handles this)
+        with open(filepath, mode='r', encoding='utf-8-sig') as f:
+            reader = csv.DictReader(f)
+            reader.fieldnames = csv_headers
+            next(reader, None)  # Skip header row explicitly
+            for idx, row in enumerate(reader, start=2):
+                mapped_row = {}
+                for csv_h, bapi_name in results["field_map"].items():
+                    val = (row.get(csv_h, "") or "").strip()
+                    mapped_row[bapi_name] = val
+
+                row_errors = self.validate_row(mapped_row, idx)
+                if row_errors:
+                    results["errors"].extend(row_errors)
+                else:
+                    results["valid_rows"] += 1
+                    results["generated_payload"].append(mapped_row)
+
+        return results
 
 def main():
     parser = argparse.ArgumentParser(description="XLS/CSV Converter for BAPI Payloads")
-    parser.add_argument("command", choices=["convert", "template", "validate"])
+    parser.add_argument("command", choices=["convert", "template", "validate", "check-bapi-mapping"])
     parser.add_argument("--input", help="Path to input XLS/CSV file")
     parser.add_argument("--output", help="Path to output JSON/XLS/CSV file")
     parser.add_argument("--module", required=True, help="SAP Module (e.g. MM)")
@@ -428,6 +498,59 @@ def main():
                 with open(args.output, 'w', encoding='utf-8') as f:
                     json.dump(results, f, indent=2)
                 print(f"Converted payload saved to {args.output}")
+
+    elif args.command == "check-bapi-mapping":
+        if not args.input:
+            print("Error: --input is required for check-bapi-mapping", file=sys.stderr)
+            sys.exit(1)
+        result = converter.validate_csv_bapi_mapping(args.input)
+        print("=" * 60)
+        print("CSV -> BAPI FIELD MAPPING VALIDATION")
+        print("=" * 60)
+        print(f"Module: {args.module}")
+        print(f"Action: {args.action}")
+        print(f"BAPI: {args.module}_{args.action}")
+        print("")
+        print("FIELD MAP (CSV column -> BAPI field):")
+        if result["field_map"]:
+            for csv_h, bapi_name in sorted(result["field_map"].items()):
+                print(f"  {csv_h} -> {bapi_name}")
+        else:
+            print("  (no matches found)")
+        print("")
+        if result["missing_required"]:
+            print(f"MISSING REQUIRED FIELDS ({len(result['missing_required'])}):")
+            for m in result["missing_required"]:
+                print(f"  {m['bapi_field']}: {m['description']}")
+                print(f"    Fix: {m['fix']}")
+        else:
+            print("All required BAPI fields found in CSV.")
+        print("")
+        if result["extra_csv_cols"]:
+            print(f"UNMAPPED CSV COLUMNS ({len(result['extra_csv_cols'])}):")
+            for col in result["extra_csv_cols"]:
+                print(f"  {col} (no BAPI field match)")
+        print("")
+        print(f"Valid rows: {result['valid_rows']}")
+        print(f"Row errors: {len(result['errors'])}")
+        if result["errors"]:
+            for err in result["errors"][:10]:
+                print(f"  - {err}")
+            if len(result["errors"]) > 10:
+                print(f"  ... and {len(result['errors']) - 10} more")
+        print("")
+        if result["missing_required"] or result["errors"]:
+            print(f"RESULT: NEEDS FIX - {len(result['missing_required'])} missing fields, {len(result['errors'])} row errors")
+            sys.exit(1)
+        else:
+            print("RESULT: CSV READY for BAPI upload")
+            if args.output:
+                with open(args.output, 'w', encoding='utf-8') as f:
+                    json.dump(result["generated_payload"], f, indent=2)
+                print(f"Payload saved to: {args.output}")
+            else:
+                print(f"Payload ({len(result['generated_payload'])} rows):")
+                print(json.dumps(result["generated_payload"], indent=2))
 
 if __name__ == "__main__":
     main()

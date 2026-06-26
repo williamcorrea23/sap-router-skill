@@ -15,6 +15,19 @@ class MemoryManager:
         self.blocks = []
         self.pending = []
         self.archive = []
+        self.abaplint_results = {}  # v3.0: track lint results in memory
+
+    def set_abaplint_result(self, lint_data):
+        """Store abaplint results for MEMORY.md integration."""
+        self.abaplint_results = {
+            'timestamp': datetime.now().isoformat()[:19],
+            'total': lint_data.get('total', 0),
+            'critical': lint_data.get('critical', 0),
+            'high': lint_data.get('high', 0),
+            'medium': lint_data.get('medium', 0),
+            'low': lint_data.get('low', 0),
+            'pass': lint_data.get('pass', True),
+        }
 
     def parse(self):
         if not os.path.exists(self.filepath):
@@ -45,6 +58,23 @@ class MemoryManager:
                 if ':' in part:
                     k, v = part.split(':', 1)
                     self.active[k.strip()] = v.strip()
+
+        # Parse ABAPLINT section (v3.0)
+        lint_match = re.search(
+            r'## ABAPLINT\s*\n-\s*last_run:\s*(.*?)\s*\n-\s*findings:'
+            r'\s*T:(\d+)\s*C:(\d+)\s*H:(\d+)\s*M:(\d+)\s*L:(\d+)\s*\n'
+            r'-\s*gate:\s*(PASS|FAIL)', content
+        )
+        if lint_match:
+            self.abaplint_results = {
+                'timestamp': lint_match.group(1),
+                'total': int(lint_match.group(2)),
+                'critical': int(lint_match.group(3)),
+                'high': int(lint_match.group(4)),
+                'medium': int(lint_match.group(5)),
+                'low': int(lint_match.group(6)),
+                'pass': lint_match.group(7) == 'PASS',
+            }
 
         # Parse BLOCKS, PENDING, ARCHIVE
         lines = content.split('\n')
@@ -170,7 +200,16 @@ class MemoryManager:
             for item in self.archive:
                 content.append(item)
             content.append("")
-            
+
+        # v3.0: Write abaplint results if present
+        if self.abaplint_results:
+            content.append("## ABAPLINT")
+            ar = self.abaplint_results
+            content.append(f"- last_run: {ar['timestamp']}")
+            content.append(f"- findings: T:{ar['total']} C:{ar['critical']} H:{ar['high']} M:{ar['medium']} L:{ar['low']}")
+            content.append(f"- gate: {'PASS' if ar['pass'] else 'FAIL'}")
+            content.append("")
+
         content.append("## PENDING")
         for item in self.pending:
             content.append(item)
@@ -207,7 +246,7 @@ class MemoryManager:
 
 def main():
     parser = argparse.ArgumentParser(description="MEMORY.md Context Manager")
-    parser.add_argument("action", choices=["init", "add", "compact", "verify", "show"])
+    parser.add_argument("action", choices=["init", "add", "compact", "verify", "show", "lint-result"])
     parser.add_argument("--input", required=True, help="Path to MEMORY.md")
     parser.add_argument("--sys", help="System ID (e.g. S4H)")
     parser.add_argument("--client", help="Client (e.g. 100)")
@@ -262,6 +301,21 @@ def main():
         manager.write()
         print(f"Compacted {args.input}")
         
+    elif args.action == "lint-result":
+        if not args.fields:
+            print("Error: --fields JSON required with lint data", file=sys.stderr)
+            sys.exit(1)
+        if not manager.parse():
+            manager.init_new("S4H", "100", "DEV", os.environ.get("USERNAME", "DEVELOPER"))
+        try:
+            lint_data = json.loads(args.fields)
+        except Exception as e:
+            print(f"Error parsing lint JSON: {e}", file=sys.stderr)
+            sys.exit(1)
+        manager.set_abaplint_result(lint_data)
+        manager.write()
+        print(f"ABAPLINT results stored in {args.input}")
+
     elif args.action == "verify":
         manager.parse()
         ok, errors = manager.verify()
@@ -281,6 +335,9 @@ def main():
             print(f"Active: {manager.active}")
             print(f"Blocks count: {len(manager.blocks)}")
             print(f"Pending tasks: {len(manager.pending)}")
+            if manager.abaplint_results:
+                ar = manager.abaplint_results
+                print(f"ABAPLINT: {ar['total']} findings (C:{ar['critical']} H:{ar['high']} M:{ar['medium']} L:{ar['low']}) gate={ar['pass'] and 'PASS' or 'FAIL'}")
         else:
             print(f"File {args.input} not found.")
 

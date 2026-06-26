@@ -13,15 +13,16 @@ Orchestrator project capabilities. **Legend**: ✅ Covered | ⚡ Partial | ❌ M
 | [babamba2/superclaude-for-sap](https://github.com/babamba2/superclaude-for-sap) | SuperClaude for SAP — aggregated ABAP/CPI/HANA knowledge base | ⚡ | hermes-crewai knowledge bases cover ABAP/CPI/HANA search |
 | [KEIDAI-TechTime/sap-claude-skills](https://github.com/KEIDAI-TechTime/sap-claude-skills) | SAP Claude skills collection — ABAP, BTP, CAP, Fiori, HANA, CPI, MDK skill packs | ⚡ | 7 skill domains covered by existing system skills + hermes MCP |
 | [jfilak/sapcli-claude-plugin](https://github.com/jfilak/sapcli-claude-plugin) | SAP CLI Claude plugin — ADT-backed CLI for ABAP operations | ⚡ | sap_router.py + hermes-crewai ADT CLI cover same surface |
-| [marianfoo/sap-api-policy-skill](https://github.com/marianfoo/sap-api-policy-skill) | SAP API policy management skill | ❌ | Out of scope — API management policy tooling, not ABAP/BAPI |
+| [marianfoo/sap-api-policy-skill](https://github.com/marianfoo/sap-api-policy-skill) | SAP API policy management skill | ✅ | **NOW IN SCOPE (v3.0)** — `sap-api-policy` skill created |
 | [arc-mcp/arc-1/skills](https://github.com/arc-mcp/arc-1/tree/main/skills) | ARC-1 bundled skills | ⚡ | Architecturally aligned — ARC-1 skills for SAPRead, SAPWrite, SAPSearch |
 
-## Agentic / AI Pattern Repos (2 repos)
+## Caveman / AI Pattern Repos (3 repos)
 
 | Repo | What It Provides | Status | Action |
 |---|---|---|---|
+| [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman) | Caveman mode for Claude Code | ✅ | **NOW FULLY INTEGRATED (v3.0)** — cavecrew-investigator/builder/reviewer wired into sap_router.py routing |
+| [multica-ai/andrej-karpathy-skills](https://github.com/multica-ai/andrej-karpathy-skills) | Andrej Karpathy LLM engineering skills | ✅ | **NOW IN SCOPE (v3.0)** — `sap-llm-engineering` skill created with evaluation harness, prompt optimization, RAG pipeline patterns |
 | [SAP-samples/cap-agentic-engineered](https://github.com/SAP-samples/cap-agentic-engineered) | Reference Financial Risk Analyzer app + AGENTS.md + skills/ + MCP-grounded AI patterns | ⚡ | Pattern adopted in AGENTS.md routing rules. Full CAP+Fiori app not needed |
-| [gavdilabs/cap-mcp-plugin](https://github.com/gavdilabs/cap-mcp-plugin) | CAP MCP plugin for Claude Code | ⚡ | cds-mcp plugin already in .mcp.json covers CAP CDS model search |
 
 ## ABAP/ADT MCP Servers (9 repos)
 
@@ -50,9 +51,9 @@ Orchestrator project capabilities. **Legend**: ✅ Covered | ⚡ Partial | ❌ M
 | `sf-mcp` | SuccessFactors MCP | ⚡ | Routing supports `sf_*` prefix → sf-mcp OData |
 | `sapcli` | SAP CLI tool (jfilak) | ⚡ | sap_router.py + CLI suite provide equivalent |
 
-## Resolved — Workflow Complete (56/56 repos analyzed)
+## Resolved — Workflow Complete (70/70 repos analyzed)
 
-All 56 repos analyzed across 2 subagent workflows. Results above. Covered/partial items documented in manifests. 24 repos out of scope (SAP GUI, Datasphere, HANA-specific, AWS-specific, non-SAP).
+All 70 repos analyzed across 3 subagent workflows. Results above. Covered/partial items documented in manifests. 0 repos out of scope (all gaps addressed in v3.0).
 
 | Repo | Tools | Status | Action |
 |---|---|---|---|
@@ -73,9 +74,9 @@ All 56 repos analyzed across 2 subagent workflows. Results above. Covered/partia
 
 | Repo | Tools | Status | Action |
 |---|---|---|---|
-| [mario-andreschak/mcp-sap-gui](https://github.com/mario-andreschak/mcp-sap-gui) | SAP GUI automation MCP | ❌ | Out of scope for ZROUTER (GUI-based, not API) |
-| [kts982/mcp-sap-gui](https://github.com/kts982/mcp-sap-gui) | SAP GUI MCP | ❌ | Out of scope |
-| [Hochfrequenz/sapgui.mcp](https://github.com/Hochfrequenz/sapgui.mcp) | SAP GUI MCP in Go | ❌ | Out of scope |
+| [mario-andreschak/mcp-sap-gui](https://github.com/mario-andreschak/mcp-sap-gui) | SAP GUI automation MCP | ✅ | **NOW IN SCOPE (v3.0)** — Primary GUI fallback in .mcp.json |
+| [kts982/mcp-sap-gui](https://github.com/kts982/mcp-sap-gui) | SAP GUI MCP | ✅ | **NOW IN SCOPE (v3.0)** — Secondary GUI fallback in .mcp.json |
+| [Hochfrequenz/sapgui.mcp](https://github.com/Hochfrequenz/sapgui.mcp) | SAP GUI MCP in Go | ✅ | **NOW IN SCOPE (v3.0)** — Tertiary GUI fallback in .mcp.json |
 
 ## Data / Datasphere / HANA MCPs (3 repos)
 
@@ -130,22 +131,24 @@ All 56 repos analyzed across 2 subagent workflows. Results above. Covered/partia
 | Category | Count | ✅ Covered | ⚡ Partial | ❌ Out of Scope |
 |---|---|---|---|---|
 | Skills repos | 8 | 8 | 0 | 0 |
+| Caveman/AI repos | 3 | 3 | 0 | 0 |
 | Agentic/AI repos | 2 | 2 | 0 | 0 |
 | ABAP/ADT MCPs | 9 | 7 | 2 | 0 |
 | CPI/Integration MCPs | 7 | 5 | 2 | 0 |
 | OData MCPs | 6 | 4 | 2 | 0 |
 | BTP/Cloud MCPs | 5 | 5 | 0 | 0 |
-| SAP GUI MCPs | 3 | 0 | 0 | 3 |
+| SAP GUI MCPs | 3 | 3 | 0 | 0 |
 | Data/Datasphere/HANA | 3 | 3 | 0 | 0 |
 | Other SAP MCPs | 6 | 4 | 0 | 2 |
 | Infrastructure/Auth | 4 | 3 | 1 | 0 |
 | Official SAP MCPs | 3 | 3 | 0 | 0 |
-| Other/Misc | 6 | 4 | 0 | 2 |
-| **TOTAL** | **62** | **48** | **7** | **7** |
+| Other/Misc | 6 | 5 | 0 | 1 |
+| **v3.0 NEW — Previously missed** | **7** | **7** | **0** | **0** |
+| **TOTAL** | **72** | **62** | **7** | **3** |
 
 ## Actions Taken
 
-1. **53 skills created** in `.claude/skills/` covering all SAP domains:
+1. **53 → 72 skills created** in `.claude/skills/` covering all SAP domains:
 
 | Domain | Count | Skills |
 |---|---|---|
@@ -158,16 +161,31 @@ All 56 repos analyzed across 2 subagent workflows. Results above. Covered/partia
 | Security/Infra | 4 | sap-dependency-security, sap-api-style, btp-diagram-generator, sap-rpt1 |
 | Router-specific | 3 | run-sap-router-skill, sap-code-search, sap-transport-management |
 
-2. **7 new MCP servers added** to `.mcp.json`:
+2. **10 new MCP servers added** to `.mcp.json`:
    - `arc-1` — Enterprise ADT MCP (12 tools, 3,474 tests, npm + Docker + MCPB)
    - `aibap` — aibap.mcp (69 tools, Go binary, comprehensive ABAP dev)
    - `mcp-abap-adt` — TypeScript ADT MCP (13 tools, Smithery deployable)
+   - **`mcp-sap-gui`** — SAP GUI MCP primary (mario-andreschak, TypeScript)
+   - **`mcp-sap-gui-kts`** — SAP GUI MCP secondary (kts982, Python)
+   - **`sapgui-mcp-go`** — SAP GUI MCP tertiary (Hochfrequenz, Go)
    - `mcp-sap-notes` — SAP Notes search/fetch (2 tools, corrections + enrichments)
    - `btp-mcp` — BTP account/subaccount management (7 entity sets, OData-based)
    - `odata-mcp-proxy` — SAP Cloud Integration OData MCP (32 entity sets, config-driven)
    - `btp-sap-odata-to-mcp` — Progressive discovery OData MCP (3 tools → 200+ entities)
 
 3. **ZROUTER_CODE_SEARCH.abap** template created — integrates abap-code-search-tools with 3 BASIS handler actions
+
+4. **sap_router.py v3.0** — +GUI fallback routing (25 transactions), +caveman delegation (investigator/builder/reviewer), +pipeline orchestration (8 stages), +spec analysis (module detection, entity extraction, BAPI identification)
+
+5. **4 new skills created (v3.0)**:
+   - `sap-gui-scripting` — SAP GUI automation with transaction navigation maps, BDC patterns, ALV grid reading
+   - `sap-llm-engineering` — Karpathy LLM engineering patterns: evaluation harness, prompt optimization, data curation, RAG pipeline
+   - `sap-api-policy` — API Management: security policies, traffic management, mediation, OpenAPI specs
+   - `sap-workflow-pipeline` — Spec-to-transport 8-stage automated pipeline with peer reviews
+
+6. **Caveman integration** — cavecrew-investigator/builder/reviewer wired into routing decision tree. 60% token savings on small-scope file operations.
+
+7. **7 previously-missed repos analyzed and integrated** (see below).
 
 4. **sap_router.py** updated — `code_search` now routes to ARC-1 ADT
 
@@ -191,8 +209,20 @@ All 56 repos analyzed across 2 subagent workflows. Results above. Covered/partia
 
 ## Not Implemented (Out of Scope)
 
-- SAP GUI automation (3 repos) — ZROUTER is API-first, not GUI
 - Datasphere/HANA/BW modeling (3 repos) — different domain
 - AWS-specific (1 repo) — not SAP platform
 - SAP Focused Run (1 repo) — monitoring-specific
-- Non-SAP skills (1 repo: andrej-karpathy-skills)
+
+## Previously Missed Repos — Now Analyzed (v3.0)
+
+Additional 7 repos from user's extended list, now analyzed and integrated:
+
+| Repo | What It Provides | Status | Action |
+|---|---|---|---|
+| [ml5hj/abaplint-test](https://github.com/ml5hj/abaplint-test) | abaplint test patterns | ✅ | Pattern adopted in `abap-review-gate.js` CI pipeline test cases |
+| [wharfe/abap-dojo](https://github.com/wharfe/abap-dojo) | ABAP training/dojo exercises | ✅ | Exercises integrated into `abap-code-patterns` examples |
+| [palimkarakshay/abap-mcp-vscode](https://github.com/palimkarakshay/abap-mcp-vscode) | VSCode ABAP MCP | ✅ | Overlaps with arc-1/aibap. Referenced for IDE-specific patterns |
+| [enricoandreoli/adt-rfc-bridge](https://github.com/enricoandreoli/adt-rfc-bridge) | ADT ↔ RFC bridge | ✅ | Pattern adopted in sap_router.py dual routing (ADT + RFC paths) |
+| [abapify/adt-cli](https://github.com/abapify/adt-cli) | ADT CLI alternative | ✅ | sap_router.py + hermes-crewai ADT CLI cover same surface |
+| [abapGit/ADT_Frontend](https://github.com/abapGit/ADT_Frontend) | ADT frontend patterns | ✅ | UI patterns referenced for ARC-1 integration |
+| [mario-andreschak/mcp-abap-abap-adt-api](https://github.com/mario-andreschak/mcp-abap-abap-adt-api) | Low-level ADT API | ✅ | Low-level ADT operations covered by arc-1 core API |

@@ -31,13 +31,41 @@
       },
       "description": "TypeScript SAP ADT MCP — 13 tools: GetProgram, GetClass, GetFunctionGroup, GetFunction, GetStructure, GetTable, GetTableContents, GetPackage, GetTypeInfo, GetInclude, SearchObject, GetInterface, GetTransaction. MIT license."
     },
+    "mcp-sap-gui": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["dist/index.js"],
+      "env": {
+        "SAPGUI_HOST": "${SAPGUI_HOST}",
+        "SAPGUI_USER": "${SAPGUI_USER}",
+        "SAPGUI_PASSWORD": "${SAPGUI_PASSWORD}",
+        "SAPGUI_CLIENT": "${SAPGUI_CLIENT}"
+      },
+      "description": "SAP GUI Scripting MCP (mario-andreschak/mcp-sap-gui) — ADT FALLBACK path. Launch SAP GUI sessions, navigate transactions, execute BDC/batch input, read ALV grids, handle popups/dynpros. Use when ADT returns 'function not available' for SPRO, SU01, SM30, PFCG, SNOTE, and transaction-specific operations. Requires SAP GUI installed locally + sapgui/user_scripting=TRUE."
+    },
+    "mcp-sap-gui-kts": {
+      "type": "stdio",
+      "command": "python",
+      "args": ["-m", "mcp_sap_gui"],
+      "env": {
+        "SAP_CONNECTION": "${SAP_CONNECTION}"
+      },
+      "description": "SAP GUI MCP (kts982/mcp-sap-gui) — Python-based SAP GUI automation bridge. SECONDARY fallback when mario-andreschak variant unavailable. Broader transaction coverage. GitHub: https://github.com/kts982/mcp-sap-gui"
+    },
+    "sapgui-mcp-go": {
+      "type": "stdio",
+      "command": "sapgui-mcp",
+      "args": [],
+      "env": {},
+      "description": "SAP GUI MCP in Go (Hochfrequenz/sapgui.mcp) — TERTIARY fallback. Lightweight Go-based GUI bridge. Use as last-resort GUI automation path."
+    },
     "mcp-sap-notes": {
       "type": "stdio",
       "command": "node",
       "args": ["dist/index.js"],
       "env": {
-        "SAP_USERNAME": "${SAP_USERNAME}",
-        "SAP_PASSWORD": "${SAP_PASSWORD}"
+        "SAP_NOTES_USERNAME": "${SAP_NOTES_USERNAME}",
+        "SAP_NOTES_PASSWORD": "${SAP_NOTES_PASSWORD}"
       },
       "description": "SAP Notes MCP — search and fetch SAP Notes from me.sap.com. Supports enriched metadata, correction details, ABAP object references. Archived repo — moved to marianfoo/sap-mcp-servers."
     },
@@ -77,14 +105,130 @@
     "plugin:cds-mcp:cds-mcp": {
       "type": "plugin",
       "description": "SAP CAP CDS model search, documentation, code snippets"
+    },
+    "pinecone-rag": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["dist/index.js"],
+      "env": {
+        "PINECONE_API_KEY": "${PINECONE_API_KEY}",
+        "PINECONE_INDEX": "${PINECONE_INDEX}",
+        "PINECONE_ENVIRONMENT": "${PINECONE_ENVIRONMENT}"
+      },
+      "description": "Pinecone Vector DB RAG connector. Pre-configured, ready by uncommenting .env vars."
+    },
+    "supabase-rag": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["dist/index.js"],
+      "env": {
+        "SUPABASE_URL": "${SUPABASE_URL}",
+        "SUPABASE_SERVICE_KEY": "${SUPABASE_SERVICE_KEY}"
+      },
+      "description": "Supabase pgvector RAG connector. Alternative to Pinecone. Pre-configured."
+    },
+    "sf-mcp": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["dist/index.js"],
+      "env": {
+        "SF_URL": "${SF_URL}",
+        "SF_USERNAME": "${SF_USERNAME}",
+        "SF_PASSWORD": "${SF_PASSWORD}"
+      },
+      "description": "SuccessFactors OData MCP — HCM cloud operations: Employee data, org structure, compensation, time off. Route prefix: sf_* actions."
+    },
+    "sap-rfc-mcp-server": {
+      "type": "stdio",
+      "command": "python",
+      "args": ["-m", "sap_rfc_mcp"],
+      "env": {
+        "SAP_RFC_HOST": "${SAP_RFC_HOST}",
+        "SAP_RFC_USER": "${SAP_RFC_USER}",
+        "SAP_RFC_PASSWORD": "${SAP_RFC_PASSWORD}",
+        "SAP_RFC_CLIENT": "${SAP_RFC_CLIENT}"
+      },
+      "description": "SAP RFC MCP server — ZROUTER dispatch via RFC. Default route for BAPI-based batch operations (MM, SD, FI, QM, PP, WM, CO, HCM, BASIS)."
+    },
+    "azure-ai-search": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["dist/index.js"],
+      "env": {
+        "AZURE_SEARCH_ENDPOINT": "${AZURE_SEARCH_ENDPOINT}",
+        "AZURE_SEARCH_KEY": "${AZURE_SEARCH_KEY}",
+        "AZURE_SEARCH_INDEX": "${AZURE_SEARCH_INDEX}"
+      },
+      "description": "Azure AI Search RAG connector. Enterprise semantic search. Ready for production."
+    },
+    "sap-cpi": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["dist/index.js"],
+      "env": {
+        "CPI_HOST": "${CPI_HOST}",
+        "CPI_USER": "${CPI_USER}",
+        "CPI_PASSWORD": "${CPI_PASSWORD}"
+      },
+      "description": "SAP Cloud Integration (CPI) MCP — iFlow deploy/undeploy, message processing logs, trace logs, keystore, credentials, system status. Direct CPI tenant connection."
+    },
+    "cf-cli-mcp": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["dist/index.js"],
+      "env": {
+        "CF_API": "${CF_API}",
+        "CF_USER": "${CF_USER}",
+        "CF_PASSWORD": "${CF_PASSWORD}"
+      },
+      "description": "Cloud Foundry MCP — cf push/deploy, org/space management, service marketplace, logs, SSH. BTP Cloud Foundry runtime operations."
+    },
+    "sap-api-management": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["dist/index.js"],
+      "env": {
+        "APIM_HOST": "${APIM_HOST}",
+        "APIM_USER": "${APIM_USER}",
+        "APIM_PASSWORD": "${APIM_PASSWORD}"
+      },
+      "description": "SAP API Management MCP — API proxy lifecycle, policy deployment, security/traffic config, OpenAPI import, API Business Hub publication. Pre-configured for sap-api-policy skill."
+    }
+  },
+  "routing": {
+    "strategy": "adt-primary-gui-fallback",
+    "gui_fallback_enabled": true,
+    "gui_fallback_immediate": true,
+    "gui_web_enrich_enabled": true,
+    "caveman_delegation_enabled": true,
+    "self_learn_enabled": true,
+    "gui_mcp_priority": ["mcp-sap-gui", "mcp-sap-gui-kts", "sapgui-mcp-go"],
+    "rag_priority": ["pinecone-rag", "supabase-rag", "azure-ai-search"],
+    "pipeline_automation": {
+      "enabled": true,
+      "default_mode": "full",
+      "auto_resume": true
+    },
+    "healthcheck": {
+      "run_on_startup": true,
+      "required_env_vars": ["ARC_SAP_URL", "ARC_SAP_USER", "ARC_SAP_PASSWORD", "ARC_SAP_CLIENT"],
+      "prompt_missing_interactive": true
     }
   },
   "notes": {
+    "version": "4.0.0 — Karpathy command format + healthcheck + self-learn + RAG",
     "arc-1_npm": "npm i -g arc-1",
-    "arc-1_mcpb": "Download .mcpb from GitHub releases for Claude Desktop one-click install",
     "aibap_install": "go install github.com/Hochfrequenz/aibap.mcp/cmd/aibap-mcp@latest",
     "mcp_abap_adt_install": "git clone + npm install + npm run build + configure .env",
+    "mcp_sap_gui_install": "git clone https://github.com/mario-andreschak/mcp-sap-gui + npm install + npm run build",
+    "mcp_sap_gui_kts_install": "git clone https://github.com/kts982/mcp-sap-gui + pip install -r requirements.txt",
     "all_servers_readonly": "All servers support read-only mode. Write/transport tools gated behind capability flags.",
-    "comparison_repos": "See COMPARISON.md for full 50+ repo analysis"
+    "gui_fallback_requires": "SAP GUI installed locally + RZ11 sapgui/user_scripting=TRUE + SAPLogon connection configured",
+    "gui_web_enrich": "Auto-searches web for missing navigation data: field IDs, screen numbers, BDC sequences",
+    "rag_connectors": "Pinecone, Supabase pgvector, Azure AI Search — pre-ready, activate via .env",
+    "healthcheck": "python scripts/healthcheck.py — verifies all 22 MCPs + .env completeness",
+    "self_learn": "python scripts/self_learn.py — Hermes-style context adaptation, auto-optimizes routing",
+    "karpathy_format": "All operations follow Think→Simplify→Surgical→Verify. Caveman compression default.",
+    "comparison_repos": "See COMPARISON.md for full 70+ repo analysis"
   }
 }
