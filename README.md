@@ -23,60 +23,6 @@ You type **"create material FERT with these fields"** in VS Code chat. The route
 
 ---
 
-## Tags
-
-**SAP Core:**
-`#sap` `#sap-erp` `#sap-s4hana` `#sap-ecc` `#sap-netweaver` `#sap-basis` `#sap-abap`
-`#abap` `#abap-cloud` `#abap-steampunk` `#clean-abap` `#abap-oo` `#abap-cds`
-`#abap-rap` `#abap-adt` `#abap-development` `#abap-code` `#abap-programming`
-
-**SAP Modules:**
-`#sap-mm` `#sap-sd` `#sap-fi` `#sap-co` `#sap-pp` `#sap-qm` `#sap-wm`
-`#sap-ewm` `#sap-hcm` `#sap-pm` `#sap-ps` `#sap-bw`
-
-**SAP BTP & Cloud:**
-`#sap-btp` `#sap-cloud-platform` `#sap-cloud-foundry` `#sap-kyma`
-`#sap-build` `#sap-launchpad` `#sap-workzone` `#sap-ias` `#sap-xsuaa`
-
-**SAP Integration & API:**
-`#sap-cpi` `#sap-pi` `#sap-po` `#sap-api-management` `#sap-apim`
-`#sap-odata` `#sap-gateway` `#sap-idoc` `#sap-rfc` `#sap-bapi`
-`#sap-soap` `#sap-rest` `#sap-event-mesh`
-
-**SAP Fiori & UI:**
-`#sap-fiori` `#sap-fiori-elements` `#sapui5` `#openui5` `#sap-fiori-tools`
-`#sap-screen-personas` `#sap-build-apps`
-
-**SAP HANA & Data:**
-`#sap-hana` `#sap-hana-cloud` `#sap-datasphere` `#sap-sac` `#sap-analytics-cloud`
-`#sap-hana-sql` `#sap-hana-sqlscript` `#sap-bw4hana`
-
-**SAP CAP & RAP:**
-`#sap-cap` `#cap-cds` `#sap-rap` `#restful-abap` `#sap-business-objects`
-
-**SAP Development Tools:**
-`#sap-adt` `#eclipse-adt` `#abapgit` `#abaplint` `#sap-atc` `#sap-sci`
-`#sap-code-inspector` `#sap-transport` `#sap-cts` `#sap-charm`
-`#sap-solution-manager` `#sap-cloud-alm`
-
-**MCP & AI Agents:**
-`#mcp` `#model-context-protocol` `#mcp-server` `#mcp-tool` `#sap-mcp`
-`#sap-mcp-server` `#abap-mcp` `#claude-code` `#claude-ai` `#anthropic`
-`#ai-agent` `#ai-coding-agent` `#ai-orchestrator` `#llm-agent`
-`#sap-ai` `#sap-ai-core` `#sap-genai-hub` `#generative-ai`
-
-**DevOps & Quality:**
-`#devops` `#cicd` `#sap-cicd` `#transport-management` `#abap-unit`
-`#abap-unit-testing` `#sap-testing` `#sap-automation` `#code-review`
-`#security-audit` `#sap-security` `#sap-authorization`
-
-**IDE & Platform:**
-`#vscode` `#vscode-extension` `#sap-business-application-studio` `#sap-bas`
-`#low-code` `#no-code` `#developer-tools` `#developer-productivity`
-
-**Other:**
-`#self-learning` `#routing-engine` `#orchestrator` `#sap-automation-tool`
-`#sap-skills` `#claude-skills` `#sap-workflow` `#sap-orchestration`
 
 ---
 
@@ -684,66 +630,52 @@ PRs and issues welcome. See [SKILL.md](SKILL.md) for the full dispatch table and
 
 ---
 
-<sub>
-**Also known as:** sap development environment, abap ide for vscode, sap vscode extension,
-sap automation tool, sap bapi framework, sap code generator, sap claude ai agent,
-abap code review tool, sap transport management, sap btp deployment, sap gui scripting,
-sap cloud integration, sap fiori generator, sap hana tools, sap api management,
-sap testing framework, sap security audit, clean abap, sap devops pipeline,
-sap spec to code, sap csv to bapi, abap serializer, sap self-learning agent,
-sap mcp server, sap model context protocol, sap routing engine, sap rfc wrapper,
-sap skills collection, sap development platform, sap low code platform,
-sap ai development tool, sap orchestration framework, sap abap development environment,
-abap in vscode, sap without eclipse, sap without sap gui, sap developer productivity,
-sap mm automation, sap sd automation, sap fi automation, sap pp automation,
-sap qm automation, sap wm automation, sap co automation, sap hcm automation,
-sap basis automation, sap bapi caller, sap rfc client, sap scripting engine,
-sap transaction automation, sap batch input, sap bdc automation, sap lsmw alternative,
-sap data migration tool, sap master data management, sap material creation tool,
-sap purchase order automation, sap sales order creation, sap financial posting,
-sap invoice automation, sap goods movement, sap production order confirmation,
-sap quality inspection recording, sap warehouse transfer order, sap cost allocation,
-sap hr infotype management, sap transport request automation, sap dump analysis tool,
-sap abap code search, sap abap review gate, sap release management,
-sap change control, sap continuous integration, sap continuous delivery,
-sap abap modern development, sap cloud development, sap on-premise development,
-sap hybrid development, sap abap modernization, sap custom code migration,
-sap s4hana migration, sap ecc migration, sap abap cloud migration,
-sap steampunk development, sap embedded steampunk, sap abap environment,
-sap cds view generator, sap rap business object generator, sap odata service generator,
-sap fiori elements generator, sap list report, sap object page,
-sap analytical list page, sap overview page, sap worklist,
-sap form entry, sap flexible programming model, sap building block,
-sap integration flow, sap iflow, sap groovy script, sap xslt mapping,
-sap message mapping, sap value mapping, sap content modifier, sap request reply,
-sap cloud integration tenant, sap cpi monitoring, sap cpi message processing,
-sap cap application, sap cap service, sap cap handler, sap cap model,
-sap nodejs cap, sap java cap, sap mta deployment, sap mta build,
-sap xsuaa security, sap approuter, sap html5 repository, sap launchpad service,
-sap sapui5 freestyle, sap sapui5 typescript, sap ui5 linter, sap ui5 best practices,
-sap fiori launchpad, sap fiori configuration, sap manifest json, sap annotations,
-sap mobile development kit, sap mdk, sap mobile services,
-sap hana database, sap hana cloud database, sap hana hdi container,
-sap hana calculation view, sap hana analytic view, sap hana procedure,
-sap datasphere space, sap datasphere view, sap datasphere data flow,
-sap analytics cloud story, sap analytics cloud planning, sap analytics cloud widget,
-sap bw query, sap bw transformation, sap bw dtp, sap bw infocube,
-sap process integration, sap process orchestration, sap pi adapter,
-sap xi adapter, sap pi message mapping, sap pi channel monitoring,
-sap cloud alm, sap alm itsm, sap incident management, sap problem management,
-sap successfactors integration, sap sf employee central, sap sf compensation,
-sap sf recruiting, sap sf onboarding, sap sf performance management,
-sap concur integration, sap ariba integration, sap fieldglass integration,
-sap signavio integration, sap business network, sap integration suite,
-sap open connectors, sap trading partner management, sap integration advisor,
-sap enterprise messaging, sap advanced event mesh, sap event broker,
-sap graph, sap one domain model, sap business accelerator hub,
-sap build process automation, sap build workflow, sap build decision table,
-sap build form, sap build approval, sap build automation trigger,
-sap irpa, sap intelligent rpa, sap robotic process automation,
-sap ai business services, sap document information extraction, sap data attribute recommendation,
-sap personalized recommendation, sap business entity recognition, sap invoice object recommendation,
-sap service ticket intelligence, sap returnable packaging, sap data quality microservice
-</sub>
+## Tags
 
-*Not affiliated with or endorsed by SAP SE. MIT licensed.*
+**SAP Core:**
+`#sap` `#sap-erp` `#sap-s4hana` `#sap-ecc` `#sap-netweaver` `#sap-basis` `#sap-abap`
+`#abap` `#abap-cloud` `#abap-steampunk` `#clean-abap` `#abap-oo` `#abap-cds`
+`#abap-rap` `#abap-adt` `#abap-development` `#abap-code` `#abap-programming`
+
+**SAP Modules:**
+`#sap-mm` `#sap-sd` `#sap-fi` `#sap-co` `#sap-pp` `#sap-qm` `#sap-wm`
+`#sap-ewm` `#sap-hcm` `#sap-pm` `#sap-ps` `#sap-bw`
+
+**SAP BTP & Cloud:**
+`#sap-btp` `#sap-cloud-platform` `#sap-cloud-foundry` `#sap-kyma`
+`#sap-build` `#sap-launchpad` `#sap-workzone` `#sap-ias` `#sap-xsuaa`
+
+**SAP Integration & API:**
+`#sap-cpi` `#sap-pi` `#sap-po` `#sap-api-management` `#sap-apim`
+`#sap-odata` `#sap-gateway` `#sap-idoc` `#sap-rfc` `#sap-bapi`
+`#sap-soap` `#sap-rest` `#sap-event-mesh`
+
+**SAP Fiori & UI:**
+`#sap-fiori` `#sap-fiori-elements` `#sapui5` `#openui5` `#sap-fiori-tools`
+`#sap-screen-personas` `#sap-build-apps`
+
+**SAP HANA & Data:**
+`#sap-hana` `#sap-hana-cloud` `#sap-datasphere` `#sap-sac` `#sap-analytics-cloud`
+`#sap-hana-sql` `#sap-hana-sqlscript` `#sap-bw4hana`
+
+**SAP CAP & RAP:**
+`#sap-cap` `#cap-cds` `#sap-rap` `#restful-abap` `#sap-business-objects`
+**SAP Development Tools:**
+`#sap-adt` `#eclipse-adt` `#abapgit` `#abaplint` `#sap-atc` `#sap-sci`
+`#sap-code-inspector` `#sap-transport` `#sap-cts` `#sap-charm`
+`#sap-solution-manager` `#sap-cloud-alm`
+**MCP & AI Agents:**
+`#mcp` `#model-context-protocol` `#mcp-server` `#mcp-tool` `#sap-mcp`
+`#sap-mcp-server` `#abap-mcp` `#claude-code` `#claude-ai` `#anthropic`
+`#ai-agent` `#ai-coding-agent` `#ai-orchestrator` `#llm-agent`
+`#sap-ai` `#sap-ai-core` `#sap-genai-hub` `#generative-ai`
+**DevOps & Quality:**
+`#devops` `#cicd` `#sap-cicd` `#transport-management` `#abap-unit`
+`#abap-unit-testing` `#sap-testing` `#sap-automation` `#code-review`
+`#security-audit` `#sap-security` `#sap-authorization`
+**IDE & Platform:**
+`#vscode` `#vscode-extension` `#sap-business-application-studio` `#sap-bas`
+`#low-code` `#no-code` `#developer-tools` `#developer-productivity`
+**Other:**
+`#self-learning` `#routing-engine` `#orchestrator` `#sap-automation-tool`
+`#sap-skills` `#claude-skills` `#sap-workflow` `#sap-orchestration`
