@@ -1,9 +1,15 @@
-# SAP Router Orchestrator — Agent Instructions
+# SAP Router Skill — Multi-IDE Agent Instructions
 
-> **Codex / OpenAI / any agent host**: this file is the entry point.
-> Claude Code uses `.claude/skills/run-sap-router-skill/SKILL.md`.
-> Antigravity uses `.gemini/skills/run-sap-router-skill/SKILL.md`.
-> All three point to the same `driver.py`.
+> **55 skills mirrored across 4 IDEs — same SKILL.md content in each.**
+>
+> | IDE | Skill Directory | Entry Point |
+> |---|---|---|
+> | **Claude Code** | `.claude/skills/` (55 skills) | `.claude/skills/run-sap-router-skill/SKILL.md` |
+> | **Antigravity (Gemini)** | `.gemini/skills/` (55 skills) | `.gemini/skills/run-sap-router-skill/SKILL.md` |
+> | **Codex / OpenAI** | `.codex/skills/` (55 skills) | `.codex/AGENTS.md` |
+> | **Cursor** | `.cursor/skills/` (55 skills) | `.cursor/skills/run-sap-router-skill/SKILL.md` |
+>
+> All skills auto-trigger by file context and keyword. See SKILL.md for master dispatch.
 
 ## What this project is
 

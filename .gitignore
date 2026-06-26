@@ -20,6 +20,9 @@ env/
 *.swo
 *~
 
+# Multi-IDE skills are committed in their respective directories
+# .claude/  .gemini/  .codex/  .cursor/  are all tracked
+
 # OS
 .DS_Store
 Thumbs.db
