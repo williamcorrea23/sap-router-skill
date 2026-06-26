@@ -131,7 +131,38 @@ python scripts/sap_router.py pipeline --spec requirements.md --dry-run
 
 # Resume from specific stage (after fixing issues)
 python scripts/sap_router.py pipeline --spec requirements.md --resume-from stage4
+
+# Parallel waves (DEFAULT): same-wave stages launch concurrently; Stage 4 fans out 1 builder per object
+python scripts/sap_router.py pipeline --spec requirements.md            # --parallel is the default
+python scripts/sap_router.py pipeline --spec requirements.md --serial   # one stage per wave (no concurrency)
+
+# Emit just the machine-readable wave plan (stages 2-8) for the orchestrator to launch in batches
+python scripts/sap_router.py dispatch-plan --spec requirements.md
+# Plan concurrent caveman subagents for an ad-hoc task
+python scripts/sap_router.py crew-dispatch --task "find the leak then review the diff"
 ```
+
+## Parallel Dispatch (waves)
+
+Stages are grouped into WAVES; stages sharing a wave run concurrently (the
+orchestrator launches all same-wave subagents in ONE batch). `dispatch-plan`
+and `pipeline` emit a machine-readable plan: `{ "mode": "parallel", "waves": [ {wave, concurrent, stages:[...]} ] }`.
+
+```
+Wave 0  [sequential]  stage1 Spec Analysis            (must run first)
+Wave 1  [sequential]  stage2 Technical Proposal
+Wave 2  [sequential]  stage3 Peer Review 1
+Wave 3  [concurrent]  stage4 Implementation (fan-out x N objects — 1 cavecrew-builder per object)
+Wave 4  [concurrent]  stage5 Static Analysis (abaplint)  ||  stage6 Deep Analysis (Crew)
+Wave 5  [sequential]  stage7 Peer Review 2
+Wave 6  [sequential]  stage8 Transport Gate
+```
+
+Rules:
+- Same wave => launch agents concurrently in one batch. Different waves => sequential (barrier between).
+- Stage 4 fans out one `cavecrew-builder` per detected object — the big parallel win.
+- `--serial` collapses to one stage per wave (no concurrency) for debugging.
+- ZROUTER is never required; the pipeline runs ADT-first -> SAP GUI scripting regardless of opt-in.
 
 ## Stage 1 Detail: Spec Analysis
 

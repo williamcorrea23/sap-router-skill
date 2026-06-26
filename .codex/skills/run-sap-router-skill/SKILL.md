@@ -20,7 +20,7 @@ is local file I/O, `xls_to_bapi` parses CSV/XLSX. Everything runs offline.
 
 | Script | Purpose |
 |---|---|
-| `sap_router.py` | Routing engine: ADT vs ZROUTER RFC vs sf-mcp |
+| `sap_router.py` | Routing engine: ADT-first; SAP GUI scripting fallback (mcp-sap-gui); sf-mcp |
 | `memory_manager.py` | Session context file (MEMORY.md) lifecycle |
 | `xls_to_bapi.py` | CSV/XLSX → BAPI JSON payload converter |
 | `template_repo.py` | Offline ABAP template repository with `{{placeholders}}` |
@@ -43,22 +43,35 @@ All paths below are relative to the unit root (`sap-router-skill/`).
 python .claude/skills/run-sap-router-skill/driver.py
 ```
 
-Exit `0` = all 50 checks passed; `1` = a check failed (offending line printed).
+Exit `0` = all 62 checks passed; `1` = a check failed (offending line printed).
 The driver creates and deletes its own temp workspace — it touches no project
-files. Use it as the regression gate after editing any script in `scripts/`.
+files (ZROUTER opt-in state is redirected to a temp file via
+`SAP_ROUTER_OPTIN_FILE`, so the smoke run never mutates the real decision).
+Use it as the regression gate after editing any script in `scripts/`.
 
 Verified output this session:
 
 ```text
-50 passed, 0 failed
+62 passed, 0 failed
 ```
 
 ## Run (manual, individual CLIs)
 
 ```bash
-# Routing decision (functional -> ZROUTER RFC, dev op -> ARC-1 ADT, sf_* -> sf-mcp)
-python scripts/sap_router.py route --action MM_CREATE_MATERIAL
-python scripts/sap_router.py route --action read_source
+# Routing: dev op -> ARC-1 ADT; ADT-unavailable -> SAP GUI scripting (mcp-sap-gui); sf_* -> sf-mcp
+python scripts/sap_router.py route --action read_source                       # -> ARC-1 (ADT)
+python scripts/sap_router.py route --action MM_CREATE_MATERIAL                 # -> needs-functional-context (no BAPI fired)
+python scripts/sap_router.py route --action MM_CREATE_MATERIAL --functional    # -> BAPI dispatch (functional context)
+
+# Parallel subagent dispatch (same-wave agents launch concurrently)
+python scripts/sap_router.py dispatch-plan --spec requirements.md              # wave plan for stages 2-8
+python scripts/sap_router.py crew-dispatch --task "find the leak then review the diff"  # concurrent cavecrew agents
+
+# ZROUTER opt-in (optional RFC accelerator; never auto-installed)
+python scripts/sap_router.py zrouter offer      # show the install offer (default: decline)
+python scripts/sap_router.py zrouter decline    # persisted; routing stays ADT-first -> SAP GUI scripting
+python scripts/sap_router.py zrouter accept     # then: zrouter install
+python scripts/sap_router.py zrouter status     # current opt-in + enabled flag
 
 # Session memory lifecycle (writes MEMORY.md at the given path)
 python scripts/memory_manager.py init --input MEMORY.md --sys S4H --client 100 --env DEV --usr DEVELOPER
@@ -98,7 +111,16 @@ python scripts/abap_serializer.py split    --source multi_class.abap --output ou
 - **8 SAP modules field-defined**: `MM`, `SD`, `FI`, `QM`, `PP`, `WM`, `CO`, `HCM`, `BASIS`.
   Unknown module/action exits 1 with an "Available:" list — not a crash.
 - **`route` never validates the action against a catalog** — unknown actions
-  fall through to the ZROUTER RFC default. It's a classifier, not a validator.
+  fall through to the SAP GUI scripting fallback (mcp-sap-gui) default — never BLOCKED. It's a classifier, not a validator.
+- **Functional WRITE actions are gated** — `CREATE_*`, `CHANGE_*`, `POST_*`,
+  `GOODS_MOVEMENT`, etc. return `needs-functional-context` (no BAPI fired) unless
+  `--functional` is passed. BAPIs fire only when a real functional action requires
+  them — a bare token (smoke test) never auto-fires one. Pure reads and explicit
+  `*_GUI` actions are not gated.
+- **ZROUTER is opt-in, never the engine.** Routing never auto-probes or
+  auto-installs it. `--use-zrouter` is honoured only after `zrouter accept`;
+  a `zrouter decline` is persisted (in `zrouter_optin.json`) and routing keeps
+  working ADT-first -> SAP GUI scripting with no ZROUTER dependency.
 - **`template_repo.py resolve` requires double quotes in --values JSON on Windows.**
   Use single-quote wrapping on the outside: `--values '{"KEY":"val"}'` works on both
   Windows and Unix. Double-quote-wrapped JSON on cmd.exe may break.

@@ -49,13 +49,25 @@ def check(name, cond, detail=""):
 def main():
     work = tempfile.mkdtemp(prefix="zrouter_smoke_")
     mem = os.path.join(work, "MEMORY.md")
+    pipe_mem = os.path.join(work, "pipe_mem.md")
+    # Hermetic ZROUTER opt-in state: keep the persisted decision inside the temp
+    # workspace so the smoke run never touches the real zrouter_optin.json.
+    os.environ["SAP_ROUTER_OPTIN_FILE"] = os.path.join(work, "optin.json")
     router = os.path.join(SCRIPTS, "sap_router.py")
     memmgr = os.path.join(SCRIPTS, "memory_manager.py")
     xls = os.path.join(SCRIPTS, "xls_to_bapi.py")
     try:
         # --- routing engine ---
+        # Functional WRITE token WITHOUT context -> NO BAPI auto-fired
+        # (Req: BAPIs fire only when a real functional action requires them).
         r = run([router, "route", "--action", "MM_CREATE_MATERIAL"])
-        check("route functional -> ZROUTER", r.returncode == 0 and "ZROUTER RFC" in r.stdout, r.stderr)
+        check("route write w/o context -> needs-functional-context",
+              r.returncode == 0 and "needs-functional-context" in r.stdout, r.stdout)
+
+        # Same token WITH explicit functional context -> BAPI dispatch allowed
+        r = run([router, "route", "--action", "MM_CREATE_MATERIAL", "--functional"])
+        check("route write --functional -> BAPI dispatch",
+              r.returncode == 0 and ("bapi-functional" in r.stdout or "BAPI_MATERIAL_SAVEDATA" in r.stdout), r.stdout)
 
         r = run([router, "route", "--action", "read_source"])
         check("route dev op -> ARC-1 ADT", "ARC-1 (ADT)" in r.stdout, r.stdout)
@@ -66,8 +78,53 @@ def main():
         r = run([router, "route", "--action", "code_search"])
         check("route code_search -> ARC-1 ADT", "ARC-1 (ADT)" in r.stdout, r.stdout)
 
+        r = run([router, "route", "--action", "SE16_DATA"])
+        check("route read/admin -> SAP GUI (SE16)", r.returncode == 0 and "SE16" in r.stdout, r.stdout)
+
         r = run([router, "route"])  # missing --action
         check("route missing --action -> exit 1", r.returncode == 1, f"rc={r.returncode}")
+
+        # --- ZROUTER opt-in (optional accelerator, never the engine) ---
+        r = run([router, "zrouter", "decline"])
+        check("zrouter decline persists", r.returncode == 0 and "declined" in r.stdout, r.stdout)
+
+        r = run([router, "zrouter", "status"])
+        check("zrouter status declined+disabled",
+              '"optin": "declined"' in r.stdout and '"enabled": false' in r.stdout, r.stdout)
+
+        # functional write + --use-zrouter while DECLINED -> must NOT use ZROUTER
+        r = run([router, "route", "--action", "MM_CREATE_MATERIAL", "--functional", "--use-zrouter"])
+        check("declined -> ZROUTER not used", r.returncode == 0 and "zrouter-rfc" not in r.stdout, r.stdout)
+
+        r = run([router, "zrouter", "accept"])
+        check("zrouter accept persists", r.returncode == 0 and "accepted" in r.stdout, r.stdout)
+
+        r = run([router, "zrouter", "status"])
+        check("zrouter status accepted+enabled",
+              '"optin": "accepted"' in r.stdout and '"enabled": true' in r.stdout, r.stdout)
+
+        r = run([router, "zrouter", "reset"])
+        check("zrouter reset -> unasked", r.returncode == 0 and "unasked" in r.stdout, r.stdout)
+
+        # --- parallel subagent dispatch ---
+        r = run([router, "dispatch-plan", "--spec-text",
+                 "Create class ZCL_FOO and table ZBAR for material inspection lot"])
+        check("dispatch-plan emits concurrent waves",
+              r.returncode == 0 and '"waves"' in r.stdout and '"concurrent": true' in r.stdout, r.stdout)
+
+        r = run([router, "dispatch-plan", "--spec-text", "x", "--serial"])
+        check("dispatch-plan --serial -> no concurrency",
+              r.returncode == 0 and '"concurrent": true' not in r.stdout, r.stdout)
+
+        r = run([router, "crew-dispatch", "--task", "find the leak then review the diff"])
+        check("crew-dispatch -> parallel investigator+reviewer",
+              r.returncode == 0 and "investigator" in r.stdout and "reviewer" in r.stdout
+              and '"parallel": true' in r.stdout, r.stdout)
+
+        r = run([router, "pipeline", "--spec-text", "Create class ZCL_X for material",
+                 "--memory-file", pipe_mem])
+        check("pipeline emits PARALLEL waves",
+              r.returncode == 0 and "Wave" in r.stdout and "PARALLEL" in r.stdout, r.stdout)
 
         # --- memory manager lifecycle ---
         r = run([memmgr, "init", "--input", mem, "--sys", "S4H",

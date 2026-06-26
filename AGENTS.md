@@ -18,7 +18,7 @@ credentials required. Everything runs offline:
 
 | Script | Purpose |
 |---|---|
-| `scripts/sap_router.py` | Routing engine: ADT vs ZROUTER RFC vs sf-mcp |
+| `scripts/sap_router.py` | Routing engine: ADT-first; SAP GUI scripting fallback (mcp-sap-gui); sf-mcp; ZROUTER RFC opt-in |
 | `scripts/memory_manager.py` | Session context file (MEMORY.md) lifecycle |
 | `scripts/xls_to_bapi.py` | CSV/XLSX → BAPI JSON payload converter |
 | `scripts/template_repo.py` | Offline ABAP template repository with `{{placeholders}}` |
@@ -29,7 +29,7 @@ credentials required. Everything runs offline:
 
 ```bash
 python .claude/skills/run-sap-router-skill/driver.py
-# Exit 0 = all 50 checks passed. No project files modified.
+# Exit 0 = all 62 checks passed. No project files modified.
 ```
 
 Requires Python 3.8+. No packages needed for CSV; `pip install openpyxl`
@@ -41,7 +41,7 @@ Decision tree:
 1. CAVEMAN DELEGATION? (fix/find/review, 1-2 files) → cavecrew-investigator/builder/reviewer
 2. ADT AVAILABLE? (read_source, search, activate...) → ARC-1 / aibap / mcp-abap-adt
 3. GUI FALLBACK? (SPRO, SM30, SU01, MM01, VA01...) → mcp-sap-gui (25 transactions)
-4. ZROUTER RFC? (BAPI batch) → ZROUTER_DISPATCH_FM
+4. FUNCTIONAL WRITE? (BAPI batch) → needs explicit --functional context (else needs-functional-context, NO BAPI fired); then BAPI-first / SAP GUI dispatch. ZROUTER RFC only if opted in (zrouter accept).
 5. SPEC→PIPELINE? → sap_router.py pipeline (8 stages)
 
 | Action contains | Destination |
@@ -53,7 +53,7 @@ Decision tree:
 | `sf_*` prefix | sf-mcp (OData) |
 | `SPRO`, `SM30`, `SU01`, `PFCG`, `MM01`, `VA01`, `FB01`, etc. | SAP GUI Scripting (mcp-sap-gui) |
 | `pipeline`, `spec`, `implement specification` | sap_router.py pipeline → 8 stages |
-| anything else | ZROUTER RFC (ZROUTER_DISPATCH_FM) |
+| anything else | SAP GUI scripting (mcp-sap-gui) default |
 
 ## Memory session commands
 
@@ -108,7 +108,7 @@ python scripts/xls_to_bapi.py convert  --input data.csv  --module MM --action CR
 | BASIS | CODE_SEARCH_STATS | `ZCL_ADCOSET_SEARCH_ENGINE` | package + owner → counts per object type |
 | BASIS | CODE_SEARCH_ADT | `ZCL_ADCOSET_SEARCH_ENGINE` + ADT URIs | Same as CODE_SEARCH + build_adt_uri for each hit |
 
-All functional actions route to ZROUTER RFC. ADT ops and `code_search` go to ARC-1 ADT. `sf_*` go to sf-mcp.
+Functional WRITE actions need explicit --functional context (else needs-functional-context, no BAPI fired); they then dispatch BAPI-first / SAP GUI. ZROUTER RFC is opt-in only (zrouter accept) — never the default. ADT ops and `code_search` → ARC-1 ADT. `sf_*` → sf-mcp.
 
 ## Template repository commands
 
@@ -141,6 +141,6 @@ python scripts/abap_serializer.py list-formats
 
 - Template row 2 = field descriptions — **not** valid data row. Replace before converting.
 - `memory_manager add` auto-inits a missing MEMORY.md silently with defaults.
-- `route` is a classifier, not a validator — unknown actions silently fall to ZROUTER.
+- `route` is a classifier, not a validator — unknown actions fall to SAP GUI scripting. Functional writes are gated on --functional. ZROUTER is opt-in, never the default.
 - **`template_repo.py` works offline** — resolves placeholders via Python string substitution. ABAP runtime eval uses `GENERATE SUBROUTINE POOL` (see ZROUTER_DISPATCH v2).
 - **`abap_serializer.py` `_class_to_type`** auto-detects from name prefix: `ZCL_`→CLAS, `ZIF_`→INTF, `ZCX_`→CLAS, other `Z*`→PROG. Use explicit `--type` to override.

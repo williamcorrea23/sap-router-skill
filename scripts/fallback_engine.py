@@ -374,7 +374,7 @@ class TieredFallback:
                     "method": "SAP GUI Transaction",
                     "tcode": gui_info["tcode"],
                     "mcp": "mcp-sap-gui",
-                    "command": f"mcp-sap-gui: navigate /n{gui_info["tcode"]}",
+                    "command": "mcp-sap-gui: navigate /n{}".format(gui_info["tcode"]),
                     "alt_method": gui_info.get("alt"),
                 }
             }
@@ -393,7 +393,7 @@ class TieredFallback:
                     "method": "SAP GUI BDC Recording",
                     "bdc_name": gui_info["bdc"],
                     "mcp": "mcp-sap-gui",
-                    "command": f"mcp-sap-gui: execute_bdc {gui_info["bdc"]}",
+                    "command": "mcp-sap-gui: execute_bdc {}".format(gui_info["bdc"]),
                     "note": "BDC may require SHDB recording setup first",
                 }
             }
@@ -560,7 +560,7 @@ class TieredFallback:
                     "elapsed_ms": elapsed_ms,
                 }),
                 "--details", "Fallback chain: " + " -> ".join(
-                    f"{c["tier"]}:{"OK" if c["success"] else "FAIL"}"
+                    "{}:{}".format(c["tier"], "OK" if c["success"] else "FAIL")
                     for c in self.chain
                 )
             ]

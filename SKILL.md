@@ -4,7 +4,7 @@ description: >-
   SAP development orchestrator v4.0 — Karpathy command format (Think→Simplify→
   Surgical→Verify), healthcheck guardian, self-learning router, caveman-compressed
   output default. 78 skills, 30 MCPs (all SAP domains covered), 10 CLIs. Routes: ADT →
-  GUI (immediate) → RFC → Pipeline. RAG-ready: Pinecone, Supabase, Azure.
+  GUI (immediate); BAPI dispatch only in functional context; ZROUTER RFC opt-in; parallel pipeline waves. RAG-ready: Pinecone, Supabase, Azure.
   Use for any SAP task.
 ---
 
@@ -90,8 +90,13 @@ User Request
     │ Missing nav data? → sap-gui-web-enrich → web search for field IDs
     │ Try: mcp-sap-gui → mcp-sap-gui-kts → sapgui-mcp-go
     ▼
-4. BAPI batch? (create material, post document, create order...)
-    │ YES → ZROUTER RFC via ZROUTER_DISPATCH_FM
+4. Functional WRITE? (create material, post document, create order...)
+    │ Requires explicit functional context (--functional). Without it →
+    │   needs-functional-context, NO BAPI fired (BAPIs fire only when a real
+    │   functional action requires them).
+    │ With context → BAPI-first dispatch (commit stays in backend), else
+    │   SAP GUI write transaction. Optional: --use-zrouter uses ZROUTER RFC
+    │   ONLY if the user opted in (zrouter accept). Never the default.
     ▼
 5. Spec → code? (implement specification, full workflow)
     │ YES → sap_router.py pipeline → 8 stages
@@ -214,7 +219,9 @@ npm run learn:ctx
 |---|---|---|
 | "read ZCL_*" / "get source" | ADT (self-learn best) | arc-1 SAPRead → verify: source returned |
 | "write/activate Z*" | ADT direct | arc-1 SAPWrite → SAPActivate → syntax check |
-| "create material/order" | ZROUTER RFC | BAPI → BAPIRET2 check → MM03/VA03 verify |
+| "create material/order" (functional) | BAPI dispatch (--functional) | BAPI → BAPIRET2 check → MM03/VA03 verify. ZROUTER only if opted in. |
+| functional write w/o --functional | needs-functional-context | classify only — no BAPI fired out of context |
+| "run stages in parallel" / big spec | dispatch-plan / crew-dispatch | emit wave plan; same-wave agents launch concurrently |
 | "SPRO / SM30 / SU01 / MM01 / VA01..." | GUI IMMEDIATE | mcp-sap-gui navigate → execute → verify |
 | "GUI data missing for tcode X" | GUI + web enrich | WebSearch SAP Help → build BDC → cache |
 | "find/where is X" | cavecrew-investigator | delegate → 60% token savings |
@@ -264,7 +271,12 @@ npm run learn:ctx
 
 ---
 
-## Install ZROUTER on SAP
+## Install ZROUTER on SAP (OPTIONAL — opt-in only, never the engine)
+
+ZROUTER is an OPTIONAL RFC accelerator. Routing never auto-probes or
+auto-installs it. Ask first: `python scripts/sap_router.py zrouter offer`
+(default: decline; a decline is persisted in `zrouter_optin.json`). Only after
+`python scripts/sap_router.py zrouter accept` do the steps below apply:
 
 ```bash
 # 1. Create package
@@ -281,5 +293,5 @@ aibap: create_object(type="FUNC", name="ZROUTER_DISPATCH_FM", function_group="ZR
 
 # 4. Activate + test
 aibap: activate_objects(["ZCL_ZROUTER_DISPATCH","CX_ZROUTER","ZROUTER_DISPATCH_FM"])
-python scripts/sap_router.py route --action MM_CREATE_MATERIAL
+python scripts/sap_router.py route --action MM_CREATE_MATERIAL --functional --use-zrouter
 ```

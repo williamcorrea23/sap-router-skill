@@ -161,6 +161,17 @@ class MemoryManager:
             self.active['tr'] = fields['tr']
 
     def compact(self):
+        """Deduplicate identical blocks, then limit to 20. Older ones -> archive."""
+        # Dedup: remove blocks with identical header + content
+        seen = {}
+        unique_blocks = []
+        for block in self.blocks:
+            key = (block['header'], tuple(block['lines']))
+            if key not in seen:
+                seen[key] = True
+                unique_blocks.append(block)
+        self.blocks = unique_blocks
+
         # Limit to 20 blocks. Move older ones to archive
         if len(self.blocks) > 20:
             excess = len(self.blocks) - 20
@@ -168,7 +179,6 @@ class MemoryManager:
             self.blocks = self.blocks[excess:]
 
             for block in to_archive:
-                # Format archive summary: - [time] Mod/Act: status, key=val
                 header = block['header']
                 status_line = block['lines'][0] if block['lines'] else ""
                 self.archive.append(f"- {header} | {status_line}")

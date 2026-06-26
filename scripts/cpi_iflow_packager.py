@@ -345,13 +345,19 @@ def cmd_validate(args):
 
 
 def cmd_extract(args):
-    """Extract iFlow ZIP to directory."""
+    """Extract iFlow ZIP to directory (path-traversal safe)."""
     input_path = Path(args.input)
-    output_dir = Path(args.output)
+    output_dir = Path(args.output).resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
 
     with zipfile.ZipFile(input_path, "r") as zf:
-        zf.extractall(output_dir)
+        for info in zf.infolist():
+            # Prevent zip-slip path traversal
+            member_path = os.path.normpath(output_dir / info.filename)
+            if not str(member_path).startswith(str(output_dir)):
+                print(f"WARNING: Skipping suspicious path: {info.filename}", file=sys.stderr)
+                continue
+            zf.extract(info, output_dir)
 
     print(f"Extracted {input_path} -> {output_dir}")
     print(f"  Files extracted: {len(zf.namelist())}")
