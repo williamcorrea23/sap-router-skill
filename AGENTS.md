@@ -1,19 +1,19 @@
 # SAP Router Skill — Multi-IDE Agent Instructions
 
-> **55 skills mirrored across 4 IDEs — same SKILL.md content in each.**
+> **68 skills mirrored across 4 IDEs — same SKILL.md content in each.**
 >
 > | IDE | Skill Directory | Entry Point |
 > |---|---|---|
-> | **Claude Code** | `.claude/skills/` (55 skills) | `.claude/skills/run-sap-router-skill/SKILL.md` |
-> | **Antigravity (Gemini)** | `.gemini/skills/` (55 skills) | `.gemini/skills/run-sap-router-skill/SKILL.md` |
-> | **Codex / OpenAI** | `.codex/skills/` (55 skills) | `.codex/AGENTS.md` |
-> | **Cursor** | `.cursor/skills/` (55 skills) | `.cursor/skills/run-sap-router-skill/SKILL.md` |
+> | **Claude Code** | `.claude/skills/` (68 skills) | `.claude/skills/run-sap-router-skill/SKILL.md` |
+> | **Antigravity (Gemini)** | `.gemini/skills/` (68 skills) | `.gemini/skills/run-sap-router-skill/SKILL.md` |
+> | **Codex / OpenAI** | `.codex/skills/` (68 skills) | `.codex/AGENTS.md` |
+> | **Cursor** | `.cursor/skills/` (68 skills) | `.cursor/skills/run-sap-router-skill/SKILL.md` |
 >
 > All skills auto-trigger by file context and keyword. See SKILL.md for master dispatch.
 
 ## What this project is
 
-Three standalone Python 3 CLIs — no live SAP system, no network, no
+Six standalone Python 3 CLIs — no live SAP system, no network, no
 credentials required. Everything runs offline:
 
 | Script | Purpose |
@@ -23,12 +23,13 @@ credentials required. Everything runs offline:
 | `scripts/xls_to_bapi.py` | CSV/XLSX → BAPI JSON payload converter |
 | `scripts/template_repo.py` | Offline ABAP template repository with `{{placeholders}}` |
 | `scripts/abap_serializer.py` | Multi-format ABAP packer: .nugg, abapGit, ZDOWNLOAD XML |
+| `scripts/cpi_iflow_packager.py` | CPI iFlow ZIP create/validate/extract |
 
 ## Run / verify
 
 ```bash
 python .claude/skills/run-sap-router-skill/driver.py
-# Exit 0 = all 44 checks passed. No project files modified.
+# Exit 0 = all 50 checks passed. No project files modified.
 ```
 
 Requires Python 3.8+. No packages needed for CSV; `pip install openpyxl`
@@ -60,7 +61,7 @@ python scripts/xls_to_bapi.py template --output tmpl.csv --module MM --action CR
 python scripts/xls_to_bapi.py convert  --input data.csv  --module MM --action CREATE_MATERIAL
 ```
 
-## Action-to-BAPI mapping (26 actions / 9 modules)
+## Action-to-BAPI mapping (29 actions / 9 modules)
 
 | Module | Action | Background BAPI/FM | BAPI Params |
 |---|---|---|---|
@@ -101,7 +102,7 @@ All functional actions route to ZROUTER RFC. ADT ops and `code_search` go to ARC
 
 ```bash
 python scripts/template_repo.py init                                                  # Create blank repo
-python scripts/template_repo.py seed                                                  # Populate 9 starter templates
+python scripts/template_repo.py seed                                                  # Populate 12 starter templates
 python scripts/template_repo.py list                                                  # List all templates
 python scripts/template_repo.py add --file template.abap --module MM --action FOO     # Import from ABAP file
 python scripts/template_repo.py resolve --template MM_CREATE_MATERIAL --values '{"HEADER":"h"}'  # Substitute placeholders

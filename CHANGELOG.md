@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.0.0] — 2026-06-25
+## [2.0.0] — 2026-06-26
 
 ### Added
 - **54 Claude Code skills** covering all SAP domains (ABAP, RAP, CDS, BTP, CAP, UI5, Fiori, HANA, SAC, CPI, AI)

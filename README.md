@@ -7,8 +7,8 @@
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8%2B-green.svg)](https://python.org)
 [![Tests](https://img.shields.io/badge/tests-50%2F50-brightgreen.svg)](.claude/skills/run-sap-router-skill/driver.py)
-[![Skills](https://img.shields.io/badge/skills-68-blueviolet.svg)](.claude/skills/)
-[![MCPs](https://img.shields.io/badge/mcps-11-orange.svg)](.mcp.json)
+[![Skills](https://img.shields.io/badge/skills-68-blueviolet.svg)-blueviolet.svg)](.claude/skills/)
+[![MCPs](https://img.shields.io/badge/mcps-11-orange.svg)-orange.svg)](.mcp.json)
 
 **68 skills · 6 CLIs · 11 public SAP MCPs · 4 ABAP templates** — ABAP, RAP, CDS, BTP,
 CPI, CAP, UI5, Fiori, HANA, Datasphere, SAC, AI Core.
@@ -36,17 +36,11 @@ the correct MCP server connects to your SAP system live. No context switching.
 │  │  ├─ action: BAPI → sap-bapi-*      │              │
 │  │  └─ action: transport → sap-trans* │              │
 │  ├─────────────────────────────────────┤              │
-│  │  16 MCP servers (live SAP)          │              │
+│  │  11 MCP servers (live SAP)          │              │
 │  │  ├─ arc-1 → ADT read/write          │              │
 │  │  ├─ aibap → 69 ABAP dev tools       │              │
-│  │  ├─ hermes-crewai → BAPI calls      │              │
-│  │  └─ sap-cpi → CPI deploy/monitor    │              │
-│  ├─────────────────────────────────────┤              │
-│  │  6 Python CLIs (offline safety)     │              │
-│  │  ├─ route actions                  │              │
-│  │  ├─ CSV → BAPI payload             │              │
-│  │  ├─ serialize ABAP objects         │              │
-│  │  └─ package CPI iFlows             │              │
+│  │  ├─ mcp-abap-adt → ADT bridge       │              │
+│  │  └─ mcp-sap-notes → SAP Notes       │              │
 │  └─────────────────────────────────────┘              │
 │       │                                               │
 │       ▼                                               │
@@ -106,7 +100,7 @@ cp .mcp.json <your-project>/.mcp.json
 | `arc-1` | `ARC_SAP_URL`, `ARC_SAP_USER`, `ARC_SAP_PASSWORD`, `ARC_SAP_CLIENT` |
 | `aibap` | Configure `systems.json` with host, user, password, client |
 | `mcp-abap-adt` | `SAP_URL`, `SAP_USERNAME`, `SAP_PASSWORD`, `SAP_CLIENT` |
-| `hermes-crewai` | Already configured on the local system |
+| `sap-cpi` | Already configured — requires live CPI tenant |
 | `sap-cpi` | Already configured — requires live CPI tenant |
 | `mcp-sap-notes` | `SAP_USERNAME`, `SAP_PASSWORD` (me.sap.com account) |
 
@@ -115,7 +109,7 @@ cp .mcp.json <your-project>/.mcp.json
 
 ### Step 4 — Skills Load Automatically
 
-All 54 skills in `.claude/skills/` are auto-discovered by Claude Code when
+All 68 skills in `.claude/skills/` are auto-discovered by Claude Code when
 you open the project. **Zero manual configuration** — each skill has
 auto-activation triggers based on file context and keywords.
 
@@ -171,7 +165,7 @@ You:
 
 Auto-trigger skill: sap-bapi-integration
 CLI called: xls_to_bapi.py template + convert
-MCP called: hermes-crewai / arc-1 → executes BAPI for each row
+MCP called: aibap / arc-1 → executes BAPI for each row
 
 Result: JSON payload generated, BAPI called, return validated.
 ```
@@ -208,17 +202,16 @@ Result: HTML report with 9 dimensions, GO/NO-GO decision.
 | `*.xslt` / `*.mmap` | cpi-iflow-development |
 | `transport request` | sap-transport-management, btp-cloud-transport-management |
 
-**54 skills = 8 ABAP Core + 7 RAP/CDS/Cloud + 15 BTP + 3 UI5/Fiori +
+**68 skills = 8 ABAP Core + 7 RAP/CDS/Cloud + 15 BTP + 3 UI5/Fiori +
 6 CAP/HANA/AI + 6 SAC/Datasphere + 1 CPI + 5 Security/Infra + 3 Tooling**
 
-### 16 MCPs (live SAP connection from IDE)
+### 11 MCPs (live SAP connection from IDE)
 
 | MCP | Tools | Connects To |
 |---|---|---|
 | `arc-1` | 12 (SAPRead/Write/Search/Activate/Transport/...) | S/4HANA via ADT |
 | `aibap` | 69 (source, objects, testing, ST22, BAdI, DEBUG...) | S/4HANA via ADT |
 | `mcp-abap-adt` | 13 (GetProgram, GetClass, GetTable, SearchObject...) | S/4HANA via ADT |
-| `hermes-crewai` | 21 (ADT, BAPI, HANA, ABAP lint, transport gate...) | S/4HANA + HANA |
 | `sap-cpi` | 11 (deploy, messages, keystore, credentials...) | CPI tenant |
 | `mcp-sap-notes` | 2 (search, fetch) | me.sap.com |
 | `btp-mcp` | 7 (GlobalAccount, Subaccounts, Entitlements...) | BTP cockpit |
@@ -301,11 +294,11 @@ sap-router-skill/
 ├── LICENSE                     ← MIT
 ├── CHANGELOG.md
 ├── .gitignore
-├── .mcp.json                   ← 16 MCPs — copy to your workspace
+├── .mcp.json                   ← 11 SAP MCPs — copy to your workspace
 ├── .abaplint.json              ← 60+ ABAP lint rules
 ├── package.json                ← npm scripts (lint, review, CI)
 │
-├── .claude/skills/             ← 54 skills (auto-load in IDE)
+├── .claude/skills/             ← 68 skills (auto-load in IDE)
 │   ├── run-sap-router-skill/  ← Smoke driver
 │   ├── abap-code-patterns/           ← BAPI, GEN SUBROUTINE POOL
 │   ├── clean-abap/                   ← Clean ABAP Style Guide
@@ -355,7 +348,7 @@ sap-router-skill/
 
 | Action contains | Destination | MCP Used |
 |---|---|---|
-| `read_source`, `search_object`, `syntax_check`, `where_used`, `get_deps`, `code_search` | ARC-1 ADT | arc-1 / aibap / hermes-crewai |
+| `read_source`, `search_object`, `syntax_check`, `where_used`, `get_deps`, `code_search` | ARC-1 ADT | arc-1 / aibap / mcp-abap-adt |
 | `sf_*` prefix | sf-mcp OData | SuccessFactors API |
 | everything else | ZROUTER RFC | ZROUTER_DISPATCH_FM → 9 handlers |
 
