@@ -16,6 +16,7 @@
     "7bit_ascii": {
       "enabled": true,
       "exclude": []
+    },
     "check_abstract": {
       "enabled": true
     },
