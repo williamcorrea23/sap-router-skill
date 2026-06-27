@@ -8,6 +8,7 @@
 > Every route learned. Every response compressed.
 
 ---
+<img width="2816" height="1536" alt="Gemini_Generated_Image_fenqd2fenqd2fenq" src="https://github.com/user-attachments/assets/b93bb48a-a704-44f6-b4c0-437a21712be5" />
 
 ## What It Does
 
