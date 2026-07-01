@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""ZROUTER Bootstrap v4.0 - probe, install, and fallback manager."""
+"""ZROUTER Bootstrap v4.2.0 - probe, install, and fallback manager."""
 
 import json
 import sys
@@ -8,7 +8,7 @@ import argparse
 import subprocess
 from pathlib import Path
 
-__version__ = "4.0.0"
+__version__ = "4.2.0"
 
 SKILL_DIR = Path(__file__).resolve().parent.parent
 

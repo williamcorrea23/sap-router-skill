@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Tiered Fallback Engine v4.0 - multi-tier routing fallback with retry + verification.
+Tiered Fallback Engine v4.2.0 - multi-tier routing fallback with retry + verification.
 
 When primary routing fails (ZROUTER not installed, ADT unavailable, GUI down),
 this engine cascades through fallback tiers until one succeeds or all fail.
@@ -35,7 +35,7 @@ from pathlib import Path
 from datetime import datetime
 from typing import Optional, Any
 
-__version__ = "4.0.0"
+__version__ = "4.2.0"
 
 SKILL_DIR = Path(__file__).resolve().parent.parent
 

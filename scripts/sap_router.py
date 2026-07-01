@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-SAP Router v4.1 - intelligent routing engine with ADT-first, GUI-fallback strategy.
+SAP Router v4.2.0 - intelligent routing engine with ADT-first, GUI-fallback strategy.
 +parallel subagent dispatch +ZROUTER opt-in (asked, never the engine)
 +functional-context BAPI gate +caveman delegation +pipeline orchestration.
 
-Routing law (v4.1):
+Routing law (v4.2):
   1. ADT-first for dev/read ops; SAP GUI scripting (mcp-sap-gui) is the universal fallback.
   2. ZROUTER is an OPTIONAL RFC accelerator. It is never auto-installed or
      auto-probed. The user is asked ('zrouter offer'); a decline is persisted
@@ -20,7 +20,7 @@ import json
 import argparse
 import subprocess
 
-__version__ = "4.1.0"
+__version__ = "4.2.0"
 
 # === ZROUTER LIVE STATE (probe cache, used by bootstrap/fallback engine) ===
 # Cached probe result. None=not checked, True=installed, False=missing
@@ -191,6 +191,39 @@ class SapRouter:
         action_lower = action.lower()
         action_upper = action.upper()
 
+        # Step 0a: Cloud ALM (CALM) operations
+        if any(kw in action_lower for kw in ["calm_", "alm_", "cloud_alm"]):
+            return {
+                "destination": "SAP Cloud ALM (CALM)",
+                "mcp_server": "mcp-calm-server",
+                "mcp_servers": ["mcp-calm-server", "cloud-alm-itsm"],
+                "strategy": "cloud-alm",
+                "details": "SAP Cloud ALM operation via mcp-calm-server"
+            }
+
+        # Step 0b: Transport / CTS operations
+        if any(kw in action_lower for kw in ["transport_", "cts_", "release_request", "import_queue"]):
+            return {
+                "destination": "SAP CTS (Transports)",
+                "mcp_server": "sap-transport-mcp",
+                "mcp_servers": ["sap-transport-mcp", "abap-mcp", "arc-1", "aibap"],
+                "strategy": "cts-transport",
+                "details": "Change and Transport System (CTS) management via sap-transport-mcp"
+            }
+
+        # Step 0c: Advanced ABAP MCP operations
+        advanced_abap_kws = ["read_abap_method", "edit_abap_method", "validate_ddic", 
+                             "execute_abap_snippet", "get_abap_contract", "get_call_graph", 
+                             "find_dead_code", "review_clean_abap", "abap_develop"]
+        if any(kw in action_lower for kw in advanced_abap_kws):
+            return {
+                "destination": "ABAP MCP Server (DimiDR)",
+                "mcp_server": "abap-mcp",
+                "mcp_servers": ["abap-mcp", "arc-1", "aibap", "mcp-abap-adt"],
+                "strategy": "abap-mcp-advanced",
+                "details": "Advanced ABAP MCP operation: method surgery / DDIC validation / Clean ABAP"
+            }
+
         # Step 1: ADT read/dev ops (primary path) — never fire a BAPI
         if try_adt:
             for adt_action in ADT_ACTIONS:
@@ -198,6 +231,7 @@ class SapRouter:
                     return {
                         "destination": "ARC-1 (ADT)",
                         "mcp_server": "arc-1",
+                        "mcp_servers": ["arc-1", "abap-mcp", "aibap", "mcp-abap-adt"],
                         "fallback": "sap-gui-scripting",
                         "strategy": "adt-primary",
                         "details": "Direct ADT operation via arc-1 SAPRead/SAPWrite/SAPSearch"
@@ -208,6 +242,7 @@ class SapRouter:
             return {
                 "destination": "sf-mcp (OData)",
                 "mcp_server": "sf-mcp",
+                "mcp_servers": ["sf-mcp"],
                 "strategy": "hcm-cloud",
                 "details": "SuccessFactors API via OData V2 endpoint"
             }
@@ -251,6 +286,7 @@ class SapRouter:
                     return {
                         "destination": "SAP GUI Scripting",
                         "mcp_server": "mcp-sap-gui",
+                        "mcp_servers": ["mcp-sap-gui", "mcp-sap-gui-kts", "sapgui-mcp-go"],
                         "transaction": gui_info['tcode'],
                         "description": gui_info['description'],
                         "strategy": "gui-fallback",
@@ -263,6 +299,7 @@ class SapRouter:
         return {
             "destination": "SAP GUI Scripting",
             "mcp_server": "mcp-sap-gui",
+            "mcp_servers": ["mcp-sap-gui", "mcp-sap-gui-kts", "sapgui-mcp-go"],
             "transaction": tcode,
             "strategy": "gui-fallback",
             "details": (f"ADT cannot handle '{action_upper}'. "
@@ -307,12 +344,14 @@ class SapRouter:
                 "bapi": bapi,
                 "transaction": tcode,
                 "mcp_server": "mcp-sap-gui",
+                "mcp_servers": ["mcp-sap-gui", "mcp-sap-gui-kts", "sapgui-mcp-go"],
                 "details": (f"Functional action {action_upper}: dispatch {bapi} "
                             f"(GUI fallback: {tcode or 'n/a'}). Commit stays in the backend."),
             }
         return {
             "destination": "SAP GUI Scripting",
             "mcp_server": "mcp-sap-gui",
+            "mcp_servers": ["mcp-sap-gui", "mcp-sap-gui-kts", "sapgui-mcp-go"],
             "transaction": tcode,
             "strategy": "gui-fallback",
             "details": (f"Functional action {action_upper} via SAP GUI scripting"

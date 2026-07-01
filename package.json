@@ -1,7 +1,7 @@
 {
   "name": "sap-router-orchestrator",
-  "version": "4.0.0",
-  "description": "SAP Router Orchestrator v4.0 - Karpathy command format. 78 skills, 30 MCPs, 10 CLIs, 60 npm scripts. All SAP domains covered.",
+  "version": "4.2.0",
+  "description": "SAP Router Orchestrator v4.2.0 - Karpathy command format. 78 skills, 35 MCPs, 10 CLIs, 60 npm scripts. All SAP domains covered.",
   "private": true,
   "scripts": {
     "abap:lint": "abaplint templates/**/*.abap",

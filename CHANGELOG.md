@@ -1,5 +1,21 @@
 # Changelog
 
+## [4.2.0] — 2026-07-01
+
+### Added
+- **abap-mcp** integration (DimiDR/ABAP-MCP) for advanced agentic ABAP development (method surgery, DDIC validation, Clean ABAP workflow).
+- **mcp-calm-server** integration (fr0ster/mcp-calm-server) for SAP Cloud ALM services.
+- **sap-transport-mcp** integration (Nidhideep/sap-transport-mcp) for Change and Transport System (CTS) management.
+- **Intelligent Dynamic Routing**: updated `sap_router.py` to route requests dynamically to `abap-mcp`, `mcp-calm-server`, and `sap-transport-mcp` based on requested actions and keywords.
+- Registered all new servers in `.mcp.json`, `.env.template`, and `healthcheck.py`.
+
+## [4.1.0] — 2026-07-01
+
+### Added
+- **mcp-integration-suite** integration (1nbuc/mcp-integration-suite) for managing Integration Packages, iFlows, message mapping, and monitoring.
+- **ci-mcp-server** integration (lemaiwo/ci-mcp-server) mapping the CPI OData V2 API to MCP tools.
+- Registered new servers in `.mcp.json`, `.env.template`, and `healthcheck.py`.
+
 ## [4.0.0] — 2026-06-26
 
 ### Added

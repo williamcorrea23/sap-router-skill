@@ -276,6 +276,109 @@
         "APIM_PASSWORD": "${APIM_PASSWORD}"
       },
       "description": "SAP API Management MCP — API proxy lifecycle, policy deployment, security/traffic config, OpenAPI import, API Business Hub publication. Pre-configured for sap-api-policy skill."
+    },
+    "mcp-integration-suite": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["packages/mcp-integration-suite/dist/index.js"],
+      "env": {
+        "API_OAUTH_CLIENT_ID": "${API_OAUTH_CLIENT_ID}",
+        "API_OAUTH_CLIENT_SECRET": "${API_OAUTH_CLIENT_SECRET}",
+        "API_OAUTH_TOKEN_URL": "${API_OAUTH_TOKEN_URL}",
+        "API_BASE_URL": "${API_BASE_URL}",
+        "API_USER": "${API_USER}",
+        "API_PASS": "${API_PASS}",
+        "CPI_BASE_URL": "${CPI_BASE_URL}",
+        "CPI_OAUTH_CLIENT_ID": "${CPI_OAUTH_CLIENT_ID}",
+        "CPI_OAUTH_CLIENT_SECRET": "${CPI_OAUTH_CLIENT_SECRET}",
+        "CPI_OAUTH_TOKEN_URL": "${CPI_OAUTH_TOKEN_URL}"
+      },
+      "description": "1nbuc/mcp-integration-suite — SAP Integration Suite API management (iFlow, package, message mapping, testing, monitoring). Requires S-User credentials or OAuth2 service key."
+    },
+    "ci-mcp-server": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["packages/ci-mcp-server/node_modules/odata-mcp-proxy/dist/index.js", "--config", "packages/ci-mcp-server/ci-api-config.json"],
+      "env": {
+        "CPI_DESTINATION_BASE_URL": "${CPI_DESTINATION_BASE_URL}",
+        "CPI_DESTINATION_TOKEN_URL": "${CPI_DESTINATION_TOKEN_URL}",
+        "CPI_DESTINATION_CLIENT_ID": "${CPI_DESTINATION_CLIENT_ID}",
+        "CPI_DESTINATION_CLIENT_SECRET": "${CPI_DESTINATION_CLIENT_SECRET}"
+      },
+      "description": "lemaiwo/ci-mcp-server — configuration-driven SAP Cloud Integration (CPI) OData V2 API proxy. Exposes 32 entity sets (packages, logs, security material, Partner Directory)."
+    },
+    "abap-mcp": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["packages/ABAP-MCP/dist/index.js"],
+      "env": {
+        "SAP_URL": "${SAP_URL}",
+        "SAP_USER": "${SAP_USER}",
+        "SAP_PASSWORD": "${SAP_PASSWORD}",
+        "SAP_CLIENT": "${SAP_CLIENT}",
+        "SAP_LANGUAGE": "${SAP_LANGUAGE}",
+        "ALLOW_WRITE": "${ALLOW_WRITE}",
+        "ALLOW_DELETE": "${ALLOW_DELETE}",
+        "ALLOW_EXECUTE": "${ALLOW_EXECUTE}",
+        "BLOCKED_PACKAGES": "${BLOCKED_PACKAGES}",
+        "SYNTAX_CHECK_BEFORE_ACTIVATE": "${SYNTAX_CHECK_BEFORE_ACTIVATE}",
+        "DEFER_TOOLS": "${DEFER_TOOLS}",
+        "SAP_ABAP_VERSION": "${SAP_ABAP_VERSION}",
+        "TAVILY_API_KEY": "${TAVILY_API_KEY}",
+        "SAP_ROLE": "${SAP_ROLE}",
+        "DEFAULT_TRANSPORT": "${DEFAULT_TRANSPORT}",
+        "SAP_ALLOW_UNAUTHORIZED": "${SAP_ALLOW_UNAUTHORIZED}",
+        "SAP_BTP_CONNECTIVITY_PROXY": "${SAP_BTP_CONNECTIVITY_PROXY}",
+        "SAP_BTP_CONNECTIVITY_LOCATION_ID": "${SAP_BTP_CONNECTIVITY_LOCATION_ID}",
+        "SAP_BTP_CONNECTIVITY_DEBUG": "${SAP_BTP_CONNECTIVITY_DEBUG}",
+        "SAP_BTP_CONNECTIVITY_CREDS_FILE": "${SAP_BTP_CONNECTIVITY_CREDS_FILE}",
+        "SAP_BTP_CONNECTIVITY_CDS_BIND_FILE": "${SAP_BTP_CONNECTIVITY_CDS_BIND_FILE}",
+        "SAP_BTP_CONNECTIVITY_CDS_BIND_NAME": "${SAP_BTP_CONNECTIVITY_CDS_BIND_NAME}",
+        "SAP_BTP_CF_HOME": "${SAP_BTP_CF_HOME}",
+        "SAP_BTP_CONNECTIVITY_CLIENT_ID": "${SAP_BTP_CONNECTIVITY_CLIENT_ID}",
+        "SAP_BTP_CONNECTIVITY_CLIENT_SECRET": "${SAP_BTP_CONNECTIVITY_CLIENT_SECRET}",
+        "SAP_BTP_CONNECTIVITY_TOKEN_URL": "${SAP_BTP_CONNECTIVITY_TOKEN_URL}",
+        "SAP_ROUTER": "${SAP_ROUTER}",
+        "SAP_ROUTER_PASSWORD": "${SAP_ROUTER_PASSWORD}",
+        "SAP_ROUTER_DEBUG": "${SAP_ROUTER_DEBUG}",
+        "SAP_PROXY_URL": "${SAP_PROXY_URL}",
+        "MAX_DUMPS": "${MAX_DUMPS}",
+        "SOURCE_CACHE_TTL_MS": "${SOURCE_CACHE_TTL_MS}",
+        "WEB_ALLOW_UNAUTHORIZED": "${WEB_ALLOW_UNAUTHORIZED}"
+      },
+      "description": "DimiDR/ABAP-MCP — Standalone MCP Server for agentic ABAP development (67 tools, method surgery, DDIC validation, Clean ABAP workflow)."
+    },
+    "mcp-calm-server": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["packages/mcp-calm-server/dist/bin/stdio.js"],
+      "env": {
+        "CALM_MODE": "${CALM_MODE}",
+        "CALM_BASE_URL": "${CALM_BASE_URL}",
+        "CALM_UAA_URL": "${CALM_UAA_URL}",
+        "CALM_UAA_CLIENT_ID": "${CALM_UAA_CLIENT_ID}",
+        "CALM_UAA_CLIENT_SECRET": "${CALM_UAA_CLIENT_SECRET}",
+        "CALM_API_KEY": "${CALM_API_KEY}"
+      },
+      "description": "fr0ster/mcp-calm-server — SAP Cloud ALM MCP server. Exposes 54 tools covering all 9 Cloud ALM services."
+    },
+    "sap-transport-mcp": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["packages/sap-transport-mcp/dist/src/index.js"],
+      "env": {
+        "SAP_HOSTNAME": "${SAP_HOSTNAME}",
+        "SAP_SYSNR": "${SAP_SYSNR}",
+        "SAP_CLIENT": "${SAP_CLIENT}",
+        "SAP_LANGUAGE": "${SAP_LANGUAGE}",
+        "SAP_SYSTEM_ID": "${SAP_SYSTEM_ID}",
+        "AUTH_METHOD": "${AUTH_METHOD}",
+        "SAP_USERNAME": "${SAP_USERNAME}",
+        "SAP_PASSWORD": "${SAP_PASSWORD}",
+        "LOG_LEVEL": "${LOG_LEVEL}",
+        "DRY_RUN": "${DRY_RUN}"
+      },
+      "description": "Nidhideep/sap-transport-mcp — CTS Transport Request management (list, inspect, release, delete) via SAP ADT REST API."
     }
   },
   "routing": {

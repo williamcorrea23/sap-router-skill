@@ -3,7 +3,7 @@ name: sap-router-skill
 description: >-
   SAP development orchestrator v4.0 — Karpathy command format (Think→Simplify→
   Surgical→Verify), healthcheck guardian, self-learning router, caveman-compressed
-  output default. 78 skills, 30 MCPs (all SAP domains covered), 10 CLIs. Routes: ADT →
+  output default. 78 skills, 35 MCPs (all SAP domains covered), 10 CLIs. Routes: ADT →
   GUI (immediate); BAPI dispatch only in functional context; ZROUTER RFC opt-in; parallel pipeline waves. RAG-ready: Pinecone, Supabase, Azure.
   Use for any SAP task.
 ---
@@ -29,7 +29,7 @@ Before ANY operation, verify:
    → If missing: prompt user for ARC_SAP_URL, ARC_SAP_USER, ARC_SAP_PASSWORD, ARC_SAP_CLIENT
    → Show: `cp .env.template .env` + edit instructions
 
-2. **MCPs connected**: probes all 30 MCPs
+2. **MCPs connected**: probes all 35 MCPs
    → HIGH criticality: arc-1, aibap (block on failure)
    → MEDIUM: mcp-abap-adt, mcp-sap-gui, btp-sap-odata-to-mcp (warn)
    → OPTIONAL: RAG connectors (Pinecone, Supabase, Azure) — pre-ready, activate later
@@ -63,7 +63,7 @@ TRADEOFFS:
 → RECOMMENDATION: ZROUTER RFC for batch, GUI for single material with config
 ```
 
-If multiple BAPIs exist → present options. If SAP config unclear → ask.
+If multiple BAPIs, transaction fallbacks, or routing options exist, always present them as an enumerated (numbered) list (1., 2., 3...) to facilitate user selection. If SAP config unclear → ask.
 
 ---
 
@@ -105,6 +105,14 @@ User Request
 6. LLM optimization? (prompt engineering, eval harness)
     │ YES → sap-llm-engineering → evaluate → optimize → retry
 ```
+
+**Cascading MCP Fallback**:
+If a tool call to the primary `mcp_server` fails (due to connection timeout, missing credentials, or server errors), the agent must inspect the `mcp_servers` list returned by the router and iteratively execute the tool on the next server in the list until one succeeds, or until all options are exhausted.
+- Advanced ABAP: `abap-mcp` → `arc-1` → `aibap` → `mcp-abap-adt`
+- Standard ADT: `arc-1` → `abap-mcp` → `aibap` → `mcp-abap-adt`
+- Cloud ALM: `mcp-calm-server` → `cloud-alm-itsm`
+- Transports: `sap-transport-mcp` → `abap-mcp` → `arc-1` → `aibap`
+- GUI Fallbacks: `mcp-sap-gui` → `mcp-sap-gui-kts` → `sapgui-mcp-go`
 
 **Self-learn adapts routing**: tracks MCP latency, success rates, auto-prefers faster paths.
 `python scripts/self_learn.py best-mcp --candidates "arc-1,aibap,mcp-abap-adt"` → returns best.

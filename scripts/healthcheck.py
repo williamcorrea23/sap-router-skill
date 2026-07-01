@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 SAP Router Healthcheck — MCP connectivity probe, .env guardian, credential validator.
-v4.0: Probes all 30 MCPs + ZROUTER, verifies .env completeness, prompts user for missing data.
+v4.2.0: Probes all 35 MCPs + ZROUTER, verifies .env completeness, prompts user for missing data.
 Andrej-style: "eval first, then act" — diagnose before routing.
 """
 import os
@@ -207,6 +207,36 @@ MCP_HEALTHCHECK_SPEC = {
         "criticality": "LOW",
         "description": "Sapient AI agent - faster alternative orchestrator",
     },
+    "mcp-integration-suite": {
+        "env_vars": ["API_BASE_URL", "API_USER", "API_PASS"],
+        "probe_command": None,
+        "criticality": "LOW",
+        "description": "SAP Integration Suite - packages, iFlows, message mapping, monitoring",
+    },
+    "ci-mcp-server": {
+        "env_vars": ["CPI_DESTINATION_BASE_URL", "CPI_DESTINATION_TOKEN_URL", "CPI_DESTINATION_CLIENT_ID", "CPI_DESTINATION_CLIENT_SECRET"],
+        "probe_command": None,
+        "criticality": "LOW",
+        "description": "SAP CPI OData API proxy via odata-mcp-proxy",
+    },
+    "abap-mcp": {
+        "env_vars": ["SAP_URL", "SAP_USER", "SAP_PASSWORD", "SAP_CLIENT"],
+        "probe_command": None,
+        "criticality": "LOW",
+        "description": "ABAP MCP Server (DimiDR) — agentic ABAP development client",
+    },
+    "mcp-calm-server": {
+        "env_vars": ["CALM_BASE_URL"],
+        "probe_command": None,
+        "criticality": "LOW",
+        "description": "SAP Cloud ALM MCP server (fr0ster)",
+    },
+    "sap-transport-mcp": {
+        "env_vars": ["SAP_HOSTNAME", "SAP_USERNAME", "SAP_PASSWORD"],
+        "probe_command": None,
+        "criticality": "LOW",
+        "description": "SAP CTS Transport Request management (Nidhideep)",
+    },
 }
 
 REQUIRED_ENV_FILE_VARS = [
@@ -231,6 +261,14 @@ OPTIONAL_ENV_FILE_VARS = [
     "SUPABASE_URL", "SUPABASE_SERVICE_KEY",
     "AZURE_SEARCH_ENDPOINT", "AZURE_SEARCH_KEY", "AZURE_SEARCH_INDEX",
     "OPENAI_API_KEY", "DEEPSEEK_API_KEY", "OPENROUTER_API_KEY",
+    "API_OAUTH_CLIENT_ID", "API_OAUTH_CLIENT_SECRET", "API_OAUTH_TOKEN_URL",
+    "API_BASE_URL", "API_USER", "API_PASS",
+    "CPI_BASE_URL", "CPI_OAUTH_CLIENT_ID", "CPI_OAUTH_CLIENT_SECRET", "CPI_OAUTH_TOKEN_URL",
+    "CPI_DESTINATION_BASE_URL", "CPI_DESTINATION_TOKEN_URL", "CPI_DESTINATION_CLIENT_ID", "CPI_DESTINATION_CLIENT_SECRET",
+    "SAP_USER", "SAP_LANGUAGE", "ALLOW_WRITE", "ALLOW_DELETE", "ALLOW_EXECUTE", "BLOCKED_PACKAGES", "SYNTAX_CHECK_BEFORE_ACTIVATE", "DEFER_TOOLS", "SAP_ABAP_VERSION",
+    "CALM_MODE", "CALM_BASE_URL", "CALM_UAA_URL", "CALM_UAA_CLIENT_ID", "CALM_UAA_CLIENT_SECRET", "CALM_API_KEY",
+    "SAP_HOSTNAME", "SAP_SYSNR", "SAP_SYSTEM_ID", "AUTH_METHOD", "SAP_USERNAME", "LOG_LEVEL", "DRY_RUN",
+    "SAP_ROLE", "DEFAULT_TRANSPORT", "SAP_ALLOW_UNAUTHORIZED", "SAP_BTP_CONNECTIVITY_PROXY", "SAP_BTP_CONNECTIVITY_LOCATION_ID", "SAP_BTP_CONNECTIVITY_DEBUG", "SAP_BTP_CONNECTIVITY_CREDS_FILE", "SAP_BTP_CONNECTIVITY_CDS_BIND_FILE", "SAP_BTP_CONNECTIVITY_CDS_BIND_NAME", "SAP_BTP_CF_HOME", "SAP_BTP_CONNECTIVITY_CLIENT_ID", "SAP_BTP_CONNECTIVITY_CLIENT_SECRET", "SAP_BTP_CONNECTIVITY_TOKEN_URL", "SAP_ROUTER", "SAP_ROUTER_PASSWORD", "SAP_ROUTER_DEBUG", "SAP_PROXY_URL", "MAX_DUMPS", "SOURCE_CACHE_TTL_MS", "WEB_ALLOW_UNAUTHORIZED",
 ]
 
 
@@ -471,8 +509,8 @@ class HealthChecker:
                 elif var == "ARC_SAP_CLIENT":
                     missing_vars.append(("ARC_SAP_CLIENT", "SAP client number (e.g., 100)"))
 
-            for var_name, var_desc in missing_vars:
-                prompts.append(f"  {var_name}: {var_desc}")
+            for idx, (var_name, var_desc) in enumerate(missing_vars, 1):
+                prompts.append(f"  [{idx}] {var_name}: {var_desc}")
 
             prompts.append("")
             prompts.append("Create a .env file in the project root:")
@@ -486,8 +524,8 @@ class HealthChecker:
                           if v not in self.results["missing_critical"]]
             if optional_vars:
                 prompts.append("=== OPTIONAL (RAG, GUI, BTP) ===")
-                for var in optional_vars[:10]:
-                    prompts.append(f"  - {var}")
+                for idx, var in enumerate(optional_vars[:10], 1):
+                    prompts.append(f"  [{idx}] {var}")
                 prompts.append("")
 
         return "\n".join(prompts)
