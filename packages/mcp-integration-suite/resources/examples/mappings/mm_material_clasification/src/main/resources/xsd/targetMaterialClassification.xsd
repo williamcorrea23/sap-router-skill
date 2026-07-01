@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="CLFMAS02">
+		<xs:complexType>
+		<xs:sequence>
+			<xs:element maxOccurs="unbounded" name="IDOC">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="EDI_DC40">
+							<xs:complexType>
+								<xs:all>
+									<xs:element name="TABNAM" type="xs:string"/>
+									<xs:element minOccurs="0" name="DOCNUM" type="xs:string"/>
+									<xs:element minOccurs="0" name="SERIAL" type="xs:string"/>
+									<xs:element name="DIRECT" type="xs:string"/>
+									<xs:element name="IDOCTYP" type="xs:string"/>
+									<xs:element name="MESTYP" type="xs:string"/>
+									<xs:element minOccurs="0" name="SNDPOR" type="xs:string"/>
+									<xs:element name="SNDPRT" type="xs:string"/>
+									<xs:element name="SNDPRN" type="xs:string"/>
+									<xs:element minOccurs="0" name="RCVPOR" type="xs:string"/>
+									<xs:element minOccurs="0" name="RCVPRT" type="xs:string"/>
+									<xs:element minOccurs="0" name="RCVPRN" type="xs:string"/>
+								</xs:all>
+								<xs:attribute fixed="1" name="SEGMENT" type="xs:string"/>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="E1OCLFM">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element minOccurs="0" name="OBTAB" type="xs:string"/>
+									<xs:element minOccurs="0" name="OBJEK" type="xs:string"/>
+									<xs:element minOccurs="0" name="KLART" type="xs:string"/>
+									<xs:element minOccurs="0" name="MAFID" type="xs:string"/>
+									<xs:element name="E1KSSKM">
+										<xs:complexType>
+											<xs:all>
+												<xs:element minOccurs="0" name="CLASS" type="xs:string"/>
+											</xs:all>
+											<xs:attribute fixed="1" name="SEGMENT" type="xs:string"/>
+										</xs:complexType>
+									</xs:element>
+									<xs:sequence>
+										<xs:element name="E1AUSPM" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:all>
+													<xs:element minOccurs="0" name="ATNAM" type="xs:string"/>
+													<xs:element minOccurs="0" name="AENNR" type="xs:string"/>
+													<xs:element minOccurs="0" name="ATWRT" type="xs:string"/>
+												</xs:all>
+												<xs:attribute fixed="1" name="SEGMENT" type="xs:string"/>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+									<xs:element name="E1DATEM">
+										<xs:complexType>
+											<xs:all>
+												<xs:element minOccurs="0" name="KEY_DATE" type="xs:string"/>
+												<xs:element minOccurs="0" name="AENNR" type="xs:string"/>
+											</xs:all>
+											<xs:attribute fixed="1" name="SEGMENT" type="xs:string"/>
+										</xs:complexType>
+									</xs:element>
+								</xs:sequence>
+								<xs:attribute fixed="1" name="SEGMENT" type="xs:string"/>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute fixed="1" name="BEGIN" type="xs:string"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

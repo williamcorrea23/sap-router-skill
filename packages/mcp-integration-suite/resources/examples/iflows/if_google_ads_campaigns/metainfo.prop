@@ -1,0 +1,5 @@
+#Store metainfo properties
+#Tue Apr 01 15:13:48 UTC 2025
+description=Filters and retrieves a list of campaigns from a Google Ads service account
+source=SAP Marketing,SAPMarketingCloud
+target=Google Ads

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="root">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="element" minOccurs="1" maxOccurs="999999">
+          <xs:complexType>
+            <xs:sequence>
+        		<xs:element type="xs:string" name="product" minOccurs="0" maxOccurs="1"/>
+        		<xs:element type="xs:string" name="site" minOccurs="0" maxOccurs="1"/>
+        		<xs:element type="xs:string" name="logicalSystem" minOccurs="0" maxOccurs="1"/>
+        		<xs:element type="xs:string" name="availableFromDate" minOccurs="0" maxOccurs="1"/>
+        		<xs:element type="xs:string" name="calculationDateTime" minOccurs="0" maxOccurs="1"/>
+        		<xs:element type="xs:decimal" name="unresUseStockQuantity" minOccurs="0" maxOccurs="1"/>
+        		<xs:element type="xs:decimal" name="unresUseVndrCnsgmntStockQty" minOccurs="0" maxOccurs="1"/>
+        		<xs:element type="xs:decimal" name="safetyStock" minOccurs="0" maxOccurs="1"/>
+        		<xs:element type="xs:decimal" name="stockInTransit" minOccurs="0" maxOccurs="1"/>
+        		<xs:element type="xs:decimal" name="stockInTransfer" minOccurs="0" maxOccurs="1"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

@@ -1,0 +1,54 @@
+# ABAP MCP Server — Cline Rules
+
+## ABAP Development Workflow
+
+When developing ABAP code (writing, modifying, creating objects), ALWAYS follow the `abap_develop` workflow:
+
+### Step 1: Gather context
+1. `search_abap_objects(query="<object_name>")` to find the ADT URL
+2. `analyze_abap_context(objectUrl=<url>, depth="deep")` to read ALL includes and references
+3. NEVER write code without reading the full context first!
+
+### Step 2: Research
+- Check for modern alternatives (e.g. REUSE_ALV_GRID_DISPLAY -> CL_SALV_TABLE)
+- Use `search_sap_web(query=<topic>)` to find SAP Notes, blogs and community solutions
+- Use `search_abap_objects` and `where_used` to find patterns in the system
+
+### Step 3: Clean ABAP
+- Run `review_clean_abap(source=<existing_code>)` on existing code before changes
+- Apply modern ABAP: inline declarations, string templates, ABAP SQL, CX_* exceptions, OOP
+- The Clean ABAP styleguide has 226 rules with examples (`clean-abap/CleanABAP.md`).
+  Do NOT work from memory. For EACH topic your task touches (naming, methods, error
+  handling, tables, conditions, …), FIRST call `search_clean_abap(query=<specific topic>)`
+  to retrieve the exact rule + its before/after example, THEN apply it.
+  Use specific queries (e.g. "RETURNING EXPORTING single output"), not broad ones ("methods").
+- Baseline defaults (still look up the detail before applying): descriptive names (no
+  Hungarian prefixes like `lv_`/`lt_`/`gs_`), small single-purpose methods, `RETURNING`
+  over `EXPORTING` for single values, positive conditions, `CASE` over `ELSE IF` chains,
+  named constants instead of magic numbers, exceptions instead of return codes
+- Precedence on conflicts: (1) the edited object's existing convention →
+  (2) these project rules → (3) Clean ABAP defaults. Never half-convert an object.
+
+### Step 4: DDIC validation (MANDATORY for DB tables)
+- For each table used: `get_object_info` to read exact field names
+- NEVER guess or invent field names!
+
+### Step 5: Implementation
+1. `search_abap_syntax(query=<statement>)` for each ABAP statement you plan to use
+2. `validate_ddic_references(source=<planned_code>)` before writing
+3. Only write when validation passes: `write_abap_source`
+4. On errors: fix and retry. Stop only if the SAME error persists after 3 attempts
+5. On persistent errors: `search_sap_web(query=<error_message>)` to find solutions
+
+### Step 6: Quality
+- `review_clean_abap(source=<the_code_you_just_wrote>)` — run on the NEWLY written/edited
+  source, not only the pre-existing code. Fix every reported finding, then re-run until it
+  returns "No Clean ABAP anti-patterns detected" (or only findings you can justify).
+- `run_atc_check` — fix priority 1+2 findings
+
+## Important Rules
+- Full-line ABAP comments (`*`) MUST start in column 1 — no indentation!
+- Use `"` for indented comments
+- Use `execute_abap_snippet` for one-off system queries — never create persistent programs
+- Use `batch_read` to parallelize multiple read operations in a single call
+- When `search_sap_web` is available (TAVILY_API_KEY configured): use it to research error messages, SAP Notes and best practices

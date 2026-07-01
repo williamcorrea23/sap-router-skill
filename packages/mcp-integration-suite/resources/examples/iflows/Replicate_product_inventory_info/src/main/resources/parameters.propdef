@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?><parameters><parameter>
+    <key/>
+    <name>Authorization</name>
+    <type>xsd:string</type>
+    <isRequired>false</isRequired>
+    <constraint/>
+    <description/>
+    <additionalMetadata>
+      <isCombobox>true</isCombobox>
+    </additionalMetadata>
+  </parameter><parameter>
+    <key/>
+    <name>CentraInventoryAPIHomePath</name>
+    <type>xsd:string</type>
+    <isRequired>false</isRequired>
+    <constraint/>
+    <description/>
+    <additionalMetadata/>
+  </parameter><parameter>
+    <key/>
+    <name>OAuth2Credentials</name>
+    <type>xsd:string</type>
+    <isRequired>false</isRequired>
+    <constraint/>
+    <description/>
+    <additionalMetadata/>
+  </parameter><parameter>
+    <key/>
+    <name>User Role</name>
+    <type>xsd:string</type>
+    <isRequired>false</isRequired>
+    <constraint/>
+    <description/>
+    <additionalMetadata/>
+  </parameter><param_references><reference attribute_category="ERP" attribute_id="ctype::AdapterVariant/cname::IDOC/tp::HTTP/mp::IDoc SOAP/direction::Receiver/version::1.3.3/attrId::userRole" attribute_uilabel="" param_key="User Role"/><reference attribute_category="ERP" attribute_id="ctype::AdapterVariant/cname::IDOC/tp::HTTP/mp::IDoc SOAP/direction::Receiver/version::1.3.3/attrId::senderAuthType" attribute_uilabel="" param_key="Authorization"/></param_references></parameters>

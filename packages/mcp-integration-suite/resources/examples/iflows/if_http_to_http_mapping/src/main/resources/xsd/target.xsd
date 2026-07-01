@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <!-- Root-Element: Order mit flachen Attributen und separater ShippingInfo -->
+  <xs:element name="Order">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="OrderID" type="xs:string"/>
+        <xs:element name="OrderDate" type="xs:date"/>
+        <!-- Customer-Daten als Attribute -->
+        <xs:element name="CustomerID" type="xs:string"/>
+        <xs:element name="CustomerName" type="xs:string"/>
+        <xs:element name="ShippingInfo">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Street" type="xs:string"/>
+              <xs:element name="City" type="xs:string"/>
+              <xs:element name="PostalCode" type="xs:string"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <!-- Items mit Attributen statt verschachtelten Elementen -->
+        <xs:element name="Items">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Item" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute name="ProductID" type="xs:string" use="required"/>
+                  <xs:attribute name="Name" type="xs:string" use="required"/>
+                  <xs:attribute name="Quantity" type="xs:integer" use="required"/>
+                  <xs:attribute name="Price" type="xs:decimal" use="required"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="TotalAmount">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="xs:decimal">
+                <xs:attribute name="Currency" type="xs:string" use="required"/>
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

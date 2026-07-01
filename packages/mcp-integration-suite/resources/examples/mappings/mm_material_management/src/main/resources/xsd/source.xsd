@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="root">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element maxOccurs="unbounded" name="value">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element minOccurs="0" name="Product" type="xs:string"/>
+							<xs:element minOccurs="0" name="ValidFrom" type="xs:string"/>
+							<xs:element minOccurs="0" name="ValidTo" type="xs:string"/>
+							<xs:element minOccurs="0" name="ReportConfiguration" type="xs:string"/>
+							<xs:element minOccurs="0" name="ReportCategory" type="xs:string"/>
+							<xs:element minOccurs="0" name="ReportCategoryCountry" type="xs:string"/>
+							<xs:element minOccurs="0" name="ReportCategoryRegion" type="xs:string"/>
+							<xs:element minOccurs="0" name="PackagingComposition" type="xs:string"/>
+							<xs:element minOccurs="0" name="BusinessProcessDirection" type="xs:string"/>
+							<xs:element minOccurs="0" name="ApplicableOrganizationData">
+								<xs:complexType>
+									<xs:all>
+										<xs:element minOccurs="0" name="CompanyCode" type="xs:string"/>
+										<xs:element minOccurs="0" name="SalesOrganization" type="xs:string"/>
+										<xs:element minOccurs="0" name="DistributionChannel" type="xs:string"/>
+										<xs:element minOccurs="0" name="Division" type="xs:string"/>
+									</xs:all>
+								</xs:complexType>
+							</xs:element>
+							<xs:element  minOccurs="0" name="Suppliers">
+								<xs:complexType>
+									<xs:all>
+										<xs:element minOccurs="0" name="Supplier" type="xs:string"/>
+										<xs:element minOccurs="0" name="IsExcludedFromReportConfiguration" type="xs:string"/>
+									</xs:all>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="IsFallbackFee" type="xs:string"/>
+							<xs:element minOccurs="0" name="ReferenceQuantity" type="xs:string"/>
+							<xs:element minOccurs="0" name="BaseUnitOfMeasure" type="xs:string"/>
+							<xs:element minOccurs="0" name="BaseUnitOfMeasureISOCode" type="xs:string"/>
+							<xs:element minOccurs="0" maxOccurs="unbounded" name="ShipToPartyRole" type="xs:string"/>
+							<xs:element minOccurs="0" name="TotalFee" type="xs:string"/>
+							<xs:element minOccurs="0" name="Currency" type="xs:string"/>
+							<xs:element minOccurs="0" name="LastChangedDate" type="xs:string"/>
+							<xs:element minOccurs="0" name="Context" type="xs:string"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

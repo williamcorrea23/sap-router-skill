@@ -1,0 +1,5 @@
+#Store metainfo properties
+#Tue Apr 01 15:11:28 UTC 2025
+description=Retrieves OAuth access token stored in Cloud Integration tenant.
+source=SAPCloudPlatformIntegration
+target=SAPCloudPlatformIntegration

@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "abap-mcp-server": {
+      "command": "node",
+      "args": ["C:\\Users\\rybak\\Downloads\\Apps\\ABAP_MCP\\dist\\index.js"]
+    }
+  }
+}

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:element name="COND_A01">
+		<xsd:complexType>
+		<xsd:sequence>
+			<xsd:element maxOccurs="unbounded" name="IDOC">
+				<xsd:complexType>
+					<xsd:all>
+						<xsd:element name="EDI_DC40">
+							<xsd:complexType>
+								<xsd:all>
+									<xsd:element name="TABNAM" type="xsd:string"/>
+									<xsd:element minOccurs="0" name="DOCNUM" type="xsd:string"/>
+									<xsd:element minOccurs="0" name="SERIAL" type="xsd:string"/>
+									<xsd:element name="DIRECT" type="xsd:string"/>
+									<xsd:element name="IDOCTYP" type="xsd:string"/>
+									<xsd:element name="MESTYP" type="xsd:string"/>
+									<xsd:element minOccurs="0" name="SNDPOR" type="xsd:string"/>
+									<xsd:element name="SNDPRT" type="xsd:string"/>
+									<xsd:element name="SNDPRN" type="xsd:string"/>
+									<xsd:element minOccurs="0" name="RCVPOR" type="xsd:string"/>
+									<xsd:element minOccurs="0" name="RCVPRT" type="xsd:string"/>
+									<xsd:element minOccurs="0" name="RCVPRN" type="xsd:string"/>
+								</xsd:all>
+								<xsd:attribute fixed="1" name="SEGMENT" type="xsd:string"/>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="E1KOMG">
+							<xsd:complexType>
+								<xsd:all>
+									<xsd:element minOccurs="0" name="MATNR" type="xsd:string"/>
+									<xsd:element minOccurs="0" name="VAKEY" type="xsd:string"/>
+									<xsd:element minOccurs="0" name="LAND1" type="xsd:string"/>
+									<xsd:element minOccurs="0" name="REGIO" type="xsd:string"/>
+									<xsd:element minOccurs="0" name="BUKRS" type="xsd:string"/>
+									<xsd:element minOccurs="0" name="VKORG" type="xsd:string"/>
+									<xsd:element minOccurs="0" name="VTWEG" type="xsd:string"/>
+									<xsd:element minOccurs="0" name="SPART" type="xsd:string"/>	
+									<xsd:element minOccurs="0" name="KSCHL" type="xsd:string"/>
+									<xsd:element minOccurs="0" name="KVEWE" type="xsd:string"/>
+									<xsd:element name="KOTABNR" type="xsd:string"/>
+									<xsd:element name="KAPPL" type="xsd:string"/>
+									<xsd:element name="E1KONH">
+										<xsd:complexType>
+											<xsd:all>
+												<xsd:element minOccurs="0" name="DATAB" type="xsd:string"/>
+												<xsd:element minOccurs="0" name="DATBI" type="xsd:string"/>
+												<xsd:element name="E1KONP">
+													<xsd:complexType>
+														<xsd:all>
+															<xsd:element minOccurs="0" name="KPEIN" type="xsd:string"/>
+															<xsd:element minOccurs="0" name="KMEIN" type="xsd:string"/>
+															<xsd:element minOccurs="0" name="KBETR" type="xsd:string"/>
+															<xsd:element minOccurs="0" name="KONWA" type="xsd:string"/>
+														</xsd:all>
+														<xsd:attribute fixed="1" name="SEGMENT" type="xsd:string"/>
+													</xsd:complexType>
+												</xsd:element>
+											</xsd:all>
+											<xsd:attribute fixed="1" name="SEGMENT" type="xsd:string"/>
+										</xsd:complexType>
+									</xsd:element>
+								</xsd:all>
+								<xsd:attribute fixed="1" name="SEGMENT" type="xsd:string"/>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:all>
+					<xsd:attribute fixed="1" name="BEGIN" type="xsd:string"/>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

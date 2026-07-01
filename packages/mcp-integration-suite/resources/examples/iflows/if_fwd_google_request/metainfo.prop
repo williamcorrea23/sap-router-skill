@@ -1,0 +1,5 @@
+#Store metainfo properties
+#Tue Apr 01 15:56:19 UTC 2025
+description=Forward request to Google Ads services
+source=SAPCloudPlatformIntegration
+target=SAPCloudPlatformIntegration

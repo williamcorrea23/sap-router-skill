@@ -1,0 +1,147 @@
+Manifest-Version: 1.0
+Bundle-Description: 
+Bundle-SymbolicName: com.sap.hybris.mkt.gaw.campaignServiceRead;singleto
+ n:=true
+Origin-Bundle-SymbolicName: com.sap.hybris.mkt.gaw.campaignServiceRead
+Bundle-ManifestVersion: 2
+Origin-Bundle-Version: 3.6.0
+Import-Package:  com.sap.esb.camel.webservice.endpoint.configurer, com.s
+ ap.esb.webservice.one.way, com.sap.esb.size.limiter, com.sap.sod.utils.
+ idoc.soap.interceptors, org.springframework.transaction.support, com.sa
+ p.esb.camel.http.ahc.configurer;version="[1,2)", org.mozilla.javascript
+ , org.codehaus.groovy.reflection, org.codehaus.groovy.runtime.callsite,
+  org.codehaus.groovy.runtime.typehandling, org.codehaus.groovy.runtime,
+  groovy.lang, org.codehaus.groovy.jsr223, com.sap.gateway.ip.core.custo
+ mdev.util, com.sap.gateway.ip.core.customdev.logging, com.sap.gateway.i
+ p.core.customdev.processor, com.sap.it.api.mapping, com.sap.aii.mapping
+ .value.api, org.apache.wss4j.common.crypto, org.springframework.jdbc.da
+ tasource, com.sap.esb.camel.message.storage.api, com.sap.it.op.agent.tr
+ ace, com.sap.esb.webservice.security.crypto.api, com.sap.esb.webservice
+ .policy.alternative.selector, org.apache.cxf.ws.security.wss4j, org.apa
+ che.ws.security.components.crypto, javax.security.auth.callback, com.sa
+ p.esb.camel.jdbc.idempotency.reorg, com.sap.it.iflow.model.runtime, com
+ .sap.it.iflow.model, com.sap.sod.utils.soap.processors, com.sap.it.rt.s
+ cc.proxy, com.sap.esb.camel.jdbc.inprogress.repository, com.sap.esb.cam
+ el.jdbc.idempotency.repository, com.sap.esb.camel.security.cms, org.apa
+ che.camel.processor.idempotent.jdbc, org.apache.camel.spi, com.sap.esb.
+ camel.endpoint.configurator.api, com.sap.it.op.ed, com.sap.esb.webservi
+ ce.authorization.supplier.api, org.apache.cxf.interceptor.security, com
+ .sap.esb.camel.mpl.access, com.sap.esb.camel.eip.splitter, com.sap.it.o
+ p.agent.ed.plugins.camel.api, com.sap.esb.camel.xmljson, net.sf.saxon.x
+ path, net.sf.saxon,com.sap.esb.application.services.cxf.interceptor,com
+ .sap.esb.security,com.sap.it.op.agent.api,com.sap.it.op.agent.collector
+ .camel,com.sap.it.op.agent.collector.cxf,com.sap.it.op.agent.mpl,com.sa
+ p.sod.utils.cxf.interceptors,com.sap.sod.utils.encoding.processors,com.
+ sap.sod.utils.idoc.soap,com.sap.sod.utils.soap,com.sap.sod.utils.idoc.s
+ oap.processors,javax.jms,javax.jws,javax.wsdl,javax.xml.bind.annotation
+ ,javax.xml.namespace,javax.xml.ws,org.apache.camel;version="2.8",org.ap
+ ache.camel.builder;version="2.8",org.apache.camel.builder.xml;version="
+ 2.8",org.apache.camel.component.cxf,org.apache.camel.model;version="2.8
+ ",org.apache.camel.processor;version="2.8",org.apache.camel.processor.a
+ ggregate;version="2.8",org.apache.camel.spring.spi;version="2.8",org.ap
+ ache.commons.logging,org.apache.cxf.binding,org.apache.cxf.binding.soap
+ ,org.apache.cxf.binding.soap.spring,org.apache.cxf.bus,org.apache.cxf.b
+ us.resource,org.apache.cxf.bus.spring,org.apache.cxf.buslifecycle,org.a
+ pache.cxf.catalog,org.apache.cxf.configuration.jsse,org.apache.cxf.conf
+ iguration.spring,org.apache.cxf.endpoint,org.apache.cxf.headers,org.apa
+ che.cxf.interceptor,org.apache.cxf.management.counters,org.apache.cxf.m
+ essage,org.apache.cxf.phase,org.apache.cxf.resource,org.apache.cxf.serv
+ ice.factory,org.apache.cxf.service.model,org.apache.cxf.transport,org.a
+ pache.cxf.transport.common.gzip,org.apache.cxf.transport.http,org.apach
+ e.cxf.transport.http.policy,org.apache.cxf.workqueue,org.apache.cxf.ws.
+ rm.persistence,org.apache.cxf.wsdl11,org.osgi.framework;version="1.6.0"
+ ,org.osgi.service.blueprint;version="[1.0.0,2.0.0)",org.slf4j;version="
+ 1.6",org.springframework.beans.factory.config;version="3.0",com.sap.aii
+ .ib.bom.flib.types,com.sap.aii.mapping.api,com.sap.aii.mappingtool.flib
+ 3,com.sap.aii.mappingtool.flib7,com.sap.aii.mappingtool.tf3,com.sap.aii
+ .mappingtool.tf3.rt,com.sap.aii.mappingtool.tf7,com.sap.aii.mappingtool
+ .tf7.rt,com.sap.aii.mappingtool.tfapi,com.sap.esb.webservice.audit.log
+Require-Capability: scriptcollection.Google_Ads_API_Common;resolution:=o
+ ptional;bundleType:String="ScriptCollection";source:String="reference"
+Origin-Bundle-Name: Read Campaigns from Google Ads
+Bundle-Name: Read Campaigns from Google Ads
+Bundle-Version: 3.6.0
+Bundle-ClassPath: .,/src/main/resources/mapping/com.sap.hci.met.oauth.se
+ cureapiwrapper-1.0.0-SNAPSHOT.jar,/src/main/resources/mapping/com.sap.h
+ ci.met.oauth.tokencontainer-1.0.0-SNAPSHOT.jar,/mapping/com.sap.hci.met
+ .oauth.secureapiwrapper-1.0.0-SNAPSHOT.jar,/mapping/com.sap.hci.met.oau
+ th.tokencontainer-1.0.0-SNAPSHOT.jar,/mapping/com.sap.hci.met.oauth.sec
+ ureapiwrapper-1.0.0-SNAPSHOT.jar,/mapping/com.sap.hci.met.oauth.tokenco
+ ntainer-1.0.0-SNAPSHOT.jar,/src/main/resources/mapping/com.sap.hci.met.
+ oauth.secureapiwrapper-1.0.0-SNAPSHOT.jar,/src/main/resources/mapping/c
+ om.sap.hci.met.oauth.tokencontainer-1.0.0-SNAPSHOT.jar,/mapping/com.sap
+ .hci.met.oauth.secureapiwrapper-1.0.0-SNAPSHOT.jar,/mapping/com.sap.hci
+ .met.oauth.tokencontainer-1.0.0-SNAPSHOT.jar,/src/main/resources/mappin
+ g/com.sap.hci.met.oauth.secureapiwrapper-1.0.0-SNAPSHOT.jar,/src/main/r
+ esources/mapping/com.sap.hci.met.oauth.tokencontainer-1.0.0-SNAPSHOT.ja
+ r,/mapping/com.sap.hci.met.oauth.tokencontainer-1.0.0-SNAPSHOT.jar,/map
+ ping/com.sap.hci.met.oauth.secureapiwrapper-1.0.0-SNAPSHOT.jar,/src/mai
+ n/resources/mapping/com.sap.hci.met.oauth.tokencontainer-1.0.0-SNAPSHOT
+ .jar,/src/main/resources/mapping/com.sap.hci.met.oauth.secureapiwrapper
+ -1.0.0-SNAPSHOT.jar,/mapping/com.sap.hci.met.oauth.tokencontainer-1.0.0
+ -SNAPSHOT.jar,/mapping/com.sap.hci.met.oauth.secureapiwrapper-1.0.0-SNA
+ PSHOT.jar,/src/main/resources/mapping/com.sap.hci.met.oauth.tokencontai
+ ner-1.0.0-SNAPSHOT.jar,/src/main/resources/mapping/com.sap.hci.met.oaut
+ h.secureapiwrapper-1.0.0-SNAPSHOT.jar,/mapping/CampaignServiceReadToCam
+ paignService.jar,/mapping/CampaignServiceResponseToCampaignServiceReadR
+ esponse.jar,/mapping/CampaignServiceReadRequestToCampaignServiceRequest
+ .jar,/mapping/CampaignServiceReadRequestToCampaignServiceRequest.jar,/m
+ apping/CampaignServiceReadRequestToCampaignServiceRequest.jar,/mapping/
+ CampaignServiceReadRequestToCampaignServiceRequest.jar,/src/main/resour
+ ces/mapping/com.sap.hci.met.oauth.secureapiwrapper-1.0.0-SNAPSHOT.jar,/
+ mapping/CampaignServiceReadRequestToCampaignServiceRequest.jar,/mapping
+ /com.sap.hci.met.oauth.secureapiwrapper-1.0.0-SNAPSHOT.jar,/src/main/re
+ sources/mapping/com.sap.hci.met.oauth.secureapiwrapper-1.0.0-SNAPSHOT.j
+ ar,/mapping/com.sap.hci.met.oauth.secureapiwrapper-1.0.0-SNAPSHOT.jar,/
+ mapping/CampaignServiceReadRequestToCampaignServiceRequest.jar,/mapping
+ /CampaignServiceReadRequestToCampaignServiceRequest.mmap.jar,/mapping/c
+ om.sap.hci.met.oauth.secureapiwrapper-1.0.0-SNAPSHOT.jar,/src/main/reso
+ urces/mapping/com.sap.hci.met.oauth.secureapiwrapper-1.0.0-SNAPSHOT.jar
+ ,/mapping/CampaignServiceReadRequestToCampaignServiceRequest.mmap.jar,/
+ mapping/CampaignServiceResponseToCampaignServiceReadResponse.mmap.jar,/
+ mapping/com.sap.hci.met.oauth.secureapiwrapper-1.0.0-SNAPSHOT.jar,/src/
+ main/resources/mapping/com.sap.hci.met.oauth.secureapiwrapper-1.0.0-SNA
+ PSHOT.jar,/mapping/CampaignServiceReadRequestToCampaignServiceRequest.m
+ map.jar,/mapping/CampaignServiceResponseToCampaignServiceReadResponse.m
+ map.jar,/mapping/com.sap.hci.met.oauth.secureapiwrapper-1.0.0-SNAPSHOT.
+ jar,/src/main/resources/mapping/com.sap.hci.met.oauth.secureapiwrapper-
+ 1.0.0-SNAPSHOT.jar,/mapping/com.sap.hci.met.oauth.secureapiwrapper-1.0.
+ 0-SNAPSHOT.jar,/mapping/CampaignServiceResponseToCampaignServiceReadRes
+ ponse.jar,/mapping/CampaignServiceReadRequestToCampaignServiceRequest.j
+ ar,/src/main/resources/mapping/com.sap.hci.met.oauth.secureapiwrapper-1
+ .0.0-SNAPSHOT.jar,/mapping/CampaignServiceResponseToCampaignServiceRead
+ Response.jar,/mapping/CampaignServiceReadRequestToCampaignServiceReques
+ t.jar,/mapping/com.sap.hci.met.oauth.secureapiwrapper-1.0.0-SNAPSHOT.ja
+ r,/src/main/resources/mapping/com.sap.hci.met.oauth.secureapiwrapper-1.
+ 0.0-SNAPSHOT.jar,/mapping/CampaignServiceResponseToCampaignServiceReadR
+ esponse.jar,/mapping/CampaignServiceReadRequestToCampaignServiceRequest
+ .jar,/mapping/com.sap.hci.met.oauth.secureapiwrapper-1.0.0-SNAPSHOT.jar
+ ,/src/main/resources/mapping/com.sap.hci.met.oauth.secureapiwrapper-1.0
+ .0-SNAPSHOT.jar,/mapping/com.sap.hci.met.oauth.secureapiwrapper-1.0.0-S
+ NAPSHOT.jar,/mapping/CampaignServiceResponseToCampaignServiceReadRespon
+ se.jar,/mapping/CampaignServiceReadRequestToCampaignServiceRequest.jar,
+ /src/main/resources/mapping/com.sap.hci.met.oauth.secureapiwrapper-1.0.
+ 0-SNAPSHOT.jar,/mapping/com.sap.hci.met.oauth.secureapiwrapper-1.0.0-SN
+ APSHOT.jar,/mapping/CampaignServiceReadRequestToCampaignServiceRequest.
+ jar,/mapping/CampaignServiceResponseToCampaignServiceReadResponse.jar,/
+ src/main/resources/mapping/com.sap.hci.met.oauth.secureapiwrapper-1.0.0
+ -SNAPSHOT.jar,/mapping/CampaignServiceResponseToCampaignServiceReadResp
+ onse.jar,/mapping/com.sap.hci.met.oauth.secureapiwrapper-1.0.0-SNAPSHOT
+ .jar,/mapping/CampaignServiceReadRequestToCampaignServiceRequest.jar,/s
+ rc/main/resources/mapping/com.sap.hci.met.oauth.secureapiwrapper-1.0.0-
+ SNAPSHOT.jar,/src/main/resources/mapping/com.sap.hci.met.oauth.secureap
+ iwrapper-1.0.0-SNAPSHOT.jar,/mapping/CampaignServiceResponseToCampaignS
+ erviceReadResponse.jar,/mapping/com.sap.hci.met.oauth.secureapiwrapper-
+ 1.0.0-SNAPSHOT.jar,/mapping/CampaignServiceReadRequestToCampaignService
+ Request.jar
+SAP-NodeType: IFLMAP
+Origin-ModifiedDate: 1732604236253
+Import-Service:  com.sap.esb.camel.security.cms.SignatureSplitter;multip
+ le:=false, org.apache.cxf.ws.rm.persistence.RMStore;multiple:=false, ja
+ vax.sql.DataSource;multiple:=false;filter="(dataSourceName=default)", c
+ om.sap.esb.security.TrustManagerFactory;multiple:=false,  com.sap.esb.s
+ ecurity.KeyManagerFactory;multiple:=false, com.sap.esb.camel.endpoint.c
+ onfigurator.api.EndpointConfigurator;multiple:=false;filter="(endpointT
+ ype=SFTP)",com.sap.esb.webservice.audit.log.AuditLogger 
+SAP-BundleType: IntegrationFlow
+

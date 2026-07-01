@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?><parameters><parameter>
+      <key/>
+      <name>USE_OWN_GOOGLE_OAUTH_CLIENT</name>
+      <type>xsd:string</type>
+      <isRequired>false</isRequired>
+      <constraint/>
+      <description/>
+      <additionalMetadata/>
+   </parameter><param_references/></parameters>

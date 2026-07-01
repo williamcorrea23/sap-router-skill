@@ -1,0 +1,5 @@
+#Thu Mar 31 17:53:03 UTC 2022
+CentraInventoryAPIHomePath=Service API Path
+OAuth2Credentials=Security Material Credentials
+User\ Role=ESBMessaging.send
+Authorization=RoleBased

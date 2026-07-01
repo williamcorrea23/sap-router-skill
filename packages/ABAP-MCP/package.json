@@ -1,0 +1,41 @@
+{
+  "name": "abap-mcp-server",
+  "version": "2.0.0",
+  "description": "Standalone MCP Server für agentives ABAP-Development — 67 Tools, Method-Level Surgery, Dependency Contracts, Intent-Facade, Rollen/Audit",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "abap-mcp": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "rimraf dist",
+    "diag:adt": "tsx scripts/adt-client-smoke.ts",
+    "diag:btp-proxy": "tsx scripts/btp-connectivity-smoke.ts",
+    "diag:btp-token": "tsx scripts/btp-token-inspect.ts",
+    "diag:btp-destination": "tsx scripts/btp-destination-inspect.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.10.1",
+    "abap-adt-api": "^7.1.0",
+    "dotenv": "^16.4.7",
+    "http-proxy-agent": "^7.0.2",
+    "https-proxy-agent": "^9.0.0",
+    "undici": "^8.4.1",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "rimraf": "^6.0.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^4.1.7"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

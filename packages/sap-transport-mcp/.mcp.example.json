@@ -1,0 +1,44 @@
+{
+  "_comment": "Copy to .mcp.json and fill in real values. Never commit .mcp.json. Choose Option A or Option B below.",
+
+  "_optionA_local_build": "Use this if you cloned the repo and ran npm run build",
+  "_optionB_npx": "Use this if the package is published to npm — no clone or build needed",
+
+  "mcpServers": {
+    "sap-transport": {
+      "_active": "Option A — local build (replace path using: echo $(pwd)/dist/src/index.js)",
+      "command": "node",
+      "args": ["/absolute/path/to/sap-transport-mcp/dist/src/index.js"],
+      "env": {
+        "SAP_HOSTNAME": "your-sap-host.example.com",
+        "SAP_SYSNR": "00",
+        "SAP_CLIENT": "100",
+        "SAP_LANGUAGE": "EN",
+        "SAP_SYSTEM_ID": "DEV",
+        "AUTH_METHOD": "basic",
+        "SAP_USERNAME": "YOUR_SAP_USER",
+        "SAP_PASSWORD": "YOUR_SAP_PASSWORD",
+        "LOG_LEVEL": "info",
+        "DRY_RUN": "false"
+      }
+    },
+
+    "_sap-transport-npx": {
+      "_active": "Option B — npx (rename key to sap-transport and remove Option A block)",
+      "command": "npx",
+      "args": ["-y", "sap-transport-mcp"],
+      "env": {
+        "SAP_HOSTNAME": "your-sap-host.example.com",
+        "SAP_SYSNR": "00",
+        "SAP_CLIENT": "100",
+        "SAP_LANGUAGE": "EN",
+        "SAP_SYSTEM_ID": "DEV",
+        "AUTH_METHOD": "basic",
+        "SAP_USERNAME": "YOUR_SAP_USER",
+        "SAP_PASSWORD": "YOUR_SAP_PASSWORD",
+        "LOG_LEVEL": "info",
+        "DRY_RUN": "false"
+      }
+    }
+  }
+}
