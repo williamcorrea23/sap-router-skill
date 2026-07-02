@@ -1,0 +1,106 @@
+# SAP Router v5.0 — routing configuration (externalized from sap_router.py v4.2)
+adt_actions:
+  - read_source
+  - search_object
+  - syntax_check
+  - where_used
+  - get_deps
+  - code_search
+
+functional_write_keywords:
+  - CREATE
+  - CHANGE
+  - POST
+  - MOVEMENT
+  - RECEIPT
+  - DELIVERY
+  - BILLING
+  - INVOICE
+  - CONFIRM
+  - RELEASE
+  - REVERSE
+  - SAVE
+  - UPDATE
+  - CANCEL
+  - PAYMENT
+
+functional_read_keywords:
+  - READ
+  - DISPLAY
+  - OVERVIEW
+  - CHECK
+  - GET
+  - LIST
+  - SEARCH
+
+functional_bapi_map:
+  CREATE_MATERIAL:       BAPI_MATERIAL_SAVEDATA
+  CHANGE_MATERIAL:       BAPI_MATERIAL_SAVEDATA
+  CREATE_PO:             BAPI_PO_CREATE1
+  CHANGE_PO:             BAPI_PO_CHANGE
+  GOODS_MOVEMENT:        BAPI_GOODSMVT_CREATE
+  GOODS_RECEIPT:         BAPI_GOODSMVT_CREATE
+  CREATE_DELIVERY:       BAPI_OUTB_DELIVERY_CREATE_SLS
+  CREATE_INVOICE:        BAPI_BILLINGDOC_CREATEMULTIPLE
+  CREATE_SALES_ORDER:    BAPI_SALESORDER_CREATEFROMDAT2
+  CHANGE_SALES_ORDER:    BAPI_SALESORDER_CHANGE
+  POST_DOCUMENT:         BAPI_ACC_DOCUMENT_POST
+  REVERSE_DOCUMENT:      BAPI_ACC_DOCUMENT_REV_POST
+  CREATE_INSPECTION:     BAPI_INSPLOT_CREATE
+  CREATE_RN:             ZFM_QM_CREATE_RN
+  CREATE_INTERNAL_ORDER: BAPI_INTERNALORDER_CREATE
+  CREATE_PROD_ORDER:     BAPI_PRODORD_CREATE
+  PAYMENT_RUN:           F110_BATCH
+  CREATE_MAINT_ORDER:    BAPI_ALM_ORDER_MAINTAIN
+  CREATE_NOTIFICATION:   BAPI_ALM_NOTIF_CREATE
+
+gui_fallback_map:
+  SPRO_CONFIG:           {tcode: SPRO,  description: IMG Customizing}
+  TABLE_MAINTENANCE:     {tcode: SM30,  description: Table View Maintenance}
+  USER_MAINTENANCE:      {tcode: SU01,  description: User Maintenance}
+  AUTH_CHECK:            {tcode: SU53,  description: Authorization Check}
+  ROLE_EDITOR:           {tcode: PFCG,  description: Role Maintenance}
+  NOTE_APPLY:            {tcode: SNOTE, description: SAP Note Application}
+  MATERIAL_GUI:          {tcode: MM01,  description: Create Material (GUI)}
+  MATERIAL_CHANGE_GUI:   {tcode: MM02,  description: Change Material (GUI)}
+  PO_CREATE_GUI:         {tcode: ME21N, description: Create Purchase Order}
+  GOODS_RECEIPT:         {tcode: MIGO,  description: Goods Movement}
+  STOCK_OVERVIEW:        {tcode: MMBE,  description: Stock Overview}
+  ORDER_CREATE_GUI:      {tcode: VA01,  description: Create Sales Order}
+  ORDER_CHANGE_GUI:      {tcode: VA02,  description: Change Sales Order}
+  DELIVERY_CREATE_GUI:   {tcode: VL01N, description: Create Delivery}
+  BILLING_CREATE_GUI:    {tcode: VF01,  description: Create Billing Document}
+  FI_POST_GUI:           {tcode: FB01,  description: Post Document (GUI)}
+  GL_MASTER_GUI:         {tcode: FS00,  description: GL Account Master}
+  INSPECTION_CREATE_GUI: {tcode: QA01,  description: Create Inspection Lot}
+  PROD_ORDER_CREATE_GUI: {tcode: CO01,  description: Create Production Order}
+  INTERNAL_ORDER_GUI:    {tcode: KO01,  description: Create Internal Order}
+  EMPLOYEE_DISPLAY_GUI:  {tcode: PA20,  description: Display HR Master Data}
+  SE16_DATA:             {tcode: SE16,  description: Data Browser}
+  SE80_NAVIGATE:         {tcode: SE80,  description: Object Navigator}
+  SA38_EXECUTE:          {tcode: SA38,  description: Program Execution}
+  ST22_SCAN_GUI:         {tcode: ST22,  description: Dump Analysis}
+  SM37_JOB_MONITOR:      {tcode: SM37,  description: Job Monitor}
+  SM50_PROCESS_LIST:     {tcode: SM50,  description: Process Overview}
+  PAYMENT_RUN_GUI:       {tcode: F110,  description: Payment Run}
+  BANK_STATEMENT_GUI:    {tcode: FF_5,  description: Import Bank Statement}
+  MAINT_ORDER_GUI:       {tcode: IW31,  description: Create Maintenance Order}
+  NOTIFICATION_GUI:      {tcode: IW21,  description: Create PM Notification}
+
+tcode_derive:
+  - [CREATE_MATERIAL, MM01]
+  - [CHANGE_MATERIAL, MM02]
+  - [CREATE_PO, ME21N]
+  - [GOODS, MIGO]
+  - [STOCK, MMBE]
+  - [SALES_ORDER, VA01]
+  - [DELIVERY, VL01N]
+  - [BILLING, VF01]
+  - [INSPECTION, QA01]
+  - [CREATE_RN, QM01]
+  - [PROD_ORDER, CO01]
+  - [INTERNAL_ORDER, KO01]
+  - [FI_POST, FB01]
+  - [GL_MASTER, FS00]
+  - [PAYMENT_RUN, F110]
+  - [MAINT_ORDER, IW31]

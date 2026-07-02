@@ -129,7 +129,7 @@ python scripts/self_learn.py persist   # Preserve learned context
 ### Post-Install — Healthcheck + .env Setup
 
 ```bash
-# Run healthcheck — probes all 35 MCPs + verifies .env
+# Run healthcheck — probes all 53 MCPs + verifies .env
 npm run hc
 
 # If .env missing, generate interactive prompt
@@ -147,7 +147,7 @@ cp .env.template .env
 ```mermaid
 flowchart LR
     subgraph Health["Healthcheck"]
-        HC["npm run hc<br/>probes 35 MCPs + .env"]
+        HC["npm run hc<br/>probes 53 MCPs + .env"]
         HCP["npm run hc:prompt<br/>interactive setup"]
     end
     subgraph Routes["Routing"]
@@ -175,7 +175,7 @@ flowchart LR
 |---|---|---|
 | **Install** | `git clone ... && python scripts/healthcheck.py` | Clone + verify everything works |
 | **Update** | `git pull && npm install && npm run hc` | Pull latest + refresh deps + healthcheck |
-| **Health** | `npm run hc` | Probes 35 MCPs + .env completeness |
+| **Health** | `npm run hc` | Probes 53 MCPs + .env completeness |
 | **Health** | `npm run hc:prompt` | Interactive setup wizard for missing vars |
 | **Route** | `npm run router -- --action MM_CREATE_MATERIAL` | Route action: ADT → GUI → RFC |
 | **Route** | `npm run router:gui -- --action SPRO_CONFIG` | Force SAP GUI fallback |
@@ -575,7 +575,7 @@ git pull origin main
 npm install
 pip install --upgrade openpyxl  # if using XLSX features
 
-# Verify health — probes all 35 MCPs
+# Verify health — probes all 53 MCPs
 python scripts/healthcheck.py
 
 # Preserve learned context through update

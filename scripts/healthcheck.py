@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 SAP Router Healthcheck — MCP connectivity probe, .env guardian, credential validator.
-v4.2.0: Probes all 35 MCPs + ZROUTER, verifies .env completeness, prompts user for missing data.
+v4.2.0: Probes all 53 MCPs + ZROUTER, verifies .env completeness, prompts user for missing data.
 Andrej-style: "eval first, then act" — diagnose before routing.
 """
 import os
@@ -237,6 +237,114 @@ MCP_HEALTHCHECK_SPEC = {
         "criticality": "LOW",
         "description": "SAP CTS Transport Request management (Nidhideep)",
     },
+    "mcp-abap-abap-adt-api": {
+        "env_vars": [],
+        "probe_command": None,
+        "criticality": "OPTIONAL",
+        "description": "ABAP ADT API MCP (mario-andreschak)",
+    },
+    "sap-mcp": {
+        "env_vars": [],
+        "probe_command": None,
+        "criticality": "OPTIONAL",
+        "description": "MarkWu SAP MCP",
+    },
+    "vibing-steampunk": {
+        "env_vars": [],
+        "probe_command": None,
+        "criticality": "OPTIONAL",
+        "description": "oisee vibing-steampunk MCP",
+    },
+    "dassian-adt": {
+        "env_vars": [],
+        "probe_command": None,
+        "criticality": "OPTIONAL",
+        "description": "Dassian ADT MCP",
+    },
+    "abap-mcp-adt-powerup": {
+        "env_vars": [],
+        "probe_command": None,
+        "criticality": "OPTIONAL",
+        "description": "ABAP ADT Powerup MCP (babamba2)",
+    },
+    "sapgui-mcp": {
+        "env_vars": [],
+        "probe_command": None,
+        "criticality": "OPTIONAL",
+        "description": "Hochfrequenz SAP GUI MCP",
+    },
+    "sap-gui-mcp-jduncan": {
+        "env_vars": [],
+        "probe_command": None,
+        "criticality": "OPTIONAL",
+        "description": "jduncan SAP GUI MCP",
+    },
+    "cpi-mcp-server": {
+        "env_vars": [],
+        "probe_command": None,
+        "criticality": "OPTIONAL",
+        "description": "Vadim Klimov CPI MCP",
+    },
+    "mcp-ci-python": {
+        "env_vars": [],
+        "probe_command": None,
+        "criticality": "OPTIONAL",
+        "description": "Paulo Calazans CPI Python MCP",
+    },
+    "btp-is-ci-mcp-server": {
+        "env_vars": [],
+        "probe_command": None,
+        "criticality": "OPTIONAL",
+        "description": "Taulia CPI Integration Suite MCP",
+    },
+    "sap-cpi-mcp-backup": {
+        "env_vars": [],
+        "probe_command": None,
+        "criticality": "OPTIONAL",
+        "description": "gymishra CPI Backup MCP",
+    },
+    "cap-mcp-plugin": {
+        "env_vars": [],
+        "probe_command": None,
+        "criticality": "OPTIONAL",
+        "description": "gavdilabs CAP MCP plugin",
+    },
+    "hana-mcp-server": {
+        "env_vars": [],
+        "probe_command": None,
+        "criticality": "OPTIONAL",
+        "description": "HatriGt HANA MCP server",
+    },
+    "mcp-sap-docs": {
+        "env_vars": [],
+        "probe_command": None,
+        "criticality": "OPTIONAL",
+        "description": "marianfoo SAP Docs MCP",
+    },
+    "mcp-hub": {
+        "env_vars": [],
+        "probe_command": None,
+        "criticality": "OPTIONAL",
+        "description": "arc-mcp MCP Hub",
+    },
+    "sap-ai-mcp-servers": {
+        "env_vars": [],
+        "probe_command": None,
+        "criticality": "OPTIONAL",
+        "description": "marianfoo SAP AI MCP servers",
+    },
+    "adt-ls": {
+        "env_vars": [],
+        "probe_command": None,
+        "criticality": "OPTIONAL",
+        "description": "arc-mcp Generic ADT Language Server",
+    },
+    "sap-mcp-config": {
+        "env_vars": [],
+        "probe_command": None,
+        "criticality": "OPTIONAL",
+        "description": "Hochfrequenz SAP MCP Config Model",
+    },
 }
 
 REQUIRED_ENV_FILE_VARS = [
@@ -407,6 +515,25 @@ class HealthChecker:
 
     def run_full_check(self):
         """Run complete healthcheck across all MCPs and .env."""
+        # Load local .env into os.environ for verification
+        env_path = self.project_root / ".env"
+        if env_path.exists():
+            try:
+                env_content = env_path.read_text(encoding='utf-8')
+                for line in env_content.split('\n'):
+                    line_strip = line.strip()
+                    if not line_strip or line_strip.startswith('#') or '=' not in line_strip:
+                        continue
+                    k, v = line_strip.split('=', 1)
+                    k = k.strip()
+                    v = v.strip()
+                    if (v.startswith('"') and v.endswith('"')) or (v.startswith("'") and v.endswith("'")):
+                        v = v[1:-1]
+                    if v:
+                        os.environ[k] = v
+            except Exception:
+                pass
+
         self.log("=" * 60)
         self.log("SAP ROUTER HEALTHCHECK v4.0")
         self.log(f"Timestamp: {self.results['timestamp']}")
@@ -454,7 +581,7 @@ class HealthChecker:
             "templates/": (SKILL_DIR / "templates").exists(),
             "templates/*.abap": len(list((SKILL_DIR / "templates").glob("*.abap"))) >= 4,
             "scripts/*.py": len(list((SKILL_DIR / "scripts").glob("*.py"))) >= 10,
-            ".claude/skills/": len(list((SKILL_DIR / ".claude" / "skills").glob("*/SKILL.md"))) >= 78,
+            ".claude/skills/": len(list((SKILL_DIR / ".claude" / "skills").glob("*/SKILL.md"))) >= 85,
             "zrouter_bootstrap.py": (SKILL_DIR / "scripts" / "zrouter_bootstrap.py").exists(),
             "packages/samples/": (SKILL_DIR / "packages" / "samples").exists(),
         }
@@ -487,6 +614,14 @@ class HealthChecker:
                 self.log(f"  [{rec['priority']}] {rec['action']}: {rec['detail']}")
                 if 'fix' in rec:
                     self.log(f"    Fix: {rec['fix']}")
+
+        # v5.0: Cache healthcheck results
+        cache_path = self.project_root / ".healthcheck_cache.json"
+        try:
+            with open(cache_path, "w", encoding="utf-8") as f:
+                json.dump(self.results, f, indent=2)
+        except Exception:
+            pass
 
         return self.results
 

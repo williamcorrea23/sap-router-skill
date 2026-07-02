@@ -19,8 +19,11 @@ import sys
 import json
 import argparse
 import subprocess
+from datetime import datetime
 
-__version__ = "4.2.0"
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+__version__ = "5.0.0"
 
 # === ZROUTER LIVE STATE (probe cache, used by bootstrap/fallback engine) ===
 # Cached probe result. None=not checked, True=installed, False=missing
@@ -170,16 +173,194 @@ PIPELINE_STAGES = [
     {'id': 'stage7', 'name': 'Peer Review 2',               'skill': 'abap-code-review',      'avg_time': '1min',   'wave': 5},
     {'id': 'stage8', 'name': 'Transport Gate',              'skill': 'sap-transport-gate',    'avg_time': '2min',   'wave': 6},
 ]
+# === v5.0: CONFIG LOADER (YAML external, hardcoded fallback) ===
+CONFIG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "config")
+
+def _load_yaml_config(filename, fallback):
+    """Load routing map from config/*.yaml. Fallback to hardcoded on any error."""
+    path = os.path.join(CONFIG_DIR, filename)
+    try:
+        import yaml
+        with open(path, encoding="utf-8") as f:
+            return yaml.safe_load(f)
+    except Exception:
+        return fallback
+
+_cfg = _load_yaml_config("routing_maps.yaml", None)
+if _cfg:
+    ADT_ACTIONS = _cfg.get("adt_actions", ADT_ACTIONS)
+    FUNCTIONAL_WRITE_KEYWORDS = _cfg.get("functional_write_keywords", FUNCTIONAL_WRITE_KEYWORDS)
+    FUNCTIONAL_READ_KEYWORDS = _cfg.get("functional_read_keywords", FUNCTIONAL_READ_KEYWORDS)
+    FUNCTIONAL_BAPI_MAP = _cfg.get("functional_bapi_map", FUNCTIONAL_BAPI_MAP)
+    GUI_FALLBACK_MAP = _cfg.get("gui_fallback_map", GUI_FALLBACK_MAP)
+
+_pipe_cfg = _load_yaml_config("pipeline_stages.yaml", None)
+if _pipe_cfg:
+    PIPELINE_STAGES = _pipe_cfg.get("pipeline_stages", PIPELINE_STAGES)
 
 
 class SapRouter:
     def __init__(self, memory_file="MEMORY.md"):
-        self.memory_file = memory_file
+        self.memory_file = os.path.abspath(memory_file)
         self.gui_fallback_enabled = True
         self.caveman_delegation_enabled = True
 
+    def scan_agent_registry(self):
+        """v5.0: Discover agents from .claude/agents/*.md YAML frontmatter.
+        Returns {name: {description, tools, model, keywords}}."""
+        agents = {}
+        agents_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                  "..", ".claude", "agents")
+        if not os.path.isdir(agents_dir):
+            return agents
+        import glob as _glob
+        for path in _glob.glob(os.path.join(agents_dir, "*.md")):
+            try:
+                text = open(path, encoding="utf-8").read()
+                if not text.startswith("---"):
+                    continue
+                fm_raw = text.split("---")[1]
+                import yaml
+                fm = yaml.safe_load(fm_raw)
+                desc = str(fm.get("description", ""))
+                # Trigger keywords = palavras significativas da description
+                keywords = [w.strip(".,()").lower() for w in desc.split()
+                            if len(w) > 4 and w.lower() not in ("specialist", "trigger")]
+                agents[fm["name"]] = {
+                    "description": desc,
+                    "tools": fm.get("tools", []),
+                    "model": fm.get("model", "sonnet"),
+                    "keywords": keywords,
+                    "path": path,
+                }
+            except Exception as e:
+                continue
+        return agents
+
+    def _normalize_text(self, text):
+        import unicodedata
+        # Convert to string and normalize accents / strip characters
+        text = str(text)
+        return "".join(c for c in unicodedata.normalize('NFD', text)
+                       if unicodedata.category(c) != 'Mn').lower()
+
+    def match_agent(self, task_text):
+        """v5.0: Return best-matching agent for a task, or None.
+        Scoring: keyword hits in description. Threshold: >= 2 hits."""
+        agents = self.scan_agent_registry()
+        task_norm = self._normalize_text(task_text)
+        best, best_score = None, 0
+        for name, info in agents.items():
+            # Normalize agent keywords
+            norm_kws = [self._normalize_text(kw) for kw in info["keywords"]]
+            # Split slashes/dashes
+            split_kws = []
+            for kw in norm_kws:
+                if "/" in kw:
+                    split_kws.extend(kw.split("/"))
+                elif "-" in kw:
+                    split_kws.extend(kw.split("-"))
+                else:
+                    split_kws.append(kw)
+            score = sum(1 for kw in split_kws if len(kw) > 3 and kw in task_norm)
+            if score > best_score:
+                best, best_score = name, score
+        if best_score >= 2:
+            return {"agent": best, "score": best_score,
+                    "model": agents[best]["model"],
+                    "strategy": "agent-dispatch"}
+        return None
+
+
     def get_route(self, action, try_adt=True, allow_gui_fallback=True,
                   functional_context=False, use_zrouter=False):
+        # v5.0: Integrate Self-Learning Engine
+        from self_learn import SelfLearnEngine
+        engine = SelfLearnEngine(self.memory_file)
+        try:
+            engine.load_history()
+        except Exception:
+            pass
+
+        route = self._get_route_inner(action, try_adt=try_adt,
+                                      allow_gui_fallback=allow_gui_fallback,
+                                      functional_context=functional_context,
+                                      use_zrouter=use_zrouter)
+
+        # Rerank MCP servers based on learned stats
+        if "mcp_servers" in route and route["mcp_servers"]:
+            best = engine.get_best_mcp(route["mcp_servers"])
+            if best:
+                route["mcp_server"] = best
+
+        # v5.0: Bypass offline MCPs using healthcheck cache
+        cache = self._load_healthcheck_cache()
+        if cache:
+            mcp_servers = route.get("mcp_servers", [])
+            primary_mcp = route.get("mcp_server")
+            if primary_mcp and mcp_servers:
+                if not self._is_mcp_healthy_in_cache(primary_mcp, cache):
+                    # Find first healthy backup MCP
+                    fallback_mcp = None
+                    for b_mcp in mcp_servers:
+                        if b_mcp != primary_mcp and self._is_mcp_healthy_in_cache(b_mcp, cache):
+                            fallback_mcp = b_mcp
+                            break
+                    if fallback_mcp:
+                        route["mcp_server"] = fallback_mcp
+                        route["health_bypass"] = True
+                        route["details"] = (route.get("details", "") + 
+                                            f" (Bypassed offline {primary_mcp} -> {fallback_mcp})")
+
+        # Adapt route (adds confidence, warnings)
+        try:
+            route = engine.adapt_route(action, route)
+        except Exception:
+            pass
+
+        # Inject learned context for prompt injection
+        ctx = engine.get_context_for_prompt()
+        if ctx:
+            route["learned_context"] = ctx
+
+        # v5.0 Complexity model routing
+        complexity = self._assess_complexity(action)
+        if complexity in ["VERY_COMPLEX", "COMPLEX"]:
+            route["model"] = "sonnet"
+        else:
+            route["model"] = "haiku"
+
+        return route
+
+    def _is_mcp_healthy_in_cache(self, mcp_name, cache):
+        checks = cache.get("mcp_checks", {})
+        if mcp_name not in checks:
+            return True # If not checked, assume healthy (fail-open)
+        mcp_data = checks[mcp_name]
+        env_ok = mcp_data.get("env", {}).get("status") in ("ALL_SET", "CONFIGURED", "NO_ENV_NEEDED")
+        binary_ok = mcp_data.get("binary", {}).get("status") in ("AVAILABLE", "SKIPPED")
+        return env_ok and binary_ok
+
+    def _load_healthcheck_cache(self):
+        """v5.0: Load healthcheck cache. Returns dict or None."""
+        cache_path = os.path.join(CONFIG_DIR, "..", ".healthcheck_cache.json")
+        if not os.path.exists(cache_path):
+            return None
+        try:
+            with open(cache_path, "r", encoding="utf-8") as f:
+                cache = json.load(f)
+            ts_str = cache.get("timestamp")
+            if ts_str:
+                ts = datetime.fromisoformat(ts_str)
+                elapsed = datetime.now() - ts
+                if elapsed.total_seconds() < 900: # 15 minutes
+                    return cache
+        except Exception:
+            pass
+        return None
+
+    def _get_route_inner(self, action, try_adt=True, allow_gui_fallback=True,
+                         functional_context=False, use_zrouter=False):
         """Route action: ADT primary -> SAP GUI scripting fallback (mcp-sap-gui).
 
         functional_context: real functional request — required before any BAPI /
@@ -272,6 +453,18 @@ class SapRouter:
                     return route
             # 3b. BAPI-first when a BAPI is known, else SAP GUI write transaction.
             return self._route_functional_write(action_upper)
+
+        # Step 3.5 (v5.0): dynamic agent registry match — SÓ para texto livre.
+        # Tokens de ação (sem espaço) nunca entram aqui; preserva rotas v4.2.
+        if " " in action:
+            agent_match = self.match_agent(action_lower)
+            if agent_match:
+                return {
+                    "destination": agent_match["agent"],
+                    "strategy": "agent-dispatch",
+                    "model": agent_match["model"],
+                    "details": f"Dynamic agent registry match (score {agent_match['score']})",
+                }
 
         # Step 4: caveman delegation (small-scope DEV edits — not SAP functional writes)
         if self.caveman_delegation_enabled:
@@ -523,8 +716,89 @@ class SapRouter:
 
         return analysis
 
+    def _load_tcode_index(self):
+        """v5.0: Load tcodes.yaml mapping. Returns dict of tcode -> list of modules."""
+        path = os.path.join(CONFIG_DIR, "..", "references", "data", "tcodes.yaml")
+        if not os.path.exists(path):
+            return {}
+        try:
+            import yaml
+            with open(path, "r", encoding="utf-8") as f:
+                data = yaml.safe_load(f)
+            tcodes = {}
+            if data:
+                for tcode, info in data.items():
+                    if isinstance(info, dict) and "modules" in info:
+                        tcodes[tcode.upper()] = info["modules"]
+            return tcodes
+        except Exception:
+            return {}
+
+    def _load_symptom_index(self):
+        """v5.0: Load symptom-index.yaml mapping. Returns list of symptom dicts."""
+        path = os.path.join(CONFIG_DIR, "..", "references", "data", "symptom-index.yaml")
+        if not os.path.exists(path):
+            return []
+        try:
+            import yaml
+            with open(path, "r", encoding="utf-8") as f:
+                data = yaml.safe_load(f)
+            if data and isinstance(data, dict) and "symptoms" in data:
+                return data["symptoms"]
+            return []
+        except Exception:
+            return []
+
     def _identify_modules(self, text):
         text_upper = text.upper()
+        detected = []
+
+        # 1. T-code matching
+        # Extract potential T-codes (e.g. F110, IW31, XK03, FBZP, SE16N, ME21N)
+        tcode_candidates = re.findall(r'\b[A-Z]{1,2}[0-9]{2,4}[A-Z0-9]?\b', text_upper)
+        words = [w.strip(".,()[]{}'\"") for w in text_upper.split()]
+        tcode_candidates.extend(words)
+
+        tcode_index = self._load_tcode_index()
+        for cand in set(tcode_candidates):
+            if cand in tcode_index:
+                for mod in tcode_index[cand]:
+                    if mod not in detected:
+                        detected.append(mod)
+
+        # 2. Symptom matching (substring/fuzzy)
+        symptoms = self._load_symptom_index()
+        text_norm = self._normalize_text(text)
+        for sym in symptoms:
+            match_found = False
+            for val in sym.values():
+                if isinstance(val, str):
+                    norm_val = self._normalize_text(val)
+                    if norm_val and norm_val in text_norm:
+                        match_found = True
+                        break
+                elif isinstance(val, list):
+                    for item in val:
+                        if isinstance(item, str):
+                            norm_val = self._normalize_text(item)
+                            if norm_val and norm_val in text_norm:
+                                match_found = True
+                                break
+                    if match_found:
+                        break
+            
+            if match_found:
+                for mod in sym.get("likely_modules", []):
+                    if mod not in detected:
+                        detected.append(mod)
+                for tc in sym.get("first_check_tcodes", []):
+                    tc_upper = tc.upper()
+                    if tc_upper in tcode_index:
+                        for mod in tcode_index[tc_upper]:
+                            if mod not in detected:
+                                detected.append(mod)
+
+        # 3. Fallback to v4.2 keyword dictionary
         module_keywords = {
             'MM': ['MATERIAL', 'PURCHASE ORDER', 'PO ', 'MIGO', 'INVENTORY', 'VENDOR',
                    'PROCUREMENT', 'GOODS RECEIPT', 'STOCK', 'MRP', 'SOURCE LIST'],
@@ -542,10 +816,11 @@ class SapRouter:
             'BASIS': ['TRANSPORT', 'ST22', 'DEBUG', 'ACTIVATE', 'ABAP UNIT', 'CODE SEARCH'],
         }
 
-        detected = []
         for module, keywords in module_keywords.items():
             if any(kw in text_upper for kw in keywords):
-                detected.append(module)
+                if module not in detected:
+                    detected.append(module)
+
         return detected
 
     def _extract_entities(self, text):
@@ -679,12 +954,14 @@ def main():
     dp_parser.add_argument('--spec-text', help='Specification text inline')
     dp_parser.add_argument('--serial', action='store_true', help='One stage per wave (no concurrency)')
     dp_parser.add_argument('--resume-from', help='Plan from stage (stage1-8)')
+    dp_parser.add_argument('--use-crewai', action='store_true', help='Generate executable tool_call payload for CrewAI')
     dp_parser.add_argument('--memory-file', default='MEMORY.md')
 
     # crew-dispatch — plan concurrent caveman subagents for a task
     crew_parser = subparsers.add_parser('crew-dispatch',
                                         help='Plan concurrent caveman subagents for a task')
     crew_parser.add_argument('--task', required=True, help='Task description')
+    crew_parser.add_argument('--use-crewai', action='store_true', help='Generate executable tool_call payload for CrewAI')
     crew_parser.add_argument('--memory-file', default='MEMORY.md')
 
     # zrouter — opt-in lifecycle for the optional RFC accelerator
@@ -706,6 +983,12 @@ def main():
     status_parser = subparsers.add_parser('status', help='Show MEMORY.md session status')
     status_parser.add_argument('--memory-file', default='MEMORY.md')
 
+    # rag
+    rag_parser = subparsers.add_parser('rag', help='Query RAG pipeline for SAP Notes or module maps')
+    rag_parser.add_argument('rag_action', choices=['search', 'ingest'])
+    rag_parser.add_argument('--query', help='Search query')
+    rag_parser.add_argument('--top', type=int, default=3, help='Top N results')
+
     # gui-fallback — list all GUI fallback transactions
     gui_parser = subparsers.add_parser('gui-fallback', help='List all SAP GUI fallback transactions')
     gui_parser.add_argument('--module', help='Filter by module')
@@ -720,6 +1003,48 @@ def main():
     gui_enrich.add_argument('--module', help='Enrich all transactions for a module')
     gui_enrich.add_argument('--status', action='store_true', help='Show enrichment status')
     gui_enrich.add_argument('--force', action='store_true', help='Force re-enrich (ignore cache)')
+    # agents — dynamic agent registry subcommands (list / match)
+    agents_parser = subparsers.add_parser('agents', help='Manage dynamic sub-agents registry')
+    agents_subparsers = agents_parser.add_subparsers(dest='agents_command', required=True)
+    
+    # agents list
+    agents_subparsers.add_parser('list', help='List all registered sub-agents')
+    
+    # agents match
+    match_parser = agents_subparsers.add_parser('match', help='Match agent by task description')
+    match_parser.add_argument('--task', required=True, help='Task description to match against')
+
+    # feedback — feedback loops for self-learning
+    feedback_parser = subparsers.add_parser('feedback', help='Submit execution feedback to memory manager')
+    feedback_parser.add_argument('--action', required=True, help='Action name')
+    feedback_parser.add_argument('--success', choices=['true', 'false'], required=True, help='Success status')
+    feedback_parser.add_argument('--details', help='Optional feedback details')
+    feedback_parser.add_argument('--memory-file', default='MEMORY.md')
+
+    # memory — delegate to memory_manager.py
+    memory_parser = subparsers.add_parser('memory', help='Manage session context (MEMORY.md) lifecycle')
+    memory_parser.add_argument('args', nargs=argparse.REMAINDER, help='Arguments passed to memory_manager.py')
+
+    # xls — delegate to xls_to_bapi.py
+    xls_parser = subparsers.add_parser('xls', help='Convert CSV/XLSX to BAPI JSON payloads')
+    xls_parser.add_argument('args', nargs=argparse.REMAINDER, help='Arguments passed to xls_to_bapi.py')
+
+    # templates — delegate to template_repo.py
+    templates_parser = subparsers.add_parser('templates', help='Manage offline ABAP template repository')
+    templates_parser.add_argument('args', nargs=argparse.REMAINDER, help='Arguments passed to template_repo.py')
+
+    # cpi — delegate to cpi_iflow_packager.py
+    cpi_parser = subparsers.add_parser('cpi', help='CPI iFlow packaging and validation')
+    cpi_parser.add_argument('args', nargs=argparse.REMAINDER, help='Arguments passed to cpi_iflow_packager.py')
+
+    # cpi-live — delegate to cpi_client.py
+    cpi_live_parser = subparsers.add_parser('cpi-live', help='Query live SAP CPI tenant via OData API')
+    cpi_live_parser.add_argument('args', nargs=argparse.REMAINDER, help='Arguments passed to cpi_client.py')
+
+    # sap-crew — manage local sap-crew-agent integration
+    sap_crew_parser = subparsers.add_parser('sap-crew', help='Local sap-crew-agent integration')
+    sap_crew_parser.add_argument('crew_action', choices=['status', 'install', 'run'])
+    sap_crew_parser.add_argument('args', nargs=argparse.REMAINDER, help='Additional arguments for run')
 
     args = parser.parse_args()
     router = SapRouter(args.memory_file if hasattr(args, 'memory_file') else 'MEMORY.md')
@@ -766,20 +1091,52 @@ def main():
                     start_idx = i
                     break
         plan = router.build_dispatch_plan(parallel=not args.serial, start_idx=start_idx, n_objects=n_objects)
-        print(json.dumps({
-            'mode': 'serial' if args.serial else 'parallel',
-            'n_objects': n_objects,
-            'waves': plan,
-        }, indent=2))
+        if args.use_crewai:
+            print(json.dumps({
+                "tool_call": {
+                    "server": "hermes-crewai",
+                    "tool": "mcp__hermes-crewai__crewai_orchestrate",
+                    "arguments": {
+                        "mode": "pipeline",
+                        "waves": plan
+                    }
+                }
+            }, indent=2))
+        else:
+            print(json.dumps({
+                'mode': 'serial' if args.serial else 'parallel',
+                'n_objects': n_objects,
+                'waves': plan,
+            }, indent=2))
 
     elif args.command == 'crew-dispatch':
         agents = router._plan_parallel_crew(args.task.lower())
-        if agents:
-            print(json.dumps({'parallel': len(agents) > 1, 'count': len(agents),
-                              'agents': agents}, indent=2))
+        expert = router.match_agent(args.task.lower())
+        if expert:
+            agents.append({
+                'role': 'expert',
+                'agent_type': expert['agent'],
+                'description': f"Specialized expert matching {expert['agent']}"
+            })
+        if args.use_crewai:
+            print(json.dumps({
+                "tool_call": {
+                    "server": "hermes-crewai",
+                    "tool": "mcp__hermes-crewai__crewai_orchestrate",
+                    "arguments": {
+                        "mode": "crew-dispatch",
+                        "task": args.task,
+                        "agents": agents
+                    }
+                }
+            }, indent=2))
         else:
-            print(json.dumps({'parallel': False, 'count': 0, 'agents': [],
-                              'note': 'No caveman roles matched — use a full agent.'}, indent=2))
+            if agents:
+                print(json.dumps({'parallel': len(agents) > 1, 'count': len(agents),
+                                  'agents': agents}, indent=2))
+            else:
+                print(json.dumps({'parallel': False, 'count': 0, 'agents': [],
+                                  'note': 'No caveman roles matched — use a full agent.'}, indent=2))
 
     elif args.command == 'zrouter':
         action = args.zr_action
@@ -815,6 +1172,36 @@ def main():
         elif action == 'reset':
             write_zrouter_optin('unasked')
             print(json.dumps({'optin': 'unasked'}, indent=2))
+    elif args.command == 'agents':
+        if args.agents_command == 'list':
+            agents = router.scan_agent_registry()
+            res = []
+            for name, info in agents.items():
+                res.append({
+                    "name": name,
+                    "description": info["description"].strip(),
+                    "model": info["model"],
+                    "tools": info["tools"],
+                    "path": info["path"]
+                })
+            print(json.dumps(res, indent=2))
+        elif args.agents_command == 'match':
+            match = router.match_agent(args.task)
+            if match:
+                print(json.dumps(match, indent=2))
+            else:
+                print(json.dumps({"agent": None, "score": 0, "strategy": "none", "details": "No agent matched the description threshold."}, indent=2))
+
+    elif args.command == 'feedback':
+        success_status = "OK" if args.success == "true" else "FAIL"
+        router.update_session(
+            module="FEEDBACK",
+            action=args.action,
+            status=success_status,
+            fields_json="{}",
+            details=args.details or "Execution feedback logged."
+        )
+        print(json.dumps({"status": "logged", "action": args.action, "result": success_status}))
 
     elif args.command == 'pipeline':
         spec_text = args.spec_text
@@ -894,6 +1281,28 @@ def main():
     elif args.command == 'status':
         print(router.pipeline_status())
 
+    elif args.command == 'rag':
+        try:
+            from scripts.rag_ingest import PureRAG, run_ingestion, INDEX_PATH
+        except ImportError:
+            from rag_ingest import PureRAG, run_ingestion, INDEX_PATH
+        if args.rag_action == 'ingest':
+            run_ingestion()
+        elif args.rag_action == 'search':
+            if not args.query:
+                print("error: --query required for search", file=sys.stderr)
+                sys.exit(1)
+            rag = PureRAG()
+            if not os.path.exists(INDEX_PATH):
+                run_ingestion()
+            try:
+                rag.load_index(INDEX_PATH)
+            except Exception as e:
+                print(f"Error loading RAG index: {e}", file=sys.stderr)
+                sys.exit(1)
+            results = rag.search(args.query, top_n=args.top)
+            print(json.dumps(results, indent=2, ensure_ascii=False))
+
     elif args.command == 'gui-fallback':
         module_filter = args.module.upper() if args.module else None
         print("SAP GUI Fallback Transactions:")
@@ -942,6 +1351,124 @@ def main():
             print(f"  [READY] Module enrichment queued. See MEMORY.md GUI_DATA after completion.")
         else:
             print("Usage: gui-enrich --tcode MM01 | --module MM | --status")
+
+    elif args.command in ('memory', 'xls', 'templates', 'cpi'):
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        cmd_to_script = {
+            'memory': 'memory_manager.py',
+            'xls': 'xls_to_bapi.py',
+            'templates': 'template_repo.py',
+            'cpi': 'cpi_iflow_packager.py'
+        }
+        script_name = cmd_to_script[args.command]
+        script_path = os.path.join(script_dir, script_name)
+        cmd = [sys.executable, script_path] + args.args
+        try:
+            res = subprocess.run(cmd)
+            sys.exit(res.returncode)
+        except Exception as e:
+            print(f"Error executing {script_name}: {e}", file=sys.stderr)
+            sys.exit(1)
+
+    elif args.command == 'cpi-live':
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        script_path = os.path.join(script_dir, 'cpi_client.py')
+        cmd = [sys.executable, script_path] + args.args
+        try:
+            res = subprocess.run(cmd)
+            sys.exit(res.returncode)
+        except Exception as e:
+            print(f"Error executing cpi_client.py: {e}", file=sys.stderr)
+            sys.exit(1)
+
+    elif args.command == 'sap-crew':
+        # Resolve sap-crew-agent directory:
+        # 1. SAP_CREW_DIR env var (user override)
+        # 2. Side-by-side sibling directory
+        # 3. Common GitHub path on Windows
+        _crew_candidates = [
+            os.environ.get("SAP_CREW_DIR", ""),
+            os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                         '..', 'sap-crew-agent', 'sap-crew-agent'),
+            r"C:\Users\William Correa\Documents\GitHub\sap-crew-agent\sap-crew-agent",
+        ]
+        _crew_dir = next(
+            (p for p in _crew_candidates if p and os.path.isdir(p)), None
+        )
+
+        def _crew_status():
+            print("SAP Crew Agent Status")
+            print("=" * 50)
+            if not _crew_dir:
+                print("  [MISSING] sap-crew-agent directory not found.")
+                print("  Run: sap_router.py sap-crew install")
+                return False
+            run_py = os.path.join(_crew_dir, 'sap_crew', 'run.py')
+            req_txt = os.path.join(_crew_dir, 'requirements.txt')
+            env_file = os.path.join(_crew_dir, '.env')
+            venv_dir = os.path.join(_crew_dir, '.venv')
+            print(f"  Directory  : {_crew_dir}")
+            print(f"  run.py     : {'[OK]' if os.path.isfile(run_py) else '[MISSING]'}")
+            print(f"  requirements: {'[OK]' if os.path.isfile(req_txt) else '[MISSING]'}")
+            print(f"  .env       : {'[OK]' if os.path.isfile(env_file) else '[MISSING — copy .env.example]'}")
+            print(f"  .venv      : {'[OK]' if os.path.isdir(venv_dir) else '[NOT FOUND — run install]'}")
+            # Quick crewai import probe
+            probe = subprocess.run(
+                [sys.executable, '-c', 'import crewai; print("crewai", crewai.__version__)'],
+                capture_output=True, text=True, timeout=10
+            )
+            if probe.returncode == 0:
+                print(f"  crewai     : [OK] {probe.stdout.strip()}")
+            else:
+                print("  crewai     : [NOT INSTALLED — run install]")
+            return True
+
+        def _crew_install():
+            if not _crew_dir:
+                print("[ERROR] sap-crew-agent directory not found. Set SAP_CREW_DIR env var.", file=sys.stderr)
+                sys.exit(1)
+            req_txt = os.path.join(_crew_dir, 'requirements.txt')
+            env_example = os.path.join(_crew_dir, '.env.example')
+            env_file = os.path.join(_crew_dir, '.env')
+            print(f"Installing sap-crew-agent dependencies from {req_txt}...")
+            res = subprocess.run(
+                [sys.executable, '-m', 'pip', 'install', '-r', req_txt],
+                timeout=300
+            )
+            if res.returncode != 0:
+                print("[FAILED] pip install failed.", file=sys.stderr)
+                sys.exit(res.returncode)
+            print("[OK] Dependencies installed.")
+            if not os.path.isfile(env_file) and os.path.isfile(env_example):
+                import shutil
+                shutil.copy(env_example, env_file)
+                print(f"[OK] .env created from .env.example — edit {env_file} with your API keys.")
+            elif os.path.isfile(env_file):
+                print("[OK] .env already exists.")
+            print("[DONE] sap-crew-agent ready. Run: sap_router.py sap-crew run \"your task\"")
+
+        def _crew_run(extra_args):
+            if not _crew_dir:
+                print("[ERROR] sap-crew-agent not found. Run: sap_router.py sap-crew install", file=sys.stderr)
+                sys.exit(1)
+            run_py = os.path.join(_crew_dir, 'sap_crew', 'run.py')
+            if not os.path.isfile(run_py):
+                print(f"[ERROR] {run_py} not found.", file=sys.stderr)
+                sys.exit(1)
+            cmd = [sys.executable, run_py, '--json'] + extra_args
+            try:
+                res = subprocess.run(cmd, cwd=_crew_dir)
+                sys.exit(res.returncode)
+            except Exception as exc:
+                print(f"[ERROR] {exc}", file=sys.stderr)
+                sys.exit(1)
+
+        if args.crew_action == 'status':
+            _crew_status()
+        elif args.crew_action == 'install':
+            _crew_install()
+        elif args.crew_action == 'run':
+            _crew_run(args.args)
 
     else:
         parser.print_help()

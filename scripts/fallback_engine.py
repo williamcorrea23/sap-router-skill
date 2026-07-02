@@ -291,9 +291,19 @@ class TieredFallback:
         if any(a in action.lower() for a in adt_actions):
             return {
                 "success": True,
-                "data": {"method": "ADT direct",
-                         "mcp": "arc-1 or aibap",
-                         "operation": action}
+                "data": {
+                    "method": "ADT direct",
+                    "mcp": "arc-1 or aibap",
+                    "operation": action,
+                    "tool_call": {
+                        "server": "mcp-sap-adt",
+                        "tool": "execute_abap",
+                        "arguments": {
+                            "operation": action,
+                            "payload": payload or {}
+                        }
+                    }
+                }
             }
         return {"success": False,
                 "error": f"Action '{action}' is not an ADT operation"}
@@ -309,21 +319,60 @@ class TieredFallback:
             # Check if partially installed
             partial = self._check_partial_zrouter()
             if partial.get("repairable"):
+                bapi_name = "BAPI_XM_RUN"
+                try:
+                    from scripts.sap_router import FUNCTIONAL_BAPI_MAP
+                    for key, bapi in FUNCTIONAL_BAPI_MAP.items():
+                        if key in action.upper():
+                            bapi_name = bapi
+                            break
+                except Exception:
+                    pass
                 return {
                     "success": True,
-                    "data": {"method": "ZROUTER RFC (auto-repaired)",
-                             "repair": partial,
-                             "action": action}
+                    "data": {
+                        "method": "ZROUTER RFC (auto-repaired)",
+                        "repair": partial,
+                        "action": action,
+                        "tool_call": {
+                            "server": "sap-rfc",
+                            "tool": "execute_bapi",
+                            "arguments": {
+                                "bapi_name": bapi_name,
+                                "payload": payload or {}
+                            }
+                        }
+                    }
                 }
             return {"success": False,
                     "error": "ZROUTER not installed. Install: zrouter_bootstrap.py install --method adt"}
 
         # ZROUTER installed
+        bapi_name = "BAPI_XM_RUN"
+        try:
+            from scripts.sap_router import FUNCTIONAL_BAPI_MAP
+            for key, bapi in FUNCTIONAL_BAPI_MAP.items():
+                if key in action.upper():
+                    bapi_name = bapi
+                    break
+        except Exception:
+            pass
+
         return {
             "success": True,
-            "data": {"method": "ZROUTER RFC",
-                     "fm": "ZROUTER_DISPATCH_FM",
-                     "action": action}
+            "data": {
+                "method": "ZROUTER RFC",
+                "fm": "ZROUTER_DISPATCH_FM",
+                "action": action,
+                "tool_call": {
+                    "server": "sap-rfc",
+                    "tool": "execute_bapi",
+                    "arguments": {
+                        "bapi_name": bapi_name,
+                        "payload": payload or {}
+                    }
+                }
+            }
         }
 
     def _check_partial_zrouter(self):
@@ -376,6 +425,14 @@ class TieredFallback:
                     "mcp": "mcp-sap-gui",
                     "command": "mcp-sap-gui: navigate /n{}".format(gui_info["tcode"]),
                     "alt_method": gui_info.get("alt"),
+                    "tool_call": {
+                        "server": "mcp-sap-gui",
+                        "tool": "run_transaction",
+                        "arguments": {
+                            "tcode": gui_info["tcode"],
+                            "parameters": payload or {}
+                        }
+                    }
                 }
             }
         return {"success": False,

@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-# Healthcheck — probes 35 MCPs + .env completeness (run first)
+# Healthcheck — probes 53 MCPs + .env completeness (run first)
 npm run hc
 npm run hc:prompt       # Interactive setup for missing .env vars
 
@@ -40,7 +40,7 @@ npm run update          # git pull + npm install + healthcheck
 
 ## Architecture
 
-**Skill orchestration is model-driven, not code-driven.** 78 skill files in `.claude/skills/*/SKILL.md` contain YAML frontmatter (`name`, `description` with trigger keywords) and markdown instructions. Claude Code activates matching skills by scanning the frontmatter descriptions. There is no programmatic skill dispatcher — the LLM reads the SKILL.md instructions and decides what to call.
+**Skill orchestration is model-driven, not code-driven.** 85 skill files in `.claude/skills/*/SKILL.md` contain YAML frontmatter (`name`, `description` with trigger keywords) and markdown instructions. Claude Code activates matching skills by scanning the frontmatter descriptions. There is no programmatic skill dispatcher — the LLM reads the SKILL.md instructions and decides what to call.
 
 **karpathy-guidelines** is the mandatory behavioral wrapper. Every SAP operation follows Think (surface assumptions) → Simplify (shortest path) → Surgical (touch only what's needed) → Goal-Verify (loop until criteria met). Output defaults to caveman compression.
 
@@ -61,12 +61,12 @@ npm run update          # git pull + npm install + healthcheck
 | `SKILL.md` | Master dispatch table, 4-principle Karpathy wrapper, routing decision tree |
 | `scripts/sap_router.py` | Routing engine with ADT-first/GUI-fallback/caveman delegation/pipeline orchestration |
 | `scripts/fallback_engine.py` | 6-tier cascading fallback with retry, verification, 36 mapped actions |
-| `scripts/healthcheck.py` | Probes 35 MCPs, validates .env, generates interactive prompts |
+| `scripts/healthcheck.py` | Probes 53 MCPs, validates .env, generates interactive prompts |
 | `scripts/self_learn.py` | Hermes-style context adaptation — tracks MCP latency/reliability, adapts routing |
 | `scripts/zrouter_bootstrap.py` | ZROUTER probe + install (ADT/GUI/Offline) + fallback mapping |
 | `scripts/xls_to_bapi.py` | CSV/XLSX → BAPI JSON with field mapping validation |
 | `scripts/memory_manager.py` | MEMORY.md session lifecycle + ABAPLINT section |
-| `.mcp.json` | 35 MCP server configs — ADT, GUI (3 tiers), RFC, CPI, CF, APIM, RAG (3), PI/PO, BW, Datasphere, Steampunk, Sapient, Integration Suite, CPI OData Proxy, ABAP-MCP, Cloud ALM, CTS Transport + 4 plugins |
+| `.mcp.json` | 53 MCP server configs — ADT, GUI (3 tiers), RFC, CPI, CF, APIM, RAG (3), PI/PO, BW, Datasphere, Steampunk, Sapient, Integration Suite, CPI OData Proxy, ABAP-MCP, Cloud ALM, CTS Transport + 4 plugins |
 | `README.md` | GitHub landing page — 8 Mermaid diagrams, skill catalog, MCP reference, 130 topic tags, SEO footer |
 
 ## Cross-file consistency rules

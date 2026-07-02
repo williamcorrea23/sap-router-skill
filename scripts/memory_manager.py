@@ -15,6 +15,7 @@ class MemoryManager:
         self.blocks = []
         self.pending = []
         self.archive = []
+        self.learn_lines = []
         self.abaplint_results = {}  # v3.0: track lint results in memory
 
     def set_abaplint_result(self, lint_data):
@@ -95,6 +96,12 @@ class MemoryManager:
             elif line_strip.startswith('## ARCHIVE'):
                 current_section = 'ARCHIVE'
                 continue
+            elif line_strip.startswith('## LEARN'):
+                current_section = 'LEARN'
+                continue
+            elif line_strip.startswith('## ABAPLINT'):
+                current_section = 'ABAPLINT'
+                continue
             elif line_strip.startswith('## ENV') or line_strip.startswith('## ACTIVE') or line_strip.startswith('# SAP_SESSION'):
                 current_section = None
                 continue
@@ -113,6 +120,8 @@ class MemoryManager:
             elif current_section == 'ARCHIVE':
                 if line_strip.startswith('- '):
                     self.archive.append(line_strip)
+            elif current_section == 'LEARN':
+                self.learn_lines.append(line_strip)
 
         if current_block:
             self.blocks.append(current_block)
@@ -218,6 +227,12 @@ class MemoryManager:
             content.append(f"- last_run: {ar['timestamp']}")
             content.append(f"- findings: T:{ar['total']} C:{ar['critical']} H:{ar['high']} M:{ar['medium']} L:{ar['low']}")
             content.append(f"- gate: {'PASS' if ar['pass'] else 'FAIL'}")
+            content.append("")
+
+        if self.learn_lines:
+            content.append("## LEARN")
+            for item in self.learn_lines:
+                content.append(item)
             content.append("")
 
         content.append("## PENDING")

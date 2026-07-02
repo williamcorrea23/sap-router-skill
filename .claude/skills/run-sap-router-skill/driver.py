@@ -368,6 +368,18 @@ def main():
     finally:
         shutil.rmtree(work, ignore_errors=True)
 
+    # ── cpi_client and cpi-live ──────────────────────────────────────────────
+    cpi_cli = os.path.join(SCRIPTS, "cpi_client.py")
+    r = run([cpi_cli, "--help"])
+    check("cpi_client --help", r.returncode == 0 and "packages" in r.stdout, r.stderr)
+
+    r = run(["scripts/sap_router.py", "cpi-live", "--help"])
+    check("sap_router cpi-live --help", r.returncode == 0, r.stderr)
+
+    # ── sap-crew status ──────────────────────────────────────────────────────
+    r = run(["scripts/sap_router.py", "sap-crew", "status"])
+    check("sap-crew status", r.returncode == 0 and "SAP Crew Agent Status" in r.stdout, r.stderr)
+
     print(f"\n{passed} passed, {failed} failed")
     sys.exit(1 if failed else 0)
 

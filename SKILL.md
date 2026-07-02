@@ -3,7 +3,7 @@ name: sap-router-skill
 description: >-
   SAP development orchestrator v4.0 — Karpathy command format (Think→Simplify→
   Surgical→Verify), healthcheck guardian, self-learning router, caveman-compressed
-  output default. 78 skills, 35 MCPs (all SAP domains covered), 10 CLIs. Routes: ADT →
+  output default. 105 skills, 53 MCPs (all SAP domains covered), 11 CLIs. Routes: ADT →
   GUI (immediate); BAPI dispatch only in functional context; ZROUTER RFC opt-in; parallel pipeline waves. RAG-ready: Pinecone, Supabase, Azure.
   Use for any SAP task.
 ---
@@ -29,7 +29,7 @@ Before ANY operation, verify:
    → If missing: prompt user for ARC_SAP_URL, ARC_SAP_USER, ARC_SAP_PASSWORD, ARC_SAP_CLIENT
    → Show: `cp .env.template .env` + edit instructions
 
-2. **MCPs connected**: probes all 35 MCPs
+2. **MCPs connected**: probes all 53 MCPs
    → HIGH criticality: arc-1, aibap (block on failure)
    → MEDIUM: mcp-abap-adt, mcp-sap-gui, btp-sap-odata-to-mcp (warn)
    → OPTIONAL: RAG connectors (Pinecone, Supabase, Azure) — pre-ready, activate later
@@ -245,37 +245,41 @@ npm run learn:ctx
 
 ## Project Objects
 
-### Skills (78 — v4.0)
+### Skills (105 — v4.2)
 
-`abap` `abap-cloud` `abap-cloud-migration` `abap-code-patterns` **`abap-code-review`** `abap-sql-amdp` `abap-unit-testing` `abapgit` `atc-cloudification` `authorization-iam` `badi-enhancement` `btp-abap-environment` `btp-best-practices` `btp-build-work-zone` `btp-business-application-studio` **`btp-cloud-foundry`** `btp-cias` `btp-cloud-identity` `btp-cloud-logging` `btp-cloud-platform` `btp-cloud-transport-management` `btp-connectivity` `btp-developer-guide` `btp-diagram-generator` `btp-integration-suite` `btp-job-scheduling` `btp-master-data-integration` `btp-service-manager` `cds-view-entities` `clean-abap` `cpi-iflow-development` **`karpathy-guidelines`** `odata` `odata-abap` `rap` `rap-business-events` `released-abap-classes` `run-sap-router-skill` `sap-ai-core` `sap-api-policy` `sap-api-style` `sap-bapi-integration` `sap-btp-audit-log` `sap-btp-credential-store` `sap-btp-devops` `sap-btp-document-mgmt` `sap-btp-feature-flags` `sap-btp-html5-repo` `sap-btp-kyma` `sap-btp-launchpad` `sap-btp-saas` `sap-build` `sap-cap` `sap-cloud-sdk-ai` `sap-code-search` `sap-crew-analysis` `sap-datasphere` `sap-dependency-security` `sap-fiori-apps-reference` `sap-fiori-tools` `sap-gui-scripting` **`sap-gui-web-enrich`** `sap-hana-cli` `sap-hana-cloud-data-intelligence` `sap-hana-ml` `sap-hana-sqlscript` `sap-llm-engineering` `sap-rap-gen` `sap-rpt1` `sap-sac-custom-widget` `sap-sac-planning` `sap-sac-scripting` `sap-sac-test-automation` **`sap-self-learn`** **`sap-transport-gate`** `sap-transport-management` `sap-workflow-pipeline` `sapui5-framework`
+`abap` `abap-cloud` `abap-cloud-migration` `abap-code-patterns` **`abap-code-review`** `abap-sql-amdp` `abap-unit-testing` `abapgit` **`arc-1-skills`** `atc-cloudification` `authorization-iam` `badi-enhancement` `btp-abap-environment` `btp-best-practices` `btp-build-work-zone` `btp-business-application-studio` **`btp-cloud-foundry`** `btp-cias` `btp-cloud-identity` `sap-btp-cloud-identity-services` `btp-cloud-logging` `btp-cloud-platform` `btp-cloud-transport-management` `btp-connectivity` `btp-developer-guide` `btp-diagram-generator` `btp-integration-suite` `btp-job-scheduling` `btp-master-data-integration` `btp-service-manager` `cds-view-entities` `clean-abap` **`claude-abap-skills`** `cpi-iflow-development` **`karpathy-guidelines`** `odata` `odata-abap` `rap` `rap-business-events` `released-abap-classes` `run-sap-router-skill` `sap-ai-core` `sap-api-policy` `sap-api-style` `sap-bapi-integration` `sap-btp-audit-log` `sap-btp-credential-store` `sap-btp-devops` `sap-btp-document-mgmt` `sap-btp-feature-flags` `sap-btp-html5-repo` `sap-kyma` `sap-launchpad` `sap-saas` **`sap-skills`** `sap-build` **`sap-claude-skills`** `sap-cap` **`sap-commerce-skill`** `sap-ui5` `sap-fiori` `sap-cloud-sdk-ai` `sap-cloud-sdk-ai-python` `sap-code-search` `sap-crew-analysis` **`sap-datasphere-plugin`** `sap-datasphere` `sap-dependency-security` `sap-fiori-apps-reference` `sap-fiori-tools` `sap-functional-ariba` `sap-functional-bw` `sap-functional-co` `sap-functional-fi` `sap-functional-hcm` `sap-functional-mm` `sap-functional-pm` `sap-functional-pp` `sap-functional-ps` `sap-functional-qm` `sap-functional-sd` `sap-functional-tm` `sap-functional-tr` `sap-functional-wm` `sap-functional-common` `sap-gui-scripting` **`sap-gui-web-enrich`** `sap-hana-cli` `sap-hana-cloud-data-intelligence` `sap-hana-ml` `sap-hana-sqlscript` `sap-llm-engineering` `sap-rap-gen` `sap-rpt1` `sap-router-skill` `sap-sac-custom-widget` `sap-sac-planning` `sap-sac-scripting` `sap-sac-test-automation` **`sap-self-learn`** **`sap-transport-gate`** `sap-transport-management` `sap-workflow-pipeline` `sapui5-framework` **`superclaude-for-sap`**
 
-**Bold** = NEW v4.0 (6 added: abap-code-review, btp-cloud-foundry, karpathy-guidelines, sap-gui-web-enrich, sap-self-learn, sap-transport-gate)
+**Bold** = NEW v4.0/v4.2 (36 added: abap-code-review, btp-cloud-foundry, karpathy-guidelines, sap-gui-web-enrich, sap-self-learn, sap-transport-gate, sap-btp-cloud-identity-services, sap-cloud-sdk-ai-python, sap-cap, sap-ui5, sap-fiori, sap-functional-ariba, sap-functional-bw, sap-functional-co, sap-functional-fi, sap-functional-hcm, sap-functional-mm, sap-functional-pm, sap-functional-pp, sap-functional-ps, sap-functional-qm, sap-functional-sd, sap-functional-tm, sap-functional-tr, sap-functional-wm, sap-functional-common, sap-skills, arc-1-skills, superclaude-for-sap, sap-datasphere-plugin, sap-commerce-skill, sap-claude-skills, claude-abap-skills, sap-router-skill)
 
-### MCPs (30 — v4.0)
+### MCPs (53 — v4.2)
 
 **Core (HIGH):** `arc-1` `aibap`
-**ADT (MEDIUM):** `mcp-abap-adt`
-**GUI (3 tiers):** `mcp-sap-gui` `mcp-sap-gui-kts` `sapgui-mcp-go`
+**ADT (MEDIUM):** `mcp-abap-adt`, `mcp-abap-abap-adt-api`, `dassian-adt`, `adt-ls`
+**GUI (3 tiers):** `mcp-sap-gui`, `mcp-sap-gui-kts`, `sapgui-mcp-go`, `sapgui-mcp`, `sap-gui-mcp-jduncan`
 **RFC (MEDIUM):** `sap-rfc-mcp-server` (ZROUTER dispatch)
-**CPI:** `sap-cpi` (iFlow deploy + monitoring)
+**CPI:** `sap-cpi` (iFlow deploy + monitoring), `mcp-integration-suite` (iFlow/package admin), `ci-mcp-server` (OData proxy for packages/logs/keystore), `cpi-mcp-server`, `mcp-ci-python`, `btp-is-ci-mcp-server`, `sap-cpi-mcp-backup`
+**CAP:** `cap-mcp-plugin`
+**HANA:** `hana-mcp-server`
 **CF Runtime:** `cf-cli-mcp` (Cloud Foundry deploy + operations)
 **APIM:** `sap-api-management` (API proxy lifecycle)
 **HCM:** `sf-mcp` (SuccessFactors OData)
-**BTP/OData:** `btp-mcp` `odata-mcp-proxy` `btp-sap-odata-to-mcp`
-**Docs:** `mcp-sap-notes`
+**BTP/OData:** `btp-mcp`, `odata-mcp-proxy`, `btp-sap-odata-to-mcp`, `odata-mcp-go`
+**Docs:** `mcp-sap-notes`, `mcp-sap-docs`
 **PI/PO:** `sap-pi-mcp` (legacy PI/PO integration)
 **BW:** `bw-modeling-mcp` (BW/4HANA modeling)
 **ERPL:** `erpl-adt` (ERPL ADT bridge)
 **Datasphere:** `datasphere-mcp` (spaces, views, federation)
-**Steampunk:** `steampunk-mcp` (ABAP Cloud released APIs)
-**ALM:** `cloud-alm-itsm` (Cloud ALM ITSM)
-**Sapient:** `sapient-mcp` (faster alternative AI orchestrator)
-**Plugins:** `ui5` `fiori-mcp` `mdk-mcp` `cds-mcp` `odata-mcp-go`
+**Steampunk:** `steampunk-mcp` (ABAP Cloud released APIs), `vibing-steampunk`
+**ALM:** `cloud-alm-itsm` (Cloud ALM ITSM), `mcp-calm-server`
+**Sapient/Automation:** `sapient-mcp` (faster alternative AI orchestrator), `sap-mcp`, `abap-mcp-adt-powerup`, `abap-mcp`, `sap-transport-mcp`
+**MCP Hub:** `mcp-hub`, `sap-ai-mcp-servers`
+**Config:** `sap-mcp-config`
+**Plugins:** `ui5-mcp` (or `ui5`), `fiori-mcp`, `mdk-mcp`, `cds-mcp`
 **RAG (pre-ready):** `pinecone-rag` `supabase-rag` `azure-ai-search`
 
-### CLIs (10 — v4.0)
+### CLIs (11 — v4.2)
 
-`sap_router.py` `memory_manager.py` `healthcheck.py` `self_learn.py` `fallback_engine.py` `zrouter_bootstrap.py` `xls_to_bapi.py` `template_repo.py` `abap_serializer.py` `cpi_iflow_packager.py`
+`sap_router.py` `memory_manager.py` `healthcheck.py` `self_learn.py` `fallback_engine.py` `zrouter_bootstrap.py` `xls_to_bapi.py` `template_repo.py` `abap_serializer.py` `cpi_iflow_packager.py` `sapcli`
 
 ---
 

@@ -215,34 +215,35 @@ class SelfLearnEngine:
         # Build LEARN section
         learn_lines = ["## LEARN"]
 
-        if self.system_features:
-            for key, value in sorted(self.system_features.items()):
-                learn_lines.append(f"- sys:{key} {value}")
+        sys_lines = [f"- sys:{k} {v}" for k, v in sorted(self.system_features.items())]
+        pattern_lines = [f"- pattern:{t} {p['preferred_route']} {p['note']}" for t, p in sorted(self.learned_patterns.items())]
+        
+        mcp_lines = []
+        for name in sorted(self.mcp_stats):
+            stats = self.mcp_stats[name]
+            weight = _decay_weight(stats.get('last_used', ''))
+            mcp_lines.append(
+                f"- mcp:{name} latency:{stats['latency_ms']}ms "
+                f"success:{stats['success_rate']:.2f} last:{stats['last_used']} "
+                f"decay:{weight:.2f}"
+            )
 
-        if self.mcp_stats:
-            for name in sorted(self.mcp_stats):
-                stats = self.mcp_stats[name]
-                weight = _decay_weight(stats.get('last_used', ''))
-                learn_lines.append(
-                    f"- mcp:{name} latency:{stats['latency_ms']}ms "
-                    f"success:{stats['success_rate']:.2f} last:{stats['last_used']} "
-                    f"decay:{weight:.2f}"
-                )
+        route_lines = []
+        for action in sorted(self.route_success):
+            stats = self.route_success[action]
+            route_lines.append(
+                f"- route:{action} total:{stats['total']} "
+                f"ok:{stats['ok']} fail:{stats['fail']}"
+            )
 
-        if self.route_success:
-            for action in sorted(self.route_success):
-                stats = self.route_success[action]
-                learn_lines.append(
-                    f"- route:{action} total:{stats['total']} "
-                    f"ok:{stats['ok']} fail:{stats['fail']}"
-                )
-
-        if self.learned_patterns:
-            for trigger, pattern in sorted(self.learned_patterns.items()):
-                learn_lines.append(
-                    f"- pattern:{trigger} {pattern['preferred_route']} {pattern['note']}"
-                )
-
+        # Truncate mcp/route to fit under 25 lines total
+        allowed_mcp_route = max(0, 25 - len(sys_lines) - len(pattern_lines))
+        combined_mcp_route = mcp_lines + route_lines
+        if len(combined_mcp_route) > allowed_mcp_route:
+            combined_mcp_route = combined_mcp_route[-allowed_mcp_route:]
+            
+        detail_lines = sys_lines + pattern_lines + combined_mcp_route
+        learn_lines.extend(detail_lines)
         learn_section = '\n'.join(learn_lines)
 
         # Replace or add LEARN section
