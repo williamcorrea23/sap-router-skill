@@ -1,86 +1,59 @@
 ---
 name: btp-cloud-foundry
-description: >-
-  SAP BTP Cloud Foundry runtime — CF CLI operations, org/space management,
-  cf push/deploy, service marketplace, service instance/binding lifecycle,
-  CF logs and troubleshooting, manifest.yml authoring, CF auto-scaling,
-  route management, buildpack selection, CF security (XSUAA, CF UAA).
-  Use when deploying apps to Cloud Foundry, managing CF orgs/spaces,
-  troubleshooting CF deployments, or configuring CF services on BTP.
-  Triggers on: "Cloud Foundry", "cf push", "cf deploy", "CF org", "CF space",
-  "cf marketplace", "cf logs", "manifest.yml", "buildpack", "CF route",
-  "BTP CF", "BTP Cloud Foundry", "cf create-service".
+description: SAP BTP Cloud Foundry runtime — CF CLI operations, deployment, service lifecycle, troubleshooting, manifest authoring.
+trigger:
+  - cloud foundry
+  - cf push
+  - cf deploy
+  - cf org
+  - cf space
+  - cf marketplace
+  - cf logs
+  - manifest.yml
+  - buildpack
+  - cf route
+  - btp cf
+  - cf create-service
+  - cf bind-service
+prerequisites:
+  - CF CLI v8+ installed (https://github.com/cloudfoundry/cli/releases)
+  - BTP subaccount with Cloud Foundry environment enabled
+  - Org and space already created in BTP Cockpit
+  - Network access to CF API endpoint
 ---
 
-# BTP Cloud Foundry — CF CLI, Deploy, & Lifecycle
+# BTP Cloud Foundry — Deploy, Manage, & Troubleshoot
 
-Full Cloud Foundry runtime management on SAP BTP.
-
-## Architecture
-
-```
-cf CLI / MCP
-    │
-    ▼
-┌──────────────────────────────────────────┐
-│  Cloud Foundry Runtime (BTP)             │
-│                                           │
-│  Org: my-org                              │
-│    Space: dev    Space: qa   Space: prd  │
-│      │              │            │        │
-│      ▼              ▼            ▼        │
-│  ┌───────┐    ┌───────┐   ┌───────┐     │
-│  │ App   │    │ App   │   │ App   │     │
-│  │ CAP   │    │ CAP   │   │ CAP   │     │
-│  │ +XSUAA│    │ +XSUAA│   │ +XSUAA│     │
-│  └───────┘    └───────┘   └───────┘     │
-└──────────────────────────────────────────┘
-```
-
-## CF CLI Quick Reference
-
-### Authentication & Targeting
+## 1. Login and Target
 
 ```bash
-# Login to BTP CF API endpoint
+# Login to BTP CF API (region-specific endpoint)
 cf login -a https://api.cf.us10.hana.ondemand.com
 
 # Target specific org and space
 cf target -o my-org -s dev
 
-# List available orgs and spaces
-cf orgs
-cf spaces
-
-# Check current target
+# Verify current target
 cf target
 ```
 
-### Application Deployment
+## 2. Deploy Application
 
 ```bash
-# Standard push
+# Standard push (uses manifest.yml if present)
 cf push my-app
 
 # Push with custom manifest
-cf push my-app -f manifest.yml
+cf push my-app -f manifest-prod.yml
 
 # Push with specific buildpack
 cf push my-app -b nodejs_buildpack
 
-# Push without starting
+# Push without starting (for binding services first)
 cf push my-app --no-start
-
-# Zero-downtime deploy (blue-green)
-cf push my-app-green
-cf map-route my-app-green cfapps.us10.hana.ondemand.com -n my-app
-cf unmap-route my-app cfapps.us10.hana.ondemand.com -n my-app
-cf stop my-app
-cf rename my-app my-app-old
-cf rename my-app-green my-app
 ```
 
-### manifest.yml
+## 3. Author manifest.yml
 
 ```yaml
 ---
@@ -99,151 +72,117 @@ applications:
   env:
     NODE_ENV: production
     CDS_ENVIRONMENT: production
-    SAP_JWT_TRUST_ACL: '[{"clientid":"*","identityzone":"*"}]'
   health-check-type: http
   health-check-http-endpoint: /health
 ```
 
-### Service Management
+## 4. Manage Services
 
 ```bash
-# List marketplace services
+# List marketplace services and plans
 cf marketplace
-
-# List services in current space
-cf services
+cf marketplace -s xsuaa
 
 # Create service instance
 cf create-service xsuaa application my-xsuaa -c xs-security.json
-
-# Create HDI container
 cf create-service hana hdi-shared my-hdi-container
+cf create-service destination lite my-destination
 
 # Bind service to app
 cf bind-service my-app my-xsuaa
 
-# Unbind and rebind
-cf unbind-service my-app my-xsuaa
-cf bind-service my-app my-xsuaa
+# Create and view service keys
+cf create-service-key my-xsuaa my-key
+cf service-key my-xsuaa my-key
 
-# Service keys
-cf create-service-key my-service my-key
-cf service-key my-service my-key
+# List all services in space
+cf services
 ```
 
-### Troubleshooting
+## 5. Zero-Downtime Deploy (Blue-Green)
 
 ```bash
-# App logs (recent)
-cf logs my-app --recent
+# Deploy new version with temporary route
+cf push my-app-green
 
-# Stream logs
-cf logs my-app
+# Map production route to new version
+cf map-route my-app-green cfapps.us10.hana.ondemand.com -n my-app
 
-# App status and events
+# Unmap route from old version
+cf unmap-route my-app cfapps.us10.hana.ondemand.com -n my-app
+
+# Stop and rename old version
+cf stop my-app
+cf rename my-app my-app-old
+cf rename my-app-green my-app
+```
+
+## 6. Troubleshoot
+
+```bash
+cf logs my-app --recent    # recent logs
+cf logs my-app             # stream live logs
+cf app my-app              # app status and instances
+cf events my-app           # crash/start/stop events
+cf env my-app              # VCAP_SERVICES and env vars
+cf enable-ssh my-app && cf ssh my-app   # SSH into container
+cf restart my-app          # restart with same droplet
+cf restage my-app          # rebuild droplet (needed after new bindings)
+```
+
+## 7. Deploy CAP App with mta.yaml
+
+```bash
+mbt build                              # build MTA archive
+cf deploy mta_archives/my-cap-app_1.0.0.mtar   # deploy to CF
+cf mta my-cap-app                      # verify deployment
+```
+
+## Verification
+
+```bash
+# Check app is running
 cf app my-app
-cf events my-app
+# Expected: #0 running, state=RUNNING
 
-# SSH into container (if enabled)
-cf ssh my-app
+# Health check endpoint
+curl -s https://my-app.cfapps.us10.hana.ondemand.com/health
+# Expected: 200 OK
 
-# Check environment variables
-cf env my-app
+# Verify service bindings
+cf env my-app | grep -A5 VCAP_SERVICES
+# Expected: JSON with bound service credentials
 
-# Restart / restage
-cf restart my-app
-cf restage my-app
-
-# Check CF events at org-level
-cf events
+# Check org quota usage
+cf org-quota my-org
 ```
 
-## Integration with SAP Router
+## Pitfalls
 
-```python
-# sap_router.py routing entry for CF operations
-CF_ACTIONS = {
-    'cf_deploy': {
-        'destination': 'CF CLI',
-        'command': 'cf push',
-        'description': 'Deploy app to Cloud Foundry',
-    },
-    'cf_service': {
-        'destination': 'CF CLI',
-        'command': 'cf create-service / cf bind-service',
-        'description': 'Manage CF services',
-    },
-    'cf_logs': {
-        'destination': 'CF CLI',
-        'command': 'cf logs --recent',
-        'description': 'Troubleshoot CF app',
-    },
-}
-```
+1. **App crashes immediately after push (401 on all endpoints)**
+   - Cause: XSUAA service not bound before app start, or binding created after staging.
+   - Solution: `cf push my-app --no-start` → `cf bind-service my-app my-xsuaa` → `cf start my-app`.
 
-## mta.yaml Integration (CAP on CF)
+2. **Memory quota exceeded**
+   - Cause: BTP CF trial accounts limited to 1GB total. Paid accounts have org-level quotas.
+   - Solution: Check `cf org-quota my-org`. Reduce `memory` in manifest or stop unused apps.
 
-```yaml
-_schema-version: "3.1"
-ID: my-cap-app
-version: 1.0.0
-description: "CAP Application deployed to CF"
+3. **Route collision during blue-green deploy**
+   - Cause: Both old and new apps mapped to same hostname simultaneously without unique temp name.
+   - Solution: Use `-green` suffix for new version. Map route only after green is healthy.
 
-modules:
-- name: my-cap-app-srv
-  type: nodejs
-  path: gen/srv
-  requires:
-  - name: my-cap-app-db
-  - name: my-cap-app-xsuaa
-  - name: my-cap-app-destination
-  provides:
-  - name: srv-api
-    properties:
-      srv-url: ${default-url}
+4. **SSH fails with "not enabled"**
+   - Cause: SSH disabled by default on BTP CF for security.
+   - Solution: `cf enable-ssh my-app` then `cf restage my-app`. Disable in production.
 
-- name: my-cap-app-db-deployer
-  type: hdb
-  path: gen/db
-  requires:
-  - name: my-cap-app-db
+5. **Restage needed after binding new service**
+   - Cause: VCAP_SERVICES env vars are injected at staging time, not runtime.
+   - Solution: After `cf bind-service`, run `cf restage my-app` to pick up new credentials.
 
-- name: my-cap-app-approuter
-  type: approuter.nodejs
-  path: app/router
-  requires:
-  - name: my-cap-app-xsuaa
-  - name: srv-api
-    group: destinations
-    properties:
-      forwardAuthToken: true
-      name: srv-api
-      url: ~{srv-url}
+6. **Buildpack version mismatch**
+   - Cause: SAP buildpacks have version-specific Node.js/Java requirements. Unpinned buildpack auto-updates may break.
+   - Solution: Pin buildpack version in manifest: `buildpack: nodejs_buildpack#1.8.0`.
 
-resources:
-- name: my-cap-app-db
-  type: com.sap.xs.hdi-container
-
-- name: my-cap-app-xsuaa
-  type: org.cloudfoundry.managed-service
-  parameters:
-    service: xsuaa
-    service-plan: application
-
-- name: my-cap-app-destination
-  type: org.cloudfoundry.managed-service
-  parameters:
-    service: destination
-    service-plan: lite
-```
-
-## Gotchas
-
-- **CF memory quota**: Default BTP CF org has limited memory. Check `cf org-users` and quotas.
-- **Buildpack order**: SAP buildpacks have specific version requirements. Pin `buildpack` in manifest.
-- **XSUAA binding**: Must happen before app start. Missing binding → 401 on all endpoints.
-- **AppRouter with destinations**: The `forwardAuthToken: true` setting must match XSUAA config.
-- **CF marketplace on BTP**: Some plans are region-specific. Verify `cf marketplace -s <service>`.
-- **Instance limits**: CF trial accounts limited to 1GB memory, 2 instances.
-- **Route collision**: Blue-green deploy must use unique temporary hostnames to avoid route conflicts.
-- **SSH disabled by default**: `cf enable-ssh my-app` needed before `cf ssh`. Production apps often disable SSH.
+7. **Service plan not available in region**
+   - Cause: Some BTP service plans are region-specific (e.g. HANA not available in all regions).
+   - Solution: Check `cf marketplace -s <service>` to verify plan availability before creating.

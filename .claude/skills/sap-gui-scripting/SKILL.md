@@ -1,247 +1,132 @@
 ---
 name: sap-gui-scripting
 description: >-
-  SAP GUI Scripting automation — fallback path when ADT cannot handle an operation.
-  Auto-navigates transactions via SAP GUI MCP, executes BDC/batch input, reads
-  ALV grids, handles popups/dynpros. Use for SPRO config, SU01 user admin,
-  SM30 table maintenance, SE16 data browser, PFTC task maintenance, SNOTE
-  and any transaction ADT cannot execute. Triggers on: "SAP GUI", "transaction
-  SA38/SE38", "BDC recording", "batch input", "SM30", "SPRO", "SU01", "SU53",
-  "ALV grid", "screen painter", "dynpro navigation", "ADT failed try GUI",
-  "navigate to transaction", "open SAP Easy Access".
+  SAP GUI Scripting automation — fallback when ADT cannot handle an operation.
+  Navigates transactions, executes BDC, reads ALV grids, handles popups.
+  Use for SPRO, SU01, SM30, SE16, SNOTE, and any transaction ADT cannot run.
+trigger:
+  - "SAP GUI"
+  - "GUI scripting"
+  - "BDC recording"
+  - "batch input"
+  - "SM30"
+  - "SPRO"
+  - "SU01"
+  - "SU53"
+  - "ALV grid"
+  - "dynpro navigation"
+  - "ADT failed try GUI"
+  - "navigate to transaction"
+  - "SE16 data browser"
 ---
 
 # SAP GUI Scripting — ADT Fallback & Transaction Automation
 
-When ADT MCP returns "not supported" or "function not available", fall back
-to SAP GUI Scripting via configured GUI MCP (mario-andreschak/mcp-sap-gui).
+When ADT MCP returns "not supported", fall back to SAP GUI Scripting.
+Uses mario-andreschak/mcp-sap-gui (TypeScript) or kts982/mcp-sap-gui (Python).
 
-## Architecture
+## Prerequisites
 
-```
-Request: "Create SPRO entry for BSART=ZNBX"
-    │
-    ▼
-sap_router.py: ADT?
-    │ SAPWrite → "Cannot create customizing entry"
-    ▼
-sap-gui-scripting (this skill):
-    │ 1. Launch SAP GUI session (or attach existing)
-    │ 2. Navigate: /nSPRO → tree expand → transaction select
-    │ 3. Execute BDC/batch input recording
-    │ 4. Verify: table read via SE16
-    │ 5. Return result with screenshot/captured data
-    ▼
-MEMORY.md: status: OK, details: SPRO entry created
-```
+- SAP GUI installed on the machine running the MCP (no GUI on server-only hosts)
+- SAP GUI Scripting enabled: RZ11 → `sapgui/user_scripting` → TRUE
+- Environment variables set: `SAPGUI_HOST`, `SAPGUI_USER`, `SAPGUI_PASSWORD`, `SAPGUI_CLIENT`
+- SHDB transaction recorder available for capturing field IDs
 
-## MCP Configuration
-
-### Primary: mario-andreschak/mcp-sap-gui (TypeScript)
+## 1. MCP Configuration
 
 ```json
 {
   "mcp-sap-gui": {
     "type": "stdio",
     "command": "node",
-    "args": ["dist/index.js"],
+    "args": ["/opt/data/mcp-sap-gui/dist/index.js"],
     "env": {
       "SAPGUI_HOST": "${SAPGUI_HOST}",
       "SAPGUI_USER": "${SAPGUI_USER}",
       "SAPGUI_PASSWORD": "${SAPGUI_PASSWORD}",
       "SAPGUI_CLIENT": "${SAPGUI_CLIENT}"
-    },
-    "description": "SAP GUI automation — connect, navigate transactions, execute BDC, read ALV, handle popups"
+    }
   }
 }
 ```
 
-### Fallback: kts982/mcp-sap-gui (Python)
+## 2. Transaction Navigation Map
 
-```json
-{
-  "mcp-sap-gui-kts": {
-    "type": "stdio",
-    "command": "python",
-    "args": ["-m", "mcp_sap_gui"],
-    "env": {
-      "SAP_CONNECTION": "${SAP_CONNECTION_STRING}"
-    },
-    "description": "SAP GUI MCP (kts982) — Python-based GUI bridge, broader transaction coverage"
-  }
-}
-```
+- **Basis/Dev**: SM30 (table maint), SE16 (data browser), SPRO (customizing),
+  SU01 (user admin), PFCG (roles), SU53 (auth check), SNOTE (notes)
+- **MM**: MM01/MM02 (material), ME21N (PO), MIGO (goods receipt), MMBE (stock)
+- **SD**: VA01/VA02 (orders), VL01N (delivery), VF01 (billing)
+- **FI**: FB01 (post doc), FB02 (change doc), FS00 (GL master), F110 (auto payment)
+- **QM**: QA01, QE01, QM01 | **PP**: CO01, CS01, MD04 | **HCM**: PA20, PA30, PA40
 
-## Transaction Navigation Map
-
-### Basis / ABAP Dev
-
-| Task | ADT Can? | GUI Fallback | Transaction Path |
-|---|---|---|---|
-| Table maintenance (SM30) | ❌ No write | ✅ | `/nSM30 → table name → maintain` |
-| SE16 data browser | ❌ Read-only | ✅ | `/nSE16 → table → execute` |
-| SPRO customizing | ❌ No | ✅ | `/nSPRO → tree nav → IMG activity` |
-| SU01 user maintenance | ❌ No | ✅ | `/nSU01 → user → change` |
-| PFCG role editor | ❌ No | ✅ | `/nPFCG → role → change` |
-| SU53 auth check | ❌ No | ✅ | `/nSU53 → read` |
-| SA38 program execute | ✅ Via SUBMIT | ✅ | `/nSA38 → program → F8` |
-| SE38 with dynpro | ✅ Source only | ✅ | `/nSE38 → program → display` |
-| SNOTE apply note | ❌ No | ✅ | `/nSNOTE → note → implement` |
-| SE80 Object Navigator | ✅ Via ADT | ✅ | `/nSE80 → tree → open object` |
-| SES_ADT_XXX tests | ⚡ Syntax only | ✅ | Full test execution |
-
-### MM (Materials Management)
-
-| Task | ADT Can? | GUI Fallback | Transaction Path |
-|---|---|---|---|
-| MM01 create material | ❌ No write | ✅ | `/nMM01 → material → views → save` |
-| MM02 change material | ❌ No write | ✅ | `/nMM02 → material → change` |
-| ME21N create PO | ❌ Via BAPI | ✅ | `/nME21N → vendor → items → save` |
-| MIGO goods receipt | ❌ No | ✅ | `/nMIGO → movement → post` |
-| MMBE stock overview | ⚡ Read | ✅ | `/nMMBE → material → plant → execute` |
-| ME51N purchase req | ❌ No | ✅ | `/nME51N → items → save` |
-| MB51 material doc list | ❌ No | ✅ | `/nMB51 → material → execute` |
-
-### SD (Sales & Distribution)
-
-| Task | ADT Can? | GUI Fallback | Transaction Path |
-|---|---|---|---|
-| VA01 create order | ❌ Via BAPI | ✅ | `/nVA01 → type → sold-to → items → save` |
-| VA02 change order | ❌ No write | ✅ | `/nVA02 → order → change` |
-| VL01N delivery | ❌ Via BAPI | ✅ | `/nVL01N → ref → items → save` |
-| VF01 billing | ❌ Via BAPI | ✅ | `/nVF01 → delivery → save` |
-| VF04 billing list | ❌ No | ✅ | `/nVF04 → criteria → execute` |
-
-### FI (Financial Accounting)
-
-| Task | ADT Can? | GUI Fallback | Transaction Path |
-|---|---|---|---|
-| FB01 post document | ❌ Via BAPI | ✅ | `/nFB01 → header → items → post` |
-| FB02 change doc | ❌ No | ✅ | `/nFB02 → doc → change` |
-| FS00 GL master | ❌ No | ✅ | `/nFS00 → account → change` |
-| F110 auto payment | ❌ No | ✅ | `/nF110 → parameters → schedule` |
-
-### QM / PP / WM / CO / HCM
-
-| Module | Key GUI Transactions |
-|---|---|
-| QM | QA01, QA02, QE01, QM01, QS21 |
-| PP | CO01, CO02, CS01, CA01, MD04 |
-| WM | MIGO, LT01, LT02, LS01, LX01 |
-| CO | KO01, KS01, KA01, KSB1 |
-| HCM | PA20, PA30, PA40, PT01, PC00 |
-
-## BDC / Batch Input Pattern
+## 3. BDC / Batch Input Pattern
 
 ```python
-# sap_gui_session.py — BDC execution pattern
+# /opt/data/scripts/sap_gui_bdc.py
+import win32com.client
+
 def execute_bdc(session, transaction, bdcdata, mode='N'):
-    """
-    Execute BDC recording via SAP GUI.
-    session: connected SAP GUI session object
-    transaction: target T-code
-    bdcdata: list of dicts with PROGRAM, DYNPRO, fields
-    mode: 'N' (no display), 'A' (all screens), 'E' (errors only)
-    """
+    """Execute BDC recording. mode: N=no display, A=all, E=errors only."""
     session.StartTransaction(transaction)
-
     for step in bdcdata:
-        session.findById(step['PROGRAM'])
-        session.findById(step['DYNPRO'])
-
-        for field_name, field_value in step['fields'].items():
+        for field_name, field_value in step.get('fields', {}).items():
             try:
                 session.findById(field_name).text = field_value
             except Exception as e:
-                # Field may be invisible/disabled — log and continue
                 log_field_skip(field_name, str(e))
-
         if step.get('okcode'):
             session.findById('wnd[0]').sendVKey(step['okcode'])
-
     return session
 
-# Example: MM01 create material (basic data view)
-BDC_MM01_BASIC = [
-    {
-        'PROGRAM': 'SAPLMGMM',
-        'DYNPRO': '0060',
-        'fields': {
-            'RMMG1-MATNR': 'MAT0001',
-            'RMMG1-MBRSH': 'M',      # Industry: Mechanical
-            'RMMG1-MTART': 'FERT',   # Material type: Finished
-        },
-        'okcode': '0'
-    },
-    # ... more steps per view selected
+# Example: SM30 table maintenance
+BDC_SM30 = [
+    {'fields': {'wnd[0]/usr/txtVIEW-AREA': 'ZROUTER_TMPL'},
+     'okcode': '0'}  ➀ Enter
 ]
+session = win32com.client.Dispatch("SapGui.ScriptingCtrl")
+connection = session.OpenConnection(SAPGUI_HOST)
+execute_bdc(connection.Children(0), 'SM30', BDC_SM30)
 ```
 
-## ALV Grid Reading Pattern
+## 4. ALV Grid Reading
 
 ```python
+# /opt/data/scripts/sap_gui_alv.py
 def read_alv_grid(session, grid_id='wnd[1]/usr/cntlGRID1/shellcont/shell'):
-    """
-    Read data from an ALV grid into a list of dicts.
-    Works for: MMBE, MB51, ME2M, VA05, FBL1N, KSB1, etc.
-    """
+    """Read ALV grid data. Works for MMBE, MB51, ME2M, VA05, FBL1N, KSB1."""
     grid = session.findById(grid_id)
-
-    # Get row count
-    row_count = grid.RowCount
-
-    # Get column headers
-    col_count = grid.ColumnCount
-    headers = []
-    for col in range(col_count):
-        headers.append(grid.GetColumnHeader(col))
-
-    # Read rows
+    headers = [grid.GetColumnHeader(c) for c in range(grid.ColumnCount)]
     rows = []
-    for row in range(row_count):
-        row_data = {}
-        for col in range(col_count):
-            row_data[headers[col]] = grid.GetCellValue(row, col)
-        rows.append(row_data)
-
+    for r in range(grid.RowCount):
+        rows.append({headers[c]: grid.GetCellValue(r, c)
+                     for c in range(grid.ColumnCount)})
     return rows
 ```
 
-## Popup / Modal Handling
+## 5. Popup / Modal Handling
 
 ```python
-def handle_popup(session, expected_title=None, default_button='OK'):
-    """
-    Detect and handle modal popup dialogs.
-    Returns True if popup was handled.
-    """
+# /opt/data/scripts/sap_gui_popup.py
+def handle_popup(session, button='OK'):
+    """Detect and dismiss modal popup. Returns True if handled."""
     try:
-        # Check for modal popup (usually wnd[1])
         popup = session.findById('wnd[1]')
-
-        if expected_title and expected_title not in popup.Text:
-            return False
-
-        # Press default button
-        if default_button == 'OK':
-            popup.sendVKey(0)  # Enter
-        elif default_button == 'CANCEL':
-            popup.sendVKey(12)  # Cancel
-        elif default_button == 'YES':
-            popup.findById('btn[0]').press()
-        elif default_button == 'NO':
-            popup.findById('btn[1]').press()
-
+        actions = {'OK': 0, 'CANCEL': 12, 'YES': 'btn[0]', 'NO': 'btn[1]'}
+        act = actions.get(button, 0)
+        if isinstance(act, int):
+            popup.sendVKey(act)
+        else:
+            popup.findById(act).press()
         return True
     except Exception:
         return False
 ```
 
-## Integration with sap_router.py
+## 6. ADT-First Routing Strategy
 
 ```python
-# Added to SapRouter.get_route():
-GUI_FALLBACK_MODULES = [
+# /opt/data/scripts/sap_router_fallback.py
+GUI_FALLBACK = [
     'SPRO', 'SM30', 'SU01', 'SU53', 'PFCG', 'SNOTE',
     'MM01', 'MM02', 'ME21N', 'MIGO', 'MMBE',
     'VA01', 'VA02', 'VL01N', 'VF01',
@@ -249,80 +134,48 @@ GUI_FALLBACK_MODULES = [
     'QA01', 'CO01', 'KO01', 'PA20', 'PA30'
 ]
 
-def get_route_with_fallback(self, action, try_adt=True):
-    """Route with ADT-first, GUI-fallback strategy."""
-    action_upper = action.upper()
-
-    # Step 1: Try ADT (primary path)
-    if try_adt:
-        for adt_action in ADT_ACTIONS:
-            if adt_action in action.lower():
-                return {
-                    "destination": "ARC-1 (ADT)",
-                    "fallback": "sap-gui-scripting",
-                    "status": "attempting ADT"
-                }
-
-    # Step 2: Check if GUI fallback is available
-    gui_transaction = GUI_TRANSACTION_MAP.get(action_upper)
-    if gui_transaction:
-        return {
-            "destination": "SAP GUI Scripting",
-            "mcp": "mcp-sap-gui",
-            "transaction": gui_transaction,
-            "status": "ADT not available — routed to GUI"
-        }
-
-    # Step 3: ZROUTER RFC (for BAPI-based operations)
-    return {
-        "destination": "ZROUTER RFC",
-        "status": "routed to RFC dispatcher"
-    }
-
-GUI_TRANSACTION_MAP = {
-    'SPRO_CONFIG': 'SPRO',
-    'TABLE_MAINTENANCE': 'SM30',
-    'USER_MAINTENANCE': 'SU01',
-    'AUTH_CHECK': 'SU53',
-    'ROLE_EDITOR': 'PFCG',
-    'NOTE_APPLY': 'SNOTE',
-    'MATERIAL_CREATE_VIA_GUI': 'MM01',
-    'MATERIAL_CHANGE_VIA_GUI': 'MM02',
-    'PO_CREATE_VIA_GUI': 'ME21N',
-    'GOODS_RECEIPT': 'MIGO',
-    'STOCK_OVERVIEW': 'MMBE',
-    'ORDER_CREATE_VIA_GUI': 'VA01',
-    'ORDER_CHANGE_VIA_GUI': 'VA02',
-    'DELIVERY_CREATE_VIA_GUI': 'VL01N',
-    'BILLING_CREATE_VIA_GUI': 'VF01',
-    'FI_POST_DOCUMENT_GUI': 'FB01',
-    'FI_CHANGE_DOC_GUI': 'FB02',
-    'GL_MASTER_GUI': 'FS00',
-    'AUTO_PAYMENT_GUI': 'F110',
-    'INSPECTION_CREATE_GUI': 'QA01',
-    'PROD_ORDER_CREATE_GUI': 'CO01',
-    'INTERNAL_ORDER_GUI': 'KO01',
-    'EMPLOYEE_DISPLAY_GUI': 'PA20',
-}
+def route(action, try_adt=True):
+    """Route: ADT first → GUI fallback → ZROUTER RFC."""
+    if try_adt and adt_supports(action):
+        return {"dest": "ADT", "fallback": "sap-gui-scripting"}
+    if action.upper() in GUI_FALLBACK:
+        return {"dest": "SAP GUI", "mcp": "mcp-sap-gui", "tcode": action}
+    return {"dest": "ZROUTER RFC"}
 ```
 
-## Pre-Flight Check
+## Pitfalls
 
-Before routing to GUI:
+- **SAP GUI Scripting not enabled**:
+  - Cause: `sapgui/user_scripting` is FALSE in RZ11.
+  - Solution: Set to TRUE via RZ11 and restart SAP GUI.
+- **Field IDs change across SAP versions**:
+  - Cause: Screen modifications in support packages shift field positions.
+  - Solution: Use SHDB transaction recorder to capture correct field IDs before scripting.
+- **Popups break BDC navigation silently**:
+  - Cause: Modal window appears between steps; script tries next field on wrong screen.
+  - Solution: Call `handle_popup()` after every `sendVKey` in BDC loops.
+- **Password hardcoded in script**:
+  - Cause: Developer embeds credentials for convenience.
+  - Solution: Always use environment variables or secure vault — never hardcode.
+- **BDC mode A floods with screens in production**:
+  - Cause: Mode 'A' shows every screen — useful for debug, terrible for batch.
+  - Solution: Use mode 'N' (no display) for production, 'E' for error-only visibility.
+- **No SAP GUI on server host**:
+  - Cause: MCP runs on Linux server without SAP GUI installed.
+  - Solution: Run GUI MCP on a Windows machine with SAP GUI, or use RFC/BAPI instead.
 
-1. **Verify SAP GUI is installed**: `session = win32com.client.Dispatch("SapGui.ScriptingCtrl")`
-2. **Check connection exists**: `connection = session.OpenConnection(host, system_number)`
-3. **Detect screen state**: if already in a transaction, handle gracefully
-4. **Record transaction path**: log every screen for auditability
+## Verification
 
-## Gotchas
+```bash
+# Verify SAP GUI scripting is enabled
+python3 /opt/data/scripts/check_gui_scripting.py --host "$SAPGUI_HOST"
 
-- **SAP GUI Scripting must be enabled**: RZ11 → `sapgui/user_scripting` → TRUE
-- **No GUI on server**: SAP GUI must be installed on the machine running the MCP
-- **Popups break navigation**: Always check for modal windows between steps
-- **Field names change across SAP versions**: Use transaction recorder (SHDB) to capture correct field IDs
-- **Long-running transactions**: Set session timeout higher (default 120s)
-- **Password fields**: Never hardcode — always pass via env var or secure vault
-- **Batch vs interactive**: BDC mode 'E' shows errors only; mode 'A' shows all for debugging
-- **ALV grid variant**: ALV may be classic or modern (CL_GUI_ALV_GRID) — adapt grid ID pattern
-- **GUI MCP fallback priority**: mario-andreschak > kts982 > Hochfrequenz/sapgui.mcp
+# Verify MCP config exists
+test -f /opt/data/.mcp/sap-gui.json && echo "OK: MCP config found" || echo "FAIL: no config"
+
+# Verify BDC script syntax
+python3 -m py_compile /opt/data/scripts/sap_gui_bdc.py && echo "OK: BDC script valid"
+
+# Verify environment variables are set
+test -n "$SAPGUI_HOST" && test -n "$SAPGUI_USER" && echo "OK: env set" || echo "FAIL: missing env"
+```

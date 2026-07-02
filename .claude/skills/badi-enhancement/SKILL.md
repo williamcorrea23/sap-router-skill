@@ -1,59 +1,60 @@
 ---
 name: badi-enhancement
-description: BAdI and enhancement patterns — classic BAdI (CL_EXITHANDLER), new Kernel BAdI (BADI_NAME), enhancement spots (ENHANCEMENT-SECTION), implicit enhancements, BAdI filters and conditions, fallback class, ENHANCEMENT-POINT, SAP standard modification via BAdI. Use when implementing BAdIs, creating enhancement spots, or finding the right BAdI for a customer exit.
+description: >-
+  SAP BAdI (Business Add-In) and Enhancement Spot patterns — classic BAdI
+  (CL_EXITHANDLER), Kernel BAdI (GET BADI), new BAdI (direct reference),
+  enhancement spots, implicit enhancements, BAdI filters, fallback classes.
+  Use when implementing BAdIs, creating enhancement spots, or finding the
+  right BAdI for a customer exit. Follows Karpathy: surgical changes,
+  explicit assumptions, verifiable outcomes.
+trigger:
+  - BAdI
+  - badi
+  - enhancement spot
+  - SE18
+  - SE19
+  - CL_EXITHANDLER
+  - GET BADI
+  - enhancement spot implementation
+  - customer exit
+  - implicit enhancement
+  - ENHANCEMENT-SECTION
+  - fallback class
+  - BAdI filter
+  - filtro BAdI
+  - implementar BAdI
 ---
 
 # BAdI and Enhancement Patterns
 
-SAP Business Add-Ins (BAdI) — sanctioned extension points for modifying SAP standard behavior.
+**Mental model:** A BAdI is an SAP-sanctioned extension contract — SAP defines
+an interface at a specific call point; you implement the interface in a Z/Y
+class. The SAP standard code calls your implementation via a dispatcher.
+No standard code is modified. Upgrades preserve your logic because the contract
+(interface) is stable.
 
-## BAdI Types
+## Prerequisites
 
-| Type | ABAP Version | Defining Class | Key Feature |
-|---|---|---|---|
-| Classic BAdI | ≤ 7.0 | CL_EXITHANDLER | Filter-dependent. Deprecated. |
-| Kernel BAdI | ≥ 7.0 | GET BADI | Improved performance, filter support |
-| New BAdI | ≥ 7.40 | BADI name directly | Best: type-safe, filter UI, fallback |
+- SAP system access (DEV client with developer key / S/4HANA Cloud ABAP)
+- Transaction SE18 (BAdI definition) and SE19 (BAdI implementation)
+- Object name in customer namespace (Z* or Y*)
+- Transport request assigned (SE09/SE10)
+- For new Kernel BAdI: ABAP ≥ 7.0 (GET BADI statement)
+- For new BAdI syntax: ABAP ≥ 7.40 (BADI name directly in code)
+- ADT/Eclipse recommended for class-based implementation
 
-## New Kernel BAdI Implementation
+## BAdI Type Selection
 
-```abap
-" BAdI Definition (SAP or customer namespace)
-" SE18 → BAdI Definition → ZBADI_VALIDATE_MATERIAL
+- **Classic BAdI** (≤ 7.0): Uses `CL_EXITHANDLER=>GET_INSTANCE`. Deprecated — avoid for new development.
+- **Kernel BAdI** (≥ 7.0): Uses `GET BADI` statement. Filter support, multiple-use.
+- **New BAdI** (≥ 7.40): Direct `BADI_NAME` reference. Best: type-safe, filter UI, fallback class.
 
-" BAdI Implementation
-CLASS zcl_badi_material_validate DEFINITION PUBLIC FINAL CREATE PUBLIC.
-  PUBLIC SECTION.
-    INTERFACES zif_badi_validate_material.
-ENDCLASS.
+> **Rule:** Always prefer New/Kernel BAdI. Only touch classic BAdI when enhancing existing SAP code that already calls `CL_EXITHANDLER`.
 
-CLASS zcl_badi_material_validate IMPLEMENTATION.
-  METHOD zif_badi_validate_material~validate.
-    IF iv_material_type = 'ZMAT' AND iv_description IS INITIAL.
-      ct_return = VALUE #( BASE ct_return
-        ( type = 'E' id = 'ZMM' number = '001'
-          message_v1 = iv_material ) ).
-    ENDIF.
-  ENDMETHOD.
-ENDCLASS.
-```
-
-## BAdI with Filter
+## Step 1 — Find the Right BAdI
 
 ```abap
-" BAdI Definition with filter: COUNTRY
-" Fallback class: zcl_badi_material_default
-
-" Implementation 1: Filter COUNTRY = 'DE'
-" Implementation 2: Filter COUNTRY = 'BR'
-" No matching filter → fallback class is called
-```
-
-## Finding BAdIs
-
-```abap
-" Search for BAdI definitions (SE18)
-" Or programmatic lookup:
+" Search BAdI definitions by keyword (SE18 or SQL)
 SELECT name, descript FROM badi
   WHERE name LIKE '%MATERIAL%'
   INTO TABLE @DATA(lt_badis).
@@ -64,32 +65,110 @@ SELECT badi_name, impl_name FROM badi_impl
   INTO TABLE @DATA(lt_impls).
 ```
 
-## Enhancement Spots
-
-```abap
-" Explicit enhancement section (defined by SAP)
-ENHANCEMENT-SECTION Z_CUSTOM_VALIDATION SPOTS ZSPOT_MATERIAL.
-  " Custom code here — survives upgrades
-  DATA(lv_custom_check) = zcl_custom_validator=>check( lv_matnr ).
-END-ENHANCEMENT-SECTION.
-
-" Implicit enhancement at end of any method/FM
-" Right-click → Enhance → Create Enhancement Implementation
+```bash
+# SAP GUI: SE18 → BAdI Definition → enter name → Display
+# Check interface methods and filter types
+# SE19 → Create Implementation → enter BAdI name
 ```
 
-## BAdI vs Enhancement Decision
+## Step 2 — Implement New Kernel BAdI
 
-| Criterion | BAdI | Enhancement Spot |
-|---|---|---|
-| Type safety | Yes (typed interface) | No |
-| Multiple implementations | Yes (with filters) | No (single) |
-| Upgrade safety | Yes (SAP contract) | Partial (may break) |
-| SAP recommended | Yes | Only if no BAdI exists |
-| Fallback | Yes (fallback class) | No |
+```abap
+" BAdI Definition: SE18 → ZBADI_VALIDATE_MATERIAL
+" Interface: ZIF_BADI_VALIDATE_MATERIAL with method VALIDATE
 
-## Gotchas
+" Implementation class (SE19 or ADT)
+CLASS zcl_badi_material_validate DEFINITION PUBLIC FINAL CREATE PUBLIC.
+  PUBLIC SECTION.
+    INTERFACES zif_badi_validate_material.
+ENDCLASS.
 
-- **Classic BAdI (CL_EXITHANDLER)** — avoid for new code. Use Kernel BAdI
-- **BAdI without fallback** — SAP may change interface; your implementation breaks
-- **Never modify SAP standard code directly** — use BAdI or enhancement spot
-- **BAdI filter is optional** — implementations without filter are always called
+CLASS zcl_badi_material_validate IMPLEMENTATION.
+  METHOD zif_badi_validate_material~validate.
+    " Surgical: only validate what the BAdI contract expects
+    IF iv_material_type = 'ZMAT' AND iv_description IS INITIAL.
+      ct_return = VALUE #( BASE ct_return
+        ( type = 'E' id = 'ZMM' number = '001'
+          message_v1 = iv_material ) ).
+    ENDIF.
+  ENDMETHOD.
+ENDCLASS.
+```
+
+## Step 3 — BAdI with Filter
+
+```abap
+" BAdI Definition with filter: COUNTRY (type LAND1)
+" Fallback class: ZCL_BADI_MATERIAL_DEFAULT
+"   → implements same interface, called when no filter matches
+
+" SE19 → Create Implementation:
+"   Impl 1: ZCL_BADI_MAT_DE → Filter COUNTRY = 'DE'
+"   Impl 2: ZCL_BADI_MAT_BR → Filter COUNTRY = 'BR'
+"   No match → ZCL_BADI_MATERIAL_DEFAULT (fallback)
+
+" Caller code (SAP standard or custom):
+GET BADI mo_badi
+  FILTERS country = lv_land1.
+
+CALL BADI mo_badi->validate
+  EXPORTING iv_material_type = lv_mtart
+  CHANGING  ct_return         = lt_return.
+```
+
+## Step 4 — Enhancement Spots (Fallback When No BAdI Exists)
+
+```abap
+" Explicit enhancement section (SAP-defined insertion point)
+ENHANCEMENT-SECTION Z_CUSTOM_VALIDATION SPOTS ZSPOT_MATERIAL.
+  " Your code — survives upgrades if section is preserved
+  DATA(lv_check) = zcl_validator=>check( lv_matnr ).
+END-ENHANCEMENT-SECTION.
+
+" Implicit enhancement: end of any method/FM
+" SE38/ADT → Edit → Enhancement Operations → Create Implicit Enhancement
+```
+
+## BAdI vs Enhancement Spot — Decision
+
+- **Type safety:** BAdI = yes (typed interface) | Enhancement = no
+- **Multiple implementations:** BAdI = yes (filters) | Enhancement = single
+- **Upgrade safety:** BAdI = SAP contract | Enhancement = partial risk
+- **Fallback class:** BAdI = yes | Enhancement = no
+- **SAP recommendation:** BAdI first; Enhancement only if no BAdI exists
+
+## Pitfalls
+
+- **Classic CL_EXITHANDLER** — deprecated, slower, no filter UI. Migrate to Kernel BAdI when SAP provides one.
+- **No fallback class** — if no filter matches and no fallback exists, the BAdI call is a no-op. Always define a fallback.
+- **Modifying SAP standard** — never edit standard code directly. Use BAdI, enhancement spot, or key-user extensibility (S/4HANA).
+- **Filter without value** — implementations without filter are ALWAYS called. Unintended side effects.
+- **COMMIT in BAdI** — BAdI runs in SAP standard LUW. Never call `COMMIT WORK` inside a BAdI method.
+- **Unreleased interface** — check if BAdI interface is released (API state) before implementing in Cloud.
+- **Multiple-use BAdI without filter** — all implementations fire; order is undefined. Use filters to control.
+
+## Verification
+
+```abap
+" 1. Activate implementation in SE19 → status must be 'Active'
+" 2. Set external breakpoint in implementation class
+" 3. Trigger SAP standard transaction that calls the BAdI
+" 4. Debugger must stop in your method → BAdI is wired correctly
+
+" 5. Verify filter logic:
+GET BADI mo_badi FILTERS country = 'DE'.
+" → zcl_badi_mat_de called (not fallback)
+
+GET BADI mo_badi FILTERS country = 'XX'.
+" → zcl_badi_material_default called (fallback)
+
+" 6. Check transport: SE09 → your impl object is in the request
+" 7. ATC check: no priority 1/2 findings on implementation class
+" 8. Unit test: call interface method directly with test doubles
+```
+
+```bash
+# ADT: right-click implementation class → Run As → ABAP Unit Test
+# SE19 → Implementation → Test (if BAdI provides test report)
+# SE18 → BAdI → Where-used list to confirm call points
+```

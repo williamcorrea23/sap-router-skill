@@ -1,46 +1,72 @@
 ---
 name: sap-rap-gen
-description: SAP RAP Generator — generate complete RAP business objects (BDEF, behavior implementation, CDS views, service definition, service binding) from templates or specifications, RAP BO scaffolding, CRUD and transactional patterns, managed vs unmanaged scenario generation, draft-enabled BO generation, custom entity and value help generation. Use when generating RAP business objects from scratch, scaffolding RAP services, creating RAP CRUD applications, or accelerating RAP development with code generation.
+description: Generate complete SAP RAP business objects — BDEF, behavior implementation, CDS views, service definition, service binding. Managed/unmanaged, draft-enabled, custom entities.
+trigger:
+  keywords:
+    - generate rap
+    - rap business object
+    - behavior definition
+    - bdef
+    - cds view entity
+    - rap service
+    - draft enabled bo
+    - restful application programming model
+  patterns:
+    - "generate.*rap.*bo"
+    - "create.*behavior definition"
+    - "scaffold.*rap"
+    - "rap.*managed.*implementation"
 ---
 
 # SAP RAP Generator
 
-Generate complete RAP business objects from specifications or templates — accelerates RAP development from days to minutes.
+RAP = CDS data model + behavior definition + behavior implementation + service exposure.
+One root entity per BO. Compositions link child nodes. Managed = runtime handles CRUD automatically.
 
-## What It Generates
+## Prerequisites
 
-```
-RAP Business Object "Z_I_PRODUCT"
-├── Z_I_PRODUCT (CDS View Entity) — Data model
-├── Z_C_PRODUCT (CDS Projection View) — Consumption layer
-├── Z_R_PRODUCT (Behavior Definition) — Transactional model
-├── ZBP_I_PRODUCT (Behavior Implementation) — ABAP logic
-├── Z_SRV_PRODUCT (Service Definition) — Service interface
-├── Z_SRV_PRODUCT (Service Binding) — OData V4 endpoint
-└── Z_D_PRODUCT (Draft table, if draft enabled) — Draft persistence
-```
+- ABAP 7.57+ (Cloud or on-premise S/4HANA 2020+); ADT with RAP support
+- Authorization to create DDIC tables, CDS views, BDEF, classes, service definitions
+- Existing persistent table (e.g. `ZPRODUCT`) with key fields
 
-## Generating a Managed BO
-
-### From Specification (using this skill)
+## Architecture (generate in this order)
 
 ```
-You: "generate RAP BO for Product entity with fields:
-      product_guid (UUID, key), material (CHAR18, semantic key),
-      material_type (CHAR4, mandatory), description (CHAR40),
-      plant (CHAR4), created_at (timestamp)
-      Enable: create, update, delete, draft, ETag, numbering"
-
-Skill: sap-rap-gen
-
-Generated output:
-  - Z_I_PRODUCT CDS view entity
-  - Behavior definition (managed, draft enabled, late numbering)
-  - Behavior implementation (determinations for audit fields)
-  - Service definition + binding recommendation
+ZPRODUCT (DB table)
+  └─ Z_I_PRODUCT   → CDS View Entity (data model, root)
+  └─ Z_R_PRODUCT   → Behavior Definition (transactional contract)
+  └─ ZBP_I_PRODUCT → Behavior Implementation (ABAP class)
+  └─ Z_C_PRODUCT   → CDS Projection (consumption layer)
+  └─ Z_SRV_PRODUCT → Service Definition + Binding (OData V4)
+  └─ Z_D_PRODUCT   → Draft table (only if draft-enabled)
 ```
 
-### Generated Behavior Definition
+## Step 1 — CDS View Entity
+
+```cds
+@AccessControl.authorizationCheck: #CHECK
+@EndUserText.label: 'Product Master Data'
+@ObjectModel.semanticKey: ['Material']
+define view entity Z_I_PRODUCT
+  as select from zproduct
+  composition [0..*] of Z_I_STOCK as _Stock
+{
+  key product_guid    as ProductGuid,
+      material        as Material,
+      @ObjectModel.mandatory: true
+      material_type   as MaterialType,
+      @Search.defaultSearchElement: true
+      description     as Description,
+      plant           as Plant,
+      @Semantics.systemDate.createdAt: true
+      created_at      as CreatedAt,
+      @Semantics.systemDate.lastChangedAt: true
+      last_changed_at as LastChangedAt,
+      _Stock
+}
+```
+
+## Step 2 — Behavior Definition (Managed + Draft)
 
 ```abap
 managed implementation in class zbp_i_product unique;
@@ -52,7 +78,6 @@ draft table z_d_product
 lock master total etag last_changed_at
 authorization master ( instance )
 etag master last_changed_at
-
 {
   create;
   update;
@@ -64,47 +89,16 @@ etag master last_changed_at
 
   determination set_audit_fields on modify { create; update; }
 
-  mapping for zproduct
-    {
-      product_guid  = product_guid;
-      material      = material;
-      material_type = material_type;
-      description   = description;
-      plant         = plant;
-      created_at    = created_at;
-      last_changed_at = last_changed_at;
-    }
+  mapping for zproduct {
+    product_guid = product_guid; material = material;
+    material_type = material_type; description = description;
+    plant = plant; created_at = created_at;
+    last_changed_at = last_changed_at;
+  }
 }
 ```
 
-### Generated CDS View Entity
-
-```cds
-@AbapCatalog.sqlViewName: 'ZPRODUCTV'
-@AbapCatalog.compiler.compareFilter: true
-@AbapCatalog.preserveKey: true
-@AccessControl.authorizationCheck: #CHECK
-@EndUserText.label: 'Product Master Data'
-@ObjectModel.representativeKey: 'Material'
-@ObjectModel.semanticKey: ['Material']
-define view entity Z_I_PRODUCT
-  as select from zproduct
-{
-  key product_guid   as ProductGuid,
-      material       as Material,
-      @ObjectModel.mandatory: true
-      material_type  as MaterialType,
-      @Search.defaultSearchElement: true
-      description    as Description,
-      plant          as Plant,
-      @Semantics.systemDate.createdAt: true
-      created_at     as CreatedAt,
-      @Semantics.systemDate.lastChangedAt: true
-      last_changed_at as LastChangedAt
-}
-```
-
-### Generated Behavior Implementation
+## Step 3 — Behavior Implementation
 
 ```abap
 CLASS lhc_product DEFINITION INHERITING FROM cl_abap_behavior_handler.
@@ -121,88 +115,87 @@ CLASS lhc_product IMPLEMENTATION.
       RESULT DATA(lt_products).
 
     MODIFY ENTITIES OF z_i_product IN LOCAL MODE
-      ENTITY product UPDATE
-      FIELDS ( created_at last_changed_at )
+      ENTITY product UPDATE FIELDS ( created_at last_changed_at )
       WITH VALUE #( FOR ls IN lt_products (
         %tky = ls-%tky
         created_at = COND #( WHEN ls-created_at IS INITIAL
-          THEN utclong_current( ) ELSE ls-created_at )
-        last_changed_at = utclong_current( )
-      ) ).
+                             THEN utclong_current( ) ELSE ls-created_at )
+        last_changed_at = utclong_current( ) ) ).
   ENDMETHOD.
 ENDCLASS.
 ```
 
-## Generated Service Definition
+## Step 4 — Projection View
+
+```cds
+@AccessControl.authorizationCheck: #CHECK
+@Metadata.allowExtensions: true
+define root view entity Z_C_PRODUCT as projection on Z_I_PRODUCT
+{
+  key ProductGuid, Material, MaterialType, Description,
+      Plant, CreatedAt, LastChangedAt,
+      _Stock : redirected to Z_C_STOCK
+}
+```
+
+## Step 5 — Service Definition + Binding
 
 ```cds
 @EndUserText.label: 'Product Service'
-define service Z_SRV_PRODUCT {
-  expose Z_C_PRODUCT as Product;
-  expose Z_I_PLANT as Plant;       // Value help
-  expose I_MaterialType as MaterialType;  // Value help
-}
+define service Z_SRV_PRODUCT { expose Z_C_PRODUCT as Product; }
 ```
 
-## Managed vs Unmanaged Decision
+Bind: right-click service definition → **New Service Binding** → `OData V4 - UI` → Activate.
 
-| Scenario | Use Managed | Use Unmanaged |
-|---|---|---|
-| Greenfield (new table) | ✅ | ❌ |
-| Standard CRUD with draft | ✅ | ❌ |
-| Legacy table with complex validation | ❌ | ✅ |
-| External API calls in save sequence | ❌ | ✅ (custom SAVE) |
-| Multi-table atomics (LUW) | ❌ | ✅ |
-| Custom locking beyond ETag | ❌ | ✅ |
+## Managed vs Unmanaged
 
-## Draft-Enabled BO
+- **Managed**: runtime auto-implements CRUD, draft, locking, ETag. Use for greenfield tables.
+- **Unmanaged**: you write `READ`, `CREATE`, `UPDATE`, `DELETE`, `SAVE`. Use for legacy tables, external APIs, multi-table LUWs.
 
-```abap
-" BDEF with draft
-draft table z_d_product
-
-" Generated draft actions:
-" - Edit (create active instance from draft)
-" - Activate (promote draft to active)
-" - Discard (delete draft)
-" - Resume (edit existing draft)
-" - Prepare (create draft from active)
-```
-
-## Custom Entity (Non-persistent)
-
-```cds
-" For value help and custom UI entities
-@ObjectModel.query.implementedBy: 'ABAP:ZCL_CUSTOM_QUERY'
-define custom entity Z_C_CUSTOM_SEARCH
-{
-  key search_id   : sysuuid_x16;
-      search_term : string;
-      result_count: int4;
-}
-```
-
-## Quick Start Commands
+## Quick Commands
 
 ```bash
-# Generate RAP BO from spec (skill auto-triggered)
-"generate RAP BO for <entity> with fields: <field_list>"
+# Trigger generation (skill auto-activates)
+"generate RAP BO for Product with fields: product_guid(UUID,key), material(CHAR18), description(CHAR40), draft enabled"
 
 # Check existing BDEF
 aibap: get_object_info(name="Z_I_PRODUCT")
 
-# Activate generated objects
-aibap: activate_objects(["Z_I_PRODUCT","Z_C_PRODUCT","Z_R_PRODUCT"])
+# Activate all generated objects (dependency order)
+aibap: activate_objects(["Z_I_PRODUCT","Z_C_PRODUCT","Z_R_PRODUCT","ZBP_I_PRODUCT","Z_SRV_PRODUCT"])
 
-# Run ABAP Unit on generated BO
+# Run unit tests on behavior implementation
 aibap: run_unit_tests(["ZBP_I_PRODUCT"])
 ```
 
-## Gotchas
+## Pitfalls
 
-- **Managed BO uses late numbering** by default for UUID keys
-- **Draft table auto-named**: CDS view name + '_D' → Z_D_PRODUCT
-- **Strict(2) enables all RAP features** — use strict(1) for S/4HANA 2020 compat
-- **Service binding type**: OData V4 UI for Fiori Elements, OData V4 API for programmatic
-- **BDEF name = CDS view name** — automatically linked at activation
-- **MAPPING clause**: maps CDS field names to DB table field names (must match if identical)
+- **BDEF name = CDS view name** — linked automatically at activation, no manual mapping.
+- **strict(2)** requires S/4HANA 2021+; use `strict(1)` for 2020 compat.
+- **Draft table**: must match active table fields + draft-specific columns (`mandt`, `draftentityoperationcode`). Generate via ADT "Generate Draft Table".
+- **MAPPING clause**: required when CDS aliases differ from DB column names; omit only if identical.
+- **Projection view**: must redirect compositions via `: redirected to` — missing redirect breaks activation.
+- **Service binding**: `OData V4 - UI` for Fiori Elements, `OData V4 - API` for programmatic.
+- **Late numbering**: managed BOs with UUID keys use late numbering — keys assigned in save sequence.
+- **Never** use `READ ENTITIES` outside `IN LOCAL MODE` inside determinations — breaks transactional buffer.
+- **Never** call `COMMIT ENTITIES` from within a determination or validation method.
+
+## Verification
+
+```abap
+" 1. Activate in order: Table → CDS → BDEF → Impl → Projection → Svc Def → Svc Binding
+" 2. Preview service binding → OData $metadata must list entity + draft actions
+" 3. Test draft flow: Create → Edit → Save → Verify active record in ZPRODUCT
+" 4. Run behavior unit tests:
+aibap: run_unit_tests(["ZBP_I_PRODUCT"])
+" 5. Verify ETag: LastChangedAt must update on each modify
+```
+
+## Custom Entity (query-only, no persistence)
+
+```cds
+@ObjectModel.query.implementedBy: 'ABAP:ZCL_CUSTOM_QUERY'
+define custom entity Z_C_CUSTOM_SEARCH {
+  key search_id : sysuuid_x16; search_term : string; result_count : int4;
+}
+```

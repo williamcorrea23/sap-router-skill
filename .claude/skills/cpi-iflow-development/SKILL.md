@@ -1,445 +1,200 @@
 ---
 name: cpi-iflow-development
-description: SAP CPI iFlow development — integration flow design, Groovy scripting, XSLT/Message mappings, content modifier, router, ZIP packaging, deploy via MCP, iFlow structure, CPI best practices. Use when creating CPI iFlows, writing Groovy scripts for CPI, packaging iFlows as ZIP, deploying to SAP CPI tenant, or debugging CPI message processing failures.
+description: >-
+  SAP CPI iFlow development — integration flow design, Groovy scripting, XSLT/Message
+  mappings, content modifier, router, ZIP packaging, deploy via MCP. Use when creating
+  CPI iFlows, writing Groovy scripts for CPI, packaging iFlows as ZIP, deploying to
+  SAP CPI tenant, or debugging CPI message processing failures.
+trigger:
+  - CPI iFlow development
+  - Groovy script CPI
+  - integration flow design
+  - XSLT mapping
+  - message mapping
+  - content modifier
+  - router pattern
+  - iFlow ZIP packaging
+  - deploy iFlow
+  - CPI message processing
+  - XmlSlurper
+  - value mapping API
+  - exception subprocess
 ---
 
 # SAP CPI iFlow Development
 
 Full development lifecycle for SAP Cloud Integration (CPI) iFlows — from source code to deployed integration.
 
+## Prerequisites
+
+- SAP BTP subaccount with Integration Suite enabled
+- Service Key for Process Integration Runtime (OAuth2 client_credentials)
+- Environment vars set: `CPI_TENANT_URL`, `CPI_TOKEN_URL`, `CPI_CLIENT_ID`, `CPI_CLIENT_SECRET`
+- Groovy 2.4+ syntax knowledge (CPI uses Nashorn engine, ECMAScript 5.1 dialect)
+- Access to CPI Web UI for monitoring and trace
+
 ## iFlow ZIP Structure
 
 ```
 my-iflow.zip/
-├── META-INF/
-│   └── MANIFEST.MF                         ← Bundle metadata
-├── src/
-│   └── main/
-│       └── resources/
-│           ├── flow.xml                     ← Main integration flow
-│           ├── script/
-│           │   ├── process-data.groovy      ← Groovy scripts
-│           │   └── validate-input.groovy
-│           ├── mapping/
-│           │   ├── field-mapping.xslt       ← XSLT transformations
-│           │   └── order-to-invoice.mmap    ← Message mappings
-│           ├── resources/
-│           │   ├── edifact-schema.xsd       ← EDI schemas
-│           │   └── wsdl/
-│           │       └── partner-service.wsdl ← WSDL files
-│           ├── value-mapping/
-│           │   └── country-codes.vmap       ← Value mappings
-│           ├── parameters.prop              ← Externalized parameters
-│           └── security/
-│               └── keystore.jks             ← (if bundled)
+├── META-INF/MANIFEST.MF
+└── src/main/resources/
+    ├── flow.xml                  ← Main integration flow definition
+    ├── script/*.groovy           ← Groovy scripts
+    ├── mapping/*.xslt            ← XSLT transformations
+    ├── mapping/*.mmap            ← Message mappings
+    ├── resources/*.xsd           ← EDI/XML schemas
+    └── parameters.prop           ← Externalized parameters
 ```
 
-## MANIFEST.MF
+## Step 1 — Create iFlow Source Files
+
+Create the project directory and core files:
+
+```bash
+mkdir -p /opt/data/iflows/my-integration-flow/{src/main/resources/script,src/main/resources/mapping}
+```
+
+Write the `MANIFEST.MF`:
 
 ```
 Manifest-Version: 1.0
-Created-By: SAP Router Orchestrator CPI Packager
 Bundle-SymbolicName: my_integration_flow
 Bundle-Version: 1.0.0
 Bundle-Name: My Integration Flow
-Bundle-Vendor: company.com
 ```
 
-## flow.xml Structure
+## Step 2 — Write flow.xml
+
+Define sender channel, integration process steps, and receiver channel:
 
 ```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<IntegrationFlow
-  xmlns="http://xmlns.sap.com/CPI/IntegrationFlow"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  id="my_integration_flow"
-  version="1.0"
-  senderId="sender_1"
-  receiverId="receiver_1">
-
-  <!-- Sender channel -->
+<IntegrationFlow id="my_integration_flow" version="1.0">
   <Sender id="sender_1" type="HTTPS" direction="Inbound">
     <Address>/process/order</Address>
     <Authentication>Basic</Authentication>
-    <CSRFProtected>true</CSRFProtected>
   </Sender>
-
-  <!-- Integration Process -->
   <IntegrationProcess id="process_1" name="Process Order">
-    <!-- Steps execute in order -->
-
     <ContentModifier id="cm_1" name="Set Headers">
-      <Header name="Content-Type">application/json</Header>
       <Property name="OrderId" source="body" sourceField="orderId"/>
     </ContentModifier>
-
     <GroovyScript id="script_1" name="Transform Payload"
                   scriptPath="script/process-data.groovy"/>
-
-    <RequestReply id="rr_1" name="Call SAP S/4HANA">
+    <RequestReply id="rr_1" name="Call S/4HANA">
       <Receiver ref="receiver_1"/>
       <Timeout>60000</Timeout>
     </RequestReply>
-
     <Router id="router_1" name="Route by Status">
-      <Condition expression="${property.Status} = 'OK'"
-                 targetStep="end_ok"/>
-      <Condition expression="${property.Status} = 'ERROR'"
-                 targetStep="end_error"/>
+      <Condition expression="${property.Status} = 'OK'" targetStep="end_ok"/>
+      <Condition expression="${property.Status} = 'ERROR'" targetStep="end_error"/>
     </Router>
   </IntegrationProcess>
-
-  <!-- Receiver channel -->
   <Receiver id="receiver_1" type="ODataV2" direction="Outbound">
     <Address>${destination.S4HANA}/sap/opu/odata/sap/Z_ORDER_SRV</Address>
-    <Authentication>Basic</Authentication>
   </Receiver>
 </IntegrationFlow>
 ```
 
-## Groovy Scripts for CPI
+## Step 3 — Write Groovy Scripts
 
-### Basic Script Template
-
-```groovy
-import com.sap.gateway.ip.core.customdev.util.Message
-import java.util.HashMap
-
-def Message processData(Message message) {
-    // Get message body
-    def body = message.getBody(java.lang.String) as String
-
-    // Get headers and properties
-    def headers = message.getHeaders()
-    def properties = message.getProperties()
-    def orderId = properties.get("OrderId")
-
-    // Transform payload
-    def xml = new XmlSlurper().parseText(body)
-    def result = """{
-        "orderId": "${orderId}",
-        "customer": "${xml.customer.text()}",
-        "items": ${xml.items.item.size()}
-    }"""
-
-    // Set transformed body
-    message.setBody(result)
-
-    // Set response headers
-    message.setHeader("Content-Type", "application/json")
-    message.setProperty("ProcessedAt", new Date().format("yyyy-MM-dd'T'HH:mm:ss"))
-
-    return message
-}
-```
-
-### XML Parsing (XmlSlurper)
-
-```groovy
-import com.sap.gateway.ip.core.customdev.util.Message
-
-def Message parseXML(Message message) {
-    def body = message.getBody(String)
-    def order = new XmlSlurper().parseText(body)
-
-    // Navigate XML
-    def customerName = order.header.customerName.text()
-    def lineItems = order.items.item
-
-    def json = new groovy.json.JsonBuilder()
-    json {
-        customer customerName
-        itemCount lineItems.size()
-        items lineItems.collect { item ->
-            [
-                material: item.material.text(),
-                quantity: item.quantity.text().toInteger(),
-                price: item.price.text().toBigDecimal()
-            ]
-        }
-    }
-
-    message.setBody(json.toPrettyString())
-    message.setHeader("Content-Type", "application/json")
-    return message
-}
-```
-
-### JSON Processing
-
-```groovy
-import com.sap.gateway.ip.core.customdev.util.Message
-import groovy.json.JsonSlurper
-import groovy.json.JsonOutput
-
-def Message enrichJSON(Message message) {
-    def body = message.getBody(String)
-    def json = new JsonSlurper().parseText(body)
-
-    // Add enrichment fields
-    json.processedAt = new Date().format("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-    json.source = "CPI"
-
-    // Add calculation
-    json.items.each { item ->
-        item.totalPrice = item.quantity * item.price
-    }
-
-    message.setBody(JsonOutput.toJson(json))
-    return message
-}
-```
-
-### HTTP Call from Groovy
-
-```groovy
-import com.sap.gateway.ip.core.customdev.util.Message
-import groovy.json.JsonSlurper
-
-def Message callExternalAPI(Message message) {
-    // Read destination from CPI header
-    def destUrl = message.getProperties().get("SAP_S4HANA_URL")
-
-    // Make HTTP GET call
-    def connection = new URL(destUrl + "/sap/opu/odata/sap/Z_MATERIAL_SRV/MaterialSet?\$top=10").openConnection()
-    connection.setRequestMethod("GET")
-    connection.setRequestProperty("Accept", "application/json")
-    connection.setRequestProperty("Authorization", message.getHeaders().get("Authorization"))
-
-    def responseCode = connection.getResponseCode()
-    if (responseCode == 200) {
-        def responseBody = connection.getInputStream().getText()
-        message.setBody(responseBody)
-    } else {
-        throw new Exception("HTTP call failed with code: ${responseCode}")
-    }
-
-    return message
-}
-```
-
-### Error Handling
+**XML-to-JSON transform with error handling:**
 
 ```groovy
 import com.sap.gateway.ip.core.customdev.util.Message
 import com.sap.it.api.ITApiFactory
 import com.sap.it.api.msglog.MessageLog
 
-def Message processWithErrorHandling(Message message) {
-    def messageLog = message.getMessageLog()
-
+def Message processData(Message message) {
+    def log = message.getMessageLog()
     try {
-        def body = message.getBody(String)
-        if (!body || body.trim().isEmpty()) {
-            throw new IllegalArgumentException("Empty message body")
-        }
-
-        messageLog.setStringProperty("Status", "PROCESSING")
-        // Process logic...
-        messageLog.setStringProperty("Status", "COMPLETED")
-
+        def body = message.getBody(java.lang.String)
+        if (!body?.trim()) throw new IllegalArgumentException("Empty body")
+        def xml = new XmlSlurper().parseText(body)
+        message.setBody("""{"orderId":"${xml.orderId.text()}","customer":"${xml.customer.text()}"}""")
+        message.setHeader("Content-Type", "application/json")
+        log.setStringProperty("Status", "COMPLETED")
     } catch (Exception e) {
-        messageLog.setStringProperty("Status", "FAILED")
-        messageLog.setStringProperty("Error", e.getMessage())
-        messageLog.addAttachmentAsString("error-details.txt",
-            "Error: ${e.getMessage()}\nStack: ${e.getStackTrace().join('\n')}",
-            "text/plain")
-
-        // Re-throw to trigger exception subprocess
+        log.setStringProperty("Status", "FAILED")
+        log.addAttachmentAsString("error.txt", e.getMessage(), "text/plain")
         throw e
     }
-
     return message
 }
 ```
 
-### Value Mapping Lookup
+**Value mapping lookup:** `ITApiFactory.getApi(ValueMappingApi).getMappedValue('COUNTRY_CODES', 'SAP_Internal', 'ISO', countryCode)`
 
-```groovy
-import com.sap.gateway.ip.core.customdev.util.Message
-import com.sap.it.api.ITApiFactory
-import com.sap.it.api.mapping.ValueMappingApi
+## Step 4 — Package as ZIP
 
-def Message mapValues(Message message) {
-    def valueMappingApi = ITApiFactory.getApi(ValueMappingApi)
-    def body = message.getBody(String)
-    def json = new groovy.json.JsonSlurper().parseText(body)
-
-    // Lookup country code in value mapping
-    def countryCode = json.country
-    def isoCode = valueMappingApi.getMappedValue(
-        'COUNTRY_CODES',    // Value Mapping Group
-        'SAP_Internal',     // Source Agency
-        'ISO',              // Target Agency
-        countryCode         // Source Value
-    )
-
-    json.countryISO = isoCode ?: countryCode
-    message.setBody(groovy.json.JsonOutput.toJson(json))
-    return message
-}
+```bash
+python /opt/data/scripts/cpi_iflow_packager.py create \
+  --name my-integration-flow \
+  --flow /opt/data/iflows/my-integration-flow/src/main/resources/flow.xml \
+  --scripts /opt/data/iflows/my-integration-flow/src/main/resources/script/process-data.groovy \
+  --output /opt/data/iflows/my-iflow.zip
 ```
 
-## Content Modifier Patterns
+Validate the ZIP structure:
 
-### Set Headers
-
-```xml
-<ContentModifier id="cm_1" name="Set Headers">
-  <Header name="Content-Type">application/json</Header>
-  <Header name="Accept">application/json</Header>
-  <Property name="MessageID" source="header" sourceField="SAP_MessageProcessingLogID"/>
-  <Property name="Tenant" value="${config.tenant}"/>
-</ContentModifier>
+```bash
+python /opt/data/scripts/cpi_iflow_packager.py validate --input /opt/data/iflows/my-iflow.zip
 ```
 
-### Modify Body with Expression
+## Step 5 — Lint Before Deploy
 
-```xml
-<ContentModifier id="cm_2" name="Wrap Body">
-  <Body>
-    <![CDATA[
-    {
-      "header": {"messageId": "${property.MessageID}", "timestamp": "${date:now:yyyy-MM-dd'T'HH:mm:ss}"},
-      "payload": ${in.body}
-    }
-    ]]>
-  </Body>
-</ContentModifier>
+```bash
+# Lint Groovy script
+cpi_lint --code "$(cat /opt/data/iflows/my-integration-flow/src/main/resources/script/process-data.groovy)"
+
+# Lint flow.xml
+cpi_lint --code "$(cat /opt/data/iflows/my-integration-flow/src/main/resources/flow.xml)"
 ```
 
-## Router Patterns
+Key lint rules: hardcoded passwords → error, no exception subprocess → warning,
+`new File()` in Groovy → error, `println()` → info (use MessageLog).
 
-```xml
-<Router id="router_1" name="Route by Content">
-  <Condition expression="${property.OrderType} = 'STANDARD'" targetStep="process_standard"/>
-  <Condition expression="${property.OrderType} = 'RUSH'" targetStep="process_rush"/>
-  <DefaultCondition targetStep="process_standard"/>
-</Router>
+## Step 6 — Deploy to CPI Tenant
+
+```bash
+# List existing packages
+cpi_mcp --tool list_integration_flows
+
+# Deploy iFlow from source ZIP
+cpi_mcp --tool deploy_artifact --params '{"artifactId":"my_iflow","artifactType":"IntegrationFlow"}'
+
+# Check failed messages
+cpi_mcp --tool get_runtime_stats --params '{"artifactName":"my_iflow"}'
 ```
 
-## XSLT Mapping
+## Integration Patterns
 
-```xslt
-<?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0"
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-
-  <xsl:template match="/">
-    <ns0:SalesOrder xmlns:ns0="urn:sap-com:document:sap:so:functions:style">
-      <SalesOrderHeader>
-        <CustomerID><xsl:value-of select="/order/customer/id"/></CustomerID>
-        <OrderDate><xsl:value-of select="/order/date"/></OrderDate>
-      </SalesOrderHeader>
-      <xsl:for-each select="/order/items/item">
-        <SalesOrderItem>
-          <ItemNumber><xsl:value-of select="position()"/></ItemNumber>
-          <Material><xsl:value-of select="material"/></Material>
-          <Quantity><xsl:value-of select="quantity"/></Quantity>
-        </SalesOrderItem>
-      </xsl:for-each>
-    </ns0:SalesOrder>
-  </xsl:template>
-
-</xsl:stylesheet>
-```
-
-## Integration Pattern Library
-
-### Pattern 1: Sync Request-Reply (SOAP → OData)
-
-```
-HTTPS Sender (SOAP)
-  → Content Modifier (extract headers)
-    → Groovy Script (SOAP→JSON transform)
-      → Request-Reply (OData V2 to S/4HANA)
-        → Groovy Script (JSON→SOAP transform)
-          → HTTPS Response
-```
-
-### Pattern 2: Async with Retry
-
-```
-SFTP Sender (file poll)
-  → Content Modifier (set correlation ID)
-    → Router (validate → error subprocess)
-      → Groovy Script (transform)
-        → Request-Reply (IDoc to ECC)
-          → Retry (3x with 5min delay)
-            → SFTP Receiver (archive)
-```
-
-### Pattern 3: Splitter-Gather
-
-```
-HTTPS Sender (batch payload)
-  → Groovy Script (split into individual records)
-    → Splitter (iterate per record)
-      → Request-Reply (BAPI call)
-        → Gather (collect responses)
-          → Groovy Script (aggregate)
-            → HTTPS Response
-```
+- **Sync Request-Reply**: HTTPS → Groovy (transform) → RequestReply (OData) → Groovy (response) → HTTPS response
+- **Async with Retry**: SFTP → ContentModifier (correlation ID) → Router → Groovy → RequestReply (IDoc) → Retry (3x/5min) → SFTP archive
+- **Splitter-Gather**: HTTPS (batch) → Splitter → RequestReply (BAPI per record) → Gather → Groovy (aggregate) → HTTPS response
 
 ## CPI Constraints
 
-| Limit | Value |
-|---|---|
-| iFlow design-time size | ~10 MB |
-| Message size | 100 MB |
-| Groovy execution timeout | 5 min |
-| Number of steps per iFlow | ~100 |
-| External call timeout | 10 min |
-| Parallel branches | 50 |
+- iFlow design-time size: ~10 MB
+- Message size: 100 MB max
+- Groovy execution timeout: 5 min
+- External call timeout: 10 min
+- Max parallel branches: 50
 
-## Deploy via MCP
+## Pitfalls
 
-```bash
-# Inspect current packages
-sap_cpi_list_packages()
+- **Groovy Sandbox blocks file I/O** — Cause: CPI runs Groovy in Nashorn sandbox, `new File()` is blocked. Solution: Use Data Store or Header/Property for persistence.
+- **XmlSlurper vs XPath** — Cause: javax XPath is restricted in sandbox. Solution: Use `new XmlSlurper().parseText(body)` for XML navigation.
+- **Content Modifier expression syntax** — Cause: Wrong variable syntax causes silent failures. Solution: Use `${in.body}` not `${message.body}`; use `${property.X}` for properties.
+- **Body type mismatch** — Cause: Body can be String, InputStream, or byte[]. Solution: Always cast explicitly: `message.getBody(java.lang.String)`.
+- **Content-Type header lost after transform** — Cause: Setting body overrides headers. Solution: Set `Content-Type` header AFTER calling `message.setBody()`.
+- **Groovy timeout on large payloads** — Cause: 5-min script timeout. Solution: Split long operations across multiple iFlow steps; use Splitter for batch processing.
+- **Hardcoded credentials** — Cause: Passwords in Groovy scripts. Solution: Use Secure Parameters or OAuth2 credentials from Security Material.
 
-# List artifacts in package
-sap_cpi_list_artifacts(packageId="my-package")
+## Verification
 
-# Deploy iFlow from source ZIP
-sap_cpi_deploy_artifact(artifactId="my_iflow", artifactType="IntegrationFlow")
-
-# Check deployment status
-sap_cpi_get_runtime_artifacts()
-
-# Monitor failed messages
-sap_cpi_get_failed_messages(top=20, artifactName="my_iflow")
-```
-
-## ZIP Packaging via Python
-
-```bash
-# Create iFlow ZIP from source files
-python scripts/cpi_iflow_packager.py create \
-  --name my-integration-flow \
-  --flow flow.xml \
-  --scripts script/process.groovy script/validate.groovy \
-  --mappings mapping/order.xslt \
-  --parameters parameters.prop \
-  --output my-iflow.zip
-
-# Validate existing iFlow ZIP structure
-python scripts/cpi_iflow_packager.py validate --input my-iflow.zip
-
-# Extract iFlow ZIP to source files
-python scripts/cpi_iflow_packager.py extract --input my-iflow.zip --output src/
-
-# Lint CPI artifacts (Groovy + XML)
-cpi_lint --code "$(cat flow.xml)"
-```
-
-## Gotchas
-
-- **Groovy Sandbox**: CPI runs Groovy in Nashorn sandbox — no `System.exit()`, no file I/O, restricted `Runtime`
-- **XmlSlurper not XPath**: use Groovy's `XmlSlurper().parseText()` not javax XPath
-- **Message body types**: can be String, InputStream, or byte[]. Always cast explicitly
-- **Content Modifier expressions**: use `${in.body}` not `${message.body}`
-- **Externalize parameters**: never hardcode URLs, credentials, or threshold values
-- **CPI log**: `message.getMessageLog().setStringProperty()` appears in MPL dashboard
-- **MIME type**: `message.setHeader("Content-Type", "application/json")` must be set after body transform
-- **Timeout**: Groovy script timeout is 5 min — split long operations across multiple steps
+1. **Lint passes**: `cpi_lint` returns zero errors on all scripts and flow.xml
+2. **ZIP validates**: Packager `validate` command exits 0
+3. **Deploy succeeds**: `cpi_mcp get_runtime_stats` shows artifact in "Started" state
+4. **Test message flows**: Send test payload via HTTPS endpoint, check CPI Web UI → Monitor → Messages for successful processing
+5. **Trace enabled**: CPI Web UI → Monitor → Trace shows input/output payloads at each step
+6. **Error subprocess works**: Inject invalid payload, verify exception subprocess triggers and MessageLog shows "FAILED" status

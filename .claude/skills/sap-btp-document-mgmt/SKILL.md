@@ -1,63 +1,83 @@
 ---
 name: sap-btp-document-mgmt
-description: SAP BTP Document Management Service — document storage, folder management, file upload/download, versioning, CMIS integration, document repository for cloud apps, BTP Document Service vs SAP DMS, integration with ABAP Cloud (FILE replacement), document SDK for Node.js/Java. Use when migrating FILE/DATASET ABAP ops to BTP cloud, storing documents for CAP apps, or implementing document management on SAP BTP.
+description: >
+  SAP BTP Document Management Service — document storage, folder management,
+  file upload/download, versioning, CMIS integration. Use when migrating FILE/DATASET
+  ABAP ops to BTP cloud, storing documents for CAP apps, or implementing document
+  management on SAP BTP.
+trigger:
+  keywords:
+    - BTP document management
+    - CMIS repository
+    - OPEN DATASET replacement
+    - document storage SAP cloud
+    - file upload CAP
+  intent: User needs to store, manage, or retrieve documents on SAP BTP, or replace legacy ABAP file operations in a cloud migration.
 ---
 
 # SAP BTP Document Management Service
 
-Cloud-native document storage replacing legacy file operations on SAP BTP.
+Cloud-native document storage replacing legacy `OPEN DATASET` / `READ DATASET` ABAP operations.
 
-## Why This Matters for ABAP Cloud Migration
+## Prerequisites
 
-```abap
-" NOT available in ABAP Cloud:
-OPEN DATASET lv_file FOR INPUT IN TEXT MODE.
-READ DATASET lv_file INTO lv_data.
+- SAP BTP subaccount with Cloud Foundry enabled
+- `cf` CLI installed and logged in (`cf login`)
+- Space Developer role in the target BTP space
+- (Optional) Node.js 18+ for CAP integration
 
-" Cloud alternative: Document Management Service
-" via cl_bc_file_upload_download (C1 released)
-DATA(lo_file) = cl_bc_file_upload_download=>create_instance( ).
-lo_file->upload_file(
-  iv_file_name    = 'materials.csv'
-  iv_content_type = 'text/csv'
-  iv_data         = lv_csv_content
-).
-```
-
-## Service Instance
+## 1. Create Service Instance and Get Credentials
 
 ```bash
+# Create service (standard plan for prod, free for dev — 100MB limit)
 cf create-service document-management standard my-doc-store
+
+# Create service key
 cf create-service-key my-doc-store my-key
-cf service-key my-doc-store my-key  # → get credentials
+
+# Retrieve credentials (save URL, user, password, repositoryId)
+cf service-key my-doc-store my-key
 ```
 
-## CMIS API (Content Management Interoperability Services)
+## 2. Create a Folder via CMIS API
 
 ```bash
-# List repository
-curl https://<doc-service>.cfapps.us10.hana.ondemand.com/browser/<repo-id>/root \
-  -u <user>:<password>
-
-# Create folder
-curl -X POST https://<doc-service>.cfapps.us10.hana.ondemand.com/browser/<repo-id>/root \
+curl -X POST \
+  "https://<doc-service-url>/browser/<repo-id>/root" \
   -H "Content-Type: application/json" \
-  -u <user>:<password> \
-  -d '{"cmisaction":"createFolder","propertyId[0]":"cmis:name","propertyValue[0]":"invoices"}'
-
-# Upload file
-curl -X POST https://<doc-service>.cfapps.us10.hana.ondemand.com/browser/<repo-id>/root/invoices \
-  -F "file=@invoice.pdf" \
-  -u <user>:<password>
+  -u "<user>:<password>" \
+  -d '{
+    "cmisaction": "createFolder",
+    "propertyId[0]": "cmis:name",
+    "propertyValue[0]": "invoices"
+  }'
 ```
 
-## CAP Integration
+## 3. Upload a Document
+
+```bash
+curl -X POST \
+  "https://<doc-service-url>/browser/<repo-id>/root/invoices" \
+  -F "file=@invoice.pdf" \
+  -u "<user>:<password>"
+```
+
+The response includes `cmis:objectId` — store this as the document reference.
+
+## 4. List Documents in a Folder
+
+```bash
+curl "https://<doc-service-url>/browser/<repo-id>/root/invoices" \
+  -u "<user>:<password>"
+```
+
+## 5. CAP Integration (Node.js)
 
 ```javascript
 const cds = require('@sap/cds')
 const FormData = require('form-data')
 const axios = require('axios')
-const { getDestination } = require('@sap-cloud-sdk/connectivity')
+const { getDestination } = require('@sap/cloud-sdk/connectivity')
 
 module.exports = class InvoiceService extends cds.ApplicationService {
   async init() {
@@ -67,38 +87,61 @@ module.exports = class InvoiceService extends cds.ApplicationService {
       const form = new FormData()
       form.append('file', file.buffer, { filename: file.name })
 
-      const result = await axios.post(
+      const res = await axios.post(
         `${dest.url}/browser/${dest.repoId}/root/invoices`,
         form,
         {
           headers: {
             ...form.getHeaders(),
-            Authorization: `Basic ${Buffer.from(`${dest.username}:${dest.password}`).toString('base64')}`
-          }
+            Authorization: `Basic ${Buffer.from(
+              `${dest.username}:${dest.password}`
+            ).toString('base64')}`,
+          },
         }
       )
-      return { documentId: result.data.properties['cmis:objectId'].value }
+      return { documentId: res.data.properties['cmis:objectId'].value }
     })
     await super.init()
   }
 }
 ```
 
-## Key Features
+## 6. ABAP Cloud Replacement (C1 Released API)
 
-| Feature | Description |
-|---|---|
-| Versioning | Automatic version control for documents |
-| CMIS standard | Industry-standard API for document management |
-| Access control | Role-based access per folder/document |
-| Full-text search | Search document content and metadata |
-| Folder hierarchy | Create organizational folder structures |
-| SAP DMS integration | Sync with SAP Document Management System |
+```abap
+" Replaces OPEN DATASET / READ DATASET in ABAP Cloud
+DATA(lo_file) = cl_bc_file_upload_download=>create_instance( ).
+lo_file->upload_file(
+  iv_file_name    = 'materials.csv'
+  iv_content_type = 'text/csv'
+  iv_data         = lv_csv_content
+).
+```
 
-## Gotchas
+## Pitfalls
 
-- **Service plan**: choose `standard` for production, `free` for dev (100MB limit)
-- **CMIS is the API** — do not use proprietary APIs; CMIS is standard + portable
-- **File size limit**: 100MB per file (standard plan)
-- **Document retention**: configure in admin UI, not via API
-- **ABAP Cloud FILE replacement**: Document Management Service replaces OPEN DATASET
+- **Cause:** `free` plan used in production → **Solution:** `free` has 100MB limit; switch to `standard` plan before go-live.
+- **Cause:** CMIS call returns 401 Unauthorized → **Solution:** Service key credentials rotate; re-run `cf service-key` to get fresh credentials.
+- **Cause:** File upload fails silently above 100MB → **Solution:** Standard plan enforces 100MB per-file limit; chunk large files or use SAP Object Storage.
+- **Cause:** CMIS folder not found after creating → **Solution:** Folder creation is eventually consistent; retry after 2 seconds or check with a list call.
+- **Cause:** Using proprietary APIs instead of CMIS → **Solution:** Always use CMIS endpoints — they are standard, portable, and documented.
+- **Cause:** Document retention rules missing → **Solution:** Retention policies are configured in the admin UI, not via API.
+
+## Verification
+
+```bash
+# 1. Verify service instance exists and is running
+cf service my-doc-store
+
+# 2. Verify CMIS endpoint responds
+curl -s -o /dev/null -w "%{http_code}" \
+  "https://<doc-service-url>/browser/<repo-id>/root" \
+  -u "<user>:<password>"
+# Expected: 200
+
+# 3. Verify uploaded document is retrievable
+curl -s \
+  "https://<doc-service-url>/browser/<repo-id>/root/invoices" \
+  -u "<user>:<password>" | jq '.objects[].properties["cmis:name"].value'
+# Expected: list including your file name
+```

@@ -1,299 +1,188 @@
 ---
 name: sap-workflow-pipeline
 description: >-
-  Automated spec-to-production ABAP pipeline — reads specification,
-  identifies functional modules, routes to correct ABAP skill, generates
-  technical proposal, peer reviews with abaplint, runs sap-crew-analysis
-  (7 agents, 9 dimensions), applies review gate, and produces transport-ready
-  code. End-to-end: spec → analyze → route → proposal → implement → lint →
-  peer-review → transport-gate. Use when user asks to "implement this spec",
-  "create ABAP from requirements", "full pipeline", "end-to-end ABAP",
-  "from spec to transport", or "automated ABAP workflow". Triggers on:
-  "implement specification", "build from spec", "ABAP pipeline", "full
-  workflow", "spec to code", "automated development".
+  Pipeline automatizado spec → transport para ABAP com Business Workflow.
+  Lê especificação, identifica módulo SAP, gera proposta técnica, implementa,
+  roda abaplint, peer review com 9 dimensões, e produz transporte pronto.
+  Incorpora conceitos de BOR (Business Object Repository), eventos, receivers
+  e gestão de status do SAP Business Workflow.
+trigger:
+  - "implement specification"
+  - "build from spec"
+  - "ABAP pipeline"
+  - "full workflow"
+  - "spec to code"
+  - "automated development"
+  - "business workflow"
 ---
 
-# SAP Workflow Pipeline — Spec → Transport Automated
+# SAP Workflow Pipeline — Spec → Transport
 
-Single automated pipeline from specification document to transport-ready
-ABAP code with integrated peer review.
+Pipeline de 8 estágios: spec → análise → proposta → review → implementação →
+lint → crew analysis → transport gate. Integrado ao SAP Business Workflow:
+BOR object types, eventos, receivers e gestão de status.
 
-## Pipeline Stages
+## Pré-requisitos
 
-```
-SPEC DOC (.md / .pdf / text)
-    │
-    ▼
-┌─────────────────────────────────────────────────────┐
-│ STAGE 1 — SPEC ANALYSIS (sap-router-skill)           │
-│                                                       │
-│  1. Parse specification document                     │
-│  2. Identify functional module(s): MM/SD/FI/QM/...   │
-│  3. Extract requirements: BAPIs, tables, config      │
-│  4. Output: MODULE_ANALYSIS.md                       │
-└───────────────────────┬─────────────────────────────┘
-                        │
-                        ▼
-┌─────────────────────────────────────────────────────┐
-│ STAGE 2 — TECHNICAL PROPOSAL (sap-crew-analysis)     │
-│                                                       │
-│  1. SAP Architect agent: solution design             │
-│  2. ABAP Developer agent: implementation patterns    │
-│  3. Security Architect: threat model                  │
-│  4. Output: TECHNICAL_PROPOSAL.md with sections:     │
-│     - Architecture overview                          │
-│     - Classes/interfaces to create                   │
-│     - BAPI/RFC calls needed                          │
-│     - DDIC objects (tables, structures)              │
-│     - Authorization objects                          │
-│     - Test strategy                                  │
-│     - Risk assessment                                │
-└───────────────────────┬─────────────────────────────┘
-                        │
-                        ▼
-┌─────────────────────────────────────────────────────┐
-│ STAGE 3 — PEER REVIEW 1 (abap-code-review)          │
-│                                                       │
-│  1. Review proposal against 9 dimensions:            │
-│     SEC | AUTH | DATA | PERF | STD | INTERFACE       │
-│     CHANGE | COMP | FUNC                             │
-│  2. Output: REVIEW_1.md with GO/NO-GO decision       │
-│  3. If NO-GO → revise proposal (back to Stage 2)     │
-└───────────────────────┬─────────────────────────────┘
-                        │ GO
-                        ▼
-┌─────────────────────────────────────────────────────┐
-│ STAGE 4 — IMPLEMENTATION (cavecrew-builder + ADT)   │
-│                                                       │
-│  1. cavecrew-builder: implement each class/method    │
-│  2. ADT MCP (arc-1): write source to SAP system      │
-│  3. ADT MCP: syntax check each object                │
-│  4. ADT MCP: unit test creation                      │
-│  5. Output: deployed ABAP objects + test results     │
-└───────────────────────┬─────────────────────────────┘
-                        │
-                        ▼
-┌─────────────────────────────────────────────────────┐
-│ STAGE 5 — STATIC ANALYSIS (abaplint)                │
-│                                                       │
-│  1. npm run abap:lint → abaplint report             │
-│  2. npm run abap:review:security → security gate    │
-│  3. npm run abap:review:clean → clean code gate     │
-│  4. npm run abap:review:report → HTML report        │
-│  5. Output: abap-review-report.html                 │
-└───────────────────────┬─────────────────────────────┘
-                        │
-                        ▼
-┌─────────────────────────────────────────────────────┐
-│ STAGE 6 — DEEP ANALYSIS (sap-crew-analysis)         │
-│                                                       │
-│  1. 7-agent pipeline (full mode, 3-5 min)           │
-│  2. 9-dimension analysis of implemented code         │
-│  3. Fix suggestions with code snippets               │
-│  4. Output: CREW_ANALYSIS_REPORT.md                  │
-└───────────────────────┬─────────────────────────────┘
-                        │
-                        ▼
-┌─────────────────────────────────────────────────────┐
-│ STAGE 7 — PEER REVIEW 2 (abap-code-review)          │
-│                                                       │
-│  1. 9-dimension review of implemented + linted code  │
-│  2. Compare with REVIEW_1 expectations               │
-│  3. Output: REVIEW_2.md with transport GO/NO-GO      │
-│  4. If NO-GO → fix issues (back to Stage 4)          │
-└───────────────────────┬─────────────────────────────┘
-                        │ GO
-                        ▼
-┌─────────────────────────────────────────────────────┐
-│ STAGE 8 — TRANSPORT GATE (sap-transport-gate)       │
-│                                                       │
-│  1. 10-dimension risk assessment                     │
-│  2. Transport request creation                       │
-│  3. Object inclusion verification                    │
-│  4. Output: TRANSPORT_DECISION.md                    │
-└───────────────────────┬─────────────────────────────┘
-                        │
-                        ▼
-                   TRANSPORT RELEASED
-```
+- Python 3.8+ (`scripts/sap_router.py`)
+- Node.js 18+ com `@abaplint/cli` instalado
+- ADT MCP conectado (arc-1 / aibap / mcp-abap-adt)
+- SAP system acessível (DEV) para deploy e activation
+- `openpyxl` se usando XLSX: `pip install openpyxl`
+- Conhecimento de BOR: object types, eventos, methods (ver Referência RAG abaixo)
 
-## Pipeline CLI
+## Pipeline — Comandos Copiáveis
 
 ```bash
-# Full pipeline from spec to transport (all 8 stages)
+# Pipeline completo (8 estágios, ~50K tokens, 3-5 min)
 python scripts/sap_router.py pipeline --spec requirements.md --module auto
 
-# Fast pipeline: analyze → implement → lint (4 stages, skip crew analysis)
+# Fast mode: análise → implementação → lint (pula crew analysis, ~15K tokens)
 python scripts/sap_router.py pipeline --spec requirements.md --mode fast
 
-# Dry run: analyze spec only, output proposal, don't write code
+# Dry run: analisa spec, gera proposta, não escreve código
 python scripts/sap_router.py pipeline --spec requirements.md --dry-run
 
-# Resume from specific stage (after fixing issues)
+# Resume a partir de estágio específico (após corrigir issues)
 python scripts/sap_router.py pipeline --spec requirements.md --resume-from stage4
-
-# Parallel waves (DEFAULT): same-wave stages launch concurrently; Stage 4 fans out 1 builder per object
-python scripts/sap_router.py pipeline --spec requirements.md            # --parallel is the default
-python scripts/sap_router.py pipeline --spec requirements.md --serial   # one stage per wave (no concurrency)
-
-# Emit just the machine-readable wave plan (stages 2-8) for the orchestrator to launch in batches
-python scripts/sap_router.py dispatch-plan --spec requirements.md
-# Plan concurrent caveman subagents for an ad-hoc task
-python scripts/sap_router.py crew-dispatch --task "find the leak then review the diff"
 ```
 
-## Parallel Dispatch (waves)
-
-Stages are grouped into WAVES; stages sharing a wave run concurrently (the
-orchestrator launches all same-wave subagents in ONE batch). `dispatch-plan`
-and `pipeline` emit a machine-readable plan: `{ "mode": "parallel", "waves": [ {wave, concurrent, stages:[...]} ] }`.
+## Estágios do Pipeline
 
 ```
-Wave 0  [sequential]  stage1 Spec Analysis            (must run first)
-Wave 1  [sequential]  stage2 Technical Proposal
-Wave 2  [sequential]  stage3 Peer Review 1
-Wave 3  [concurrent]  stage4 Implementation (fan-out x N objects — 1 cavecrew-builder per object)
-Wave 4  [concurrent]  stage5 Static Analysis (abaplint)  ||  stage6 Deep Analysis (Crew)
-Wave 5  [sequential]  stage7 Peer Review 2
-Wave 6  [sequential]  stage8 Transport Gate
+SPEC → 1.Análise → 2.Proposta → 3.Review1 → 4.Implementação
+     → 5.Lint → 6.CrewAnalysis → 7.Review2 → 8.TransportGate → DONE
 ```
 
-Rules:
-- Same wave => launch agents concurrently in one batch. Different waves => sequential (barrier between).
-- Stage 4 fans out one `cavecrew-builder` per detected object — the big parallel win.
-- `--serial` collapses to one stage per wave (no concurrency) for debugging.
-- ZROUTER is never required; the pipeline runs ADT-first -> SAP GUI scripting regardless of opt-in.
+- **Estágio 1 — Análise**: parseia spec, identifica módulo (MM/SD/FI/QM/PP/...),
+  extrai BAPIs, tabelas, autorizações. Output: `MODULE_ANALYSIS.md`
+- **Estágio 2 — Proposta**: 7-agent crew gera design técnico (classes, DDIC,
+  BAPIs, auth, test strategy, risks). Output: `TECHNICAL_PROPOSAL.md`
+- **Estágio 3 — Review 1**: 9 dimensões (SEC|AUTH|DATA|PERF|STD|INTERFACE|
+  CHANGE|COMP|FUNC). GO/NO-GO. NO-GO → volta ao Estágio 2.
+- **Estágio 4 — Implementação**: cavecrew-builder + ADT escreve código no SAP,
+  syntax check, unit tests.
+- **Estágio 5 — Lint**: `abaplint` + security gate + clean code gate.
+- **Estágio 6 — Crew Analysis**: 7-agent full mode, 9 dimensões no código
+  implementado. Roda em background, paralelo ao Estágio 5.
+- **Estágio 7 — Review 2**: compara implementação com Review 1. GO/NO-GO.
+  NO-GO → volta ao Estágio 4.
+- **Estágio 8 — Transport Gate**: risk assessment 10 dimensões, cria transport
+  request, verifica inclusão de objetos.
 
-## Stage 1 Detail: Spec Analysis
+## Integração com SAP Business Workflow (RAG)
+
+Conceitos de BOR e Workflow incorporados ao pipeline:
+
+### BOR Object Types e Eventos
+
+Eventos comunicam entre aplicação e workflow system. Usados para sincronizar
+processos (ex: "Wait until document is released"). O object type é definido no
+Business Object Repository (transação `SWO1`).
 
 ```python
-# spec_analyzer.py — reads spec, identifies module, extracts requirements
-def analyze_spec(spec_text: str) -> dict:
-    """Parse specification and return structured requirements."""
-    analysis = {
-        'modules': identify_modules(spec_text),
-        'entities': extract_entity_requirements(spec_text),
-        'bapis': identify_bapi_requirements(spec_text),
-        'config_tables': identify_config_tables(spec_text),
-        'authorizations': extract_auth_requirements(spec_text),
-        'integrations': identify_integration_points(spec_text),
-        'complexity': assess_complexity(spec_text),  # SIMPLE | MODERATE | COMPLEX | VERY_COMPLEX
-        'estimated_objects': estimate_object_count(spec_text),
-    }
-
-    # Route to correct module skill
-    primary_module = analysis['modules'][0] if analysis['modules'] else 'BASIS'
-    analysis['routing'] = {
-        'primary_skill': f'sap-bapi-integration',
-        'module_skill': 'sap-bapi-integration',
-        'abap_skills': ['clean-abap', 'abap-code-patterns', 'abap-unit-testing'],
-    }
-
-    return analysis
-
-# Module keyword detection
-MODULE_KEYWORDS = {
-    'MM': ['material', 'purchase order', 'PO', 'MIGO', 'inventory', 'vendor',
-           'procurement', 'goods receipt', 'stock', 'MRP', 'source list'],
-    'SD': ['sales order', 'customer', 'delivery', 'billing', 'pricing',
-           'shipping', 'credit memo', 'invoice', 'VA01', 'VA02', 'VL01N'],
-    'FI': ['GL account', 'journal entry', 'posting', 'balance', 'profit',
-           'ledger', 'AP', 'AR', 'asset', 'tax', 'FB01', 'FB50'],
-    'QM': ['inspection', 'quality', 'lot', 'defect', 'specification',
-           'QA01', 'QA02', 'QE01', 'inspection plan'],
-    'PP': ['production order', 'BOM', 'routing', 'MRP', 'capacity',
-           'CO01', 'CS01', 'CA01', 'work center'],
-    'WM': ['warehouse', 'transfer order', 'storage bin', 'picking',
-           'LT01', 'MIGO', 'handling unit'],
-    'CO': ['cost center', 'internal order', 'allocation', 'assessment',
-           'KO01', 'KS01', 'KA01', 'cost element'],
-    'HCM': ['employee', 'personnel', 'infotype', 'PA20', 'PA30',
-           'org unit', 'payroll', 'time management'],
+# Detecção de workflow events no spec analyzer
+WORKFLOW_KEYWORDS = {
+    'event': ['event', 'trigger', 'BOR', 'object type', 'SWO1'],
+    'receiver': ['receiver', 'event receiver', 'linkage', 'SWE2'],
+    'status': ['status management', 'work item', 'SWI1', 'SWI2_FREQ'],
+    'decision': ['user decision', 'approval', 'reject', 'SBWP'],
 }
 ```
 
-## Stage 2 Detail: Technical Proposal Template
+### Transações-Chave de Workflow
 
-```markdown
-# TECHNICAL PROPOSAL — {Project Name}
+- `SWO1` — BOR object type maintenance
+- `SWE2` — Event linkage configuration
+- `PFTC` — General task maintenance (PFTC_DIS=display, PFTC_CHG=change)
+- `SWI1` — Workflow log (overview of steps, container, agents)
+- `SBWP` — Business workspace (workitem inbox)
+- `SWI2_FREQ` — Work items per task frequency analysis
 
-## 1. Architecture Overview
-- Primary module: {MODULE}
-- Implementation approach: {ADT-first | ZROUTER RFC | Hybrid with GUI fallback}
-- Estimated objects: {N} classes, {M} methods, {K} DDIC objects
+### APIs de Workflow (Runtime)
 
-## 2. Object List
+```abap
+" Obter objetos do work item (leading object como POR)
+CALL FUNCTION 'SAP_WAPI_GET_OBJECTS'
+  EXPORTING
+    workitem_id = lv_wi_id
+  IMPORTING
+    leading_object = ls_por.
 
-### Classes
-| Class | Type | Purpose | Methods | LOC Est |
-|---|---|---|---|---|
-| ZCL_{MODULE}_HANDLER | Handler | BAPI wrapper for {entity} | 5 | 200 |
-| ZCL_{MODULE}_HELPER | Utility | Config checks, validation | 3 | 100 |
-
-### DDIC Objects
-| Object | Type | Purpose |
-|---|---|---|
-| Z{MODULE}_LOG | TABLE | Audit log for {entity} operations |
-
-### BAPI/RFC Calls
-| BAPI/FM | Module | Purpose |
-|---|---|---|
-| BAPI_MATERIAL_SAVEDATA | MM | Create material master |
-
-## 3. Error Handling Strategy
-- Exception class: ZCX_{MODULE} (inherits CX_STATIC_CHECK)
-- BAL logging: all operations logged to Z{MODULE}_LOG
-- BAPIRET2 validation: check TABLES RETURN, not just IMPORTING RETURN
-
-## 4. Authorization Strategy
-- Auth objects required: {list}
-- Check at: method entry + before BAPI call
-
-## 5. Test Strategy
-- ABAP Unit: {N} test methods in local test class
-- Risk level: {CRITICAL | DANGEROUS | HARMLESS}
-- Test doubles: {list of mocks needed}
-
-## 6. Risk Assessment
-| Risk | Impact | Probability | Mitigation |
-|---|---|---|---|
-| BAPI returns unexpected error | High | Medium | Full BAPIRET2 TABLE check |
+" Converter POR para runtime handle (BOR macro)
+" Requer include <cntn01>
+SWC_OBJECT_FROM_PERSISTENT ls_por lv_obj.
 ```
 
-## Pipeline Integration with MEMORY.md
+### Status Management
+
+Work item status: `WAITING` → `READY` → `IN_PROGRESS` → `COMPLETED`/`CANCELLED`.
+O pipeline valida status em Stage 3 (Review) e Stage 7 (Review 2).
+
+## Template de Proposta Técnica (resumo)
+
+Proposta inclui: Architecture (module, approach, object count), Classes
+(`ZCL_{MODULE}_HANDLER/HELPER`), DDIC (`Z{MODULE}_LOG` audit table), Error
+Handling (`ZCX_{MODULE}` + BAL + BAPIRET2 TABLES RETURN check), Authorization
+(check at method entry + before BAPI), Test Strategy (ABAP Unit + risk level).
+
+## Pitfalls
+
+- **Spec vago** → proposta vaga. Sinalizar seções subespecificadas no Estágio 1.
+- **Module misdetection** → specs cross-module (MM+FI) precisam dual routing.
+- **BAPIRET2 incompleto** → sempre checar `TABLES RETURN`, nunca só `IMPORTING`.
+- **Event linkage esquecido** → se spec menciona eventos BOR, incluir SWE2 config.
+- **Token budget** → pipeline completo ~50K tokens. Fast mode ~15K.
+- **abaplint version drift** → pinar `@abaplint/cli` no CI. Rule changes flip gates.
+- **Crew analysis paralelo** → roda em background. Pipeline continua ao Estágio 5.
+- **Transport risk** → gate bloqueia só em CRITICAL security findings. MEDIUM = warning.
+- **BOR macro include** → `<cntn01>` obrigatório para `SWC_*` macros. Sem ele = dump.
+- **Workitem status race** → validar status antes de operar. `SAP_WAPI_GET_OBJECTS`
+  pode retornar POR de work item já CANCELLED.
+
+## Verificação
+
+```bash
+# 1. Verificar driver do skill (50 checks, exit 0 = pass)
+python .claude/skills/run-sap-router-skill/driver.py
+
+# 2. Verificar MEMORY.md após pipeline
+python scripts/memory_manager.py verify --input MEMORY.md
+
+# 3. Verificar objetos deployados via ADT
+# (via ADT MCP: read_source + syntax_check em cada objeto)
+
+# 4. Verificar workflow log (se BOR events envolvidos)
+# Transação SWI1 no SAP: filtrar por task/template ID
+
+# 5. Verificar event linkage ativo
+# Transação SWE2: confirmar linkage ENABLED para o object type/event
+
+# 6. Verificar workitem inbox
+# Transação SBWP: confirmar work items criados e assigned corretamente
+
+# 7. Verificar transport
+python scripts/sap_router.py transport-status --tr DEVK900043
+```
+
+## MEMORY.md — Registro de Pipeline
+
+Cada estágio escreve um bloco em MEMORY.md (máx 20 blocos, 100 linhas):
 
 ```
-Pipeline execution → each stage writes to MEMORY.md:
-
 ### [14:32] WORKFLOW/MM-CreateMaterial-Spec
-status:OK | stage:1_SpecAnalysis | module:MM | bapi:BAPI_MATERIAL_SAVEDATA
-
-### [14:35] WORKFLOW/MM-CreateMaterial-Proposal
-status:OK | stage:2_TechProposal | objects:3_classes,2_ddic | review:GO
-
-### [14:38] WORKFLOW/MM-CreateMaterial-PeerReview1
-status:OK | stage:3_PeerReview1 | score:85/100 | dimensions:SEC,AUTH,PERF
-
-### [14:42] WORKFLOW/MM-CreateMaterial-Implement
-status:OK | stage:4_Implementation | deployed:3_objects | syntax:OK
-
-### [14:44] WORKFLOW/MM-CreateMaterial-Lint
-status:OK | stage:5_Lint | critical:0 | high:0 | clean_score:78
-
-### [14:48] WORKFLOW/MM-CreateMaterial-CrewAnalysis
-status:OK | stage:6_CrewAnalysis | score:82/100 | fixes:0_critical,2_medium
+status:OK | stage:1 | module:MM | bapi:BAPI_MATERIAL_SAVEDATA
 
 ### [14:50] WORKFLOW/MM-CreateMaterial-Transport
-status:GO | stage:8_TransportGate | tr:DEVK900043 | release:APPROVED
+status:GO | stage:8 | tr:DEVK900043 | release:APPROVED
 ```
 
-## Gotchas
+## Anti-Padrões a Evitar
 
-- **Spec quality matters**: Vague specs produce vague proposals. Flag underspecified sections.
-- **Module misdetection**: Cross-module specs (MM+FI) need dual routing. Check keyword overlap.
-- **Peer review bottleneck**: Human review needed for CRITICAL findings. AI review is advisory only.
-- **Pipeline resume**: Each stage is idempotent. Resume from any stage without redoing previous work.
-- **Token budget**: Full pipeline (all 8 stages) uses ~50K tokens. Fast mode uses ~15K.
-- **Transport risk**: Transport gate blocks on CRITICAL security findings only. MEDIUM findings generate warnings.
-- **ABAplint version**: Pin `@abaplint/cli` version in CI. Rule changes can flip gate decisions.
-- **Crew analysis parallel**: sap-crew-analysis runs in background. Pipeline continues to Stage 5 (lint) in parallel.
+- ❌ Pular Review 1 (Estágio 3) mesmo em fast mode
+- ❌ Ignorar BAPIRET2 com múltiplas linhas de erro
+- ❌ Hardcoded work item IDs — sempre obter via `SAP_WAPI_*`
+- ❌ Deploy sem syntax check prévio no ADT
+- ❌ Release transport sem GO do Estágio 7 e Estágio 8
+- ❌ Usar `SWC_*` macros sem include `<cntn01>`
+- ❌ Assumir status de work item sem validar em runtime

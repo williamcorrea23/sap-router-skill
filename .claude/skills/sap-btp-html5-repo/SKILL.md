@@ -1,20 +1,36 @@
 ---
 name: sap-btp-html5-repo
-description: SAP BTP HTML5 Application Repository — deploy and host HTML5/SAPUI5/Fiori apps on BTP, app lifecycle management, versioning, app router configuration, xs-app.json patterns, integration with Launchpad Service, CI/CD for HTML5 apps. Use when deploying Fiori/UI5 apps to BTP, configuring app router for HTML5 apps, or managing UI5 app lifecycle on SAP BTP.
+description: SAP BTP HTML5 Application Repository — deploy and host SAPUI5/Fiori/HTML5 apps on BTP, app router configuration, versioning, integration with Launchpad Service. Use when deploying Fiori/UI5 apps to BTP, configuring app router for HTML5 apps, or managing UI5 app lifecycle.
+trigger:
+  - deploy Fiori app BTP
+  - HTML5 app repository setup
+  - app router xs-app.json configuration
+  - UI5 app deploy html5-apps-repo
+  - launchpad service integration
+  - html5 deployer MTA
 ---
 
 # SAP BTP HTML5 Application Repository
 
-Host and serve SAPUI5/Fiori/HTML5 applications on SAP BTP — managed app hosting with built-in app router.
+Host and serve SAPUI5/Fiori/HTML5 applications on SAP BTP — managed app hosting with built-in app router and Launchpad integration.
 
-## Service Instance
+## Prerequisites
+
+- SAP BTP subaccount with Cloud Foundry enabled
+- CF CLI installed and logged in (`cf login`)
+- HTML5 Application Repository entitlement (app-host plan)
+- Node.js ≥ 18 and a built Fiori/UI5 app (`dist/` folder)
+- XSUAA service instance for authentication
+- SAP BAS or local dev environment with `mbt` and `@sap/html5-deployer`
+
+## 1. Create the Service Instance
 
 ```bash
 cf create-service html5-apps-repo app-host my-repo
 cf create-service-key my-repo my-key
 ```
 
-## App Router (xs-app.json)
+## 2. Configure App Router (xs-app.json)
 
 ```json
 {
@@ -38,25 +54,25 @@ cf create-service-key my-repo my-key
 }
 ```
 
-## Deploying a Fiori App
+Key fields: `source` (regex match), `destination` (CF destination name), `localDir` (static file path), `authenticationType` (`xsuaa` or `none`).
+
+## 3. Deploy a Fiori App (CLI)
 
 ```bash
-# 1. Build UI5 app
 cd my-fiori-app
 npm install
 npm run build
 
-# 2. Package with HTML5 deployer
 npx @sap/html5-deployer deploy \
   --service-instance my-repo \
   --source ./dist \
   --app-name com.myorg.myapp
-
-# 3. App available at:
-# https://<launchpad>.launchpad.cfapps.us10.hana.ondemand.com/sites#myapp
 ```
 
-## MTA Integration
+App becomes available at:
+`https://<launchpad>.launchpad.cfapps.<region>.hana.ondemand.com/sites#myapp`
+
+## 4. Deploy via MTA (Production)
 
 ```yaml
 # mta.yaml
@@ -70,7 +86,6 @@ modules:
       - name: s4hana-destination
     parameters:
       app-name: com.myorg.myapp
-      service-url: ~{my-repo/url}
 
 resources:
   - name: my-repo
@@ -78,6 +93,24 @@ resources:
     parameters:
       service: html5-apps-repo
       service-plan: app-host
+```
+
+```bash
+mbt build
+cf deploy mta_archives/my-fiori-app_1.0.0.mtar
+```
+
+## 5. Version Management and Rollback
+
+```bash
+# Deploy a specific version
+npx @sap/html5-deployer deploy --app-version 2.1.0
+
+# List all versions of an app
+cf html5-list --app-name com.myorg.myapp
+
+# Rollback to a previous version
+cf html5-rollback --app-name com.myorg.myapp --version 2.0.0
 ```
 
 ## App Lifecycle
@@ -88,23 +121,55 @@ Create → Upload → Deploy → Test → Promote (Dev → Prod)
   └────────── Update (new version) ──────────────┘
 ```
 
-## Version Management
+## When to Use vs Alternatives
+
+- ✅ **SAPUI5/Fiori apps** — Native BTP hosting with Launchpad integration
+- ✅ **Multi-version app management** — Built-in versioning and rollback
+- ❌ **Static HTML without auth** → Use CF staticfile buildpack directly
+- ❌ **React/Angular apps** → Use CF nginx buildpack or Kyma container
+
+## Pitfalls
+
+- **Pitfall: App name rejected on deploy**
+  - Cause: Name must match `com.<org>.<appname>` — lowercase, dotted, globally unique.
+  - Solution: Use a consistent naming convention. Check existing names with `cf html5-list` before deploying.
+
+- **Pitfall: App not visible in Launchpad**
+  - Cause: App not registered with Launchpad Service, or missing `sap.app` crossNavigation config in `manifest.json`.
+  - Solution: Add `crossNavigation.inbounds` to `manifest.json`. Ensure the Launchpad Service subscription exists and the app is assigned to the same subaccount.
+
+- **Pitfall: CORS errors when calling backend OData**
+  - Cause: Browser blocks cross-origin requests. App router destination not configured for CORS.
+  - Solution: Route all backend calls through the app router `xs-app.json` destination. Do not call the backend directly from the browser.
+
+- **Pitfall: Deploy fails with "file too large"**
+  - Cause: Maximum app size is 200 MB per version.
+  - Solution: Exclude `node_modules/`, `test/`, and source maps from the dist folder. Use `.cfignore` or build config to strip dev assets.
+
+- **Pitfall: Stale assets served after redeploy**
+  - Cause: App router and CDN cache static assets aggressively.
+  - Solution: Use hash-based filenames (e.g., `Component-ab12cd.js`) in the UI5 build config. This forces cache busting on version change.
+
+## Verification
 
 ```bash
-# Deploy specific version
-npx @sap/html5-deployer deploy --app-version 2.1.0
+# 1. Verify service instance
+cf services | grep my-repo
 
-# List versions
+# 2. Verify app was deployed
 cf html5-list --app-name com.myorg.myapp
+# → Should list deployed versions
 
-# Rollback to previous version
-cf html5-rollback --app-name com.myorg.myapp --version 2.0.0
+# 3. Test app router serves the app
+curl "https://my-approuter.cfapps.<region>.hana.ondemand.com/index.html"
+# → Should return HTML (redirect to login if auth required)
+
+# 4. Verify OData destination works through app router
+curl "https://my-approuter.cfapps.<region>.hana.ondemand.com/sap/opu/odata/sap/ZMY_SRV/EntitySet?\$top=1" \
+  -H "Authorization: Bearer <jwt>"
+# → Should return OData JSON, not CORS error
+
+# 5. Verify app in Launchpad
+# Open: https://<launchpad>.launchpad.cfapps.<region>.hana.ondemand.com/sites
+# → App should appear in the site navigation
 ```
-
-## Gotchas
-
-- **App name format**: `com.<org>.<appname>` — lowercase, dotted, globally unique
-- **File size limit**: 200MB per app version
-- **Asset caching**: app router caches static assets — add hash to filenames for cache busting
-- **CORS**: configured in xs-app.json destination, not in app code
-- **Redirect after login**: xs-app.json `welcomeFile` handles post-auth redirect

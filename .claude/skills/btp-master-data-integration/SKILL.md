@@ -1,50 +1,87 @@
 ---
 name: btp-master-data-integration
-description: SAP Master Data Integration (MDI) — master data distribution across SAP systems, harmonization models, distribution models, business partner replication, material master sync, CPI iFlow integration for MDI. Use when replicating master data between SAP systems or setting up MDI distribution models.
+description: SAP Master Data Integration (MDI) — BP/Material replication, distribution models, CPI iFlow integration
+trigger:
+  keywords: [mdi, master data, business partner replication, material master sync, distribution model, master data hub]
+  intent: Replicating master data between SAP systems via BTP MDI
+prerequisites:
+  - BTP subaccount with MDI entitlement (Enterprise Messaging + MDI service)
+  - S/4HANA system (source or target) with MDI-compatible APIs
+  - CPI tenant for iFlow-based replication (optional but recommended)
+  - Postman or curl for API testing
 ---
 
 # SAP Master Data Integration (MDI)
 
-Central hub for master data harmonization across SAP systems on BTP.
+Central hub for master data harmonization — Business Partner, Material, Cost Center, etc.
 
-## Architecture
-
-```
-SAP S/4HANA (BP/Material) ──┐
-SAP MDG ────────────────────┤
-SAP SuccessFactors ─────────┤── MDI Service (BTP) ──→ Target Systems
-External systems ───────────┤
-```
-
-## Distribution Model
-
-```
-Source: S/4HANA Entity: BusinessPartner
-  → SuccessFactors (worker data)
-  → Commerce Cloud (customer)
-  → S/4HANA-CRM (sold-to party)
-```
-
-## APIs
+## 1. Enable MDI
 
 ```bash
-# Inbound API (Push to MDI)
-curl -X POST https://mdi.cfapps.<region>.hana.ondemand.com/api/v1/BusinessPartner \
+# Create service instance
+cf create-service master-data-integration standard mdi-instance
+cf create-service-key mdi-instance mdi-key
+cf service-key mdi-instance mdi-key
+# → Save the `url` and `clientid`/`clientsecret`
+```
+
+## 2. Define Distribution Model
+
+```json
+{
+  "sourceSystem": "S4H_100",
+  "entityType": "BusinessPartner",
+  "targetSystems": ["SFSF_worker", "COM_Cloud_customer"]
+}
+```
+
+Entities: `BusinessPartner`, `Material`, `CostCenter`, `ProfitCenter`, `CompanyCode`.
+
+## 3. Push Master Data via API
+
+```bash
+# Get OAuth token
+TOKEN=$(curl -s -X POST "$AUTH_URL/oauth/token" \
+  -d "grant_type=client_credentials&client_id=$CLIENT_ID&client_secret=$CLIENT_SECRET" \
+  | jq -r '.access_token')
+
+# Send Business Partner
+curl -X POST "$MDI_URL/api/v1/BusinessPartner" \
+  -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"BusinessPartner":"1000001","BusinessPartnerName":"ACME"}'
+  -d '{"BusinessPartner":"1000001","BusinessPartnerName":"ACME Corp"}'
 ```
 
-## CPI Integration
+## 4. CPI iFlow Integration
 
 ```
-SAP S/4HANA → CPI iFlow (BAPI → MDI API mapping) → MDI Service → target systems
+S/4HANA → CPI iFlow (BAPI_MATERIAL_GETLIST → MDI API map) → MDI Service → Targets
 ```
 
-## Monitoring
+Key CPI patterns: idempotency check (avoid duplicate BP), field mapping (S/4 field → MDI field), error logging to Cloud Logging.
 
-MDI Dashboard: distribution run status, record-level errors, queue depth per target, processing time per entity type.
+## 5. Monitoring
 
-## Gotchas
-- Message retention: 7 days default
-- One source of truth per entity type
-- Field names must align between source and MDI entity attributes
+MDI dashboard → Distribution run status, record-level errors, queue depth, processing time per entity.
+
+## Pitfalls
+
+- **7-day message retention** → Cause: default retention is 7 days. Solution: configure retention on Enterprise Messaging if longer replay needed.
+- **One source of truth per entity** → Cause: multiple systems pushing BP/Material. Solution: designate one source system per entity type on the distribution model.
+- **Field name mismatch** → Cause: source field doesn't match MDI entity attribute. Solution: check MDI entity schema via `GET $MDI_URL/api/v1/$metadata`, map fields in CPI iFlow.
+- **Duplicate Business Partner** → Cause: MDI receives same BP from multiple sources. Solution: set up dedup rules in distribution model (priority order by source).
+- **MDI instance not provisioning** → Cause: missing Enterprise Messaging prerequisite. Solution: first create Enterprise Messaging instance, then MDI.
+
+## Verification
+
+```bash
+# Check MDI service health
+curl -s -o /dev/null -w "%{http_code}" "$MDI_URL/health/v1"
+# Expect: 200
+
+# List distribution models
+curl -s -H "Authorization: Bearer $TOKEN" "$MDI_URL/api/v1/DistributionModel" | jq
+
+# Check replication log
+curl -s -H "Authorization: Bearer $TOKEN" "$MDI_URL/api/v1/DistributionLog?$top=5" | jq
+```

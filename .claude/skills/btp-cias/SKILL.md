@@ -1,89 +1,83 @@
 ---
 name: btp-cias
-description: Cloud Integration Automation Service (CIAS) — automated integration setup, task catalog, landscape discovery, automated connectivity configuration, CIAS agent deployment. Use when automating SAP BTP connectivity setup, configuring integration landscapes, or running CIAS automated tasks for SAP-to-BTP integration.
+description: BTP Cloud Integration Automation Service (CIAS) — automated setup of on-premise-to-BTP integration
+trigger:
+  keywords: [cias, cloud integration automation, automated landscape setup, trust configuration automation]
+  intent: Automating SAP on-premise → BTP connectivity setup
+prerequisites:
+  - BTP subaccount with CIAS entitlement (enable via cockpit)
+  - ABAP system (S/4HANA, ECC) with ADT services active
+  - Cloud Connector target setup (or VM for CIAS agent)
+  - SAP Support Portal access for CIAS agent download
+  - On-premise user with STRUST + SICF + SM30 authorization
 ---
 
 # Cloud Integration Automation Service (CIAS)
 
-Automates the integration setup between SAP on-premise systems and SAP BTP services. CIAS eliminates manual configuration steps for trust, connectivity, and destinations.
+Automates trust, Cloud Connector, destination, and principal propagation setup between on-premise SAP and BTP.
 
-## What CIAS Automates
-
-| Automation | Manual Equivalent |
-|---|---|
-| Trust configuration | STRUST certificate exchange + SICF setup |
-| Cloud Connector setup | SCC installation + access control mapping |
-| Destination configuration | BTP cockpit destination creation |
-| Principal propagation | STRUST + BTP trust + user mapping |
-| Integration monitoring alerts | Manual CC health checks |
-
-## Architecture
-
-```
-CIAS Agent (on-premise, near Cloud Connector)
-  ↓ HTTPS (outbound only, port 443)
-CIAS Service (SAP BTP)
-  ↓ REST API
-CIAS Web UI (BTP Cockpit or standalone)
-```
-
-## CIAS Agent Installation
+## Quick Start
 
 ```bash
-# Download from SAP Support Portal → Software Downloads
-# Install on Cloud Connector host or dedicated VM
+# 1. Enable CIAS in BTP Cockpit → Services → Integration Automation
+# 2. Download CIAS agent from SAP Support Portal
+# 3. Install agent on Cloud Connector host:
 cias-agent --register \
   --tenant <subaccount-subdomain> \
   --user <btp-email> \
   --region us10
+
+# 4. Run task chain (auto-approve):
+cias-agent execute-chain \
+  --tasks CONFIG_TRUST_ONPREME,CONFIG_CC,CONFIG_DEST_BASIC \
+  --auto-approve
+
+# 5. Verify trust:
+curl -s -o /dev/null -w "%{http_code}" \
+  "https://<system>.abap.cloud.sap/sap/bc/adt/cts"
+# Expect: 200
 ```
 
 ## Task Catalog
 
-| Task ID | Description | Time |
+| Task ID | What It Does | ~Time |
 |---|---|---|
-| CONFIG_TRUST_ONPREME | Establish trust between BTP and ABAP system | ~5 min |
-| CONFIG_CC | Install and configure Cloud Connector | ~10 min |
-| CONFIG_DEST_BASIC | Create HTTP destination to ABAP backend | ~2 min |
-| CONFIG_DEST_MAIL | Configure mail destination | ~1 min |
-| CONFIG_DEST_RFC | Configure RFC destination | ~3 min |
-| CONFIG_SSO_CERT | Exchange SSO certificates | ~2 min |
-| CONFIG_PRINCIPAL_PROP | Set up principal propagation | ~5 min |
+| `CONFIG_TRUST_ONPREME` | STRUST certificate exchange + SICF | 5 min |
+| `CONFIG_CC` | Cloud Connector install + access control | 10 min |
+| `CONFIG_DEST_BASIC` | HTTP destination to ABAP backend | 2 min |
+| `CONFIG_DEST_MAIL` | Mail destination | 1 min |
+| `CONFIG_DEST_RFC` | RFC destination (for RFC_READ_TABLE, BAPI) | 3 min |
+| `CONFIG_SSO_CERT` | SSO certificate exchange | 2 min |
+| `CONFIG_PRINCIPAL_PROP` | Principal propagation setup | 5 min |
 
-## Execution
+## Web UI Alternative
 
-```bash
-# Run single task
-cias-agent execute --task CONFIG_TRUST_ONPREME \
-  --params '{"abap_system": "S4H", "client": "100"}'
-
-# Run task chain (sequentially)
-cias-agent execute-chain \
-  --tasks CONFIG_TRUST_ONPREME,CONFIG_CC,CONFIG_DEST_BASIC \
-  --auto-approve
-```
-
-## CIAS Web UI
-
-1. Navigate to BTP Cockpit → Integration Automation
-2. Select landscape template (SAP S/4HANA + BTP)
-3. Review task list → Execute → Monitor progress
-4. Download execution report for audit
+BTP Cockpit → Integration Automation → Select landscape template (e.g. S/4HANA + BTP) → Execute → Monitor → Download audit report.
 
 ## ZROUTER Integration
 
-ZROUTER_DISPATCH BASIS handler can trigger CIAS automation tasks via BTP REST APIs for zero-touch landscape setup:
-
-```python
-# sap_router.py routes CIAS automation tasks
+```bash
+# Via sap-router-skill dispatcher:
 python scripts/sap_router.py route --action BASIS_CIAS_CONFIG_TRUST
-# → "ZROUTER RFC" (dispatches to BASIS handler)
 ```
 
-## Gotchas
+## Pitfalls
 
-- CIAS agent only needs outbound HTTPS (port 443) — no inbound firewall rules needed
-- Agent must be on same network as Cloud Connector (or have internal network access)
-- One CIAS agent per BTP subaccount
-- Tasks are idempotent — re-running checks current state, only applies changes if needed
-- Full automation depends on ABAP system having ADT services active
+- **CIAS agent blocked by firewall** → Cause: inbound rules not defined. Solution: agent needs OUTBOUND-only HTTPS (443); no inbound required.
+- **ABAP ADT unavailable** → Cause: `/sap/bc/adt` not active. Solution: activate SICF service `/sap/bc/adt` and ensure `SAP_BC_ADT_ROLE` is assigned.
+- **Task returns "already configured"** → Cause: CIAS tasks are idempotent. Solution: re-run safely — CIAS checks current state before applying changes.
+- **Agent can't reach BTP** → Cause: outbound proxy or DNS issue. Solution: configure `HTTP_PROXY` env var on agent VM, test with `curl https://cias.cfapps.<region>.hana.ondemand.com`.
+- **One CIAS agent per subaccount** → Cause: multiple agents conflict. Solution: register one agent per subaccount; for multi-region, use separate agents.
+
+## Verification
+
+```bash
+# Check agent status
+cias-agent status
+
+# List completed tasks
+cias-agent list-executions --status completed
+
+# Test destination from BTP cockpit
+# Cockpit → Connectivity → Destinations → Check Connectivity (HTTP 200)
+```

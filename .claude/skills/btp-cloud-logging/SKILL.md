@@ -1,13 +1,20 @@
 ---
 name: btp-cloud-logging
-description: SAP BTP Cloud Logging service — OpenTelemetry integration, structured logging with SAP Cloud Logging (OpenSearch), log correlation IDs, Kibana dashboards, log retention policies, service instance creation, binding to applications, log levels configuration. Use when configuring application logging on SAP BTP, troubleshooting production issues, or setting up observability pipelines.
+description: SAP BTP Cloud Logging — OpenSearch-based centralized logging with structured logs, correlation IDs, Kibana dashboards, and retention management.
+trigger: user asks about cloud logging on BTP, observability, structured logging, log dashboards, or troubleshooting production logs
 ---
 
 # SAP BTP Cloud Logging
 
-Centralized observability on SAP BTP based on OpenSearch (Elasticsearch-compatible) + Kibana dashboards.
+Centralized observability on SAP BTP powered by OpenSearch + Kibana dashboards.
 
-## Service Instance
+## Prerequisites
+
+- CF CLI logged in to target space
+- An app deployed on SAP BTP (CAP/Node.js/Python/Java)
+- Cloud Logging entitlement assigned to the subaccount (Lite/Standard/Enterprise)
+
+## 1. Create Service Instance and Bind
 
 ```bash
 cf create-service cloud-logging standard my-logging
@@ -15,29 +22,25 @@ cf bind-service my-app my-logging
 cf restage my-app
 ```
 
-## Structured Logging (CAP / Node.js)
+Verify the binding appears in `VCAP_SERVICES`:
+
+```bash
+cf env my-app | grep -A 20 cloud-logging
+```
+
+## 2. Structured Logging (CAP / Node.js)
 
 ```javascript
 const cds = require('@sap/cds')
 const LOG = cds.log('procurement')
 
-// Standard levels
-LOG.debug('Query parameters', { params: req.query })
 LOG.info('Order created', { orderId: 'ORD123', userId: 'USER1', duration: 245 })
-LOG.warn('Slow query detected', { query: sql, elapsed: 5200 })
 LOG.error('BAPI call failed', new Error('Connection timeout'))
-
-// Log entry appears in OpenSearch as:
-// {
-//   "correlation_id": "abc-123",
-//   "component": "procurement",
-//   "level": "info",
-//   "message": "Order created",
-//   "custom_fields": { "orderId": "ORD123", "userId": "USER1", "duration": 245 }
-// }
 ```
 
-## OpenTelemetry Integration
+Log entries appear in OpenSearch with fields: `correlation_id`, `component`, `level`, `message`, `custom_fields`.
+
+## 3. OpenTelemetry Tracing
 
 ```javascript
 const { trace } = require('@opentelemetry/api')
@@ -46,8 +49,6 @@ const tracer = trace.getTracer('procurement-service')
 async function processOrder(orderId) {
   const span = tracer.startSpan('processOrder')
   span.setAttribute('order.id', orderId)
-  span.setAttribute('order.type', 'purchase')
-
   try {
     await callBapi(orderId)
     span.setStatus({ code: trace.SpanStatusCode.OK })
@@ -60,28 +61,7 @@ async function processOrder(orderId) {
 }
 ```
 
-## Kibana Query Examples
-
-```
-# Find all errors for a specific order
-component:"procurement" AND level:"error" AND custom_fields.orderId:"ORD123"
-
-# Slow requests over 5 seconds
-response_time:>5000
-
-# All activity by user in last 24h
-custom_fields.userId:"USER1" AND @timestamp:>now-24h
-```
-
-## Log Retention
-
-| Plan | Retention | Daily Volume |
-|---|---|---|
-| Lite | 7 days | 500 MB |
-| Standard | 14 days | 10 GB |
-| Enterprise | 30 days | 100 GB |
-
-## Python Integration
+## 4. Python Integration
 
 ```python
 import logging
@@ -93,13 +73,63 @@ handler = CloudLoggingHandler(
     correlation_id=request.headers.get('X-Correlation-ID')
 )
 logger.addHandler(handler)
-logger.info('Processing batch job', extra={'batch_size': 1000})
+logger.info('Processing batch', extra={'batch_size': 1000})
 ```
 
-## Gotchas
+## 5. Kibana Query Examples
 
-- **Log ingestion delay**: up to 2 minutes — not real-time
-- **Logs are immutable**: cannot modify or delete after ingestion
-- **Free tier 500MB/day**: exceeded → logs dropped (no error to app)
-- **Component name**: use consistent naming across all app instances
-- **Correlation ID propagation**: must pass X-Correlation-ID header between services
+```
+# Errors for a specific order
+component:"procurement" AND level:"error" AND custom_fields.orderId:"ORD123"
+
+# Slow requests over 5 seconds
+response_time:>5000
+
+# All activity by user in last 24h
+custom_fields.userId:"USER1" AND @timestamp:>now-24h
+```
+
+## 6. Retention Plans
+
+- **Lite** — 7 days, 500 MB/day
+- **Standard** — 14 days, 10 GB/day
+- **Enterprise** — 30 days, 100 GB/day
+
+## Pitfalls
+
+- **Logs not appearing immediately**
+  - Cause: Ingestion delay of up to 2 minutes is expected.
+  - Solution: Wait and refresh Kibana. Do not assume logging is broken.
+
+- **Free tier logs silently dropped**
+  - Cause: Lite plan has a 500 MB/day hard cap; exceeding it drops logs without error.
+  - Solution: Upgrade to Standard plan or reduce log volume via level filters.
+
+- **Correlation ID missing across services**
+  - Cause: `X-Correlation-ID` header is not propagated between service calls.
+  - Solution: Forward the header in every HTTP call; use CAP middleware or OTel context propagation.
+
+- **Inconsistent component names**
+  - Cause: Different instances log under different component names, making Kibana filters unreliable.
+  - Solution: Standardize component naming (e.g., `procurement`, `fulfillment`) across all instances.
+
+- **Logs are immutable**
+  - Cause: OpenSearch indexes are append-only after ingestion.
+  - Solution: Cannot modify or delete — design log content carefully before emitting.
+
+## Verification
+
+```bash
+# Confirm service instance is created
+cf services | grep my-logging
+
+# Confirm binding exists
+cf services | grep my-app
+
+# Check app logs are flowing (from app side)
+cf logs my-app --recent | grep "procurement"
+
+# Open Kibana dashboard from BTP Cockpit:
+# Subaccount → Instances → my-logging → Open Dashboard
+# Run: component:"procurement" AND level:"info"
+```
