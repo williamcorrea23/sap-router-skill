@@ -1,4 +1,4 @@
-# SAP Router Orchestrator v4.0
+# SAP Router Orchestrator v4.2.0
 
 > **Build SAP applications from your IDE. No SAP GUI required.**
 >
@@ -129,7 +129,7 @@ python scripts/self_learn.py persist   # Preserve learned context
 ### Post-Install — Healthcheck + .env Setup
 
 ```bash
-# Run healthcheck — probes all 53 MCPs + verifies .env
+# Run healthcheck — probes all 35 MCPs + verifies .env
 npm run hc
 
 # If .env missing, generate interactive prompt
@@ -147,7 +147,7 @@ cp .env.template .env
 ```mermaid
 flowchart LR
     subgraph Health["Healthcheck"]
-        HC["npm run hc<br/>probes 53 MCPs + .env"]
+        HC["npm run hc<br/>probes 35 MCPs + .env"]
         HCP["npm run hc:prompt<br/>interactive setup"]
     end
     subgraph Routes["Routing"]
@@ -175,7 +175,7 @@ flowchart LR
 |---|---|---|
 | **Install** | `git clone ... && python scripts/healthcheck.py` | Clone + verify everything works |
 | **Update** | `git pull && npm install && npm run hc` | Pull latest + refresh deps + healthcheck |
-| **Health** | `npm run hc` | Probes 53 MCPs + .env completeness |
+| **Health** | `npm run hc` | Probes 35 MCPs + .env completeness |
 | **Health** | `npm run hc:prompt` | Interactive setup wizard for missing vars |
 | **Route** | `npm run router -- --action MM_CREATE_MATERIAL` | Route action: ADT → GUI → RFC |
 | **Route** | `npm run router:gui -- --action SPRO_CONFIG` | Force SAP GUI fallback |
@@ -197,11 +197,11 @@ flowchart LR
 
 ---
 
-## Complete Skill Catalog (75 skills)
+## Complete Skill Catalog (85 skills)
 
 ```mermaid
 flowchart TB
-    subgraph ABAP["ABAP Development — 15 skills"]
+    subgraph ABAP["ABAP Development — 17 skills"]
         A1["abap — classical ABAP, dynpro, ALV"]
         A2["abap-cloud — steampunk, released APIs"]
         A3["abap-cloud-migration — custom code to cloud"]
@@ -219,7 +219,7 @@ flowchart TB
         A15["released-abap-classes — C1/C2/C3 contracts"]
     end
 
-    subgraph BTP["SAP BTP — 18 skills"]
+    subgraph BTP["SAP BTP — 20 skills"]
         B1["btp-abap-environment — BTP ABAP projects"]
         B2["btp-best-practices — CF vs Kyma, resilience"]
         B3["btp-build-work-zone — workspaces, cards"]
@@ -240,7 +240,7 @@ flowchart TB
         B18["sap-btp-credential-store — secrets vault"]
     end
 
-    subgraph FRONT["UI5 / Fiori / CAP — 7 skills"]
+    subgraph FRONT["UI5 / Fiori / CAP — 8 skills"]
         F1["sapui5-framework — UI5 patterns"]
         F2["sap-fiori-tools — Fiori generation"]
         F3["sap-fiori-apps-reference — apps catalog"]
@@ -250,14 +250,14 @@ flowchart TB
         F7["odata-abap — SEGW, CDS-exposed OData"]
     end
 
-    subgraph INT["Integration — 4 skills"]
+    subgraph INT["Integration — 5 skills"]
         I1["cpi-iflow-development — iFlow, Groovy"]
         I2["sap-bapi-integration — BAPI discovery, patterns"]
         I3["sap-code-search — full-text ABAP search"]
         I4["sap-api-style — OpenAPI specs, standards"]
     end
 
-    subgraph HANA["HANA / AI / Data — 10 skills"]
+    subgraph HANA["HANA / AI / Data — 11 skills"]
         H1["sap-hana-sqlscript — SQLScript procedures"]
         H2["sap-hana-cli — HANA CLI operations"]
         H3["sap-hana-ml — ML on HANA"]
@@ -270,7 +270,7 @@ flowchart TB
         H10["sap-sac-custom-widget — custom widgets"]
     end
 
-    subgraph VNEW["v4.0 NEW — 5 skills"]
+    subgraph VNEW["v4.2.0 NEW — 6 skills"]
         V1["karpathy-guidelines — Think→Simplify→Surgical→Verify"]
         V2["sap-gui-scripting — SAP GUI automation, BDC, ALV"]
         V3["sap-gui-web-enrich — web-search for missing nav data"]
@@ -283,19 +283,19 @@ flowchart TB
 
 | Domain | Count | Skills |
 |---|---|---|
-| **ABAP Core** | 15 | `abap`, `abap-cloud`, `abap-cloud-migration`, `abap-code-patterns`, `abap-sql-amdp`, `abap-unit-testing`, `abapgit`, `atc-cloudification`, `authorization-iam`, `badi-enhancement`, `clean-abap`, `rap`, `rap-business-events`, `cds-view-entities`, `released-abap-classes` |
-| **SAP BTP Platform** | 18 | `btp-abap-environment`, `btp-best-practices`, `btp-build-work-zone`, `btp-business-application-studio`, `btp-cias`, `btp-cloud-identity`, `btp-cloud-logging`, `btp-cloud-platform`, `btp-cloud-transport-management`, `btp-connectivity`, `btp-developer-guide`, `btp-diagram-generator`, `btp-integration-suite`, `btp-job-scheduling`, `btp-master-data-integration`, `btp-service-manager`, `sap-btp-audit-log`, `sap-btp-credential-store` |
-| **UI5 / Fiori / CAP** | 7 | `sapui5-framework`, `sap-fiori-tools`, `sap-fiori-apps-reference`, `sap-cap`, `sap-build`, `odata`, `odata-abap` |
-| **Integration** | 4 | `cpi-iflow-development`, `sap-bapi-integration`, `sap-code-search`, `sap-api-style` |
-| **HANA / AI / Data** | 10 | `sap-hana-sqlscript`, `sap-hana-cli`, `sap-hana-ml`, `sap-ai-core`, `sap-cloud-sdk-ai`, `sap-datasphere`, `sap-hana-cloud-data-intelligence`, `sap-sac-scripting`, `sap-sac-planning`, `sap-sac-custom-widget` |
-| **Security / Infra** | 7 | `sap-dependency-security`, `sap-btp-document-mgmt`, `sap-btp-feature-flags`, `sap-btp-html5-repo`, `sap-btp-kyma`, `sap-btp-launchpad`, `sap-btp-saas` |
-| **Router / Tooling** | 8 | `run-sap-router-skill`, `sap-transport-management`, `sap-crew-analysis`, `sap-rap-gen`, `sap-rpt1`, `sap-sac-test-automation`, `sap-api-policy`, `sap-workflow-pipeline` |
-| **v4.0 NEW** | 5 | **`karpathy-guidelines`**, **`sap-gui-scripting`**, **`sap-gui-web-enrich`**, **`sap-self-learn`**, **`sap-llm-engineering`** |
+| **ABAP Core** | 17 | `abap`, `abap-cloud`, `abap-cloud-migration`, `abap-code-patterns`, `abap-sql-amdp`, `abap-unit-testing`, `abapgit`, `atc-cloudification`, `authorization-iam`, `badi-enhancement`, `clean-abap`, `rap`, `rap-business-events`, `cds-view-entities`, `released-abap-classes` |
+| **SAP BTP Platform** | 20 | `btp-abap-environment`, `btp-best-practices`, `btp-build-work-zone`, `btp-business-application-studio`, `btp-cias`, `btp-cloud-identity`, `btp-cloud-logging`, `btp-cloud-platform`, `btp-cloud-transport-management`, `btp-connectivity`, `btp-developer-guide`, `btp-diagram-generator`, `btp-integration-suite`, `btp-job-scheduling`, `btp-master-data-integration`, `btp-service-manager`, `sap-btp-audit-log`, `sap-btp-credential-store` |
+| **UI5 / Fiori / CAP** | 8 | `sapui5-framework`, `sap-fiori-tools`, `sap-fiori-apps-reference`, `sap-cap`, `sap-build`, `odata`, `odata-abap` |
+| **Integration** | 5 | `cpi-iflow-development`, `sap-bapi-integration`, `sap-code-search`, `sap-api-style` |
+| **HANA / AI / Data** | 11 | `sap-hana-sqlscript`, `sap-hana-cli`, `sap-hana-ml`, `sap-ai-core`, `sap-cloud-sdk-ai`, `sap-datasphere`, `sap-hana-cloud-data-intelligence`, `sap-sac-scripting`, `sap-sac-planning`, `sap-sac-custom-widget` |
+| **Security / Infra** | 8 | `sap-dependency-security`, `sap-btp-document-mgmt`, `sap-btp-feature-flags`, `sap-btp-html5-repo`, `sap-btp-kyma`, `sap-btp-launchpad`, `sap-btp-saas` |
+| **Router / Tooling** | 9 | `run-sap-router-skill`, `sap-transport-management`, `sap-crew-analysis`, `sap-rap-gen`, `sap-rpt1`, `sap-sac-test-automation`, `sap-api-policy`, `sap-workflow-pipeline` |
+| **v4.2.0 NEW** | 6 | **`karpathy-guidelines`**, **`sap-gui-scripting`**, **`sap-gui-web-enrich`**, **`sap-self-learn`**, **`sap-llm-engineering`** |
 | **Shared** | 1 | `abap-code-review` (GitHub: `shrek-abaper/sap-engineering-skill`) |
 
 ---
 
-## MCP Server Reference (19 servers)
+## MCP Server Reference (35 servers)
 
 ```mermaid
 flowchart TB
@@ -493,9 +493,9 @@ sap-router-skill/
 ├── .mcp.json                    ← 35 MCP servers (3 GUI + 3 RAG)
 ├── .env.template                ← 40+ env vars grouped by domain
 ├── .abaplint.json               ← 60+ ABAP lint rules
-├── package.json                 ← 34 npm scripts
+├── package.json                 ← 63 npm scripts
 │
-├── .claude/skills/              ← 75 skills (all IDE auto-load)
+├── .claude/skills/              ← 85 skills (all IDE auto-load)
 │   ├── karpathy-guidelines/     ← v4.0: Think→Simplify→Surgical→Verify
 │   ├── sap-gui-scripting/       ← SAP GUI automation + BDC + ALV
 │   ├── sap-gui-web-enrich/      ← Web-search fill missing nav data
@@ -505,9 +505,9 @@ sap-router-skill/
 │   ├── sap-api-policy/          ← API Management + OpenAPI specs
 │   └── ... (68 more domain skills)
 │
-├── scripts/                     ← 8 Python CLIs
+├── scripts/                     ← 15 Python CLIs
 │   ├── sap_router.py            ← Routing engine (ADT→GUI→RFC→Pipeline)
-│   ├── healthcheck.py           ← 19-MCP probe + .env guardian
+│   ├── healthcheck.py           ← 35-MCP probe + .env guardian
 │   ├── self_learn.py            ← Hermes-style context adaptation
 │   ├── memory_manager.py        ← MEMORY.md session lifecycle + ABAPLINT
 │   ├── xls_to_bapi.py           ← CSV/XLSX → BAPI JSON (29 actions)
@@ -575,7 +575,7 @@ git pull origin main
 npm install
 pip install --upgrade openpyxl  # if using XLSX features
 
-# Verify health — probes all 53 MCPs
+# Verify health — probes all 35 MCPs
 python scripts/healthcheck.py
 
 # Preserve learned context through update
@@ -627,7 +627,7 @@ Key integrations:
 ## Contributing
 
 PRs and issues welcome. See [SKILL.md](SKILL.md) for the full dispatch table and
-78-skill reference. MIT licensed — use freely.
+85-skill reference. MIT licensed — use freely.
 
 ---
 

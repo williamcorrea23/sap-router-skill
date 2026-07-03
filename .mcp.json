@@ -402,7 +402,7 @@
     }
   },
   "notes": {
-    "version": "4.0.0 — Karpathy command format + healthcheck + self-learn + RAG",
+    "version": "v4.2.0 — Karpathy command format + healthcheck + self-learn + RAG",
     "arc-1_npm": "npm i -g arc-1",
     "aibap_install": "go install github.com/Hochfrequenz/aibap.mcp/cmd/aibap-mcp@latest",
     "mcp_abap_adt_install": "git clone + npm install + npm run build + configure .env",
@@ -412,9 +412,10 @@
     "gui_fallback_requires": "SAP GUI installed locally + RZ11 sapgui/user_scripting=TRUE + SAPLogon connection configured",
     "gui_web_enrich": "Auto-searches web for missing navigation data: field IDs, screen numbers, BDC sequences",
     "rag_connectors": "Pinecone, Supabase pgvector, Azure AI Search — pre-ready, activate via .env",
-    "healthcheck": "python scripts/healthcheck.py — verifies all 30 MCPs + .env completeness",
+    "healthcheck": "python scripts/healthcheck.py — verifies all 35 MCPs + .env completeness",
     "self_learn": "python scripts/self_learn.py — Hermes-style context adaptation, auto-optimizes routing",
     "karpathy_format": "All operations follow Think→Simplify→Surgical→Verify. Caveman compression default.",
-    "comparison_repos": "See COMPARISON.md for full 70+ repo analysis"
+    "comparison_repos": "See COMPARISON.md for full 70+ repo analysis",
+    "planned_mcps": "18 additional MCPs documented in skills are planned for future configuration."
   }
 }

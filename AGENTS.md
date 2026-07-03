@@ -1,19 +1,19 @@
 # SAP Router Skill — Multi-IDE Agent Instructions
 
-> **78 skills mirrored across 4 IDEs — same SKILL.md content in each.**
+> **85 skills mirrored across 4 IDEs — same SKILL.md content in each.**
 >
 > | IDE | Skill Directory | Entry Point |
 > |---|---|---|
-> | **Claude Code** | `.claude/skills/` (78 skills) | `.claude/skills/run-sap-router-skill/SKILL.md` |
-> | **Antigravity (Gemini)** | `.gemini/skills/` (78 skills) | `.gemini/skills/run-sap-router-skill/SKILL.md` |
-> | **Codex / OpenAI** | `.codex/skills/` (78 skills) | `.codex/AGENTS.md` |
-> | **Cursor** | `.cursor/skills/` (78 skills) | `.cursor/skills/run-sap-router-skill/SKILL.md` |
+> | **Claude Code** | `.claude/skills/` (85 skills) | `.claude/skills/run-sap-router-skill/SKILL.md` |
+> | **Antigravity (Gemini)** | `.gemini/skills/` (85 skills) | `.gemini/skills/run-sap-router-skill/SKILL.md` |
+> | **Codex / OpenAI** | `.codex/skills/` (85 skills) | `.codex/AGENTS.md` |
+> | **Cursor** | `.cursor/skills/` (85 skills) | `.cursor/skills/run-sap-router-skill/SKILL.md` |
 >
 > All skills auto-trigger by file context and keyword. See SKILL.md for master dispatch.
 
 ## What this project is
 
-Ten standalone Python 3 CLIs + one Node.js review gate — no live SAP system required
+15 standalone Python 3 CLIs + one Node.js review gate — no live SAP system required
 credentials required. Everything runs offline:
 
 | Script | Purpose |
@@ -24,6 +24,15 @@ credentials required. Everything runs offline:
 | `scripts/template_repo.py` | Offline ABAP template repository with `{{placeholders}}` |
 | `scripts/abap_serializer.py` | Multi-format ABAP packer: .nugg, abapGit, ZDOWNLOAD XML |
 | `scripts/cpi_iflow_packager.py` | CPI iFlow ZIP create/validate/extract |
+| `scripts/fallback_engine.py` | 6-tier cascading fallback with retry, verification, 36 mapped actions |
+| `scripts/healthcheck.py` | Probes 35 MCPs (+18 planned), validates .env, generates interactive prompts |
+| `scripts/self_learn.py` | Hermes-style context adaptation — tracks MCP latency/reliability, adapts routing |
+| `scripts/zrouter_bootstrap.py` | ZROUTER probe + install (ADT/GUI/Offline) + fallback mapping |
+| `scripts/btp_diagram.py` | BTP architecture diagram generator from skill references |
+| `scripts/check_gui_scripting.py` | SAP GUI scripting readiness probe (RZ11 + SAPLogon check) |
+| `scripts/hdi_lint.py` | SAP HANA HDI container linting and validation |
+| `scripts/cpi_client.py` | CPI iFlow HTTP client with OAuth and CSRF support |
+| `scripts/rag_ingest.py` | RAG ingestion pipeline for SAP documentation indexing |
 
 ## Run / verify
 
@@ -35,7 +44,7 @@ python .claude/skills/run-sap-router-skill/driver.py
 Requires Python 3.8+. No packages needed for CSV; `pip install openpyxl`
 for XLSX support only.
 
-## Routing rules (v3.0 — ADT-first, GUI-fallback, caveman-optimized)
+## Routing rules (v4.2.0 — ADT-first, GUI-fallback, caveman-optimized)
 
 Decision tree:
 1. CAVEMAN DELEGATION? (fix/find/review, 1-2 files) → cavecrew-investigator/builder/reviewer
@@ -43,6 +52,7 @@ Decision tree:
 3. GUI FALLBACK? (SPRO, SM30, SU01, MM01, VA01...) → mcp-sap-gui (25 transactions)
 4. FUNCTIONAL WRITE? (BAPI batch) → needs explicit --functional context (else needs-functional-context, NO BAPI fired); then BAPI-first / SAP GUI dispatch. ZROUTER RFC only if opted in (zrouter accept).
 5. SPEC→PIPELINE? → sap_router.py pipeline (8 stages)
+6. LLM / RAG? (prompt optimization, doc retrieval) → sap-llm-engineering skill + RAG routing (Pinecone, Supabase pgvector, Azure AI Search)
 
 | Action contains | Destination |
 |---|---|

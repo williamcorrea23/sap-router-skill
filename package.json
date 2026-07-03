@@ -1,7 +1,7 @@
 {
   "name": "sap-router-orchestrator",
   "version": "4.2.0",
-  "description": "SAP Router Orchestrator v4.2.0 - Karpathy command format. 105 skills, 53 MCPs, 11 CLIs, 60 npm scripts. All SAP domains covered.",
+  "description": "SAP Router Orchestrator v4.2.0 - Karpathy command format. 85 skills, 35 MCPs (+18 planned), 15 CLIs, 63 npm scripts. All SAP domains covered.",
   "private": true,
   "scripts": {
     "abap:lint": "abaplint templates/**/*.abap",
@@ -34,7 +34,7 @@
     "driver": "python .claude/skills/run-sap-router-skill/driver.py",
     "update": "git pull origin main && npm install && python scripts/healthcheck.py",
     "update:quick": "git pull origin main && python scripts/healthcheck.py --quiet --json",
-    "update:deps": "npm install && pip install --upgrade openpyxl",
+    "update:deps": "npm install && pip install --upgrade openpyxl requests pyyaml",
     "update:learn": "python scripts/self_learn.py persist",
     "update:full": "npm run update && npm run abap:review && npm run update:learn",
     "uninstall": "echo 'Remove sap-router-skill directory to uninstall. Transported objects remain on SAP system.'",

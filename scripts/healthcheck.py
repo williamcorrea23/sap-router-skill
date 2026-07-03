@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 SAP Router Healthcheck — MCP connectivity probe, .env guardian, credential validator.
-v4.2.0: Probes all 53 MCPs + ZROUTER, verifies .env completeness, prompts user for missing data.
+v4.2.0: Probes 35 configured MCPs + 18 planned (roadmap) + ZROUTER, verifies .env completeness, prompts user for missing data.
 Andrej-style: "eval first, then act" — diagnose before routing.
 """
 import os
@@ -135,25 +135,25 @@ MCP_HEALTHCHECK_SPEC = {
         "description": "SAP API Management — API proxy, policies, publication",
     },
     # Plugin MCPs (auto-available when IDE plugin loaded)
-    "ui5-mcp": {
+    "plugin:ui5:ui5-mcp-server": {
         "env_vars": [],
         "probe_command": None,
         "criticality": "LOW",
         "description": "UI5/SAPUI5 app creation, linter, API reference (plugin)",
     },
-    "fiori-mcp": {
+    "plugin:sap-fiori-mcp-server:fiori-mcp": {
         "env_vars": [],
         "probe_command": None,
         "criticality": "LOW",
         "description": "Fiori app generation, metadata download, docs (plugin)",
     },
-    "mdk-mcp": {
+    "plugin:mdk-mcp:mdk-mcp": {
         "env_vars": [],
         "probe_command": None,
         "criticality": "LOW",
         "description": "MDK project creation, build, deploy (plugin)",
     },
-    "cds-mcp": {
+    "plugin:cds-mcp:cds-mcp": {
         "env_vars": [],
         "probe_command": None,
         "criticality": "LOW",
@@ -241,108 +241,126 @@ MCP_HEALTHCHECK_SPEC = {
         "env_vars": [],
         "probe_command": None,
         "criticality": "OPTIONAL",
+        "planned": True,
         "description": "ABAP ADT API MCP (mario-andreschak)",
     },
     "sap-mcp": {
         "env_vars": [],
         "probe_command": None,
         "criticality": "OPTIONAL",
+        "planned": True,
         "description": "MarkWu SAP MCP",
     },
     "vibing-steampunk": {
         "env_vars": [],
         "probe_command": None,
         "criticality": "OPTIONAL",
+        "planned": True,
         "description": "oisee vibing-steampunk MCP",
     },
     "dassian-adt": {
         "env_vars": [],
         "probe_command": None,
         "criticality": "OPTIONAL",
+        "planned": True,
         "description": "Dassian ADT MCP",
     },
     "abap-mcp-adt-powerup": {
         "env_vars": [],
         "probe_command": None,
         "criticality": "OPTIONAL",
+        "planned": True,
         "description": "ABAP ADT Powerup MCP (babamba2)",
     },
     "sapgui-mcp": {
         "env_vars": [],
         "probe_command": None,
         "criticality": "OPTIONAL",
+        "planned": True,
         "description": "Hochfrequenz SAP GUI MCP",
     },
     "sap-gui-mcp-jduncan": {
         "env_vars": [],
         "probe_command": None,
         "criticality": "OPTIONAL",
+        "planned": True,
         "description": "jduncan SAP GUI MCP",
     },
     "cpi-mcp-server": {
         "env_vars": [],
         "probe_command": None,
         "criticality": "OPTIONAL",
+        "planned": True,
         "description": "Vadim Klimov CPI MCP",
     },
     "mcp-ci-python": {
         "env_vars": [],
         "probe_command": None,
         "criticality": "OPTIONAL",
+        "planned": True,
         "description": "Paulo Calazans CPI Python MCP",
     },
     "btp-is-ci-mcp-server": {
         "env_vars": [],
         "probe_command": None,
         "criticality": "OPTIONAL",
+        "planned": True,
         "description": "Taulia CPI Integration Suite MCP",
     },
     "sap-cpi-mcp-backup": {
         "env_vars": [],
         "probe_command": None,
         "criticality": "OPTIONAL",
+        "planned": True,
         "description": "gymishra CPI Backup MCP",
     },
     "cap-mcp-plugin": {
         "env_vars": [],
         "probe_command": None,
         "criticality": "OPTIONAL",
+        "planned": True,
         "description": "gavdilabs CAP MCP plugin",
     },
     "hana-mcp-server": {
         "env_vars": [],
         "probe_command": None,
         "criticality": "OPTIONAL",
+        "planned": True,
         "description": "HatriGt HANA MCP server",
     },
     "mcp-sap-docs": {
         "env_vars": [],
         "probe_command": None,
         "criticality": "OPTIONAL",
+        "planned": True,
         "description": "marianfoo SAP Docs MCP",
     },
     "mcp-hub": {
         "env_vars": [],
         "probe_command": None,
         "criticality": "OPTIONAL",
+        "planned": True,
         "description": "arc-mcp MCP Hub",
     },
     "sap-ai-mcp-servers": {
         "env_vars": [],
         "probe_command": None,
         "criticality": "OPTIONAL",
+        "planned": True,
         "description": "marianfoo SAP AI MCP servers",
     },
     "adt-ls": {
         "env_vars": [],
         "probe_command": None,
         "criticality": "OPTIONAL",
+        "planned": True,
         "description": "arc-mcp Generic ADT Language Server",
     },
     "sap-mcp-config": {
         "env_vars": [],
         "probe_command": None,
         "criticality": "OPTIONAL",
+        "planned": True,
         "description": "Hochfrequenz SAP MCP Config Model",
     },
 }
@@ -355,6 +373,8 @@ OPTIONAL_ENV_FILE_VARS = [
     "SAP_URL", "SAP_USERNAME", "SAP_PASSWORD", "SAP_CLIENT",
     "SAPGUI_HOST", "SAPGUI_USER", "SAPGUI_PASSWORD", "SAPGUI_CLIENT",
     "SAP_CONNECTION",
+    "SAP_RFC_HOST", "SAP_RFC_USER", "SAP_RFC_PASSWORD", "SAP_RFC_CLIENT",
+    "SAP_NOTES_USERNAME", "SAP_NOTES_PASSWORD",
     "CF_API", "CF_USER", "CF_PASSWORD",
     "CPI_HOST", "CPI_USER", "CPI_PASSWORD",
     "APIM_HOST", "APIM_USER", "APIM_PASSWORD",
@@ -368,7 +388,7 @@ OPTIONAL_ENV_FILE_VARS = [
     "PINECONE_API_KEY", "PINECONE_INDEX", "PINECONE_ENVIRONMENT",
     "SUPABASE_URL", "SUPABASE_SERVICE_KEY",
     "AZURE_SEARCH_ENDPOINT", "AZURE_SEARCH_KEY", "AZURE_SEARCH_INDEX",
-    "OPENAI_API_KEY", "DEEPSEEK_API_KEY", "OPENROUTER_API_KEY",
+    "OPENAI_API_KEY", "DEEPSEEK_API_KEY", "OPENROUTER_API_KEY", "TAVILY_API_KEY",
     "API_OAUTH_CLIENT_ID", "API_OAUTH_CLIENT_SECRET", "API_OAUTH_TOKEN_URL",
     "API_BASE_URL", "API_USER", "API_PASS",
     "CPI_BASE_URL", "CPI_OAUTH_CLIENT_ID", "CPI_OAUTH_CLIENT_SECRET", "CPI_OAUTH_TOKEN_URL",
@@ -535,7 +555,7 @@ class HealthChecker:
                 pass
 
         self.log("=" * 60)
-        self.log("SAP ROUTER HEALTHCHECK v4.0")
+        self.log("SAP ROUTER HEALTHCHECK v4.2.0")
         self.log(f"Timestamp: {self.results['timestamp']}")
         self.log(f"Project: {self.project_root}")
         self.log("=" * 60)
@@ -580,7 +600,7 @@ class HealthChecker:
         checks = {
             "templates/": (SKILL_DIR / "templates").exists(),
             "templates/*.abap": len(list((SKILL_DIR / "templates").glob("*.abap"))) >= 4,
-            "scripts/*.py": len(list((SKILL_DIR / "scripts").glob("*.py"))) >= 10,
+            "scripts/*.py": len(list((SKILL_DIR / "scripts").glob("*.py"))) >= 15,
             ".claude/skills/": len(list((SKILL_DIR / ".claude" / "skills").glob("*/SKILL.md"))) >= 85,
             "zrouter_bootstrap.py": (SKILL_DIR / "scripts" / "zrouter_bootstrap.py").exists(),
             "packages/samples/": (SKILL_DIR / "packages" / "samples").exists(),
@@ -670,7 +690,7 @@ class HealthChecker:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="SAP Router Healthcheck — MCP + .env verification v4.0")
+    parser = argparse.ArgumentParser(description="SAP Router Healthcheck — MCP + .env verification v4.2.0")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
     parser.add_argument("--quiet", action="store_true", help="Minimal output")
     parser.add_argument("--prompt-missing", action="store_true", help="Show interactive setup prompts for missing config")

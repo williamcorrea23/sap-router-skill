@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-# Healthcheck — probes 53 MCPs + .env completeness (run first)
+# Healthcheck — probes 35 MCPs (+18 planned) + .env completeness (run first)
 npm run hc
 npm run hc:prompt       # Interactive setup for missing .env vars
 
@@ -61,12 +61,12 @@ npm run update          # git pull + npm install + healthcheck
 | `SKILL.md` | Master dispatch table, 4-principle Karpathy wrapper, routing decision tree |
 | `scripts/sap_router.py` | Routing engine with ADT-first/GUI-fallback/caveman delegation/pipeline orchestration |
 | `scripts/fallback_engine.py` | 6-tier cascading fallback with retry, verification, 36 mapped actions |
-| `scripts/healthcheck.py` | Probes 53 MCPs, validates .env, generates interactive prompts |
+| `scripts/healthcheck.py` | Probes 35 MCPs (+18 planned), validates .env, generates interactive prompts |
 | `scripts/self_learn.py` | Hermes-style context adaptation — tracks MCP latency/reliability, adapts routing |
 | `scripts/zrouter_bootstrap.py` | ZROUTER probe + install (ADT/GUI/Offline) + fallback mapping |
 | `scripts/xls_to_bapi.py` | CSV/XLSX → BAPI JSON with field mapping validation |
 | `scripts/memory_manager.py` | MEMORY.md session lifecycle + ABAPLINT section |
-| `.mcp.json` | 53 MCP server configs — ADT, GUI (3 tiers), RFC, CPI, CF, APIM, RAG (3), PI/PO, BW, Datasphere, Steampunk, Sapient, Integration Suite, CPI OData Proxy, ABAP-MCP, Cloud ALM, CTS Transport + 4 plugins |
+| `.mcp.json` | 35 MCP server configs (+18 planned) — ADT, GUI (3 tiers), RFC, CPI, CF, APIM, RAG (3), PI/PO, BW, Datasphere, Steampunk, Sapient, Integration Suite, CPI OData Proxy, ABAP-MCP, Cloud ALM, CTS Transport + 4 plugins |
 | `README.md` | GitHub landing page — 8 Mermaid diagrams, skill catalog, MCP reference, 130 topic tags, SEO footer |
 
 ## Cross-file consistency rules
@@ -84,7 +84,7 @@ When adding skills, MCPs, CLIs, or npm scripts, update ALL of these:
 
 - Windows cp1252 codec issues: use `.format()` or f-strings with ASCII-only characters. Avoid Unicode in print() output (arrows, emojis, curly quotes).
 - All imports from sibling scripts must handle `ModuleNotFoundError` with `sys.path.insert(0, str(SKILL_DIR))` fallback.
-- Count thresholds in `healthcheck.py` must match actual disk counts (skills >= 78, scripts >= 10).
+- Count thresholds in `healthcheck.py` must match actual disk counts (skills >= 85, scripts >= 15).
 
 ## Mermaid diagrams (README.md only)
 
