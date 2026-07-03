@@ -2,7 +2,13 @@ import os
 import sys
 import argparse
 import json
-import requests
+
+# Fallback requests check
+try:
+    import requests
+    HAS_REQUESTS = True
+except ImportError:
+    HAS_REQUESTS = False
 
 # Load .env if present
 env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env')
@@ -60,6 +66,10 @@ def test_connection():
 def main():
     parser = argparse.ArgumentParser(description="Python CPI OData Client")
     subparsers = parser.add_subparsers(dest="command", required=True)
+
+    if not HAS_REQUESTS:
+        print("Missing dependency 'requests'. Install: pip install requests", file=sys.stderr)
+        sys.exit(1)
     
     subparsers.add_parser("test-connection", help="Validate OAuth2 token and API connectivity")
     

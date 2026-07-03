@@ -1207,7 +1207,7 @@ def main():
         spec_text = args.spec_text
         if args.spec:
             if args.spec.endswith('.pdf'):
-                print("PDF spec detected — extract text first. Pipeline continuing with OCR extraction...")
+                print("PDF spec detected - extract text first. Pipeline continuing with OCR extraction...")
             else:
                 with open(args.spec, 'r', encoding='utf-8') as f:
                     spec_text = f.read()
@@ -1255,7 +1255,7 @@ def main():
         # Build dispatch plan — stages grouped into waves; same wave => concurrent.
         plan = router.build_dispatch_plan(parallel=args.parallel, start_idx=start_idx, n_objects=n_objects)
         mode_label = "PARALLEL" if args.parallel else "SERIAL"
-        print(f"Dispatch plan ({mode_label}) — same-wave agents launch concurrently in ONE batch:")
+        print(f"Dispatch plan ({mode_label}) - same-wave agents launch concurrently in ONE batch:")
         for wave in plan:
             tag = "concurrent" if wave['concurrent'] else "sequential"
             names = ", ".join(
@@ -1326,17 +1326,17 @@ def main():
             print(f"[OK] Caveman delegation: {route['destination']}")
             print(f"   {route['details']}")
         else:
-            print(f"[NO] No caveman delegation — use full agent for this task")
+            print(f"[NO] No caveman delegation - use full agent for this task")
 
     elif args.command == 'gui-enrich':
         if args.status:
             print("GUI ENRICHMENT STATUS")
             print("=" * 50)
             print("WEB SEARCH STRATEGY (for missing navigation data):")
-            print("  1. SAP Help Portal (help.sap.com) — authoritative field definitions")
-            print("  2. SAP Community (community.sap.com) — practical BDC examples")
-            print("  3. GitHub ABAP code search — real CALL TRANSACTION code")
-            print("  4. SAP Notes (mcp-sap-notes) — known issues")
+            print("  1. SAP Help Portal (help.sap.com) - authoritative field definitions")
+            print("  2. SAP Community (community.sap.com) - practical BDC examples")
+            print("  3. GitHub ABAP code search - real CALL TRANSACTION code")
+            print("  4. SAP Notes (mcp-sap-notes) - known issues")
             print("  5. Ask user to record via SHDB transaction recorder")
             print()
         tcode = args.tcode
@@ -1410,8 +1410,8 @@ def main():
             print(f"  Directory  : {_crew_dir}")
             print(f"  run.py     : {'[OK]' if os.path.isfile(run_py) else '[MISSING]'}")
             print(f"  requirements: {'[OK]' if os.path.isfile(req_txt) else '[MISSING]'}")
-            print(f"  .env       : {'[OK]' if os.path.isfile(env_file) else '[MISSING — copy .env.example]'}")
-            print(f"  .venv      : {'[OK]' if os.path.isdir(venv_dir) else '[NOT FOUND — run install]'}")
+            print(f"  .env       : {'[OK]' if os.path.isfile(env_file) else '[MISSING - copy .env.example]'}")
+            print(f"  .venv      : {'[OK]' if os.path.isdir(venv_dir) else '[NOT FOUND - run install]'}")
             # Quick crewai import probe
             probe = subprocess.run(
                 [sys.executable, '-c', 'import crewai; print("crewai", crewai.__version__)'],
@@ -1420,7 +1420,7 @@ def main():
             if probe.returncode == 0:
                 print(f"  crewai     : [OK] {probe.stdout.strip()}")
             else:
-                print("  crewai     : [NOT INSTALLED — run install]")
+                print("  crewai     : [NOT INSTALLED - run install]")
             return True
 
         def _crew_install():
@@ -1442,7 +1442,7 @@ def main():
             if not os.path.isfile(env_file) and os.path.isfile(env_example):
                 import shutil
                 shutil.copy(env_example, env_file)
-                print(f"[OK] .env created from .env.example — edit {env_file} with your API keys.")
+                print(f"[OK] .env created from .env.example - edit {env_file} with your API keys.")
             elif os.path.isfile(env_file):
                 print("[OK] .env already exists.")
             print("[DONE] sap-crew-agent ready. Run: sap_router.py sap-crew run \"your task\"")

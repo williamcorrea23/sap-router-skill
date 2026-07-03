@@ -39,6 +39,11 @@ __version__ = "4.2.0"
 
 SKILL_DIR = Path(__file__).resolve().parent.parent
 
+# Sibling imports use the 'scripts.' package prefix, which only resolves when
+# SKILL_DIR is on sys.path (CLAUDE.md sibling-import rule).
+if str(SKILL_DIR) not in sys.path:
+    sys.path.insert(0, str(SKILL_DIR))
+
 
 class TieredFallback:
     """Executes cascading fallback through 6 tiers with retry and verification."""
@@ -326,7 +331,7 @@ class TieredFallback:
                         if key in action.upper():
                             bapi_name = bapi
                             break
-                except Exception:
+                except ImportError:
                     pass
                 return {
                     "success": True,
@@ -355,7 +360,7 @@ class TieredFallback:
                 if key in action.upper():
                     bapi_name = bapi
                     break
-        except Exception:
+        except ImportError:
             pass
 
         return {

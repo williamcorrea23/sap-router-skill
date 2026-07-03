@@ -13,8 +13,14 @@ import sys
 import json
 import math
 import argparse
-import yaml
 from pathlib import Path
+
+# Fallback yaml check
+try:
+    import yaml
+    HAS_YAML = True
+except ImportError:
+    HAS_YAML = False
 
 # Setup paths
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -180,7 +186,10 @@ def run_ingestion():
 
     # 1. Load SAP Notes (YAML)
     notes_path = os.path.join(DATA_DIR, "sap-notes.yaml")
-    if os.path.exists(notes_path):
+    if os.path.exists(notes_path) and not HAS_YAML:
+        print("Missing dependency 'yaml'. Install: pip install pyyaml. Skipping SAP Notes ingestion.",
+              file=sys.stderr)
+    elif os.path.exists(notes_path):
         try:
             with open(notes_path, "r", encoding="utf-8") as f:
                 notes_data = yaml.safe_load(f)
