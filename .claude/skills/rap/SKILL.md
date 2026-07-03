@@ -1,6 +1,10 @@
 ---
 name: rap
 description: RESTful ABAP Programming (RAP) — managed and unmanaged scenarios, behavior definitions (BDEF), behavior implementations, EML (Entity Manipulation Language), determinations, validations, actions, draft handling, side effects, authorization, numbering, feature control, lock handling. Use when implementing RAP business objects, writing behavior implementations, using EML, or designing RAP managed scenarios.
+trigger:
+  keywords: [rap, restful, abap, bdef, behavior, eml, managed, unmanaged, entity, business-object]
+  intent: >-
+    Use when implementing RAP business objects with behavior definitions, EML, determinations, validations, draft handling, or managing RAP scenarios.
 ---
 
 # RESTful ABAP Programming (RAP)

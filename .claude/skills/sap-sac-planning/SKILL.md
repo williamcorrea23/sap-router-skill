@@ -14,6 +14,8 @@ trigger:
     - BPC migration
     - SAC calendar
     - predictive forecast
+  intent: >-
+    Build SAC planning models, allocations, data actions, value driver trees, and manage BPC migrations.
   file_patterns:
     - "*planning*model*"
 ---

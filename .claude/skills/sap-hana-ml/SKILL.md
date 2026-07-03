@@ -1,6 +1,10 @@
 ---
 name: sap-hana-ml
 description: SAP HANA Machine Learning — PAL (Predictive Analysis Library), APL (Automated Predictive Library), HANA ML Python client, built-in ML algorithms (regression, classification, clustering, time series), model training in HANA, model consumption from ABAP/CAP. Use when implementing HANA ML models, calling PAL/APL procedures, or integrating ML into ABAP applications.
+trigger:
+  keywords: [PAL, APL, HANA ML, machine learning, regression, classification, clustering, time series, predictive, model training]
+  intent: >-
+    Use when implementing HANA ML models, calling PAL/APL procedures, or integrating ML into ABAP applications.
 ---
 
 # SAP HANA Machine Learning

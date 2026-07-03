@@ -1,6 +1,10 @@
 ---
 name: sap-sac-scripting
 description: SAP Analytics Cloud scripting — scripting API, custom widgets, data analyzer scripts, chart scripting, planning scripts, button scripts, application design, custom calculations. Use when building SAC custom widgets, adding scripting to SAC stories, or implementing custom analytics logic in SAC.
+trigger:
+  keywords: [scripting, SAC, analytics cloud, custom widgets, data analyzer, chart scripting, planning scripts, application design, custom calculations]
+  intent: >-
+    Use when building SAC custom widgets, adding scripting to SAC stories, or implementing custom analytics logic in SAC.
 ---
 
 # SAP Analytics Cloud Scripting

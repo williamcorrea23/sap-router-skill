@@ -7,6 +7,10 @@ description: >-
   RAP event publishing and subscribing. Use when working with RAP business
   event, event mesh, business event, event binding, BDEF event, CloudEvents,
   event choreography, event publishing, or event subscription topics.
+trigger:
+  keywords: [rap, business-events, event-mesh, cloudevents, event-binding, bdef, choreography, publishing, subscribing, sap-btp]
+  intent: >-
+    Use when defining, publishing, subscribing, or consuming RAP business events with Event Mesh, CloudEvents, or event choreography on SAP BTP.
 ---
 
 # RAP Business Events

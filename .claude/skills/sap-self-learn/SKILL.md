@@ -9,6 +9,10 @@ description: >-
   past failures, or optimize routing based on historical data. Triggers on:
   "learn from", "adapt routing", "optimize MCP", "self improve", "track performance",
   "remember pattern", "system learning", "routing history", "MCP stats".
+trigger:
+  keywords: [self-improvement, MCP interaction, latency tracking, reliability, routing preferences, system learning, routing history, performance tracking, environment adaptation]
+  intent: >-
+    Use when system needs to adapt to environment, learn from past failures, or optimize routing based on historical data.
 ---
 
 # SAP Self-Learn — Hermes-Style Environment Adaptation

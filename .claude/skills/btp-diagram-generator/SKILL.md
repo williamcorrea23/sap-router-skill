@@ -1,6 +1,10 @@
 ---
 name: btp-diagram-generator
 description: SAP BTP Diagram Generator — generate BTP architecture diagrams from JSON specifications, landscape topology visualization, service dependency graphs, Mermaid/PlantUML output for BTP solutions. Use when creating BTP architecture diagrams, visualizing BTP solution landscapes, or generating deployment topology diagrams.
+trigger:
+  keywords: [BTP diagram, architecture diagram, landscape topology, service dependency, Mermaid, PlantUML, JSON specification, deployment topology, BTP solution, visualization]
+  intent: >-
+    Generate SAP BTP architecture diagrams from JSON specifications using Mermaid or PlantUML output.
 ---
 
 # SAP BTP Diagram Generator

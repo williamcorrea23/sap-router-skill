@@ -6,6 +6,10 @@ description: >-
   cpi_iflow_packager.py). Use when asked to run, start, build,
   test, verify, or smoke-test the sap-router-skill, its routing
   engine, MEMORY.md compaction, or the XLS/CSV-to-BAPI converter.
+trigger:
+  keywords: [run, smoke-test, router, cli, sap-router, skill, memory, bapi, xls, csv]
+  intent: >-
+    Use when running, smoke-testing, building, or verifying the SAP Router Skill CLI, routing engine, or data converters.
 ---
 
 # Run: sap-router-skill

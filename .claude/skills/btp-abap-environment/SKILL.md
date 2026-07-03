@@ -1,6 +1,10 @@
 ---
 name: btp-abap-environment
 description: SAP BTP ABAP Environment — ABAP Cloud projects, ADT connection, communication arrangements, service bindings, released APIs, BTP cockpit management. Use when creating ABAP Cloud projects, configuring BTP ABAP Environment, setting up ADT for Steampunk, managing service instances, or working with cloud-ABAP lifecycle.
+trigger:
+  keywords: [BTP ABAP Environment, Steampunk, ABAP Cloud, ADT, communication arrangement, service binding, released API, BTP cockpit, cloud ABAP, service instance]
+  intent: >-
+    Create and configure SAP BTP ABAP Environment projects, set up ADT connections, manage service instances, and work with cloud-ABAP lifecycle.
 ---
 
 # BTP ABAP Environment

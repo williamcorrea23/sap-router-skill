@@ -1,6 +1,10 @@
 ---
 name: clean-abap
 description: Clean ABAP Style Guide — naming conventions, formatting rules, method length limits, error handling patterns, OO best practices, modern ABAP conventions based on SAP Clean ABAP Style Guide (CC BY 4.0). Use when writing ABAP code, reviewing ABAP code quality, refactoring ABAP, or applying clean code rules to ABAP programs.
+trigger:
+  keywords: [Clean ABAP, style guide, naming convention, formatting, method length, error handling, OO best practice, modern ABAP, refactoring, code quality]
+  intent: >-
+    Apply Clean ABAP style guide rules for naming, formatting, error handling, and modern ABAP conventions when writing or reviewing ABAP code.
 ---
 
 # Clean ABAP Style Guide

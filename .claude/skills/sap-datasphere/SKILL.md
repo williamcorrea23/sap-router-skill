@@ -18,6 +18,8 @@ trigger:
     - federation
     - semantic layer
     - SAC integration
+  intent: >-
+    Build SAP Datasphere data models, federate SAP and non-SAP data, and create analytical datasets for SAC.
   file_patterns:
     - "*.hdbsynonym"
     - "*.hdbview"

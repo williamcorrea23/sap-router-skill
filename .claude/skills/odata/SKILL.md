@@ -1,6 +1,10 @@
 ---
 name: odata
 description: SAP OData service development — OData V2 and V4 protocol patterns, $metadata structure, entity sets, navigation properties, function imports, $filter/$expand/$select/$top/$skip query options, deep insert, batch requests, ETag optimistic locking, OData annotations, SAP Gateway error handling, OData security (CSRF, SAML, OAuth2). Use when building OData services, consuming SAP OData APIs, troubleshooting OData errors, or designing OData-based integrations.
+trigger:
+  keywords: [odata, service, metadata, entity, navigation, gateway, v2, v4, crud, sap]
+  intent: >-
+    Use when building, consuming, troubleshooting, or designing SAP OData services (V2/V4) with Gateway, S/4HANA, or BTP.
 ---
 
 # SAP OData Development

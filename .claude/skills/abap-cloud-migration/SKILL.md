@@ -1,6 +1,10 @@
 ---
 name: abap-cloud-migration
 description: ABAP Cloud migration patterns — custom code analysis with ATC cloud readiness checks, deprecated object replacement strategies, Dynpro → Fiori Elements migration, RFC → RAP OData migration, IDoc → SOAP migration, authorization object migration to IAM, DB access → CDS views, FILE → Document Management Service. Use when migrating ABAP code to cloud, planning S/4HANA cloud migration, or assessing custom code cloud readiness.
+trigger:
+  keywords: [cloud-migration, atc-readiness, custom-code, s4hana, deprecated-objects, dynpro-migration, rfc-migration, rap-odata, cds-views, iam]
+  intent: >-
+    Migrate ABAP code to cloud with ATC readiness checks, deprecated object replacement, and custom code assessment.
 ---
 
 # ABAP Cloud Migration

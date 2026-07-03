@@ -1,6 +1,10 @@
 ---
 name: abap-sql-amdp
 description: ABAP SQL and AMDP patterns — CDS table functions, AMDP class structure with IF_AMDP_MARKER_HDB, Open SQL vs Native SQL, HANA SQLScript procedures, parameter mapping, performance analysis, SQL Monitor (SQLM). Use when writing AMDP classes, implementing CDS table functions, optimizing ABAP SQL queries, or working with HANA SQLScript from ABAP.
+trigger:
+  keywords: [amdp, sql, cds-table-functions, hana, sqlscript, open-sql, native-sql, if-amdp-marker-hdb, sql-monitor, performance]
+  intent: >-
+    Write AMDP classes, CDS table functions, and optimize ABAP SQL queries for SAP HANA.
 ---
 
 # ABAP SQL and AMDP

@@ -14,6 +14,8 @@ trigger:
     - "optimize ABAP"
     - "improve SAP code"
     - "SAP crew analysis"
+  intent: >-
+    Run multi-agent ABAP code analysis to find errors, security flaws, performance bottlenecks, and Clean ABAP violations.
   patterns:
     - "Z[A-Z]{3,}.*error"
     - "ZCL_.*review"

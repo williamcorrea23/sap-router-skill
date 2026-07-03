@@ -1,6 +1,10 @@
 ---
 name: abapgit
 description: abapGit workflows — install from GitHub repos, branch selection (main vs nw-740), offline serialization, repo management, object serialization (.abap + .xml formats), transport integration, CI/CD with abapGit, mass object handling. Use when installing ABAP code from Git, serializing ABAP objects to files, or setting up ABAP CI/CD with abapGit.
+trigger:
+  keywords: [abapgit, git, serialization, repository, branch, transport, offline, ci-cd, abap-objects, mass-handling]
+  intent: >-
+    Manage ABAP code with Git via abapGit for version control, serialization, and CI/CD integration.
 ---
 
 # abapGit

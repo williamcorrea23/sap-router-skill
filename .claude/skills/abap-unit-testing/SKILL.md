@@ -1,6 +1,10 @@
 ---
 name: abap-unit-testing
 description: ABAP Unit testing — test class structure (FOR TESTING), risk levels, test doubles (CL_ABAP_TESTDOUBLE), CDS Test Double Framework, RAP business object testing, coverage analyzer (SCOV), SQL testing isolation, ABAP Unit in CI/CD pipelines. Use when writing ABAP Unit tests, creating test doubles, measuring code coverage, or integrating ABAP tests in CI/CD.
+trigger:
+  keywords: [unit-test, test-doubles, cl-abap-testdouble, coverage, scov, for-testing, rap-testing, cds-test-double, abap-unit, cicd]
+  intent: >-
+    Write ABAP Unit tests with test doubles, measure coverage, and integrate testing in CI/CD pipelines.
 ---
 
 # ABAP Unit Testing

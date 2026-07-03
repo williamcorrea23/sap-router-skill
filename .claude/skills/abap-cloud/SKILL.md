@@ -5,8 +5,10 @@ description: >-
   ADT-only development, embedded Steampunk in S/4HANA, ABAP Cloud project in BTP,
   SCOPE_OPEN/CLOSE rules, class pool restrictions, no dynpro, no DB access bypass,
   cloud-ABAP lifecycle, API contract versioning, C1 release contract, SYSTEM-LOCAL license.
-  Trigger keywords: ABAP Cloud, Steampunk, released API, embedded steampunk, ABAP Environment,
-  BTP ABAP, restricted ABAP, API contract, C1 release, cloud-ready, ABAP for Cloud Development.
+trigger:
+  keywords: [abap-cloud, steampunk, released-api, embedded-steampunk, btp-abap, restricted-abap, api-contract, c1-release, cloud-ready, cloud-development]
+  intent: >-
+    ABAP Cloud development with released APIs only, ADT-only, BTP ABAP Environment, and cloud-ABAP lifecycle management.
 ---
 
 # ABAP Cloud / Steampunk

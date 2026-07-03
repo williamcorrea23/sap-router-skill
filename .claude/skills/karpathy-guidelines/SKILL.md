@@ -2,6 +2,10 @@
 name: karpathy-guidelines
 description: "Behavioral guidelines to reduce common LLM coding mistakes. Use when writing, reviewing, or refactoring code to avoid overcomplication, make surgical changes, surface assumptions, and define verifiable success criteria. Adapted for SAP ABAP development."
 license: MIT
+trigger:
+  keywords: [Karpathy, behavioral guidelines, LLM coding mistakes, overcomplication, surgical changes, assumptions, verifiable success, caveman compression, ABAP development, code quality]
+  intent: >-
+    Apply behavioral guidelines to reduce LLM coding mistakes — surface assumptions, make surgical changes, and verify outcomes in SAP ABAP/BTP development.
 ---
 
 # Karpathy Guidelines — SAP Edition

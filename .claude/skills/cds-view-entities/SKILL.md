@@ -1,6 +1,10 @@
 ---
 name: cds-view-entities
 description: CDS View Entities — DEFINE VIEW ENTITY, DDL source, CDS annotations (@Semantics, @ObjectModel, @EndUserText), associations and compositions, path expressions, input parameters, EXTEND VIEW ENTITY, CDS hierarchy, CDS table functions, Metadata Extensions (MDE). Use when defining CDS views, writing DDL sources, annotating CDS entities for Fiori/OData, or extending SAP CDS views.
+trigger:
+  keywords: [CDS, DEFINE VIEW ENTITY, DDL, annotation, @Semantics, @ObjectModel, association, composition, EXTEND VIEW, Metadata Extension, MDE, table function, hierarchy]
+  intent: >-
+    Define CDS view entities, write DDL sources, apply annotations for Fiori/OData, and extend SAP CDS views.
 ---
 
 # CDS View Entities

@@ -1,6 +1,10 @@
 ---
 name: sap-ai-core
 description: SAP AI Core — ML model deployment, AI workflows, AI API, model serving (vLLM, Triton), scenario management, execution scheduling, resource groups, artifact management, SAP AI Launchpad, integration with CAP/Fiori. Use when deploying ML models on SAP BTP, creating AI workflows, or integrating AI inference into SAP applications.
+trigger:
+  keywords: [ai-core, ml, model, deployment, workflow, vllm, triton, btp, inference, launchpad]
+  intent: >-
+    Use when deploying, serving, or managing ML models on SAP AI Core (BTP), creating AI workflows, or integrating AI inference into SAP applications.
 ---
 
 # SAP AI Core

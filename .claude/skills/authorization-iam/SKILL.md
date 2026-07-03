@@ -30,18 +30,18 @@ trigger:
 # SAP Authorization & IAM
 
 Authorization in SAP is a chain: **user → role → profile → auth object → field values**.
-Every `AUTHORITY-CHECK` walks this chain at runtime. Miss any link and the check silently passes or fails.
+Every `AUTHORITY-CHECK` walks this chain at runtime.
 
 ## Prerequisites
 
 - SAP GUI or ADT access (SU01, SU21, PFCG, SU53)
 - ABAP development rights (S_DEVELOP with ACTVT 03+)
-- For S/4HANA IAM: Fiori launchpad admin access (business role apps)
+- For S/4HANA IAM: Fiori launchpad admin access
 - For BTP: `cf` CLI + XSUAA service instance
 
 ## 1. AUTHORITY-CHECK (ABAP)
 
-The fundamental building block. Always check `sy-subrc` immediately — no exceptions.
+Always check `sy-subrc` immediately — no exceptions.
 
 ```abap
 " Check before any sensitive operation
@@ -58,8 +58,7 @@ ENDIF.
 **Custom auth object** (create via SU21):
 
 ```abap
-" Object: ZROUTER | Class: ZR
-" Fields: ACTVT (Activity), MODULE (Module filter)
+" Object: ZROUTER | Class: ZR | Fields: ACTVT, MODULE
 AUTHORITY-CHECK OBJECT 'ZROUTER'
   ID 'ACTVT' FIELD '03'
   ID 'MODULE' FIELD 'MM'.
@@ -70,19 +69,18 @@ ENDIF.
 
 ## 2. S_TABU_DIS — Table-Level Authorization
 
-Controls access to tables/views via SM30, SM31, SE16, SE16N.
+Controls access via SM30, SM31, SE16, SE16N.
 
 ```abap
-" Check table group authorization before direct table access
 AUTHORITY-CHECK OBJECT 'S_TABU_DIS'
   ID 'ACTVT' FIELD '03'          " 03=Display 02=Change
   ID 'DICBERICH' FIELD lv_group. " Authorization group (e.g. 'ZMM')
 IF sy-subrc <> 0.
-  " Deny — user cannot view tables in group lv_group
+  " Denied — user cannot view tables in group lv_group
 ENDIF.
 ```
 
-> Find the auth group of a table: SE11 → table → Delivery/Maintenance tab → Auth. Group field.
+> Find auth group of a table: SE11 → table → Delivery/Maintenance tab → Auth. Group.
 > Tables without a group use `&NC&`.
 
 ## 3. Role Design (PFCG)
@@ -97,32 +95,22 @@ Role: ZROUTER_MM_FULL
 └── S_TABU_DIS: ACTVT=02, DICBERICH=ZMM
 ```
 
-Copyable PFCG workflow:
-
-```
-1. SU24 → maintain default auth values for transaction codes
-2. PFCG → create single role → add transactions → generate profile
-3. PFCG → User tab → assign users → User Comparison (full)
-4. Verify: SU53 (user's effective auths) / SUIM (role reports)
-```
+PFCG workflow: `1. SU24 → maintain default auth values → 2. PFCG → single role → add transactions → generate profile → 3. User tab → assign users → User Comparison (full) → 4. Verify: SU53 / SUIM`
 
 > **Rule**: Always run user comparison after assigning users. Uncompared roles are inactive.
 
 ## 4. S/4HANA IAM (Business Roles & Catalogs)
 
-S/4HANA replaces classic PFCG roles with **business roles** built from **business catalogs**.
+S/4HANA replaces PFCG roles with **business roles** built from **business catalogs**.
 
 ```
-Business Role: Z_PURCHASER (ZBR_PURCHASER)
-├── Catalog: SAP_MM_BC_PURCHASING_PC
-│   └── Restrictions: Plant=1000,2000 | PurGroup=P01,P02
-├── Catalog: SAP_FI_BC_GL_POST
-│   └── Restrictions: CompanyCode=1000 (overlay)
-└── Assigned to: business users via Maintain Business Roles app
+Business Role: ZBR_PURCHASER
+├── Catalog: SAP_MM_BC_PURCHASING_PC  (Restrictions: Plant=1000,2000)
+├── Catalog: SAP_FI_BC_GL_POST        (Restrictions: CompanyCode=1000)
+└── Assigned via Maintain Business Roles app
 ```
 
 Create custom catalogs via **IAM Information System** (app `SUI`).
-
 > Business catalogs are SAP-delivered. Never modify standard catalogs — create overlays instead.
 
 ## 5. CDS Access Control (DCL)
@@ -187,11 +175,11 @@ Generate from CAP model: `cds add xsuaa`
 
 ## Pitfalls
 
-- **sy-subrc semantics**: `0` = authorized. Non-zero = denied *or auth object not in profile*. An auth object absent from the user's profile returns non-zero.
+- **sy-subrc semantics**: `0` = authorized. Non-zero = denied **or auth object not in profile**. Auth object absent from user's profile returns non-zero.
 - **Missing auth object**: If an auth object is not maintained anywhere, `AUTHORITY-CHECK` always fails. Use SU53 to diagnose.
-- **SU53 only shows the LAST failed check** — instruct users to run it immediately after denial.
-- **DCL roles ≠ ABAP auth checks**: CDS DCL filters rows at DB level; AUTHORITY-CHECK validates in ABAP. You need both for full coverage.
-- **User comparison forgotten**: PFCG roles without comparison are inactive — users get no authorizations despite assignment.
+- **SU53 only shows LAST failed check** — instruct users to run it immediately after denial.
+- **DCL roles != ABAP auth checks**: CDS DCL filters rows at DB level; AUTHORITY-CHECK validates in ABAP. Both needed for full coverage.
+- **User comparison forgotten**: PFCG roles without comparison are inactive.
 - **SAP_ALL in production**: Never assign SAP_ALL in PRD. Use SAP_NEW only temporarily during upgrades.
 - **Wildcard `*` in ACTVT**: Grants all activities including delete. Use sparingly.
 - **SU24 defaults skipped**: Not maintaining SU24 means PFCG won't propose auth objects automatically.
@@ -199,36 +187,11 @@ Generate from CAP model: `cds add xsuaa`
 ## Verification
 
 ```bash
-# ABAP: Check user's effective authorizations
-# SU53      → Last failed auth check (run immediately after denial)
-# SUIM      → User → Roles → By role name
-# SU56      → Display user's authorization buffer
-# ST01      → Authorization trace (activate, reproduce, analyze)
-
-# PFCG: Verify role generation
-# PFCG → Role → Authorizations tab → Status must show green (full generated)
-
-# CDS DCL: Verify access control is active
-# ADT: Open DCL source → Check activation status
-# SE11: View → Display → Authorizations → Check if DCL applies
-
-# BTP XSUAA: Verify role collection assignment
-cf security groups
-cf roles --user <email>
-```
-
-```abap
-" Programmatic verification snippet
-REPORT zauth_verify.
-PARAMETERS: p_user TYPE xubname DEFAULT sy-uname,
-            p_obj  TYPE agobject,
-            p_act  TYPE activ_auth DEFAULT '03'.
-START-OF-SELECTION.
-  AUTHORITY-CHECK OBJECT p_obj
-    ID 'ACTVT' FIELD p_act.
-  IF sy-subrc = 0.
-    WRITE: / p_user, 'HAS', p_obj, p_act.
-  ELSE.
-    WRITE: / p_user, 'LACKS', p_obj, p_act, '(sy-subrc =', sy-subrc, ')'.
-  ENDIF.
+# SU53  → Last failed auth check (run immediately after denial)
+# SUIM  → User → Roles → By role name
+# SU56  → Display user's authorization buffer
+# ST01  → Authorization trace (activate, reproduce, analyze)
+# PFCG  → Role → Authorizations tab → green status = generated
+# ABAP: AUTHORITY-CHECK OBJECT obj ID 'ACTVT' FIELD act → sy-subrc=0 = authorized
+# BTP:  cf security groups; cf roles --user <email>
 ```

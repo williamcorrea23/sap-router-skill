@@ -1,6 +1,10 @@
 ---
 name: abap
 description: General ABAP development reference — ABAP language syntax, data types, internal tables, field symbols, MODULE POOL, function modules, classical dynpro, selection screens, ALV, batch input, BDC, FILE handling, RFC development, ABAP memory, SAP Memory. Use for general ABAP questions, ABAP syntax help, classical ABAP patterns (non-OO), dynpro/selection screen development, or ALV report creation.
+trigger:
+  keywords: [abap, syntax, internal-tables, field-symbols, alv, function-module, dynpro, selection-screen, bdc, rfc]
+  intent: >-
+    General ABAP development reference covering syntax, classical patterns, ALV reports, dynpro, and data types.
 ---
 
 # ABAP Development Reference

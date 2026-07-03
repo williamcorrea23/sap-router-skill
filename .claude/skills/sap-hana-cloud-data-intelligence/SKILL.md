@@ -1,6 +1,10 @@
 ---
 name: sap-hana-cloud-data-intelligence
 description: SAP HANA Cloud Data Intelligence — data integration pipelines, data quality rules, metadata catalog, data lineage, SAP Data Intelligence Cloud, data governance, ETL orchestration, connection management. Use when building data pipelines with SAP DI Cloud, implementing data quality checks, managing metadata catalogs, or integrating S/4HANA data with HANA Cloud analytics.
+trigger:
+  keywords: [hana-cloud, data-intelligence, pipelines, data-quality, metadata, lineage, etl, governance, di-cloud, s4hana]
+  intent: >-
+    Build data pipelines, implement data quality checks, and manage metadata catalogs with SAP Data Intelligence Cloud to integrate S/4HANA data with HANA Cloud analytics.
 ---
 
 # SAP HANA Cloud Data Intelligence

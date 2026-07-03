@@ -1,6 +1,10 @@
 ---
 name: atc-cloudification
 description: ATC cloudification and code quality — ABAP Test Cockpit check variants, custom ATC checks (SCI), ATC exemption management, CI/ATC in transport pipelines, central ATC system, S/4HANA custom code migration checks. Use when running ATC checks, configuring check variants, creating custom ATC checks, or setting up quality gates for ABAP transports.
+trigger:
+  keywords: [ATC, ABAP Test Cockpit, check variant, SCI, custom check, code quality, S/4HANA migration, exemption, quality gate, transport pipeline]
+  intent: >-
+    Run ABAP Test Cockpit checks, configure check variants, create custom SCI checks, manage exemptions, and set up quality gates for ABAP transports.
 ---
 
 # ATC Cloudification

@@ -1,6 +1,10 @@
 ---
 name: sap-sac-custom-widget
 description: SAP Analytics Cloud Custom Widgets — web component development, widget manifest, data binding, styling, deployment to SAC tenant, custom analytics extensions. Use when building custom SAC widgets, extending SAC analytic applications, or integrating external charts and visualizations into SAC.
+trigger:
+  keywords: [custom widget, web component, SAC, analytics cloud, widget manifest, data binding, deployment, analytics extensions, visualization]
+  intent: >-
+    Use when building custom SAC widgets, extending SAC analytic applications, or integrating external charts and visualizations into SAC.
 ---
 
 # SAP Analytics Cloud Custom Widgets

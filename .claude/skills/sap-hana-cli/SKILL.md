@@ -1,6 +1,10 @@
 ---
 name: sap-hana-cli
 description: SAP HANA CLI and Database Explorer — hdbsql command-line tool, HANA Database Explorer in BAS, SQL console, catalog browser, security manager, trace configuration, backup management. Use when accessing HANA via command line, running SQL queries against HANA, or managing HANA database artifacts.
+trigger:
+  keywords: [hana, cli, hdbsql, database-explorer, sql, catalog, security, trace, backup, command-line]
+  intent: >-
+    Access and manage SAP HANA databases via command-line tools, Database Explorer, SQL console, and administration utilities.
 ---
 
 # SAP HANA CLI and Database Explorer

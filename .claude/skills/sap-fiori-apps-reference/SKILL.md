@@ -1,6 +1,10 @@
 ---
 name: sap-fiori-apps-reference
 description: SAP Fiori Apps Reference — Fiori app library navigation, app ID lookup (Fxxxx), SAP Fiori lighthouse apps, app activation in S/4HANA (F1748), business role assignment, tile catalog management, Spaces and Pages configuration, SAP Mobile Start. Use when looking up Fiori app IDs, activating Fiori apps, or configuring the Fiori Launchpad content catalog.
+trigger:
+  keywords: [fiori, apps, library, app-id, activation, s4hana, tile, catalog, launchpad, spaces]
+  intent: >-
+    Look up Fiori app IDs, activate Fiori apps in S/4HANA, and configure the Fiori Launchpad content catalog including tiles, roles, spaces, and pages.
 ---
 
 # SAP Fiori Apps Reference

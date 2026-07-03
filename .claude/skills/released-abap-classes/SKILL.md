@@ -1,6 +1,10 @@
 ---
 name: released-abap-classes
 description: SAP released ABAP APIs — C1/C2/C3/sAPIsC0 release contracts, released class hierarchies (cl_abap*, cl_system*, xco*, cl_bali*), API contract verification, ABAP Cloud compatibility checking, SAP API release lifecycle. Use when checking if a SAP class is released for customer use, selecting APIs for ABAP Cloud development, or verifying release contracts.
+trigger:
+  keywords: [released, abap, classes, apis, release-contracts, c1, c2, cloud, compatibility, sap-classes]
+  intent: >-
+    Use when checking SAP class release contracts (C0-C4), verifying ABAP Cloud API compatibility, or selecting released APIs for development.
 ---
 
 # SAP Released ABAP APIs

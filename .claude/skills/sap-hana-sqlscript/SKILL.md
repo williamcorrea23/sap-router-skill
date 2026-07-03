@@ -15,6 +15,8 @@ trigger:
     - HANA table function
     - CE function
     - plan visualizer
+  intent: >-
+    Write and optimize SAP HANA SQLScript procedures, table functions, AMDP classes, and calculation views.
   file_patterns:
     - "*.hdbprocedure"
     - "*.hdbtablefunction"

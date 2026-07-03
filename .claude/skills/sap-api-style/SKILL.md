@@ -1,6 +1,10 @@
 ---
 name: sap-api-style
 description: SAP API documentation standards — OData API documentation guidelines, REST API style guide, OpenAPI/Swagger specs for SAP services, API naming conventions, SAP API Business Hub documentation requirements. Use when documenting SAP APIs, creating OpenAPI specs for SAP services, or reviewing API documentation against SAP standards.
+trigger:
+  keywords: [api, odata, rest, openapi, swagger, documentation, style, naming, business-hub, specs]
+  intent: >-
+    Document SAP APIs following OData and REST style guide standards, including OpenAPI/Swagger specs and API Business Hub requirements.
 ---
 
 # SAP API Style Guide

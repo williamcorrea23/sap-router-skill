@@ -1,6 +1,10 @@
 ---
 name: sap-fiori-tools
 description: SAP Fiori Tools — Fiori Elements List Report, Object Page, Overview Page configuration, manifest.json settings, annotation-driven UI, custom actions, custom columns, visual filters, flexible column layout, side drawer navigation. Use when configuring Fiori Elements apps, adding custom actions to List Reports, or setting up Fiori application layouts.
+trigger:
+  keywords: [fiori-elements, list-report, object-page, manifest, annotations, custom-actions, visual-filters, flexible-column, side-drawer, layout]
+  intent: >-
+    Configure and extend SAP Fiori Elements applications using manifest.json settings, annotations, custom actions, columns, filters, and layout options.
 ---
 
 # SAP Fiori Tools

@@ -11,6 +11,8 @@ trigger:
     - rap service
     - draft enabled bo
     - restful application programming model
+  intent: >-
+    Generate complete SAP RAP business objects with BDEF, behavior implementation, CDS views, and service bindings.
   patterns:
     - "generate.*rap.*bo"
     - "create.*behavior definition"
@@ -22,7 +24,6 @@ trigger:
 
 RAP = CDS data model + behavior definition + behavior implementation + service exposure.
 One root entity per BO. Compositions link child nodes. Managed = runtime handles CRUD automatically.
-
 ## Prerequisites
 
 - ABAP 7.57+ (Cloud or on-premise S/4HANA 2020+); ADT with RAP support
@@ -186,13 +187,11 @@ aibap: run_unit_tests(["ZBP_I_PRODUCT"])
 " 1. Activate in order: Table → CDS → BDEF → Impl → Projection → Svc Def → Svc Binding
 " 2. Preview service binding → OData $metadata must list entity + draft actions
 " 3. Test draft flow: Create → Edit → Save → Verify active record in ZPRODUCT
-" 4. Run behavior unit tests:
-aibap: run_unit_tests(["ZBP_I_PRODUCT"])
+" 4. Run behavior unit tests: aibap: run_unit_tests(["ZBP_I_PRODUCT"])
 " 5. Verify ETag: LastChangedAt must update on each modify
 ```
 
 ## Custom Entity (query-only, no persistence)
-
 ```cds
 @ObjectModel.query.implementedBy: 'ABAP:ZCL_CUSTOM_QUERY'
 define custom entity Z_C_CUSTOM_SEARCH {

@@ -1,6 +1,10 @@
 ---
 name: sap-cloud-sdk-ai
 description: SAP Cloud SDK for AI — generative AI hub SDK, LLM orchestration, prompt templating, model selection, orchestration service for multi-step AI workflows, document grounding, retrieval augmented generation (RAG). Use when building AI agents with SAP Cloud SDK, calling LLMs via SAP BTP GenAI Hub, or implementing RAG patterns with SAP data.
+trigger:
+  keywords: [ai, sdk, generative, llm, orchestration, rag, prompt, btp, genai, models]
+  intent: >-
+    Build AI agents and orchestrate LLMs on SAP BTP using the Cloud SDK for AI, including prompt templating, RAG, and model selection.
 ---
 
 # SAP Cloud SDK for AI
