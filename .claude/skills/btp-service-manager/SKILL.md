@@ -1,7 +1,9 @@
 ---
 name: btp-service-manager
 description: SAP BTP Service Manager — service instance lifecycle, binding, service keys, instance sharing, and provisioning troubleshooting.
-trigger: user asks about creating BTP service instances, binding services, service keys, or fixing provisioning failures
+trigger:
+  keywords: [service instance, service binding, service key, instance sharing, provisioning, unbind, delete service, BTP service lifecycle]
+  intent: Manage SAP BTP service instance lifecycle — create, bind, share, unbind, and delete service instances with service keys
 ---
 
 # SAP BTP Service Manager

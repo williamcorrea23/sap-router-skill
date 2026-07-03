@@ -23,7 +23,7 @@ from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-__version__ = "5.0.0"
+__version__ = "4.2.0"
 
 # === ZROUTER LIVE STATE (probe cache, used by bootstrap/fallback engine) ===
 # Cached probe result. None=not checked, True=installed, False=missing

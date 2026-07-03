@@ -1214,4 +1214,3 @@ client.publish(
 | `authorization-iam` | Authorization considerations for event payload data |
 | `sap-transport-management` | Transport lifecycle for RAP artifacts including event bindings |
 | `abap-code-review` | Pre-release quality reviews including event-related code |
-| `sap-integration-wiki` | Cross-system integration patterns including Event Mesh |

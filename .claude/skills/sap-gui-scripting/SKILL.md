@@ -39,7 +39,7 @@ Uses mario-andreschak/mcp-sap-gui (TypeScript) or kts982/mcp-sap-gui (Python).
   "mcp-sap-gui": {
     "type": "stdio",
     "command": "node",
-    "args": ["/opt/data/mcp-sap-gui/dist/index.js"],
+    "args": ["./mcp-sap-gui/dist/index.js"],
     "env": {
       "SAPGUI_HOST": "${SAPGUI_HOST}",
       "SAPGUI_USER": "${SAPGUI_USER}",
@@ -167,13 +167,10 @@ def route(action, try_adt=True):
 ## Verification
 
 ```bash
-# Verify local prerequisites (env vars, SAP GUI install, win32com)
+# Primary: cross-platform Python check (recommended — works on Windows and Linux)
 python scripts/check_gui_scripting.py --host "$SAPGUI_HOST"
 # or: npm run gui:check
 
-# Verify MCP config exists
+# Supplementary: bash-only MCP config check
 grep -q '"mcp-sap-gui"' .mcp.json && echo "OK: MCP config found" || echo "FAIL: no config"
-
-# Verify environment variables are set
-test -n "$SAPGUI_HOST" && test -n "$SAPGUI_USER" && echo "OK: env set" || echo "FAIL: missing env"
 ```

@@ -20,8 +20,8 @@ Search by: app name, app ID (Fxxxx), transaction code, business role.
 ## App Activation (S/4HANA)
 
 ```
-Transaction: /N/UI2/FLPD_CUST (Fiori Launchpad Designer)
-  → Create Catalog → Add Tile → Select App ID
+Transaction: UI2/FLPD_CUST (Fiori Launchpad Designer)
+  -> Create Catalog -> Add Tile -> Select App ID
     → Configure Target Mapping (semantic object + action)
 
   Transaction: /N/UI2/FLPD_CONF (Fiori Launchpad Content Manager)

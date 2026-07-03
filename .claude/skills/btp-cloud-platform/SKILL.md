@@ -1,7 +1,9 @@
 ---
 name: btp-cloud-platform
 description: SAP BTP Cloud Platform — account hierarchy, entitlements, CLI tools, marketplace services, and platform navigation.
-trigger: user asks about BTP cockpit, subaccounts, entitlements, btp CLI vs cf CLI, or platform account structure
+trigger:
+  keywords: [BTP cockpit, subaccounts, entitlements, btp CLI, cf CLI, account model, marketplace, service marketplace, platform navigation, global account]
+  intent: Navigate SAP BTP platform account model, manage entitlements, and choose the right CLI tool for platform operations
 ---
 
 # SAP BTP Cloud Platform

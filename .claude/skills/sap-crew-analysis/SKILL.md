@@ -31,8 +31,8 @@ Clean ABAP compliance score. 7 agents, 13 tools, 4 phases. Runs locally — no d
 ## Prerequisites
 
 ```bash
-# 1. Clone the crew agent repo
-git clone https://github.com/your-org/sap-crew-agent.git ~/sap-crew-agent
+# 1. Clone the crew agent repo (replace with actual URL)
+git clone <your-sap-crew-agent-repo-url> ~/sap-crew-agent
 
 # 2. Install Python dependencies
 cd ~/sap-crew-agent/sap-crew-agent && pip install -r requirements.txt

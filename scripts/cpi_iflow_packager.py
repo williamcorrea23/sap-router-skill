@@ -358,9 +358,10 @@ def cmd_extract(args):
                 print(f"WARNING: Skipping suspicious path: {info.filename}", file=sys.stderr)
                 continue
             zf.extract(info, output_dir)
+        file_count = len(zf.namelist())
 
     print(f"Extracted {input_path} -> {output_dir}")
-    print(f"  Files extracted: {len(zf.namelist())}")
+    print(f"  Files extracted: {file_count}")
     return 0
 
 

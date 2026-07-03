@@ -143,11 +143,13 @@ python scripts/cpi_iflow_packager.py validate --input iflows/my-iflow.zip
 ## Step 5 — Lint Before Deploy
 
 ```bash
-# Lint Groovy script
-cpi_lint --code "$(cat iflows/my-integration-flow/src/main/resources/script/process-data.groovy)"
+# Lint Groovy script via Hermes MCP cpi_lint tool
+# Call: mcp__hermes-crewai__cpi_lint with the Groovy script content
+```
 
-# Lint flow.xml
-cpi_lint --code "$(cat iflows/my-integration-flow/src/main/resources/flow.xml)"
+```bash
+# Validate iFlow XML via Hermes MCP cpi_lint tool
+# Call: mcp__hermes-crewai__cpi_lint with the flow.xml content
 ```
 
 Key lint rules: hardcoded passwords → error, no exception subprocess → warning,
@@ -156,14 +158,10 @@ Key lint rules: hardcoded passwords → error, no exception subprocess → warni
 ## Step 6 — Deploy to CPI Tenant
 
 ```bash
-# List existing packages
-cpi_mcp --tool list_integration_flows
-
-# Deploy iFlow from source ZIP
-cpi_mcp --tool deploy_artifact --params '{"artifactId":"my_iflow","artifactType":"IntegrationFlow"}'
-
-# Check failed messages
-cpi_mcp --tool get_runtime_stats --params '{"artifactName":"my_iflow"}'
+# List packages: call MCP tool mcp__mcp-integration-suite__packages
+# Deploy iFlow: call MCP tool mcp__mcp-integration-suite__deploy-iflow
+# Check messages: call MCP tool mcp__mcp-integration-suite__get-messages
+# Check runtime: call Hermes MCP tool mcp__hermes-crewai__cpi_mcp
 ```
 
 ## Integration Patterns
@@ -192,9 +190,9 @@ cpi_mcp --tool get_runtime_stats --params '{"artifactName":"my_iflow"}'
 
 ## Verification
 
-1. **Lint passes**: `cpi_lint` returns zero errors on all scripts and flow.xml
+1. **Lint passes**: Call MCP tool `cpi_lint` (Hermes MCP) on all scripts and flow.xml — zero errors
 2. **ZIP validates**: Packager `validate` command exits 0
-3. **Deploy succeeds**: `cpi_mcp get_runtime_stats` shows artifact in "Started" state
+3. **Deploy succeeds**: Call Integration Suite MCP `get-messages` or Hermes MCP `cpi_mcp` — artifact shows "Started"
 4. **Test message flows**: Send test payload via HTTPS endpoint, check CPI Web UI → Monitor → Messages for successful processing
 5. **Trace enabled**: CPI Web UI → Monitor → Trace shows input/output payloads at each step
 6. **Error subprocess works**: Inject invalid payload, verify exception subprocess triggers and MessageLog shows "FAILED" status

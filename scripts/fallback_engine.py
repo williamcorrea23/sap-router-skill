@@ -316,7 +316,11 @@ class TieredFallback:
     def _attempt_rfc(self, action: str, payload: Optional[dict[str, Any]],
                      module: Optional[str]) -> dict[str, Any]:
         """Tier 2: Try ZROUTER RFC. Auto-repair partial installations."""
-        from scripts.sap_router import get_zrouter_state
+        try:
+            from scripts.sap_router import get_zrouter_state
+        except ImportError:
+            sys.path.insert(0, str(SKILL_DIR))
+            from scripts.sap_router import get_zrouter_state
 
         state = get_zrouter_state()
         if state is False or state is None:
@@ -326,6 +330,9 @@ class TieredFallback:
             if partial.get("repairable"):
                 bapi_name = "BAPI_XM_RUN"
                 try:
+                    from scripts.sap_router import FUNCTIONAL_BAPI_MAP
+                except ImportError:
+                    sys.path.insert(0, str(SKILL_DIR))
                     from scripts.sap_router import FUNCTIONAL_BAPI_MAP
                     for key, bapi in FUNCTIONAL_BAPI_MAP.items():
                         if key in action.upper():
@@ -382,7 +389,11 @@ class TieredFallback:
 
     def _check_partial_zrouter(self):
         """Check if ZROUTER is partially installed and can be repaired."""
-        from scripts.zrouter_bootstrap import ZROUTER_REQUIRED_OBJECTS
+        try:
+            from scripts.zrouter_bootstrap import ZROUTER_REQUIRED_OBJECTS
+        except ImportError:
+            sys.path.insert(0, str(SKILL_DIR))
+            from scripts.zrouter_bootstrap import ZROUTER_REQUIRED_OBJECTS
 
         installed = []
         missing_critical = []

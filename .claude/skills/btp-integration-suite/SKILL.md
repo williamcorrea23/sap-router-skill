@@ -69,14 +69,10 @@ Sender (HTTPS/SFTP/IDoc) → Content Modifier → Groovy Script → Request-Repl
 Deploy and monitor via MCP:
 
 ```bash
-# List deployed iFlows
-cpi_mcp --tool list_integration_flows
-
-# Deploy new iFlow
-cpi_mcp --tool deploy_artifact --params '{"artifactId":"my_iflow","artifactType":"IntegrationFlow"}'
-
-# Check failed messages
-cpi_mcp --tool get_runtime_stats --params '{"range":"24h"}'
+# List deployed iFlows: call MCP tool mcp__mcp-integration-suite__get-all-iflows
+# Deploy new iFlow: call MCP tool mcp__mcp-integration-suite__deploy-iflow
+# Check failed messages: call MCP tool mcp__mcp-integration-suite__get-messages
+# Get runtime stats: call Hermes MCP tool mcp__hermes-crewai__cpi_mcp
 ```
 
 ## Step 3 — Set Up API Management
@@ -154,7 +150,7 @@ Supported connectors: Salesforce, ServiceNow, Workday, SharePoint, Box, Slack, a
 ## Verification
 
 1. **Integration Suite enabled**: BTP Cockpit → Services → Instances shows Integration Suite in "Started" state
-2. **CPI accessible**: `cpi_mcp --tool list_integration_flows` returns flow list without error
+2. **CPI accessible**: Call Integration Suite MCP `get-all-iflows` or Hermes MCP `cpi_mcp` — returns flow list without error
 3. **API proxy works**: Send request to proxy endpoint, verify rate limiting and auth policies fire
 4. **Trading partner agreement active**: Send test EDI message, verify it routes to correct receiver
 5. **Migration completeness**: All PI/PO interfaces have CPI equivalent deployed and tested end-to-end

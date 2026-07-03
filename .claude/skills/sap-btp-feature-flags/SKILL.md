@@ -175,6 +175,6 @@ curl "https://my-app.cfapps.<region>.hana.ondemand.com/odata/v4/Products/searchP
 # → Should return search results (new or old path depending on flag state)
 
 # 4. Verify audit log in BTP Cockpit
-# Navigate: BTP Cockpit → Subaccount → Feature Flags → Dashboard → Audit Log
-# → Should show all flag changes with timestamp and user
+# Navigate: BTP Cockpit -> Subaccount -> Feature Flags -> Dashboard
+# Note: Audit Log tab availability depends on your Feature Flags service plan
 ```

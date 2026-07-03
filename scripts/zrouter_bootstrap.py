@@ -168,7 +168,6 @@ class ZrouterProbe:
 
     def probe_via_adt(self):
         self.results["probe_method"] = "ADT"
-        self.results["available_mcps"]["adt"] = True
         for obj in ZROUTER_REQUIRED_OBJECTS:
             info = self._check_object_adt(obj["type"], obj["name"])
             if info["exists"]:
@@ -177,6 +176,9 @@ class ZrouterProbe:
                 self.results["missing_critical"].append(obj)
             else:
                 self.results["missing_non_critical"].append(obj)
+        self.results["available_mcps"]["adt"] = (
+            len(self.results["missing_critical"]) == 0
+        )
         self.results["installed"] = len(self.results["missing_critical"]) == 0
         return self.results["installed"]
 

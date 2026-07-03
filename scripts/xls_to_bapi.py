@@ -405,7 +405,6 @@ class XlsToBapi:
         with open(filepath, mode='r', encoding='utf-8-sig') as f:
             reader = csv.DictReader(f)
             reader.fieldnames = csv_headers
-            next(reader, None)  # Skip header row explicitly
             for idx, row in enumerate(reader, start=2):
                 mapped_row = {}
                 for csv_h, bapi_name in results["field_map"].items():

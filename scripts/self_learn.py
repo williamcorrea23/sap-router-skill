@@ -69,7 +69,7 @@ class SelfLearnEngine:
 
             # Parse learning entries
             if line.startswith('- mcp:'):
-                m = re.match(r'- mcp:(\w+)\s+latency:(\d+)ms\s+success:([\d.]+)\s+last:(\S+)', line)
+                m = re.match(r'- mcp:(\S+)\s+latency:(\d+)ms\s+success:([\d.]+)\s+last:(\S+)', line)
                 if m:
                     self.mcp_stats[m.group(1)] = {
                         'latency_ms': int(m.group(2)),
@@ -78,7 +78,7 @@ class SelfLearnEngine:
                     }
 
             elif line.startswith('- route:'):
-                m = re.match(r'- route:(\w+)\s+total:(\d+)\s+ok:(\d+)\s+fail:(\d+)', line)
+                m = re.match(r'- route:(\S+)\s+total:(\d+)\s+ok:(\d+)\s+fail:(\d+)', line)
                 if m:
                     self.route_success[m.group(1)] = {
                         'total': int(m.group(2)),

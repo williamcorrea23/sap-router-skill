@@ -118,8 +118,11 @@ Via BTP Cockpit → **Transport Management** → **Schedules**:
 # Check CTM service is bound
 cf services | grep cts
 
+# Get CTM instance GUID
+CTM_GUID=$(cf service ctm-dev --guid)
+
 # Verify landscape configuration via API
-cf curl "/v3/service_instances/<ctm-instance-guid>/parameters"
+cf curl "/v3/service_instances/$CTM_GUID/parameters"
 ```
 
 Confirm in BTP Cockpit:

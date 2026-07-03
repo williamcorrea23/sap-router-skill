@@ -45,7 +45,7 @@ stages:
 
   Lint:
     npmLint:
-      command: npm run lint
+      command: npm run abap:lint
 
   Deploy to DEV:
     cfDeploy:

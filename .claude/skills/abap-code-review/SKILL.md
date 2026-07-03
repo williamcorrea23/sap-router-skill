@@ -25,21 +25,21 @@ sap-workflow-pipeline stages 3 (proposal review) and 7 (code review).
 ## Prerequisites
 
 - abaplint installed: `npx abaplint --version`
-- abaplint config at `/opt/data/abaplint.json`
+- abaplint config in `package.json` `abaplint` key (or root `abaplint.json`)
 - ATC accessible via ADT or `mcp_hermes_unified_sap_adt_cli`
-- Source code accessible at `/opt/data/src/`
+- ABAP source code in `templates/` directory
 
 ## 1. Run Static Analysis
 
 ```bash
 # Lint all ABAP source files
-npx abaplint --config /opt/data/abaplint.json "/opt/data/src/**/*.abap" > /opt/data/reports/lint.json
+npx abaplint templates/**/*.abap > reports/lint.json
 
 # Security-focused review
-npx abaplint --config /opt/data/abaplint.json --rule "*security*" "/opt/data/src/**/*.abap"
+npx abaplint --rule "*security*" templates/**/*.abap
 
 # Clean code score
-npx abaplint --config /opt/data/abaplint.json --rule "clean_code" "/opt/data/src/**/*.abap"
+npx abaplint --rule "clean_code" templates/**/*.abap
 ```
 
 ## 2. 9-Dimension Review
@@ -64,7 +64,7 @@ npx abaplint --config /opt/data/abaplint.json --rule "clean_code" "/opt/data/src
 
 ```bash
 # Create review report from lint output
-cat > /opt/data/reports/REVIEW_2.md << 'EOF'
+cat > reports/REVIEW_2.md << 'EOF'
 # ABAP Code Review — {Object Name}
 Date: {date} | Transport: {TR number}
 
@@ -102,7 +102,7 @@ EOF
   - Solution: Single CRITICAL = mandatory NO-GO. No exceptions.
 - **FUNC dimension without module expertise**:
   - Cause: Reviewer lacks module-specific config knowledge.
-  - Solution: Cross-reference `/opt/data/module_maps/` for config validation.
+  - Solution: Cross-reference `references/module_maps/` for config validation.
 - **Stage 7 ignores Stage 3**:
   - Cause: Reviewer treats Stage 7 as standalone, losing prior context.
   - Solution: Stage 7 report must explicitly address each Stage 3 finding.
@@ -111,14 +111,14 @@ EOF
 
 ```bash
 # Verify lint report was generated
-test -f /opt/data/reports/lint.json && echo "OK: lint report exists" || echo "FAIL: no lint report"
+test -f reports/lint.json && echo "OK: lint report exists" || echo "FAIL: no lint report"
 
 # Verify no CRITICAL findings in lint output
-grep -c '"severity":"critical"' /opt/data/reports/lint.json | xargs -I{} test {} -eq 0 && echo "OK: 0 critical" || echo "FAIL: critical findings present"
+grep -c '"severity":"critical"' reports/lint.json | xargs -I{} test {} -eq 0 && echo "OK: 0 critical" || echo "FAIL: critical findings present"
 
 # Verify review report has GO/NO-GO
-grep -E "^(GO|NO-GO|CONDITIONAL)" /opt/data/reports/REVIEW_2.md && echo "OK: decision present" || echo "FAIL: no decision"
+grep -E "^(GO|NO-GO|CONDITIONAL)" reports/REVIEW_2.md && echo "OK: decision present" || echo "FAIL: no decision"
 
 # Check for SELECT * in source (should be 0)
-grep -rn "SELECT \*" /opt/data/src/ && echo "FAIL: SELECT * found" || echo "OK: no SELECT *"
+grep -rn "SELECT \*" templates/ && echo "FAIL: SELECT * found" || echo "OK: no SELECT *"
 ```

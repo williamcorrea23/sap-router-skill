@@ -131,7 +131,7 @@ lo_file->upload_file(
 
 ```bash
 # 1. Verify service instance exists and is running
-cf service my-doc-store
+cf services | grep my-doc-store
 
 # 2. Verify CMIS endpoint responds
 curl -s -o /dev/null -w "%{http_code}" \

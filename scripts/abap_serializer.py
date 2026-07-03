@@ -505,7 +505,7 @@ def cmd_package(args):
 def cmd_list_formats(args):
     """List all known formats with description."""
     print("""
-ABAP Serialization Formats — Supported Outputs
+ABAP Serialization Formats - Supported Outputs
 ===============================================
 
 Format     File(s)              Based on                Import/Export
@@ -516,14 +516,14 @@ abapgit    {name}.{typ}.xml     abapGit                 Both (meta + source)
 xml        {name}_zdload.xml    ZDOWNLOAD tables         Export only
 
 ZDOWNLOAD metadata tables referenced:
-  TRDIR        — program headers (NAME, SUBC, RSTAT, VARCL)
-  TFDIR        — function module registry
-  VSEOCLASS    — OO class definitions (CLSNAME, STATE, CLSCCINCL)
-  VSEOINTERF   — OO interface definitions
-  DD02L        — table/structure headers
-  DD40L        — table type headers
-  D020S        — screen headers
-  D022S        — screen flow logic
+  TRDIR        - program headers (NAME, SUBC, RSTAT, VARCL)
+  TFDIR        - function module registry
+  VSEOCLASS    - OO class definitions (CLSNAME, STATE, CLSCCINCL)
+  VSEOINTERF   - OO interface definitions
+  DD02L        - table/structure headers
+  DD40L        - table type headers
+  D020S        - screen headers
+  D022S        - screen flow logic
 """)
 
 

@@ -96,7 +96,6 @@ npm run abap:review:transport
 ## Related
 
 - **sap-router-skill** — master routing tree (ADT -> arc-1 first, GUI fallback)
-- **sap-adt-cli** — ADT REST access via CLI when MCP tooling is unavailable
 - **abap-code-review** — 9-dimension GO/NO-GO gate before SAPTransport release
 - **sap-transport-gate / sap-transport-management** — transport landscape rules
 - **karpathy-guidelines** — Think, Simplify, Surgical, Goal-Verify wrapper for every edit

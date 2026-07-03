@@ -1,7 +1,9 @@
 ---
 name: btp-cloud-logging
 description: SAP BTP Cloud Logging — OpenSearch-based centralized logging with structured logs, correlation IDs, Kibana dashboards, and retention management.
-trigger: user asks about cloud logging on BTP, observability, structured logging, log dashboards, or troubleshooting production logs
+trigger:
+  keywords: [cloud logging, OpenSearch, Kibana, structured logging, correlation ID, observability, log retention, log dashboards, BTP logging]
+  intent: Configure SAP BTP Cloud Logging service with structured logs, correlation IDs, and Kibana dashboards
 ---
 
 # SAP BTP Cloud Logging

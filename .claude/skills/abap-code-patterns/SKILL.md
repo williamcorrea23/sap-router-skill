@@ -25,7 +25,7 @@ Validated against Clean ABAP guidelines and abaplint rules.
 ## Prerequisites
 
 - SAP NetWeaver 7.40+ (inline declarations, VALUE, COND, FOR)
-- abaplint configured at `/opt/data/abaplint.json`
+- abaplint configured (config in `package.json` `abaplint` key, or root `abaplint.json`)
 - Access to SE80/ADT for object creation
 
 ## 1. BAPI/RFC Pattern
@@ -139,7 +139,7 @@ SUBMIT (lv_report) VIA SELECTION-SCREEN AND RETURN.
 
 ```bash
 # Lint the ABAP source
-npx abaplint --config /opt/data/abaplint.json src/**/*.abap
+npx abaplint templates/**/*.abap
 
 # Verify BAPI commit pattern present
 grep -rn "BAPI_TRANSACTION_COMMIT" src/ | grep -c "wait.*X"
