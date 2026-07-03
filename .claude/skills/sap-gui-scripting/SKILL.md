@@ -62,7 +62,7 @@ Uses mario-andreschak/mcp-sap-gui (TypeScript) or kts982/mcp-sap-gui (Python).
 ## 3. BDC / Batch Input Pattern
 
 ```python
-# /opt/data/scripts/sap_gui_bdc.py
+# BDC execution helper (illustrative snippet - adapt into your automation)
 import win32com.client
 
 def execute_bdc(session, transaction, bdcdata, mode='N'):
@@ -81,7 +81,7 @@ def execute_bdc(session, transaction, bdcdata, mode='N'):
 # Example: SM30 table maintenance
 BDC_SM30 = [
     {'fields': {'wnd[0]/usr/txtVIEW-AREA': 'ZROUTER_TMPL'},
-     'okcode': '0'}  ➀ Enter
+     'okcode': '0'}  # 0 = Enter
 ]
 session = win32com.client.Dispatch("SapGui.ScriptingCtrl")
 connection = session.OpenConnection(SAPGUI_HOST)
@@ -91,7 +91,7 @@ execute_bdc(connection.Children(0), 'SM30', BDC_SM30)
 ## 4. ALV Grid Reading
 
 ```python
-# /opt/data/scripts/sap_gui_alv.py
+# ALV grid reader (illustrative snippet)
 def read_alv_grid(session, grid_id='wnd[1]/usr/cntlGRID1/shellcont/shell'):
     """Read ALV grid data. Works for MMBE, MB51, ME2M, VA05, FBL1N, KSB1."""
     grid = session.findById(grid_id)
@@ -106,7 +106,7 @@ def read_alv_grid(session, grid_id='wnd[1]/usr/cntlGRID1/shellcont/shell'):
 ## 5. Popup / Modal Handling
 
 ```python
-# /opt/data/scripts/sap_gui_popup.py
+# Popup handler (illustrative snippet)
 def handle_popup(session, button='OK'):
     """Detect and dismiss modal popup. Returns True if handled."""
     try:
@@ -125,7 +125,7 @@ def handle_popup(session, button='OK'):
 ## 6. ADT-First Routing Strategy
 
 ```python
-# /opt/data/scripts/sap_router_fallback.py
+# Routing strategy (illustrative snippet - real engine: scripts/sap_router.py)
 GUI_FALLBACK = [
     'SPRO', 'SM30', 'SU01', 'SU53', 'PFCG', 'SNOTE',
     'MM01', 'MM02', 'ME21N', 'MIGO', 'MMBE',
@@ -167,14 +167,12 @@ def route(action, try_adt=True):
 ## Verification
 
 ```bash
-# Verify SAP GUI scripting is enabled
-python3 /opt/data/scripts/check_gui_scripting.py --host "$SAPGUI_HOST"
+# Verify local prerequisites (env vars, SAP GUI install, win32com)
+python scripts/check_gui_scripting.py --host "$SAPGUI_HOST"
+# or: npm run gui:check
 
 # Verify MCP config exists
-test -f /opt/data/.mcp/sap-gui.json && echo "OK: MCP config found" || echo "FAIL: no config"
-
-# Verify BDC script syntax
-python3 -m py_compile /opt/data/scripts/sap_gui_bdc.py && echo "OK: BDC script valid"
+grep -q '"mcp-sap-gui"' .mcp.json && echo "OK: MCP config found" || echo "FAIL: no config"
 
 # Verify environment variables are set
 test -n "$SAPGUI_HOST" && test -n "$SAPGUI_USER" && echo "OK: env set" || echo "FAIL: missing env"

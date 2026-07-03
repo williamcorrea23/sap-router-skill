@@ -181,9 +181,9 @@ Deploy via `cds deploy` (CAP) or `hdi-deploy` (standalone HDI).
 ## Verification
 
 ```bash
-# Validate HDI artefact syntax (local)
-cd /tmp/sap-router-skill
+# Validate HDI artefact syntax (local, from skill root)
 python scripts/hdi_lint.py --path db/src/procedures/get_material_stock.hdbprocedure
+# or: npm run hana:hdi-lint -- db/src/procedures/
 
 # Check AMDP activation in ABAP (requires ADT CLI)
 python scripts/sap_router.py adt activate ZCL_AMDP_MATERIAL

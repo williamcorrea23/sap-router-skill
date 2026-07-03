@@ -52,7 +52,7 @@ my-iflow.zip/
 Create the project directory and core files:
 
 ```bash
-mkdir -p /opt/data/iflows/my-integration-flow/{src/main/resources/script,src/main/resources/mapping}
+mkdir -p iflows/my-integration-flow/{src/main/resources/script,src/main/resources/mapping}
 ```
 
 Write the `MANIFEST.MF`:
@@ -127,27 +127,27 @@ def Message processData(Message message) {
 ## Step 4 — Package as ZIP
 
 ```bash
-python /opt/data/scripts/cpi_iflow_packager.py create \
+python scripts/cpi_iflow_packager.py create \
   --name my-integration-flow \
-  --flow /opt/data/iflows/my-integration-flow/src/main/resources/flow.xml \
-  --scripts /opt/data/iflows/my-integration-flow/src/main/resources/script/process-data.groovy \
-  --output /opt/data/iflows/my-iflow.zip
+  --flow iflows/my-integration-flow/src/main/resources/flow.xml \
+  --scripts iflows/my-integration-flow/src/main/resources/script/process-data.groovy \
+  --output iflows/my-iflow.zip
 ```
 
 Validate the ZIP structure:
 
 ```bash
-python /opt/data/scripts/cpi_iflow_packager.py validate --input /opt/data/iflows/my-iflow.zip
+python scripts/cpi_iflow_packager.py validate --input iflows/my-iflow.zip
 ```
 
 ## Step 5 — Lint Before Deploy
 
 ```bash
 # Lint Groovy script
-cpi_lint --code "$(cat /opt/data/iflows/my-integration-flow/src/main/resources/script/process-data.groovy)"
+cpi_lint --code "$(cat iflows/my-integration-flow/src/main/resources/script/process-data.groovy)"
 
 # Lint flow.xml
-cpi_lint --code "$(cat /opt/data/iflows/my-integration-flow/src/main/resources/flow.xml)"
+cpi_lint --code "$(cat iflows/my-integration-flow/src/main/resources/flow.xml)"
 ```
 
 Key lint rules: hardcoded passwords → error, no exception subprocess → warning,

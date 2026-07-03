@@ -31,23 +31,23 @@ trigger: bapi, BAPI, rfc, RFC, transaction commit, BAPIRET2, BAPI_TRANSACTION, g
 
 ```bash
 # Buscar na documentação SAP local
-python3 /opt/data/skills/sap/run-sap-router-skill/scripts/sap_router.py route --action CREATE_MATERIAL --module MM
+python scripts/sap_router.py route --action CREATE_MATERIAL --module MM
 # → "ZROUTER RFC"
 
 # Listar BAPIs de um módulo
 grep -A1 "CREATE_MATERIAL\|CREATE_PO\|CREATE_ORDER\|POST_DOCUMENT" \
-  /opt/data/skills/sap/run-sap-router-skill/scripts/xls_to_bapi.py
+  scripts/xls_to_bapi.py
 ```
 
 ### 2. Converter CSV → payload BAPI
 
 ```bash
 # Gerar template
-python3 /opt/data/skills/sap/run-sap-router-skill/scripts/xls_to_bapi.py template \
+python scripts/xls_to_bapi.py template \
   --output tmpl.csv --module MM --action CREATE_MATERIAL
 
 # Converter dados
-python3 /opt/data/skills/sap/run-sap-router-skill/scripts/xls_to_bapi.py convert \
+python scripts/xls_to_bapi.py convert \
   --input data.csv --module MM --action CREATE_MATERIAL
 # Esperado: JSON com payload BAPI_MATERIAL_SAVEDATA
 ```
@@ -88,11 +88,11 @@ ENDIF.
 
 ```bash
 # Validar via sap_router
-python3 /opt/data/skills/sap/run-sap-router-skill/scripts/sap_router.py log-action \
+python scripts/sap_router.py log-action \
   --action CREATE_MATERIAL --module MM --status OK --details "MATNR: 000000000000001234"
 
 # Checar memory
-python3 /opt/data/skills/sap/run-sap-router-skill/scripts/memory_manager.py verify \
+python scripts/memory_manager.py verify \
   --input MEMORY.md
 ```
 
@@ -135,7 +135,7 @@ ENDLOOP.
 
 ```bash
 # Template CSV
-python3 /opt/data/skills/sap/run-sap-router-skill/scripts/xls_to_bapi.py template \
+python scripts/xls_to_bapi.py template \
   --module MM --action CREATE_PO
 ```
 
@@ -151,7 +151,7 @@ python3 /opt/data/skills/sap/run-sap-router-skill/scripts/xls_to_bapi.py templat
 
 ```bash
 # Criar ordem de venda via CSV
-python3 /opt/data/skills/sap/run-sap-router-skill/scripts/xls_to_bapi.py template \
+python scripts/xls_to_bapi.py template \
   --module SD --action CREATE_ORDER
 ```
 
@@ -163,7 +163,7 @@ python3 /opt/data/skills/sap/run-sap-router-skill/scripts/xls_to_bapi.py templat
 | `BAPI_GL_GETACCOUNTSALDO` | Consultar saldo contábil |
 
 ```bash
-python3 /opt/data/skills/sap/run-sap-router-skill/scripts/xls_to_bapi.py template \
+python scripts/xls_to_bapi.py template \
   --module FI --action POST_DOCUMENT
 ```
 
@@ -221,7 +221,7 @@ python3 /opt/data/skills/sap/run-sap-router-skill/scripts/xls_to_bapi.py templat
 
 ```bash
 # Gerar ABAP com placeholders resolvidos
-python3 /opt/data/skills/sap/run-sap-router-skill/scripts/template_repo.py resolve \
+python scripts/template_repo.py resolve \
   --template MM_CREATE_MATERIAL \
   --values '{"HEADER":"ls_header","DESCRIPTION":"ls_desc","RETURN_STRUCT":"ls_ret","MATERIAL_NUMBER":"lv_matnr","DESCRIPTION_TABLE":"lt_desc"}'
 ```
