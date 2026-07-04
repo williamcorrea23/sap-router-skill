@@ -25,51 +25,6 @@ You type **"create material FERT with these fields"** in VS Code chat. The route
 ---
 
 
----
-
-## Quick Overview
-
-```mermaid
-flowchart TB
-    subgraph User["User"]
-        REQ["SAP Development Request"]
-    end
-
-    subgraph Karpathy["Karpathy Wrapper"]
-        direction TB
-        P0["0. Healthcheck — verify .env + MCPs"]
-        P1["1. Think — surface assumptions, state tradeoffs"]
-        P2["2. Simplify — pick simplest path"]
-        P3["3. Surgical — touch only what's needed"]
-        P4["4. Goal-Verify — loop until criteria met"]
-        P0 --> P1 --> P2 --> P3 --> P4
-    end
-
-    subgraph Routing["Self-Learning Router"]
-        R1["Caveman? → cavecrew-investigator/builder/reviewer"]
-        R2["ADT? → arc-1 / aibap"]
-        R3["GUI? → mcp-sap-gui (immediate)"]
-        R4["Batch? → ZROUTER RFC"]
-        R5["Pipeline? → 8-stage workflow"]
-        R6["LLM? → sap-llm-engineering"]
-        R1 --> R2 --> R3 --> R4 --> R5 --> R6
-        LEARN["Self-learn adapts routing weights<br/>based on MCP latency + success rates"]
-        LEARN -.-> R1
-    end
-
-    subgraph Targets["SAP Systems"]
-        S4H["S/4HANA (ADT + RFC + GUI)"]
-        BTP["SAP BTP"]
-        CPI["SAP CPI"]
-        SF["SuccessFactors"]
-        S4H --- BTP --- CPI --- SF
-    end
-
-    REQ --> Karpathy
-    Karpathy --> Routing
-    Routing --> Targets
-```
-
 ## Routing Decision Tree
 
 ```mermaid
@@ -466,54 +421,4 @@ Key integrations:
 PRs and issues welcome. See [SKILL.md](SKILL.md) for the full dispatch table and
 85-skill reference. MIT licensed — use freely.
 
----
-
-## Tags
-
-**SAP Core:**
-`#sap` `#sap-erp` `#sap-s4hana` `#sap-ecc` `#sap-netweaver` `#sap-basis` `#sap-abap`
-`#abap` `#abap-cloud` `#abap-steampunk` `#clean-abap` `#abap-oo` `#abap-cds`
-`#abap-rap` `#abap-adt` `#abap-development` `#abap-code` `#abap-programming`
-
-**SAP Modules:**
-`#sap-mm` `#sap-sd` `#sap-fi` `#sap-co` `#sap-pp` `#sap-qm` `#sap-wm`
-`#sap-ewm` `#sap-hcm` `#sap-pm` `#sap-ps` `#sap-bw`
-
-**SAP BTP & Cloud:**
-`#sap-btp` `#sap-cloud-platform` `#sap-cloud-foundry` `#sap-kyma`
-`#sap-build` `#sap-launchpad` `#sap-workzone` `#sap-ias` `#sap-xsuaa`
-
-**SAP Integration & API:**
-`#sap-cpi` `#sap-pi` `#sap-po` `#sap-api-management` `#sap-apim`
-`#sap-odata` `#sap-gateway` `#sap-idoc` `#sap-rfc` `#sap-bapi`
-`#sap-soap` `#sap-rest` `#sap-event-mesh`
-
-**SAP Fiori & UI:**
-`#sap-fiori` `#sap-fiori-elements` `#sapui5` `#openui5` `#sap-fiori-tools`
-`#sap-screen-personas` `#sap-build-apps`
-
-**SAP HANA & Data:**
-`#sap-hana` `#sap-hana-cloud` `#sap-datasphere` `#sap-sac` `#sap-analytics-cloud`
-`#sap-hana-sql` `#sap-hana-sqlscript` `#sap-bw4hana`
-
-**SAP CAP & RAP:**
-`#sap-cap` `#cap-cds` `#sap-rap` `#restful-abap` `#sap-business-objects`
-**SAP Development Tools:**
-`#sap-adt` `#eclipse-adt` `#abapgit` `#abaplint` `#sap-atc` `#sap-sci`
-`#sap-code-inspector` `#sap-transport` `#sap-cts` `#sap-charm`
-`#sap-solution-manager` `#sap-cloud-alm`
-**MCP & AI Agents:**
-`#mcp` `#model-context-protocol` `#mcp-server` `#mcp-tool` `#sap-mcp`
-`#sap-mcp-server` `#abap-mcp` `#claude-code` `#claude-ai` `#anthropic`
-`#ai-agent` `#ai-coding-agent` `#ai-orchestrator` `#llm-agent`
-`#sap-ai` `#sap-ai-core` `#sap-genai-hub` `#generative-ai`
-**DevOps & Quality:**
-`#devops` `#cicd` `#sap-cicd` `#transport-management` `#abap-unit`
-`#abap-unit-testing` `#sap-testing` `#sap-automation` `#code-review`
-`#security-audit` `#sap-security` `#sap-authorization`
-**IDE & Platform:**
-`#vscode` `#vscode-extension` `#sap-business-application-studio` `#sap-bas`
-`#low-code` `#no-code` `#developer-tools` `#developer-productivity`
-**Other:**
-`#self-learning` `#routing-engine` `#orchestrator` `#sap-automation-tool`
-`#sap-skills` `#claude-skills` `#sap-workflow` `#sap-orchestration`
+--
