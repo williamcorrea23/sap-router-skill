@@ -67,7 +67,7 @@ npm run update          # git pull + npm install + healthcheck
 | `scripts/xls_to_bapi.py` | CSV/XLSX → BAPI JSON with field mapping validation |
 | `scripts/memory_manager.py` | MEMORY.md session lifecycle + ABAPLINT section |
 | `.mcp.json` | 35 MCP server configs (+18 planned) — ADT, GUI (3 tiers), RFC, CPI, CF, APIM, RAG (3), PI/PO, BW, Datasphere, Steampunk, Sapient, Integration Suite, CPI OData Proxy, ABAP-MCP, Cloud ALM, CTS Transport + 4 plugins |
-| `README.md` | GitHub landing page — 8 Mermaid diagrams, skill catalog, MCP reference, 130 topic tags, SEO footer |
+| `README.md` | GitHub landing page — 4 Mermaid diagrams, skill catalog, MCP reference, 130 topic tags, SEO footer |
 
 ## Cross-file consistency rules
 
@@ -88,4 +88,4 @@ When adding skills, MCPs, CLIs, or npm scripts, update ALL of these:
 
 ## Mermaid diagrams (README.md only)
 
-All 8 Mermaid blocks must avoid subgraph/node ID collisions. When a subgraph name matches any node within it, Mermaid rejects with a cycle error. Use distinct subgraph IDs.
+All 4 Mermaid blocks must avoid subgraph/node ID collisions. When a subgraph name matches any node within it, Mermaid rejects with a cycle error. Use distinct subgraph IDs.

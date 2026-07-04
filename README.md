@@ -144,33 +144,6 @@ cp .env.template .env
 
 ## Core Commands
 
-```mermaid
-flowchart LR
-    subgraph Health["Healthcheck"]
-        HC["npm run hc<br/>probes 35 MCPs + .env"]
-        HCP["npm run hc:prompt<br/>interactive setup"]
-    end
-    subgraph Routes["Routing"]
-        RT["npm run router<br/>route any action"]
-        RG["npm run router:gui<br/>force GUI fallback"]
-        RC["npm run router:caveman<br/>check delegation"]
-    end
-    subgraph Pipeline["Pipeline"]
-        PL["npm run pipeline<br/>8-stage spec→transport"]
-        PF["npm run pipeline:fast<br/>skip deep analysis"]
-    end
-    subgraph SelfLearn["Self-Learn"]
-        LM["npm run learn:mcp<br/>record MCP outcome"]
-        LR["npm run learn:route<br/>track routing success"]
-        LC["npm run learn:ctx<br/>inject context"]
-    end
-    subgraph Lint["ABAP Quality"]
-        AL["npm run abap:lint"]
-        AR["npm run abap:review"]
-        AC["npm run abap:review:ci"]
-    end
-```
-
 | Category | Command | What It Does |
 |---|---|---|
 | **Install** | `git clone ... && python scripts/healthcheck.py` | Clone + verify everything works |
@@ -199,86 +172,6 @@ flowchart LR
 
 ## Complete Skill Catalog (85 skills)
 
-```mermaid
-flowchart TB
-    subgraph ABAP["ABAP Development — 17 skills"]
-        A1["abap — classical ABAP, dynpro, ALV"]
-        A2["abap-cloud — steampunk, released APIs"]
-        A3["abap-cloud-migration — custom code to cloud"]
-        A4["abap-code-patterns — BAPI/RFC, dynamic ABAP"]
-        A5["abap-sql-amdp — SQL, AMDP, HANA procedures"]
-        A6["abap-unit-testing — ABAP Unit, test doubles"]
-        A7["abapgit — Git workflows for ABAP"]
-        A8["atc-cloudification — ATC checks, quality gates"]
-        A9["authorization-iam — AUTHORITY-CHECK, IAM"]
-        A10["badi-enhancement — BAdI, enhancement spots"]
-        A11["clean-abap — Clean ABAP Style Guide"]
-        A12["rap — RAP managed/unmanaged, EML"]
-        A13["rap-business-events — event mesh, CloudEvents"]
-        A14["cds-view-entities — CDS DDL, annotations"]
-        A15["released-abap-classes — C1/C2/C3 contracts"]
-    end
-
-    subgraph BTP["SAP BTP — 20 skills"]
-        B1["btp-abap-environment — BTP ABAP projects"]
-        B2["btp-best-practices — CF vs Kyma, resilience"]
-        B3["btp-build-work-zone — workspaces, cards"]
-        B4["btp-business-application-studio — BAS dev spaces"]
-        B5["btp-cias — CIAS automation"]
-        B6["btp-cloud-identity — IAS/IPS/AMS"]
-        B7["btp-cloud-logging — OpenTelemetry, Kibana"]
-        B8["btp-cloud-platform — accounts, entitlements"]
-        B9["btp-cloud-transport-management — CTM, gCTS"]
-        B10["btp-connectivity — Cloud Connector"]
-        B11["btp-developer-guide — BTP reference"]
-        B12["btp-diagram-generator — architecture diagrams"]
-        B13["btp-integration-suite — CPI, API Mgmt"]
-        B14["btp-job-scheduling — cron jobs"]
-        B15["btp-master-data-integration — MDI"]
-        B16["btp-service-manager — instances, bindings"]
-        B17["sap-btp-audit-log — audit trails"]
-        B18["sap-btp-credential-store — secrets vault"]
-    end
-
-    subgraph FRONT["UI5 / Fiori / CAP — 8 skills"]
-        F1["sapui5-framework — UI5 patterns"]
-        F2["sap-fiori-tools — Fiori generation"]
-        F3["sap-fiori-apps-reference — apps catalog"]
-        F4["sap-cap — CAP CDS + Node.js/Java"]
-        F5["sap-build — low-code apps, workflows"]
-        F6["odata — OData V2/V4 protocol"]
-        F7["odata-abap — SEGW, CDS-exposed OData"]
-    end
-
-    subgraph INT["Integration — 5 skills"]
-        I1["cpi-iflow-development — iFlow, Groovy"]
-        I2["sap-bapi-integration — BAPI discovery, patterns"]
-        I3["sap-code-search — full-text ABAP search"]
-        I4["sap-api-style — OpenAPI specs, standards"]
-    end
-
-    subgraph HANA["HANA / AI / Data — 11 skills"]
-        H1["sap-hana-sqlscript — SQLScript procedures"]
-        H2["sap-hana-cli — HANA CLI operations"]
-        H3["sap-hana-ml — ML on HANA"]
-        H4["sap-ai-core — AI Core, model deployment"]
-        H5["sap-cloud-sdk-ai — GenAI Hub, LLM orchestration"]
-        H6["sap-datasphere — data modeling, federation"]
-        H7["sap-hana-cloud-data-intelligence — DI"]
-        H8["sap-sac-scripting — SAC automation"]
-        H9["sap-sac-planning — SAC planning"]
-        H10["sap-sac-custom-widget — custom widgets"]
-    end
-
-    subgraph VNEW["v4.2.0 NEW — 6 skills"]
-        V1["karpathy-guidelines — Think→Simplify→Surgical→Verify"]
-        V2["sap-gui-scripting — SAP GUI automation, BDC, ALV"]
-        V3["sap-gui-web-enrich — web-search for missing nav data"]
-        V4["sap-self-learn — Hermes-style environment adaptation"]
-        V5["sap-llm-engineering — eval harness, prompt optimization"]
-    end
-```
-
 ### Skill Categories
 
 | Domain | Count | Skills |
@@ -296,49 +189,6 @@ flowchart TB
 ---
 
 ## MCP Server Reference (35 servers)
-
-```mermaid
-flowchart TB
-    subgraph Primary["Primary Path"]
-        ARC["arc-1<br/>12 intent tools<br/>npm package<br/>3,474 tests"]
-        AIB["aibap.mcp<br/>69 granular tools<br/>Go binary<br/>comprehensive ABAP"]
-        ADT2["mcp-abap-adt<br/>13 tools<br/>TypeScript<br/>Smithery deploy"]
-    end
-
-    subgraph Fallback["GUI Fallback (3 tiers)"]
-        G1["mcp-sap-gui<br/>mario-andreschak<br/>TypeScript<br/>PRIMARY fallback"]
-        G2["mcp-sap-gui-kts<br/>kts982<br/>Python<br/>SECONDARY"]
-        G3["sapgui-mcp-go<br/>Hochfrequenz<br/>Go<br/>TERTIARY"]
-        G1 --> G2 --> G3
-    end
-
-    subgraph RFC["RFC Dispatch"]
-        RFCM["sap-rfc-mcp-server<br/>ZROUTER_DISPATCH_FM<br/>9 module handlers<br/>BAPI batch operations"]
-    end
-
-    subgraph HCM["HCM"]
-        SF["sf-mcp<br/>SuccessFactors OData<br/>Employee data, org structure"]
-    end
-
-    subgraph BTP2["BTP / OData"]
-        BT["btp-mcp<br/>7 entity sets<br/>OData-based"]
-        OD1["odata-mcp-proxy<br/>32 entities<br/>config-driven"]
-        OD2["btp-sap-odata-to-mcp<br/>3 progressive tools<br/>token-optimized"]
-    end
-
-    subgraph RAG["RAG (pre-ready)"]
-        R1["pinecone-rag<br/>vector DB"]
-        R2["supabase-rag<br/>pgvector"]
-        R3["azure-ai-search<br/>semantic search"]
-    end
-
-    subgraph Plugins["IDE Plugins"]
-        P1["ui5-mcp-server"]
-        P2["fiori-mcp-server"]
-        P3["mdk-mcp-server"]
-        P4["cds-mcp-server"]
-    end
-```
 
 ### MCP Details
 
@@ -453,19 +303,6 @@ flowchart TB
 
 ## Functional Module Coverage
 
-```mermaid
-flowchart TB
-    MM["MM — Materials Management<br/>BAPI_MATERIAL_SAVEDATA<br/>BAPI_PO_CREATE1/CHANGE<br/>MM01/MM02/ME21N/MIGO<br/>Config: T134, T161, T024"]
-    SD["SD — Sales & Distribution<br/>BAPI_SALESORDER_CREATEFROMDAT2<br/>BAPI_BILLINGDOC_CREATEMULTIPLE<br/>VA01/VA02/VL01N/VF01<br/>Config: TVAK, TVKO, TVFK"]
-    FI["FI — Financial Accounting<br/>BAPI_ACC_DOCUMENT_POST<br/>BAPI_ACC_DOCUMENT_REV_POST<br/>FB01/FB02/FS00/F110<br/>Config: T001, T004, SKA1"]
-    QM["QM — Quality Management<br/>BAPI_INSPLOT_CREATE<br/>BAPI_INSRES_RECORD<br/>QA01/QA02/QE01<br/>Config: TQ01, TQ02"]
-    PP["PP — Production Planning<br/>BAPI_PRODORD_CREATE<br/>BAPI_PRODORDCONF_CREATE_HDR<br/>CO01/CO02/CS01/CA01<br/>Config: T003O, T399D"]
-    WM["WM — Warehouse Management<br/>BAPI_GOODSMVT_CREATE<br/>L_TO_CREATE_MOVE_SU<br/>MIGO/LT01/LT02<br/>Config: T311, T312, T300"]
-    CO["CO — Controlling<br/>BAPI_INTERNALORDER_CREATE<br/>BAPI_ACC_ACTIVITY_ALLOC_POST<br/>KO01/KS01/KA01<br/>Config: TKA01, CSKS"]
-    HCM["HCM — Human Capital Mgmt<br/>BAPI_EMPLOYEE_GETDATA<br/>HR_INFOTYPE_OPERATION<br/>PA20/PA30/PA40<br/>SuccessFactors: sf-mcp"]
-    BASIS["BASIS — ABAP Dev + Admin<br/>TR_INSERT_REQUEST_WITH_TASKS<br/>TH_GET_DUMP_LOG<br/>SPRO/SU01/SU53/PFCG/SNOTE<br/>ST22/SM37/SM50/SE16"]
-```
-
 ### Module BAPI/Transaction Reference
 
 | Module | BAPIs Available | GUI Fallback T-codes | Config Tables |
@@ -486,7 +323,7 @@ flowchart TB
 
 ```
 sap-router-skill/
-├── README.md                    ← This file (Mermaid diagrams)
+├── README.md                    ← This file
 ├── SKILL.md                     ← Master dispatch (Karpathy wrapper)
 ├── COMPARISON.md                ← 72-repo cross-reference analysis
 ├── CHANGELOG.md                 ← Version history
