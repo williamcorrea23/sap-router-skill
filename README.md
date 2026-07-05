@@ -215,46 +215,6 @@ flowchart LR
 
 ## Self-Learning Engine
 
-```mermaid
-flowchart TB
-    subgraph Input["Every MCP Call / Route Decision"]
-        MCP["MCP call: arc-1, latency=245ms, success=true"]
-        RTE["Route: MM_CREATE_MATERIAL, success=true"]
-    end
-
-    subgraph Learn["Self-Learn Engine"]
-        direction TB
-        REC["Record observation<br/>EMA latency + success rate"]
-        ADAPT["Adapt routing weights<br/>prefer faster, reliable MCPs"]
-        DISC["Discover system features<br/>SAP version, HANA, gCTS, RAP"]
-        PATT["Learn user patterns<br/>batch preference, ADT preference"]
-        REC --> ADAPT
-        ADAPT --> DISC
-        DISC --> PATT
-    end
-
-    subgraph Output["Persisted Context"]
-        MEM["MEMORY.md ## LEARN section"]
-        CTX["Compressed prompt injection<br/>~50 tokens"]
-    end
-
-    Input --> Learn
-    Learn --> Output
-    Output -.->|"next routing decision"| Input
-```
-
-### Learning Dimensions
-
-| Dimension | What It Tracks | Adaptation |
-|---|---|---|
-| **MCP Latency** | Exponential moving average per MCP | Prefer MCPs < 300ms when equivalent |
-| **MCP Reliability** | Success rate (ok/total) | Skip MCPs with < 50% success |
-| **Route Confidence** | ok/total per action type | Warn when < 30%, suggest alternatives |
-| **System Features** | ADT version, HANA, gCTS, RAP | Adapt code generation targets |
-| **User Patterns** | Batch vs single, ADT vs GUI | Memorize preferences per module |
-| **Decay** | 24h half-life on observations | Recent data weighted heavier |
-
----
 
 ## Functional Module Coverage
 
