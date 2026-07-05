@@ -101,7 +101,7 @@
         "SAPGUI_CLIENT": "100"
       },
       "description": "SAP GUI MCP in Go (Hochfrequenz/sapgui.mcp v0.13.3) — TERTIARY fallback. Requires: go install github.com/Hochfrequenz/sapgui.mcp/cmd/sapgui-mcp@latest (when fixed upstream)."
-    }
+    },
     "mcp-sap-notes": {
       "type": "stdio",
       "command": "node",
