@@ -90,6 +90,17 @@
       },
       "description": "ABAP MCP ADT PowerUp (babamba2/abap-mcp-adt-powerup) — Extended ADT MCP with advanced ABAP tools. Node.js."
     },
+    "sapgui-mcp-webgui": {
+      "type": "stdio",
+      "command": "python",
+      "args": ["-m", "sapguimcp.server"],
+      "env": {
+        "BACKEND_TYPE": "webgui",
+        "SAP_SYSTEM": "DS4",
+        "SAPGUI_MCP_CONFIG_PATH": "C:/Users/William Correa/.config/sap-mcp"
+      },
+      "description": "SAP GUI MCP WebGUI (Hochfrequenz/sapgui.mcp v0.13.4) — Chrome/Playwright browser automation for SAP Web GUI. Linux/Mac/Windows."
+    },
     "sapgui-mcp-go": {
       "type": "stdio",
       "command": "sapgui-mcp",
