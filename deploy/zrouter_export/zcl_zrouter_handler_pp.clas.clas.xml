@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0"
+          serializer="LCL_OBJECT_CLAS">
+  <asx:abap xmlns:asx="http://www.sap.com/abapxml">
+    <asx:values>
+      <VSEOCLASS>
+        <CLSNAME>ZCL_ZROUTER_HANDLER_PP.CLAS</CLSNAME>
+        <LANGU>E</LANGU>
+        <DESCRIPT>ZROUTER: ZCL_ZROUTER_HANDLER_PP.CLAS</DESCRIPT>
+        <STATE>1</STATE>
+        <CLSCCINCL>X</CLSCCINCL>
+        <FIXPT>X</FIXPT>
+        <UNICODE>X</UNICODE>
+        <WITH_UNIT_TESTS> </WITH_UNIT_TESTS>
+      </VSEOCLASS>
+    </asx:values>
+  </asx:abap>
+</abapGit>

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-02T04:29:20",
+  "timestamp": "2026-07-04T21:29:31",
   "overall_status": "DEGRADED",
   "mcp_checks": {
     "arc-1": {
@@ -8,20 +8,20 @@
         "details": "All 4 vars set"
       },
       "binary": {
-        "status": "NOT_INSTALLED",
-        "reason": "Command not found: npx"
+        "status": "AVAILABLE",
+        "exit_code": 0
       },
       "criticality": "HIGH",
       "description": "ADT primary \u2014 read/write ABAP source, search, transport"
     },
     "aibap": {
       "env": {
-        "status": "CONFIG_FILE_MISSING",
-        "details": "systems.json not found"
+        "status": "CONFIGURED",
+        "details": "Config file ~/.config/sap-mcp/systems.json found"
       },
       "binary": {
-        "status": "NOT_INSTALLED",
-        "reason": "Command not found: aibap-mcp"
+        "status": "AVAILABLE",
+        "exit_code": 0
       },
       "criticality": "HIGH",
       "description": "69-tool ABAP development MCP (Go binary)"
@@ -40,15 +40,8 @@
     },
     "mcp-sap-gui": {
       "env": {
-        "status": "PARTIAL",
-        "set": [
-          "SAPGUI_HOST",
-          "SAPGUI_USER",
-          "SAPGUI_CLIENT"
-        ],
-        "missing": [
-          "SAPGUI_PASSWORD"
-        ]
+        "status": "ALL_SET",
+        "details": "All 4 vars set"
       },
       "binary": {
         "status": "SKIPPED",
@@ -101,15 +94,8 @@
     },
     "sap-rfc-mcp-server": {
       "env": {
-        "status": "PARTIAL",
-        "set": [
-          "SAP_RFC_HOST",
-          "SAP_RFC_USER",
-          "SAP_RFC_CLIENT"
-        ],
-        "missing": [
-          "SAP_RFC_PASSWORD"
-        ]
+        "status": "ALL_SET",
+        "details": "All 4 vars set"
       },
       "binary": {
         "status": "SKIPPED",
@@ -173,12 +159,8 @@
     },
     "pinecone-rag": {
       "env": {
-        "status": "NONE_SET",
-        "missing": [
-          "PINECONE_API_KEY",
-          "PINECONE_INDEX",
-          "PINECONE_ENVIRONMENT"
-        ]
+        "status": "ALL_SET",
+        "details": "All 3 vars set"
       },
       "binary": {
         "status": "SKIPPED",
@@ -253,10 +235,10 @@
       "env": {
         "status": "PARTIAL",
         "set": [
-          "CF_API",
-          "CF_USER"
+          "CF_API"
         ],
         "missing": [
+          "CF_USER",
           "CF_PASSWORD"
         ]
       },
@@ -269,14 +251,8 @@
     },
     "sap-api-management": {
       "env": {
-        "status": "PARTIAL",
-        "set": [
-          "APIM_HOST",
-          "APIM_USER"
-        ],
-        "missing": [
-          "APIM_PASSWORD"
-        ]
+        "status": "ALL_SET",
+        "details": "All 3 vars set"
       },
       "binary": {
         "status": "SKIPPED",
@@ -285,7 +261,7 @@
       "criticality": "LOW",
       "description": "SAP API Management \u2014 API proxy, policies, publication"
     },
-    "ui5-mcp": {
+    "plugin:ui5:ui5-mcp-server": {
       "env": {
         "status": "NO_ENV_NEEDED",
         "details": "No env vars or config required"
@@ -297,7 +273,7 @@
       "criticality": "LOW",
       "description": "UI5/SAPUI5 app creation, linter, API reference (plugin)"
     },
-    "fiori-mcp": {
+    "plugin:sap-fiori-mcp-server:fiori-mcp": {
       "env": {
         "status": "NO_ENV_NEEDED",
         "details": "No env vars or config required"
@@ -309,7 +285,7 @@
       "criticality": "LOW",
       "description": "Fiori app generation, metadata download, docs (plugin)"
     },
-    "mdk-mcp": {
+    "plugin:mdk-mcp:mdk-mcp": {
       "env": {
         "status": "NO_ENV_NEEDED",
         "details": "No env vars or config required"
@@ -321,7 +297,7 @@
       "criticality": "LOW",
       "description": "MDK project creation, build, deploy (plugin)"
     },
-    "cds-mcp": {
+    "plugin:cds-mcp:cds-mcp": {
       "env": {
         "status": "NO_ENV_NEEDED",
         "details": "No env vars or config required"
@@ -472,9 +448,11 @@
     },
     "mcp-integration-suite": {
       "env": {
-        "status": "NONE_SET",
+        "status": "PARTIAL",
+        "set": [
+          "API_BASE_URL"
+        ],
         "missing": [
-          "API_BASE_URL",
           "API_USER",
           "API_PASS"
         ]
@@ -488,13 +466,8 @@
     },
     "ci-mcp-server": {
       "env": {
-        "status": "NONE_SET",
-        "missing": [
-          "CPI_DESTINATION_BASE_URL",
-          "CPI_DESTINATION_TOKEN_URL",
-          "CPI_DESTINATION_CLIENT_ID",
-          "CPI_DESTINATION_CLIENT_SECRET"
-        ]
+        "status": "ALL_SET",
+        "details": "All 4 vars set"
       },
       "binary": {
         "status": "SKIPPED",
@@ -505,15 +478,8 @@
     },
     "abap-mcp": {
       "env": {
-        "status": "PARTIAL",
-        "set": [
-          "SAP_URL",
-          "SAP_PASSWORD",
-          "SAP_CLIENT"
-        ],
-        "missing": [
-          "SAP_USER"
-        ]
+        "status": "ALL_SET",
+        "details": "All 4 vars set"
       },
       "binary": {
         "status": "SKIPPED",
@@ -538,14 +504,8 @@
     },
     "sap-transport-mcp": {
       "env": {
-        "status": "PARTIAL",
-        "set": [
-          "SAP_USERNAME",
-          "SAP_PASSWORD"
-        ],
-        "missing": [
-          "SAP_HOSTNAME"
-        ]
+        "status": "ALL_SET",
+        "details": "All 3 vars set"
       },
       "binary": {
         "status": "SKIPPED",
@@ -783,18 +743,24 @@
     "SAP_CLIENT": "SET",
     "SAPGUI_HOST": "SET",
     "SAPGUI_USER": "SET",
-    "SAPGUI_PASSWORD": "MISSING_OR_EMPTY",
+    "SAPGUI_PASSWORD": "SET",
     "SAPGUI_CLIENT": "SET",
     "SAP_CONNECTION": "SET",
+    "SAP_RFC_HOST": "SET",
+    "SAP_RFC_USER": "SET",
+    "SAP_RFC_PASSWORD": "SET",
+    "SAP_RFC_CLIENT": "SET",
+    "SAP_NOTES_USERNAME": "SET",
+    "SAP_NOTES_PASSWORD": "MISSING_OR_EMPTY",
     "CF_API": "SET",
-    "CF_USER": "SET",
+    "CF_USER": "MISSING_OR_EMPTY",
     "CF_PASSWORD": "MISSING_OR_EMPTY",
     "CPI_HOST": "SET",
     "CPI_USER": "SET",
     "CPI_PASSWORD": "MISSING_OR_EMPTY",
     "APIM_HOST": "SET",
     "APIM_USER": "SET",
-    "APIM_PASSWORD": "MISSING_OR_EMPTY",
+    "APIM_PASSWORD": "SET",
     "PI_HOST": "SET",
     "PI_USER": "SET",
     "PI_PASSWORD": "MISSING_OR_EMPTY",
@@ -815,75 +781,76 @@
     "STMPNK_PASSWORD": "MISSING_OR_EMPTY",
     "SAPIENT_HOST": "SET",
     "SAPIENT_KEY": "MISSING_OR_EMPTY",
-    "PINECONE_API_KEY": "MISSING_OR_EMPTY",
-    "PINECONE_INDEX": "MISSING_OR_EMPTY",
-    "PINECONE_ENVIRONMENT": "MISSING_OR_EMPTY",
+    "PINECONE_API_KEY": "SET",
+    "PINECONE_INDEX": "SET",
+    "PINECONE_ENVIRONMENT": "SET",
     "SUPABASE_URL": "MISSING_OR_EMPTY",
     "SUPABASE_SERVICE_KEY": "MISSING_OR_EMPTY",
     "AZURE_SEARCH_ENDPOINT": "MISSING_OR_EMPTY",
     "AZURE_SEARCH_KEY": "MISSING_OR_EMPTY",
     "AZURE_SEARCH_INDEX": "MISSING_OR_EMPTY",
     "OPENAI_API_KEY": "MISSING_OR_EMPTY",
-    "DEEPSEEK_API_KEY": "MISSING_OR_EMPTY",
-    "OPENROUTER_API_KEY": "MISSING_OR_EMPTY",
-    "API_OAUTH_CLIENT_ID": "MISSING_OR_EMPTY",
-    "API_OAUTH_CLIENT_SECRET": "MISSING_OR_EMPTY",
-    "API_OAUTH_TOKEN_URL": "MISSING_OR_EMPTY",
-    "API_BASE_URL": "MISSING_OR_EMPTY",
+    "DEEPSEEK_API_KEY": "SET",
+    "OPENROUTER_API_KEY": "SET",
+    "TAVILY_API_KEY": "MISSING_OR_EMPTY",
+    "API_OAUTH_CLIENT_ID": "SET",
+    "API_OAUTH_CLIENT_SECRET": "SET",
+    "API_OAUTH_TOKEN_URL": "SET",
+    "API_BASE_URL": "SET",
     "API_USER": "MISSING_OR_EMPTY",
     "API_PASS": "MISSING_OR_EMPTY",
-    "CPI_BASE_URL": "MISSING_OR_EMPTY",
-    "CPI_OAUTH_CLIENT_ID": "MISSING_OR_EMPTY",
-    "CPI_OAUTH_CLIENT_SECRET": "MISSING_OR_EMPTY",
-    "CPI_OAUTH_TOKEN_URL": "MISSING_OR_EMPTY",
-    "CPI_DESTINATION_BASE_URL": "MISSING_OR_EMPTY",
-    "CPI_DESTINATION_TOKEN_URL": "MISSING_OR_EMPTY",
-    "CPI_DESTINATION_CLIENT_ID": "MISSING_OR_EMPTY",
-    "CPI_DESTINATION_CLIENT_SECRET": "MISSING_OR_EMPTY",
-    "SAP_USER": "MISSING_OR_EMPTY",
-    "SAP_LANGUAGE": "MISSING_OR_EMPTY",
-    "ALLOW_WRITE": "MISSING_OR_EMPTY",
-    "ALLOW_DELETE": "MISSING_OR_EMPTY",
-    "ALLOW_EXECUTE": "MISSING_OR_EMPTY",
-    "BLOCKED_PACKAGES": "MISSING_OR_EMPTY",
-    "SYNTAX_CHECK_BEFORE_ACTIVATE": "MISSING_OR_EMPTY",
-    "DEFER_TOOLS": "MISSING_OR_EMPTY",
-    "SAP_ABAP_VERSION": "MISSING_OR_EMPTY",
+    "CPI_BASE_URL": "SET",
+    "CPI_OAUTH_CLIENT_ID": "SET",
+    "CPI_OAUTH_CLIENT_SECRET": "SET",
+    "CPI_OAUTH_TOKEN_URL": "SET",
+    "CPI_DESTINATION_BASE_URL": "SET",
+    "CPI_DESTINATION_TOKEN_URL": "SET",
+    "CPI_DESTINATION_CLIENT_ID": "SET",
+    "CPI_DESTINATION_CLIENT_SECRET": "SET",
+    "SAP_USER": "SET",
+    "SAP_LANGUAGE": "SET",
+    "ALLOW_WRITE": "SET",
+    "ALLOW_DELETE": "SET",
+    "ALLOW_EXECUTE": "SET",
+    "BLOCKED_PACKAGES": "SET",
+    "SYNTAX_CHECK_BEFORE_ACTIVATE": "SET",
+    "DEFER_TOOLS": "SET",
+    "SAP_ABAP_VERSION": "SET",
     "CALM_MODE": "MISSING_OR_EMPTY",
     "CALM_BASE_URL": "MISSING_OR_EMPTY",
     "CALM_UAA_URL": "MISSING_OR_EMPTY",
     "CALM_UAA_CLIENT_ID": "MISSING_OR_EMPTY",
     "CALM_UAA_CLIENT_SECRET": "MISSING_OR_EMPTY",
     "CALM_API_KEY": "MISSING_OR_EMPTY",
-    "SAP_HOSTNAME": "MISSING_OR_EMPTY",
-    "SAP_SYSNR": "MISSING_OR_EMPTY",
-    "SAP_SYSTEM_ID": "MISSING_OR_EMPTY",
-    "AUTH_METHOD": "MISSING_OR_EMPTY",
-    "LOG_LEVEL": "MISSING_OR_EMPTY",
-    "DRY_RUN": "MISSING_OR_EMPTY",
-    "SAP_ROLE": "MISSING_OR_EMPTY",
+    "SAP_HOSTNAME": "SET",
+    "SAP_SYSNR": "SET",
+    "SAP_SYSTEM_ID": "SET",
+    "AUTH_METHOD": "SET",
+    "LOG_LEVEL": "SET",
+    "DRY_RUN": "SET",
+    "SAP_ROLE": "SET",
     "DEFAULT_TRANSPORT": "MISSING_OR_EMPTY",
-    "SAP_ALLOW_UNAUTHORIZED": "MISSING_OR_EMPTY",
+    "SAP_ALLOW_UNAUTHORIZED": "SET",
     "SAP_BTP_CONNECTIVITY_PROXY": "MISSING_OR_EMPTY",
     "SAP_BTP_CONNECTIVITY_LOCATION_ID": "MISSING_OR_EMPTY",
-    "SAP_BTP_CONNECTIVITY_DEBUG": "MISSING_OR_EMPTY",
+    "SAP_BTP_CONNECTIVITY_DEBUG": "SET",
     "SAP_BTP_CONNECTIVITY_CREDS_FILE": "MISSING_OR_EMPTY",
     "SAP_BTP_CONNECTIVITY_CDS_BIND_FILE": "MISSING_OR_EMPTY",
-    "SAP_BTP_CONNECTIVITY_CDS_BIND_NAME": "MISSING_OR_EMPTY",
+    "SAP_BTP_CONNECTIVITY_CDS_BIND_NAME": "SET",
     "SAP_BTP_CF_HOME": "MISSING_OR_EMPTY",
     "SAP_BTP_CONNECTIVITY_CLIENT_ID": "MISSING_OR_EMPTY",
     "SAP_BTP_CONNECTIVITY_CLIENT_SECRET": "MISSING_OR_EMPTY",
     "SAP_BTP_CONNECTIVITY_TOKEN_URL": "MISSING_OR_EMPTY",
     "SAP_ROUTER": "MISSING_OR_EMPTY",
     "SAP_ROUTER_PASSWORD": "MISSING_OR_EMPTY",
-    "SAP_ROUTER_DEBUG": "MISSING_OR_EMPTY",
+    "SAP_ROUTER_DEBUG": "SET",
     "SAP_PROXY_URL": "MISSING_OR_EMPTY",
-    "MAX_DUMPS": "MISSING_OR_EMPTY",
-    "SOURCE_CACHE_TTL_MS": "MISSING_OR_EMPTY",
-    "WEB_ALLOW_UNAUTHORIZED": "MISSING_OR_EMPTY"
+    "MAX_DUMPS": "SET",
+    "SOURCE_CACHE_TTL_MS": "SET",
+    "WEB_ALLOW_UNAUTHORIZED": "SET"
   },
   "missing_critical": [],
   "missing_optional": [],
   "recommendations": [],
-  "high_mcp_ok": "2/9"
+  "high_mcp_ok": "6/9"
 }

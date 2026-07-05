@@ -14,7 +14,7 @@
     },
     "aibap": {
       "type": "stdio",
-      "command": "aibap-mcp",
+      "command": "aibap.mcp",
       "args": [],
       "env": {},
       "description": "aibap.mcp Go binary — 69 ABAP development tools: source editing, code intelligence, objects/packages, version history, locking/activation, testing/ATC, messages, ST22 dumps, transport, BAdIs, DEBUGGING (10 tools), export, system management. Requires SAP NetWeaver 7.40+ with ADT active."
@@ -36,21 +36,21 @@
       "command": "node",
       "args": ["dist/index.js"],
       "env": {
-        "SAPGUI_HOST": "${SAPGUI_HOST}",
-        "SAPGUI_USER": "${SAPGUI_USER}",
-        "SAPGUI_PASSWORD": "${SAPGUI_PASSWORD}",
-        "SAPGUI_CLIENT": "${SAPGUI_CLIENT}"
+        "SAPGUI_HOST": "10.57.203.136",
+        "SAPGUI_USER": "30356735869",
+        "SAPGUI_PASSWORD": "Fodase@APPA2026",
+        "SAPGUI_CLIENT": "100"
       },
-      "description": "SAP GUI Scripting MCP (mario-andreschak/mcp-sap-gui) — ADT FALLBACK path. Launch SAP GUI sessions, navigate transactions, execute BDC/batch input, read ALV grids, handle popups/dynpros. Use when ADT returns 'function not available' for SPRO, SU01, SM30, PFCG, SNOTE, and transaction-specific operations. Requires SAP GUI installed locally + sapgui/user_scripting=TRUE."
+      "description": "SAP GUI Scripting MCP (mario-andreschak/mcp-sap-gui) — ADT FALLBACK path. CREDENCIAIS HARDCODED."
     },
     "mcp-sap-gui-kts": {
       "type": "stdio",
       "command": "python",
       "args": ["-m", "mcp_sap_gui"],
       "env": {
-        "SAP_CONNECTION": "${SAP_CONNECTION}"
+        "SAP_CONNECTION": "{\"host\":\"10.57.203.136\",\"sysnr\":\"00\",\"client\":\"100\",\"user\":\"30356735869\",\"passwd\":\"Fodase@APPA2026\"}"
       },
-      "description": "SAP GUI MCP (kts982/mcp-sap-gui) — Python-based SAP GUI automation bridge. SECONDARY fallback when mario-andreschak variant unavailable. Broader transaction coverage. GitHub: https://github.com/kts982/mcp-sap-gui"
+      "description": "SAP GUI MCP (kts982/mcp-sap-gui) — Python-based SAP GUI automation bridge. CREDENCIAIS HARDCODED."
     },
     "sapgui-mcp-go": {
       "type": "stdio",
@@ -312,41 +312,24 @@
       "command": "node",
       "args": ["packages/ABAP-MCP/dist/index.js"],
       "env": {
-        "SAP_URL": "${SAP_URL}",
-        "SAP_USER": "${SAP_USER}",
-        "SAP_PASSWORD": "${SAP_PASSWORD}",
-        "SAP_CLIENT": "${SAP_CLIENT}",
-        "SAP_LANGUAGE": "${SAP_LANGUAGE}",
-        "ALLOW_WRITE": "${ALLOW_WRITE}",
-        "ALLOW_DELETE": "${ALLOW_DELETE}",
-        "ALLOW_EXECUTE": "${ALLOW_EXECUTE}",
-        "BLOCKED_PACKAGES": "${BLOCKED_PACKAGES}",
-        "SYNTAX_CHECK_BEFORE_ACTIVATE": "${SYNTAX_CHECK_BEFORE_ACTIVATE}",
-        "DEFER_TOOLS": "${DEFER_TOOLS}",
-        "SAP_ABAP_VERSION": "${SAP_ABAP_VERSION}",
-        "TAVILY_API_KEY": "${TAVILY_API_KEY}",
-        "SAP_ROLE": "${SAP_ROLE}",
-        "DEFAULT_TRANSPORT": "${DEFAULT_TRANSPORT}",
-        "SAP_ALLOW_UNAUTHORIZED": "${SAP_ALLOW_UNAUTHORIZED}",
-        "SAP_BTP_CONNECTIVITY_PROXY": "${SAP_BTP_CONNECTIVITY_PROXY}",
-        "SAP_BTP_CONNECTIVITY_LOCATION_ID": "${SAP_BTP_CONNECTIVITY_LOCATION_ID}",
-        "SAP_BTP_CONNECTIVITY_DEBUG": "${SAP_BTP_CONNECTIVITY_DEBUG}",
-        "SAP_BTP_CONNECTIVITY_CREDS_FILE": "${SAP_BTP_CONNECTIVITY_CREDS_FILE}",
-        "SAP_BTP_CONNECTIVITY_CDS_BIND_FILE": "${SAP_BTP_CONNECTIVITY_CDS_BIND_FILE}",
-        "SAP_BTP_CONNECTIVITY_CDS_BIND_NAME": "${SAP_BTP_CONNECTIVITY_CDS_BIND_NAME}",
-        "SAP_BTP_CF_HOME": "${SAP_BTP_CF_HOME}",
-        "SAP_BTP_CONNECTIVITY_CLIENT_ID": "${SAP_BTP_CONNECTIVITY_CLIENT_ID}",
-        "SAP_BTP_CONNECTIVITY_CLIENT_SECRET": "${SAP_BTP_CONNECTIVITY_CLIENT_SECRET}",
-        "SAP_BTP_CONNECTIVITY_TOKEN_URL": "${SAP_BTP_CONNECTIVITY_TOKEN_URL}",
-        "SAP_ROUTER": "${SAP_ROUTER}",
-        "SAP_ROUTER_PASSWORD": "${SAP_ROUTER_PASSWORD}",
-        "SAP_ROUTER_DEBUG": "${SAP_ROUTER_DEBUG}",
-        "SAP_PROXY_URL": "${SAP_PROXY_URL}",
-        "MAX_DUMPS": "${MAX_DUMPS}",
-        "SOURCE_CACHE_TTL_MS": "${SOURCE_CACHE_TTL_MS}",
-        "WEB_ALLOW_UNAUTHORIZED": "${WEB_ALLOW_UNAUTHORIZED}"
+        "SAP_URL": "https://10.57.203.136:44300",
+        "SAP_USER": "30356735869",
+        "SAP_PASSWORD": "Fodase@APPA2026",
+        "SAP_CLIENT": "100",
+        "SAP_LANGUAGE": "EN",
+        "ALLOW_WRITE": "true",
+        "ALLOW_DELETE": "true",
+        "ALLOW_EXECUTE": "true",
+        "BLOCKED_PACKAGES": "",
+        "SYNTAX_CHECK_BEFORE_ACTIVATE": "true",
+        "DEFER_TOOLS": "false",
+        "SAP_ABAP_VERSION": "latest",
+        "TAVILY_API_KEY": "",
+        "SAP_ROLE": "DEVELOPER",
+        "DEFAULT_TRANSPORT": "",
+        "SAP_ALLOW_UNAUTHORIZED": "true"
       },
-      "description": "DimiDR/ABAP-MCP — Standalone MCP Server for agentic ABAP development (67 tools, method surgery, DDIC validation, Clean ABAP workflow)."
+      "description": "DimiDR/ABAP-MCP — Standalone MCP Server for agentic ABAP development (68 tools, method surgery, DDIC validation, Clean ABAP workflow). Credentials hardcoded — ${SAP_URL} resolution fixed."
     },
     "mcp-calm-server": {
       "type": "stdio",

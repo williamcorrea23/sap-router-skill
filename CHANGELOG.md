@@ -9,6 +9,12 @@
 - **Intelligent Dynamic Routing**: updated `sap_router.py` to route requests dynamically to `abap-mcp`, `mcp-calm-server`, and `sap-transport-mcp` based on requested actions and keywords.
 - Registered all new servers in `.mcp.json`, `.env.template`, and `healthcheck.py`.
 
+### Changed
+- `README.md` — Mermaid diagrams reduced 8→4 (removed Core Commands, Skill Catalog, MCP Server, Module Coverage — all had equivalent tables)
+- `CLAUDE.md` — diagram count synced (8→4)
+- `.claude/agents/sap-co-consultant.md` — Korean→neutral English, 8 dead plugin references removed
+- `.claude/agents/sap-tm-consultant.md` — filled from 25-line Portuguese stub to 143-line English agent
+
 ## [4.1.0] — 2026-07-01
 
 ### Added

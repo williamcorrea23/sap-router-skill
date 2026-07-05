@@ -3,9 +3,9 @@
 *&---------------------------------------------------------------------*
 
 *&---------------------------------------------------------------------*
-*& 1. Classe de Exceção - ZCX_ZROUTER
+*& 1. Classe de Exceção - CX_ZROUTER
 *&---------------------------------------------------------------------*
-CLASS zcx_zrouter DEFINITION
+CLASS cx_zrouter DEFINITION
   INHERITING FROM cx_static_check
   PUBLIC
   CREATE PUBLIC.
@@ -20,7 +20,7 @@ CLASS zcx_zrouter DEFINITION
     DATA mv_text TYPE string READ-ONLY.
 ENDCLASS.
 
-CLASS zcx_zrouter IMPLEMENTATION.
+CLASS cx_zrouter IMPLEMENTATION.
   METHOD constructor.
     super->constructor( previous = previous ).
     if_t100_message~t100key = textid.
@@ -50,7 +50,7 @@ INTERFACE zif_zrouter_handler PUBLIC.
     RETURNING
       VALUE(rs_result) TYPE ty_action_result
     RAISING
-      zcx_zrouter.
+      cx_zrouter.
 ENDINTERFACE.
 
 INTERFACE zif_zrouter_config PUBLIC.
@@ -62,7 +62,7 @@ INTERFACE zif_zrouter_config PUBLIC.
       batchable TYPE abap_bool,
       timeout   TYPE i,
     END OF ty_config_entry,
-    ty_config_entries TYPE STANDARD TABLE OF ty_config_entry.
+    ty_config_entries TYPE STANDARD TABLE OF ty_config_entry WITH EMPTY KEY.
 
   METHODS get_config
     IMPORTING
@@ -71,7 +71,7 @@ INTERFACE zif_zrouter_config PUBLIC.
     RETURNING
       VALUE(rs_config) TYPE ty_config_entry
     RAISING
-      zcx_zrouter.
+      cx_zrouter.
 
   METHODS is_action_allowed
     IMPORTING
@@ -110,14 +110,14 @@ INTERFACE zif_zrouter_logger PUBLIC.
     RETURNING
       VALUE(rv_guid) TYPE sysuuid_c32
     RAISING
-      zcx_zrouter.
+      cx_zrouter.
 
   METHODS get_logs
     IMPORTING
       iv_module      TYPE string OPTIONAL
       iv_date        TYPE dats OPTIONAL
     RETURNING
-      VALUE(rt_logs) TYPE STANDARD TABLE OF ty_log_entry.
+      VALUE(rt_logs) TYPE STANDARD TABLE OF ty_log_entry WITH EMPTY KEY.
 ENDINTERFACE.
 
 *&---------------------------------------------------------------------*
@@ -227,7 +227,7 @@ CLASS zcl_zrouter_config IMPLEMENTATION.
     TRY.
         rs_config = lt_config_cache[ module = iv_module action = iv_action ].
       CATCH cx_sy_itab_line_not_found.
-        RAISE EXCEPTION TYPE zcx_zrouter
+        RAISE EXCEPTION TYPE cx_zrouter
           EXPORTING mv_text = |Config for { iv_module }/{ iv_action } not found|.
     ENDTRY.
   ENDMETHOD.
@@ -236,7 +236,7 @@ CLASS zcl_zrouter_config IMPLEMENTATION.
     TRY.
         DATA(ls_config) = zif_zrouter_config~get_config( iv_module = iv_module iv_action = iv_action ).
         rv_allowed = ls_config-active.
-      CATCH zcx_zrouter.
+      CATCH cx_zrouter.
         rv_allowed = abap_false.
     ENDTRY.
   ENDMETHOD.
@@ -282,7 +282,7 @@ CLASS zcl_zrouter_logger IMPLEMENTATION.
     GET TIME STAMP FIELD ls_log-timestamp.
     INSERT zrouter_log FROM @ls_log.
     IF sy-subrc <> 0.
-      RAISE EXCEPTION TYPE zcx_zrouter EXPORTING mv_text = 'Failed to write log entry'.
+      RAISE EXCEPTION TYPE cx_zrouter EXPORTING mv_text = 'Failed to write log entry'.
     ELSE.
       COMMIT WORK AND WAIT.
     ENDIF.
@@ -368,7 +368,7 @@ CLASS zcl_zrouter_handler_abstract DEFINITION PUBLIC ABSTRACT CREATE PUBLIC.
       RETURNING
         VALUE(rs_result) TYPE zif_zrouter_handler=>ty_action_result
       RAISING
-        zcx_zrouter.
+        cx_zrouter.
 
     " evaluate_expression — GENERATE SUBROUTINE POOL dynamic eval
     " Wraps iv_expression in FORM/ENDFORM, compiles as subroutine pool,
@@ -380,7 +380,7 @@ CLASS zcl_zrouter_handler_abstract DEFINITION PUBLIC ABSTRACT CREATE PUBLIC.
       CHANGING
         cv_result       TYPE string
       RAISING
-        zcx_zrouter.
+        cx_zrouter.
 ENDCLASS.
 
 CLASS zcl_zrouter_handler_abstract IMPLEMENTATION.
@@ -405,7 +405,7 @@ CLASS zcl_zrouter_handler_abstract IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD handle_custom_action.
-    RAISE EXCEPTION TYPE zcx_zrouter EXPORTING mv_text = |Unknown action { iv_action } for { mv_module }|.
+    RAISE EXCEPTION TYPE cx_zrouter EXPORTING mv_text = |Unknown action { iv_action } for { mv_module }|.
   ENDMETHOD.
 
   METHOD zif_zrouter_handler~handle_action.
@@ -446,7 +446,7 @@ CLASS zcl_zrouter_handler_abstract IMPLEMENTATION.
     LOOP AT lt_lines INTO DATA(lv_line).
       LOOP AT lt_dangerous INTO DATA(lv_dangerous).
         IF to_upper( lv_line ) CS lv_dangerous.
-          RAISE EXCEPTION TYPE zcx_zrouter
+          RAISE EXCEPTION TYPE cx_zrouter
             EXPORTING mv_text = |Forbidden statement in expression: "{ lv_dangerous }"|.
         ENDIF.
       ENDLOOP.
@@ -460,7 +460,7 @@ CLASS zcl_zrouter_handler_abstract IMPLEMENTATION.
       MESSAGE DATA(lv_msg) LINE DATA(lv_line) WORD DATA(lv_word).
 
     IF sy-subrc <> 0 OR lv_pool IS INITIAL.
-      RAISE EXCEPTION TYPE zcx_zrouter
+      RAISE EXCEPTION TYPE cx_zrouter
         EXPORTING mv_text = |Expression syntax error line { lv_line - 2 }: { lv_msg }{ COND #( WHEN lv_word IS NOT INITIAL THEN | near "{ lv_word }"| ) }|.
     ENDIF.
 
@@ -524,7 +524,7 @@ CLASS zcl_zrouter_handler_mm IMPLEMENTATION.
       WHEN 'CHECK_CONFIG'.
         rs_result = check_config( iv_payload ).
       WHEN OTHERS.
-        RAISE EXCEPTION TYPE zcx_zrouter EXPORTING mv_text = |Unknown MM action: { iv_action }|.
+        RAISE EXCEPTION TYPE cx_zrouter EXPORTING mv_text = |Unknown MM action: { iv_action }|.
     ENDCASE.
   ENDMETHOD.
 
@@ -680,7 +680,7 @@ CLASS zcl_zrouter_handler_sd IMPLEMENTATION.
       WHEN 'CHECK_CONFIG'.
         rs_result = check_config( iv_payload ).
       WHEN OTHERS.
-        RAISE EXCEPTION TYPE zcx_zrouter EXPORTING mv_text = |Unknown SD action: { iv_action }|.
+        RAISE EXCEPTION TYPE cx_zrouter EXPORTING mv_text = |Unknown SD action: { iv_action }|.
     ENDCASE.
   ENDMETHOD.
 
@@ -796,7 +796,7 @@ CLASS zcl_zrouter_handler_fi IMPLEMENTATION.
       WHEN 'GET_BALANCE'.
         rs_result = get_balance( iv_payload ).
       WHEN OTHERS.
-        RAISE EXCEPTION TYPE zcx_zrouter EXPORTING mv_text = |Unknown FI action: { iv_action }|.
+        RAISE EXCEPTION TYPE cx_zrouter EXPORTING mv_text = |Unknown FI action: { iv_action }|.
     ENDCASE.
   ENDMETHOD.
 
@@ -884,7 +884,7 @@ CLASS zcl_zrouter_handler_qm IMPLEMENTATION.
       WHEN 'RECORD_RESULTS'.
         rs_result = record_results( iv_payload ).
       WHEN OTHERS.
-        RAISE EXCEPTION TYPE zcx_zrouter EXPORTING mv_text = |Unknown QM action: { iv_action }|.
+        RAISE EXCEPTION TYPE cx_zrouter EXPORTING mv_text = |Unknown QM action: { iv_action }|.
     ENDCASE.
   ENDMETHOD.
 
@@ -976,7 +976,7 @@ CLASS zcl_zrouter_handler_pp IMPLEMENTATION.
       WHEN 'READ_ROUTING'.
         rs_result = read_routing( iv_payload ).
       WHEN OTHERS.
-        RAISE EXCEPTION TYPE zcx_zrouter EXPORTING mv_text = |Unknown PP action: { iv_action }|.
+        RAISE EXCEPTION TYPE cx_zrouter EXPORTING mv_text = |Unknown PP action: { iv_action }|.
     ENDCASE.
   ENDMETHOD.
 
@@ -1071,7 +1071,7 @@ CLASS zcl_zrouter_handler_wm IMPLEMENTATION.
       WHEN 'CREATE_TO'.
         rs_result = create_to( iv_payload ).
       WHEN OTHERS.
-        RAISE EXCEPTION TYPE zcx_zrouter EXPORTING mv_text = |Unknown WM action: { iv_action }|.
+        RAISE EXCEPTION TYPE cx_zrouter EXPORTING mv_text = |Unknown WM action: { iv_action }|.
     ENDCASE.
   ENDMETHOD.
 
@@ -1186,7 +1186,7 @@ CLASS zcl_zrouter_handler_co IMPLEMENTATION.
       WHEN 'ACTIVITY_ALLOC'.
         rs_result = activity_alloc( iv_payload ).
       WHEN OTHERS.
-        RAISE EXCEPTION TYPE zcx_zrouter EXPORTING mv_text = |Unknown CO action: { iv_action }|.
+        RAISE EXCEPTION TYPE cx_zrouter EXPORTING mv_text = |Unknown CO action: { iv_action }|.
     ENDCASE.
   ENDMETHOD.
 
@@ -1276,7 +1276,7 @@ CLASS zcl_zrouter_handler_hcm IMPLEMENTATION.
       WHEN 'CREATE_INFOTYPE'.
         rs_result = create_infotype( iv_payload ).
       WHEN OTHERS.
-        RAISE EXCEPTION TYPE zcx_zrouter EXPORTING mv_text = |Unknown HCM action: { iv_action }|.
+        RAISE EXCEPTION TYPE cx_zrouter EXPORTING mv_text = |Unknown HCM action: { iv_action }|.
     ENDCASE.
   ENDMETHOD.
 
@@ -1372,7 +1372,7 @@ CLASS zcl_zrouter_handler_basis IMPLEMENTATION.
       WHEN 'CODE_ANALYSIS'.
         rs_result = code_analysis( iv_payload ).
       WHEN OTHERS.
-        RAISE EXCEPTION TYPE zcx_zrouter EXPORTING mv_text = |Unknown BASIS action: { iv_action }|.
+        RAISE EXCEPTION TYPE cx_zrouter EXPORTING mv_text = |Unknown BASIS action: { iv_action }|.
     ENDCASE.
   ENDMETHOD.
 
@@ -1465,13 +1465,13 @@ CLASS zcl_zrouter_dispatch DEFINITION PUBLIC FINAL CREATE PUBLIC.
     METHODS get_handler_for_module
       IMPORTING iv_module         TYPE string
       RETURNING VALUE(ro_handler) TYPE REF TO zif_zrouter_handler
-      RAISING   zcx_zrouter.
+      RAISING   cx_zrouter.
     METHODS validate_and_check
       IMPORTING
         iv_module  TYPE string
         iv_action  TYPE string
       RAISING
-        zcx_zrouter.
+        cx_zrouter.
 ENDCLASS.
 
 CLASS zcl_zrouter_dispatch IMPLEMENTATION.
@@ -1485,12 +1485,12 @@ CLASS zcl_zrouter_dispatch IMPLEMENTATION.
     IF mo_config->is_action_allowed( iv_module = iv_module iv_action = iv_action ) = abap_bool.
       " Ação permitida na configuração
     ELSE.
-      RAISE EXCEPTION TYPE zcx_zrouter EXPORTING mv_text = |Action { iv_action } for { iv_module } not allowed|.
+      RAISE EXCEPTION TYPE cx_zrouter EXPORTING mv_text = |Action { iv_action } for { iv_module } not allowed|.
     ENDIF.
 
     DATA(ls_auth) = mo_auth->check_authority( iv_module = iv_module iv_action = iv_action ).
     IF ls_auth-authorized = abap_false.
-      RAISE EXCEPTION TYPE zcx_zrouter EXPORTING mv_text = ls_auth-message.
+      RAISE EXCEPTION TYPE cx_zrouter EXPORTING mv_text = ls_auth-message.
     ENDIF.
   ENDMETHOD.
 
@@ -1515,7 +1515,7 @@ CLASS zcl_zrouter_dispatch IMPLEMENTATION.
       WHEN 'BASIS'.
         ro_handler = NEW zcl_zrouter_handler_basis( io_logger = mo_logger io_config = mo_config ).
       WHEN OTHERS.
-        RAISE EXCEPTION TYPE zcx_zrouter EXPORTING mv_text = |Unknown module: { iv_module }|.
+        RAISE EXCEPTION TYPE cx_zrouter EXPORTING mv_text = |Unknown module: { iv_module }|.
     ENDCASE.
   ENDMETHOD.
 
@@ -1529,7 +1529,7 @@ CLASS zcl_zrouter_dispatch IMPLEMENTATION.
         rs_result-status  = ls_handler_result-status.
         rs_result-message = ls_handler_result-message.
         rs_result-data    = ls_handler_result-data.
-      CATCH zcx_zrouter INTO DATA(lx_zrouter).
+      CATCH cx_zrouter INTO DATA(lx_zrouter).
         rs_result-status  = 'ERROR'.
         rs_result-message = lx_zrouter->mv_text.
         mo_logger->log_action(
@@ -1555,7 +1555,7 @@ CLASS zcl_zrouter_batch DEFINITION PUBLIC FINAL CREATE PUBLIC.
         action  TYPE string,
         payload TYPE string,
       END OF ty_batch_action,
-      ty_batch_actions TYPE STANDARD TABLE OF ty_batch_action,
+      ty_batch_actions TYPE STANDARD TABLE OF ty_batch_action WITH EMPTY KEY,
 
       BEGIN OF ty_batch_item_result,
         seqnr   TYPE i,
@@ -1565,7 +1565,7 @@ CLASS zcl_zrouter_batch DEFINITION PUBLIC FINAL CREATE PUBLIC.
         message TYPE string,
         data    TYPE string,
       END OF ty_batch_item_result,
-      ty_batch_results TYPE STANDARD TABLE OF ty_batch_item_result,
+      ty_batch_results TYPE STANDARD TABLE OF ty_batch_item_result WITH EMPTY KEY,
 
       BEGIN OF ty_batch_result,
         batch_guid TYPE sysuuid_c32,
@@ -1619,7 +1619,7 @@ CLASS zcl_zrouter_batch IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD save_batch_result.
-    DATA: ls_batch TYPE zrouter_batlog.
+    DATA: ls_batch TYPE zrouter_batch_result.
     ls_batch-batch_guid = iv_batch_guid.
     ls_batch-seqnr      = iv_seqnr.
     ls_batch-module     = iv_module.
@@ -1629,7 +1629,7 @@ CLASS zcl_zrouter_batch IMPLEMENTATION.
     ls_batch-payload    = iv_payload.
     ls_batch-result     = iv_result.
     GET TIME STAMP FIELD ls_batch-timestamp.
-    MODIFY zrouter_batlog FROM @ls_batch.
+    MODIFY zrouter_batch_result FROM @ls_batch.
   ENDMETHOD.
 
   METHOD execute_batch.

@@ -69,7 +69,7 @@ CLASS zcl_zrouter_code_search_types DEFINITION PUBLIC FINAL CREATE PUBLIC.
         match_text   TYPE string,         " Matching line snippet
         source_url   TYPE string,         " ADT URI for navigation
       END OF ty_search_hit,
-      ty_search_hits TYPE STANDARD TABLE OF ty_search_hit WITH EMPTY KEY,
+      ty_search_hits TYPE STANDARD TABLE OF ty_search_hit,
 
       " Aggregated search result
       BEGIN OF ty_search_result,
@@ -88,7 +88,7 @@ CLASS zcl_zrouter_code_search_types DEFINITION PUBLIC FINAL CREATE PUBLIC.
         total_lines   TYPE i,
         avg_lines     TYPE i,
       END OF ty_code_stats,
-      ty_code_stats_tab TYPE STANDARD TABLE OF ty_code_stats WITH EMPTY KEY.
+      ty_code_stats_tab TYPE STANDARD TABLE OF ty_code_stats.
 
     CONSTANTS:
       " Source object type codes matching abapCodeSearch constants
@@ -136,7 +136,7 @@ CLASS zcl_zrouter_code_search DEFINITION PUBLIC FINAL CREATE PUBLIC.
       RETURNING
         VALUE(rs_result) TYPE zcl_zrouter_code_search_types=>ty_search_result
       RAISING
-        cx_zrouter.
+        zcx_zrouter.
 
     " Get code statistics (object counts, line counts by type)
     METHODS get_statistics
@@ -146,7 +146,7 @@ CLASS zcl_zrouter_code_search DEFINITION PUBLIC FINAL CREATE PUBLIC.
       RETURNING
         VALUE(rt_stats) TYPE zcl_zrouter_code_search_types=>ty_code_stats_tab
       RAISING
-        cx_zrouter.
+        zcx_zrouter.
 
     " Build ADT URI for navigating to a search hit
     CLASS-METHODS build_adt_uri
@@ -165,7 +165,7 @@ CLASS zcl_zrouter_code_search DEFINITION PUBLIC FINAL CREATE PUBLIC.
       RETURNING
         VALUE(rs_params) TYPE zcl_zrouter_code_search_types=>ty_search_params
       RAISING
-        cx_zrouter.
+        zcx_zrouter.
 
     " Map internal object type to abapCodeSearch engine constant
     METHODS map_object_type
@@ -182,7 +182,7 @@ CLASS zcl_zrouter_code_search DEFINITION PUBLIC FINAL CREATE PUBLIC.
       RETURNING
         VALUE(rt_hits) TYPE zcl_zrouter_code_search_types=>ty_search_hits
       RAISING
-        cx_zrouter.
+        zcx_zrouter.
 
     " Map engine result row to ty_search_hit
     METHODS engine_row_to_hit
@@ -217,7 +217,7 @@ CLASS zcl_zrouter_code_search IMPLEMENTATION.
           CHANGING
             data = rs_params ).
       CATCH cx_root INTO DATA(lx).
-        RAISE EXCEPTION TYPE cx_zrouter
+        RAISE EXCEPTION TYPE zcx_zrouter
           EXPORTING mv_text = |Failed to parse search params: { lx->get_text( ) }|.
     ENDTRY.
 
@@ -296,10 +296,10 @@ CLASS zcl_zrouter_code_search IMPLEMENTATION.
         ENDLOOP.
 
       CATCH cx_sy_create_object_error.
-        RAISE EXCEPTION TYPE cx_zrouter
+        RAISE EXCEPTION TYPE zcx_zrouter
           EXPORTING mv_text = |abap-code-search-tools engine (ZCL_ADCOSET_SEARCH_ENGINE) not found. Install via abapGit from DevEpos/abap-code-search-tools|.
       CATCH cx_root INTO DATA(lx).
-        RAISE EXCEPTION TYPE cx_zrouter
+        RAISE EXCEPTION TYPE zcx_zrouter
           EXPORTING mv_text = |Search engine error: { lx->get_text( ) }|.
     ENDTRY.
   ENDMETHOD.
@@ -349,7 +349,7 @@ CLASS zcl_zrouter_code_search IMPLEMENTATION.
             is_params       = ls_params
             iv_object_type  = lv_type ).
           APPEND LINES OF lt_type_hits TO rs_result-hits.
-        CATCH cx_zrouter INTO DATA(lx_type).
+        CATCH zcx_zrouter INTO DATA(lx_type).
           APPEND |{ lv_type }: { lx_type->mv_text }| TO rs_result-errors.
       ENDTRY.
     ENDLOOP.
@@ -508,7 +508,7 @@ CLASS zcl_zrouter_handler_basis IMPLEMENTATION.
           iv_message = |Code search complete: { ls_search_result-total_hits } hits in { ls_search_result-search_time_ms }ms |
           iv_data    = lv_result_json ).
 
-      CATCH cx_zrouter INTO DATA(lx).
+      CATCH zcx_zrouter INTO DATA(lx).
         rs_result = build_result( iv_status = 'ERROR' iv_message = lx->mv_text ).
       CATCH cx_root INTO DATA(lx_root).
         rs_result = build_result( iv_status = 'ERROR' iv_message = |Code search failed: { lx_root->get_text( ) }| ).

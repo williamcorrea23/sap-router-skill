@@ -24,12 +24,12 @@ MCP_HEALTHCHECK_SPEC = {
         "description": "ADT primary — read/write ABAP source, search, transport",
     },
     "aibap": {
-        "env_vars": [],  # Uses systems.json
-        "probe_command": "aibap-mcp --help",
-        "probe_command_alt": "which aibap-mcp",
+        "env_vars": [],  # Uses systems.json in ~/.config/sap-mcp/
+        "probe_command": "aibap.mcp --help",
+        "probe_command_alt": "where aibap.mcp",
         "criticality": "HIGH",
         "description": "69-tool ABAP development MCP (Go binary)",
-        "config_file": "systems.json",
+        "config_file": "~/.config/sap-mcp/systems.json",
     },
     "mcp-abap-adt": {
         "env_vars": ["SAP_URL", "SAP_USERNAME", "SAP_PASSWORD", "SAP_CLIENT"],
@@ -511,7 +511,10 @@ class HealthChecker:
             # Check if config file exists
             config_file = spec.get("config_file")
             if config_file:
-                config_path = self.project_root / config_file
+                if config_file.startswith("~/"):
+                    config_path = Path.home() / config_file[2:]
+                else:
+                    config_path = self.project_root / config_file
                 if config_path.exists():
                     return {"status": "CONFIGURED", "details": f"Config file {config_file} found"}
                 else:

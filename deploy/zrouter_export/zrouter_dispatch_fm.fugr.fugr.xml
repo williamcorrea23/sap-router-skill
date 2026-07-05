@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0"
+          serializer="LCL_OBJECT_FUGR">
+  <asx:abap xmlns:asx="http://www.sap.com/abapxml">
+    <asx:values>
+      <PROGDIR>
+        <NAME>ZROUTER_DISPATCH_FM.FUGR</NAME>
+        <SUBC>1</SUBC>
+        <DESCRIPT>ZROUTER: ZROUTER_DISPATCH_FM.FUGR</DESCRIPT>
+        <FIXPT>X</FIXPT>
+        <UCCHECK>X</UCCHECK>
+      </PROGDIR>
+    </asx:values>
+  </asx:abap>
+</abapGit>

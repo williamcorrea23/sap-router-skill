@@ -1,0 +1,8 @@
+
+
+CLASS zcl_zrouter_logger DEFINITION PUBLIC FINAL CREATE PUBLIC.
+  PUBLIC SECTION.
+    INTERFACES zif_zrouter_logger.
+  PRIVATE SECTION.
+    METHODS generate_guid RETURNING VALUE(rv_guid) TYPE sysuuid_c32.
+ENDCLASS.
