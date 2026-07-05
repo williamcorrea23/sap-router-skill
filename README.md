@@ -213,8 +213,6 @@ flowchart LR
 
 ---
 
-## Self-Learning Engine
-
 
 ## Functional Module Coverage
 
