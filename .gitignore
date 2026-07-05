@@ -51,3 +51,4 @@ htmlcov/
 coverage/
 abap-review-report.html
 abaplint-report.json
+packages/

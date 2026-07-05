@@ -33,32 +33,75 @@
     },
     "mcp-sap-gui": {
       "type": "stdio",
-      "command": "node",
-      "args": ["dist/index.js"],
+      "command": "python",
+      "args": ["-m", "sap_gui_server.server"],
       "env": {
         "SAPGUI_HOST": "10.57.203.136",
         "SAPGUI_USER": "30356735869",
         "SAPGUI_PASSWORD": "Fodase@APPA2026",
-        "SAPGUI_CLIENT": "100"
+        "SAPGUI_CLIENT": "100",
+        "PYTHONPATH": "packages/mcp-sap-gui-mario/src"
       },
-      "description": "SAP GUI Scripting MCP (mario-andreschak/mcp-sap-gui) — ADT FALLBACK path. CREDENCIAIS HARDCODED."
+      "description": "SAP GUI MCP (mario-andreschak/mcp-sap-gui v0.1.3) — Python, module sap_gui_server. Installed editable from packages/mcp-sap-gui-mario."
     },
     "mcp-sap-gui-kts": {
       "type": "stdio",
       "command": "python",
       "args": ["-m", "mcp_sap_gui"],
       "env": {
-        "SAP_CONNECTION": "{\"host\":\"10.57.203.136\",\"sysnr\":\"00\",\"client\":\"100\",\"user\":\"30356735869\",\"passwd\":\"Fodase@APPA2026\"}"
+        "SAP_CONNECTION": "{\"host\":\"10.57.203.136\",\"sysnr\":\"00\",\"client\":\"100\",\"user\":\"30356735869\",\"passwd\":\"Fodase@APPA2026\"}",
+        "PYTHONPATH": "packages/mcp-sap-gui-kts-code/src"
       },
-      "description": "SAP GUI MCP (kts982/mcp-sap-gui) — Python-based SAP GUI automation bridge. CREDENCIAIS HARDCODED."
+      "description": "SAP GUI MCP (kts982/mcp-sap-gui v0.1.3) — Python. Installed editable from packages/mcp-sap-gui-kts-code."
+    },
+    "sap-gui-mcp-jduncan": {
+      "type": "stdio",
+      "command": "python",
+      "args": ["-m", "sap_gui_mcp.server"],
+      "env": {
+        "SAPGUI_HOST": "10.57.203.136",
+        "SAPGUI_USER": "30356735869",
+        "SAPGUI_PASSWORD": "Fodase@APPA2026",
+        "SAPGUI_CLIENT": "100",
+        "PYTHONPATH": "packages/sap_gui_mcp/src"
+      },
+      "description": "SAP GUI MCP (jduncan8142/sap_gui_mcp v0.1.0) — FastMCP-based, Python. Installed editable from packages/sap_gui_mcp."
+    },
+    "sapient-mcp": {
+      "type": "stdio",
+      "command": "python",
+      "args": ["-m", "sapient_mcp"],
+      "env": {
+        "SAPIENT_HOST": "10.57.203.136",
+        "SAPIENT_KEY": "default",
+        "PYTHONPATH": "packages/sapient-mcp/src"
+      },
+      "description": "Sapient MCP (toni-ramchandani/sapient-mcp v1.0.0) — Intelligent SAP GUI automation, RoboSAPiens-powered. Python."
+    },
+    "abap-mcp-adt-powerup": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["packages/abap-mcp-adt-powerup/bin/mcp-abap-adt.js"],
+      "env": {
+        "SAP_URL": "https://10.57.203.136:44300",
+        "SAP_USER": "30356735869",
+        "SAP_PASSWORD": "Fodase@APPA2026",
+        "SAP_CLIENT": "100"
+      },
+      "description": "ABAP MCP ADT PowerUp (babamba2/abap-mcp-adt-powerup) — Extended ADT MCP with advanced ABAP tools. Node.js."
     },
     "sapgui-mcp-go": {
       "type": "stdio",
       "command": "sapgui-mcp",
       "args": [],
-      "env": {},
-      "description": "SAP GUI MCP in Go (Hochfrequenz/sapgui.mcp) — TERTIARY fallback. Lightweight Go-based GUI bridge. Use as last-resort GUI automation path."
-    },
+      "env": {
+        "SAPGUI_HOST": "10.57.203.136",
+        "SAPGUI_USER": "30356735869",
+        "SAPGUI_PASSWORD": "Fodase@APPA2026",
+        "SAPGUI_CLIENT": "100"
+      },
+      "description": "SAP GUI MCP in Go (Hochfrequenz/sapgui.mcp v0.13.3) — TERTIARY fallback. Requires: go install github.com/Hochfrequenz/sapgui.mcp/cmd/sapgui-mcp@latest (when fixed upstream)."
+    }
     "mcp-sap-notes": {
       "type": "stdio",
       "command": "node",
