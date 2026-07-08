@@ -1,14 +1,13 @@
 ---
 name: sap-router-skill
 description: >-
-  SAP development orchestrator v4.2.0 — Karpathy command format (Think→Simplify→
+  SAP development orchestrator v5.0.0 — Karpathy command format (Think→Simplify→
   Surgical→Verify), healthcheck guardian, self-learning router, caveman-compressed
-  output default. 85 skills, 35 MCPs (+18 planned), 15 CLIs. Routes: ADT →
-  GUI (immediate); BAPI dispatch only in functional context; ZROUTER RFC opt-in; parallel pipeline waves. RAG-ready: Pinecone, Supabase, Azure.
+  output default. 85 skills, 35 MCPs (+18 planned), 15 CLIs. Multi-protocol: HTTP/OData/RFC/BDC. ZROUTER v5 REST gateway. Install pipeline: YDOWN→ZABAPGIT→ZSAPLINK. BDC engine: YFG_SBDC. Test suites: ZODATA_TEST_AUTOMATION_FGR.
   Use for any SAP task.
 ---
 
-# SAP Router v4.2.0 — Karpathy Command Format
+# SAP Router v5.0.0 — Karpathy Command Format
 
 **Behavioral wrapper: every operation follows 4 principles. Healthcheck first.**
 
@@ -245,7 +244,7 @@ npm run learn:ctx
 
 ## Project Objects
 
-### Skills (85 — v4.2.0)
+### Skills (85 — v5.0.0)
 
 - abap
 - abap-cloud
@@ -333,7 +332,7 @@ npm run learn:ctx
 - sapui5-framework
 - superclaude-for-sap
 
-85 skills total (v4.2.0). Covers: ABAP Core, BTP, CDS/RAP, OData, CPI, HANA, SAC, Fiori/UI5, Datasphere, Workflow, AI/LLM, Code Review, Transport.
+85 skills total (v5.0.0). Covers: ABAP Core, BTP, CDS/RAP, OData, CPI, HANA, SAC, Fiori/UI5, Datasphere, Workflow, AI/LLM, Code Review, Transport.
 
 ### MCPs (35 MCPs (+18 planned))
 
@@ -341,7 +340,7 @@ npm run learn:ctx
 
 **Planned / Roadmap (18):** mcp-abap-abap-adt-api, dassian-adt, adt-ls, sapgui-mcp, sap-gui-mcp-jduncan, cpi-mcp-server, mcp-ci-python, btp-is-ci-mcp-server, sap-cpi-mcp-backup, cap-mcp-plugin, hana-mcp-server, vibing-steampunk, sap-mcp, abap-mcp-adt-powerup, mcp-hub, sap-ai-mcp-servers, sap-mcp-config, mcp-sap-docs
 
-### CLIs (15 — v4.2.0)
+### CLIs (15 — v5.0.0)
 
 - `abap_serializer.py`
 - `btp_diagram.py`

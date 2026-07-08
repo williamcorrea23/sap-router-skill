@@ -29,6 +29,19 @@ npm run learn:route -- --action MM_CREATE_MATERIAL --success true
 # ZROUTER bootstrap
 npm run zrouter:probe             # Check if ZROUTER installed on SAP
 npm run zrouter:install:force     # Install via ADT
+npm run zrouter:http:test         # Test HTTP REST endpoint
+npm run zrouter:test -- --suite SMOKE  # Run test suite
+
+# BDC / Install tools
+npm run bdc:record -- --tcode MM01 --recording ZMM01_CREATE
+npm run bdc:replay -- --recording ZMM01_CREATE --mode N
+npm run req:copy -- --source A4HK900123 --target C11
+npm run install:ydown -- --file zrouter_v5.abap
+npm run install:zabapgit -- --zip zrouter_v5.zip
+
+# Deploy
+npm run deploy -- --object zcl_zrouter_http  # Deploy single object
+npm run deploy:all                            # Deploy all v5 objects
 
 # Data
 npm run template -- --module MM --action CREATE_MATERIAL

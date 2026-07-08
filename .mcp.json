@@ -36,6 +36,10 @@
       "command": "python",
       "args": ["-m", "sap_gui_server.server"],
       "env": {
+        "SAP_SYSTEM": "10.57.203.136/00",
+        "SAP_CLIENT": "100",
+        "SAP_USER": "30356735869",
+        "SAP_PASSWORD": "Fodase@APPA2026",
         "SAPGUI_HOST": "10.57.203.136",
         "SAPGUI_USER": "30356735869",
         "SAPGUI_PASSWORD": "Fodase@APPA2026",

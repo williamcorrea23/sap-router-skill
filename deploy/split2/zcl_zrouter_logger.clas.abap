@@ -34,9 +34,9 @@ CLASS zcl_zrouter_logger IMPLEMENTATION.
     INSERT zrouter_log FROM @ls_log.
     IF sy-subrc <> 0.
       RAISE EXCEPTION TYPE zcx_zrouter EXPORTING mv_text = 'Failed to write log entry'.
-    ELSE.
-      COMMIT WORK AND WAIT.
     ENDIF.
+    " Note: No COMMIT WORK here. Caller (handler/dispatcher) controls LUW.
+    " Log entry is persisted when handler calls BAPI_TRANSACTION_COMMIT.
   ENDMETHOD.
 
   METHOD zif_zrouter_logger~get_logs.

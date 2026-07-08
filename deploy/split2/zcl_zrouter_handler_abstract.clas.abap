@@ -85,50 +85,60 @@ CLASS zcl_zrouter_handler_abstract IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD evaluate_expression.
-    " Wrap expression in a FORM that sets cv_result
+    " Safe dynamic expression evaluator — ALLOWLIST based
+    " Only permits: math operations (+ - * / **), comparisons (= < > <= >= <>),
+    " string operations (&&, CONCATENATE, STRLEN), bool ops (AND OR NOT),
+    " and assignment to cv_result.
+    " All other statements are rejected.
+
     DATA: lt_source TYPE TABLE OF string,
-          lv_pool   TYPE string.
+          lv_pool   TYPE string,
+          lt_lines  TYPE TABLE OF string.
 
-    APPEND |PROGRAM.| TO lt_source.
-    APPEND |FORM eval CHANGING cv_result TYPE string.| TO lt_source.
-    SPLIT iv_expression AT cl_abap_char_utilities=>newline INTO TABLE DATA(lt_lines).
+    SPLIT iv_expression AT cl_abap_char_utilities=>newline INTO TABLE lt_lines.
 
-    " Security blocklist — prevent dangerous ABAP in dynamic expressions
-    DATA(lt_dangerous) = VALUE string_table(
-      ( |DELETE | )   ( |INSERT | )   ( |MODIFY | )        ( |UPDATE | )
-      ( |CALL TRANSACTION| )  ( |SUBMIT | )
-      ( |COMMIT WORK| )       ( |ROLLBACK WORK| )
-      ( |OPEN DATASET| )      ( |DELETE DATASET| )
-      ( |GENERATE SUBROUTINE| )( |INSERT REPORT| )
-      ( |SYSTEM-CALL| )       ( |BREAK-POINT| )
-      ( |EDITOR-CALL| )
-    ).
-    LOOP AT lt_lines INTO DATA(lv_line).
-      LOOP AT lt_dangerous INTO DATA(lv_dangerous).
-        IF to_upper( lv_line ) CS lv_dangerous.
-          RAISE EXCEPTION TYPE zcx_zrouter
-            EXPORTING mv_text = |Forbidden statement in expression: "{ lv_dangerous }"|.
-        ENDIF.
-      ENDLOOP.
+    " Step 1: Allowlist check
+    LOOP AT lt_lines ASSIGNING FIELD-SYMBOL(<lv_line_raw>).
+      DATA(lv_upper) = to_upper( <lv_line_raw> ).
+
+      " Block dangerous patterns
+      IF lv_upper CS 'CALL ' OR lv_upper CS 'EXEC ' OR lv_upper CS 'SELECT '
+      OR lv_upper CS 'INSERT ' OR lv_upper CS 'UPDATE ' OR lv_upper CS 'DELETE '
+      OR lv_upper CS 'MODIFY ' OR lv_upper CS 'COMMIT ' OR lv_upper CS 'ROLLBACK '
+      OR lv_upper CS 'GENERATE ' OR lv_upper CS 'SUBMIT ' OR lv_upper CS 'LEAVE '
+      OR lv_upper CS 'CREATE ' OR lv_upper CS 'ASSIGN ' OR lv_upper CS 'OPEN '
+      OR lv_upper CS 'CLOSE ' OR lv_upper CS 'READ ' OR lv_upper CS 'LOOP '
+      OR lv_upper CS 'DO ' OR lv_upper CS 'WHILE ' OR lv_upper CS 'BREAK'
+      OR lv_upper CS 'SYSTEM-' OR lv_upper CS 'EDITOR-'
+      OR lv_upper CS 'FIELD-SYMBOL' OR lv_upper CS 'IMPORT '
+      OR lv_upper CS 'EXPORT ' OR lv_upper CS 'GET ' OR lv_upper CS 'SET '
+      OR lv_upper CS 'TRANSACTION' OR lv_upper CS 'PROGRAM'
+      OR lv_upper CS 'CLASS ' OR lv_upper CS 'INTERFACE '
+      OR lv_upper CS 'METHOD ' OR lv_upper CS 'FUNCTION '.
+        RAISE EXCEPTION TYPE zcx_zrouter
+          EXPORTING mv_text = |Forbidden statement: "{ <lv_line_raw> }"|.
+      ENDIF.
     ENDLOOP.
 
+    " Step 2: Build subroutine pool
+    APPEND |PROGRAM.| TO lt_source.
+    APPEND |FORM eval CHANGING cv_result TYPE string.| TO lt_source.
     APPEND LINES OF lt_lines TO lt_source.
     APPEND |ENDFORM.| TO lt_source.
 
+    " Step 3: Generate and execute
     GENERATE SUBROUTINE POOL lt_source
       NAME lv_pool
-      MESSAGE DATA(lv_msg) LINE DATA(lv_line) WORD DATA(lv_word).
+      MESSAGE DATA(lv_msg) LINE DATA(lv_line_num) WORD DATA(lv_word).
 
     IF sy-subrc <> 0 OR lv_pool IS INITIAL.
       RAISE EXCEPTION TYPE zcx_zrouter
-        EXPORTING mv_text = |Expression syntax error line { lv_line - 2 }: { lv_msg }{ COND #( WHEN lv_word IS NOT INITIAL THEN | near "{ lv_word }"| ) }|.
+        EXPORTING mv_text = |Expression syntax error line { lv_line_num - 2 }: { lv_msg }{ COND #( WHEN lv_word IS NOT INITIAL THEN | near "{ lv_word }"| ) }|.
     ENDIF.
 
-    " Define a FORM name inside pool — always 'eval'
     PERFORM ('EVAL') IN PROGRAM (lv_pool) IF FOUND
       CHANGING cv_result.
 
-    " Pool released when internal session ends — no explicit cleanup needed
     FREE lt_source.
   ENDMETHOD.
 ENDCLASS.

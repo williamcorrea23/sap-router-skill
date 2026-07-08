@@ -23,7 +23,7 @@ from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-__version__ = "4.2.0"
+__version__ = "5.0.0"
 
 # === ZROUTER LIVE STATE (probe cache, used by bootstrap/fallback engine) ===
 # Cached probe result. None=not checked, True=installed, False=missing
@@ -135,6 +135,19 @@ GUI_FALLBACK_MAP = {
     'ST22_SCAN_GUI':        {'tcode': 'ST22',   'description': 'Dump Analysis'},
     'SM37_JOB_MONITOR':     {'tcode': 'SM37',   'description': 'Job Monitor'},
     'SM50_PROCESS_LIST':    {'tcode': 'SM50',   'description': 'Process Overview'},
+    # ZROUTER v5 new actions
+    'BDC_RECORD':           {'tcode': 'SHDB',   'description': 'Record BDC session'},
+    'BDC_REPLAY':           {'tcode': 'YFG_SBDC', 'description': 'Replay BDC session via Y_SBDC_REPLAY'},
+    'BDC_LIST':             {'tcode': 'YFG_SBDC', 'description': 'List BDC sessions'},
+    'BDC_DELETE':           {'tcode': 'YFG_SBDC', 'description': 'Delete BDC session'},
+    'INSTALL_YDOWN':        {'tcode': 'SE38',   'description': 'Install via YDOWN (auto-activate)'},
+    'INSTALL_ZABAPGIT':     {'tcode': 'SE38',   'description': 'Install via ZABAPGIT offline ZIP'},
+    'INSTALL_ZSAPLINK':     {'tcode': 'SE38',   'description': 'Install via ZSAPLINK nugget'},
+    'REQ_COPY':             {'tcode': 'SE38',   'description': 'Copy transport request via ZREQ'},
+    'ZROUTER_HTTP_TEST':    {'tcode': 'SICF',   'description': 'Test ZROUTER HTTP endpoint'},
+    'ZROUTER_TEST_SUITE':   {'tcode': 'SE38',   'description': 'Run ZODATA_TEST_AUTOMATION'},
+    'SAPLINK_IMPORT':       {'tcode': 'SE38',   'description': 'Import SAPlink nugget'},
+    'SAPLINK_EXPORT':       {'tcode': 'SE38',   'description': 'Export SAPlink nugget'},
 }
 
 # Caveman sub-agent delegation rules
@@ -166,12 +179,12 @@ CAVEMAN_DELEGATION = {
 PIPELINE_STAGES = [
     {'id': 'stage1', 'name': 'Spec Analysis',              'skill': 'sap-router-skill',      'avg_time': '10s',    'wave': 0},
     {'id': 'stage2', 'name': 'Technical Proposal',          'skill': 'sap-crew-analysis',     'avg_time': '3min',   'wave': 1},
-    {'id': 'stage3', 'name': 'Peer Review 1',               'skill': 'abap-code-review',      'avg_time': '1min',   'wave': 2},
+    {'id': 'stage3', 'name': 'Peer Review 1 (12-dim)',      'skill': 'abap-code-review',      'avg_time': '2min',   'wave': 2, 'description': 'Architecture review: 12 dimensions + cumulative tracking -> REVIEW_1.md'},
     {'id': 'stage4', 'name': 'Implementation',              'skill': 'cavecrew-builder + ADT','avg_time': 'varied', 'wave': 3, 'fan_out': 'per-object'},
     {'id': 'stage5', 'name': 'Static Analysis (abaplint)',  'tool': 'npm run abap:review',    'avg_time': '30s',    'wave': 4},
     {'id': 'stage6', 'name': 'Deep Analysis (Crew)',        'skill': 'sap-crew-analysis',     'avg_time': '5min',   'wave': 4},
-    {'id': 'stage7', 'name': 'Peer Review 2',               'skill': 'abap-code-review',      'avg_time': '1min',   'wave': 5},
-    {'id': 'stage8', 'name': 'Transport Gate',              'skill': 'sap-transport-gate',    'avg_time': '2min',   'wave': 6},
+    {'id': 'stage7', 'name': 'Peer Review 2 (12-dim + delta)', 'skill': 'abap-code-review',   'avg_time': '2min',   'wave': 5, 'description': 'Code review vs Stage 3 findings + new dimensions -> REVIEW_2.md'},
+    {'id': 'stage8', 'name': 'Transport Gate (10-dim)',     'skill': 'sap-transport-gate',    'avg_time': '2min',   'wave': 6},
 ]
 # === v5.0: CONFIG LOADER (YAML external, hardcoded fallback) ===
 CONFIG_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "config")
