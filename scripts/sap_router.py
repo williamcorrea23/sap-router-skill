@@ -19,7 +19,10 @@ import sys
 import json
 import argparse
 import subprocess
+import logging
 from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
@@ -37,6 +40,19 @@ def set_zrouter_state(installed):
 def get_zrouter_state():
     """Return cached ZROUTER state. None = not checked yet."""
     return _zrouter_state
+
+# === SOAP RFC LIVE STATE (probe cache, used before GUI fallback) ===
+# Cached probe result: None=not probed, True=available, False=unavailable
+_soap_rfc_available = None
+
+def set_soap_rfc_state(available):
+    """Called after probing /sap/bc/soap/rfc endpoint availability."""
+    global _soap_rfc_available
+    _soap_rfc_available = available
+
+def get_soap_rfc_state():
+    """Return cached SOAP RFC state. None = not probed yet."""
+    return _soap_rfc_available
 
 # === ZROUTER OPT-IN (improvement, NOT the engine) ===
 # Persisted user decision so a decline survives across runs. ZROUTER is an
@@ -104,6 +120,137 @@ FUNCTIONAL_BAPI_MAP = {
     "CREATE_RN":             "ZFM_QM_CREATE_RN",
     "CREATE_INTERNAL_ORDER": "BAPI_INTERNALORDER_CREATE",
     "CREATE_PROD_ORDER":     "BAPI_PRODORD_CREATE",
+}
+
+# === SOAP RFC BAPI FALLBACK ===
+# Before falling back to SAP GUI scripting, try the SOAP-over-HTTP RFC endpoint
+# (/sap/bc/soap/rfc). This eliminates JCo/pyrfc dependency entirely — the call
+# goes as HTTP POST with SOAP XML envelope and Basic auth, using the same
+# ARC_SAP_* credentials as the ADT MCP.
+SOAP_RFC_FALLBACK_ENABLED = True
+
+# Mapping of action names -> BAPI FM names and XML parameter structure.
+# 'import_params' define the SOAP XML elements under the BAPI function node:
+#   scalar -> <NAME>value</NAME>
+#   struct -> <NAME><FIELD>value</FIELD>...</NAME>
+#   table  -> <NAME><item><FIELD>value</FIELD>...</item></NAME>
+# 'tables' lists export/change table names (RETURN always present for BAPIs).
+SOAP_RFC_BAPI_MAP = {
+    "CREATE_MATERIAL": {
+        "bapi": "BAPI_MATERIAL_SAVEDATA",
+        "import_params": [
+            {"name": "HEADDATA", "type": "struct", "fields": ["MATERIAL", "IND_SECTOR", "MATL_TYPE", "MATL_GROUP"]},
+            {"name": "CLIENTDATA", "type": "struct", "fields": ["MATL_GROUP", "BASE_UOM", "NET_WEIGHT", "UNIT_OF_WT", "SIZE_DIM", "VOLUME", "UNIT_OF_VOLUME"]},
+            {"name": "PLANTDATA", "type": "table", "fields": ["PLANT", "STGE_LOC", "STGE_BIN", "SALES_STOCK", "STOR_TYPE"]},
+            {"name": "MATERIALDESCRIPTION", "type": "table", "fields": ["LANGU", "MATL_DESC"]},
+            {"name": "UNITSOFMEASURE", "type": "table", "fields": ["ALT_UNIT", "BASE_UNIT", "NUMERATOR", "DENOMINATR", "EAN11", "GROSS_WT", "NET_WEIGHT", "UNIT_OF_WT", "VOLUME", "VOLUMEUNIT"]},
+            {"name": "TAXCLASSIFICATIONS", "type": "table", "fields": ["TAX_CLASSIFICATION", "DEPART_CNTRY", "TAX_TYPE"]},
+        ],
+        "tables": ["RETURN"],
+        "description": "Create/change material master via BAPI_MATERIAL_SAVEDATA",
+    },
+    "CHANGE_MATERIAL": {
+        "bapi": "BAPI_MATERIAL_SAVEDATA",
+        "import_params": [
+            {"name": "HEADDATA", "type": "struct", "fields": ["MATERIAL", "IND_SECTOR", "MATL_TYPE"]},
+            {"name": "CLIENTDATA", "type": "struct", "fields": ["MATL_GROUP", "BASE_UOM"]},
+            {"name": "PLANTDATA", "type": "table", "fields": ["PLANT", "STGE_LOC"]},
+        ],
+        "tables": ["RETURN"],
+        "description": "Change material master (same BAPI as create)",
+    },
+    "CREATE_PO": {
+        "bapi": "BAPI_PO_CREATE1",
+        "import_params": [
+            {"name": "PO_HEADER", "type": "struct", "fields": ["COMP_CODE", "DOC_TYPE", "VENDOR", "PURCH_ORG", "PUR_GROUP", "DOC_DATE", "CREATED_BY", "LANGU", "PMNTTRMS"]},
+            {"name": "PO_ADDRDELIVERY", "type": "struct", "fields": ["NAME", "STREET", "CITY", "REGION", "COUNTRY", "POSTL_COD1"]},
+        ],
+        "tables": ["PO_ITEM", "RETURN"],
+        "description": "Create purchase order via BAPI_PO_CREATE1",
+    },
+    "CHANGE_PO": {
+        "bapi": "BAPI_PO_CHANGE",
+        "import_params": [
+            {"name": "PO_HEADER", "type": "struct", "fields": ["COMP_CODE", "VENDOR", "PURCH_ORG", "PUR_GROUP"]},
+        ],
+        "tables": ["PO_ITEM", "RETURN"],
+        "description": "Change purchase order via BAPI_PO_CHANGE",
+    },
+    "GOODS_MOVEMENT": {
+        "bapi": "BAPI_GOODSMVT_CREATE",
+        "import_params": [
+            {"name": "GOODSMVT_HEADER", "type": "struct", "fields": ["PSTNG_DATE", "DOC_DATE", "REF_DOC_NO", "HEADER_TXT"]},
+            {"name": "GOODSMVT_CODE", "type": "struct", "fields": ["GM_CODE"]},
+        ],
+        "tables": ["GOODSMVT_ITEM", "RETURN"],
+        "description": "Goods movement via BAPI_GOODSMVT_CREATE",
+    },
+    "CREATE_SALES_ORDER": {
+        "bapi": "BAPI_SALESORDER_CREATEFROMDAT2",
+        "import_params": [
+            {"name": "ORDER_HEADER_IN", "type": "struct", "fields": ["DOC_TYPE", "SALES_ORG", "DISTR_CHAN", "DIVISION", "SALES_OFF", "SALES_GRP", "REQ_DATE_H", "PURCH_NO_C", "CURRENCY"]},
+            {"name": "ORDER_HEADER_INX", "type": "struct", "fields": ["DOC_TYPE", "SALES_ORG", "DISTR_CHAN", "DIVISION", "UPDATEFLAG"]},
+        ],
+        "tables": ["ORDER_ITEMS_IN", "ORDER_PARTNERS", "ORDER_SCHEDULES_IN", "RETURN"],
+        "description": "Create sales order via BAPI_SALESORDER_CREATEFROMDAT2",
+    },
+    "CHANGE_SALES_ORDER": {
+        "bapi": "BAPI_SALESORDER_CHANGE",
+        "import_params": [
+            {"name": "ORDER_HEADER_IN", "type": "struct", "fields": ["DOC_TYPE", "SALES_ORG", "DISTR_CHAN", "DIVISION"]},
+            {"name": "SALESDOCUMENT", "type": "scalar"},
+        ],
+        "tables": ["ORDER_ITEM_IN", "RETURN"],
+        "description": "Change sales order via BAPI_SALESORDER_CHANGE",
+    },
+    "CREATE_INVOICE": {
+        "bapi": "BAPI_BILLINGDOC_CREATEMULTIPLE",
+        "import_params": [
+            {"name": "BILLINGDOC_IN", "type": "struct", "fields": ["REF_DOC", "REF_DOC_CA", "BLL_DOC_TYPE", "DOC_DATE", "PSTNG_DATE", "SALES_ORG", "DISTR_CHAN", "DIVISION"]},
+        ],
+        "tables": ["BILLINGDOC_IN", "RETURN"],
+        "description": "Create billing document via BAPI_BILLINGDOC_CREATEMULTIPLE",
+    },
+    "POST_DOCUMENT": {
+        "bapi": "BAPI_ACC_DOCUMENT_POST",
+        "import_params": [
+            {"name": "DOCUMENTHEADER", "type": "struct", "fields": ["BUS_ACT", "USERNAME", "HEADER_TXT", "COMP_CODE", "DOC_DATE", "PSTNG_DATE", "TRANS_DATE", "FISCAL_YEAR", "DOC_TYPE", "REF_DOC_NO"]},
+        ],
+        "tables": ["ACCOUNTGL", "ACCOUNTPAYABLE", "ACCOUNTRECEIVABLE", "CURRENCYAMOUNT", "RETURN"],
+        "description": "Post FI document via BAPI_ACC_DOCUMENT_POST",
+    },
+    "REVERSE_DOCUMENT": {
+        "bapi": "BAPI_ACC_DOCUMENT_REV_POST",
+        "import_params": [
+            {"name": "REVERSALHEADER", "type": "struct", "fields": ["OBJ_TYPE", "OBJ_KEY", "OBJ_SYS", "REASON_REV", "COMP_CODE", "PSTNG_DATE", "TRANS_DATE"]},
+        ],
+        "tables": ["RETURN"],
+        "description": "Reverse FI document via BAPI_ACC_DOCUMENT_REV_POST",
+    },
+    "CREATE_INSPECTION": {
+        "bapi": "BAPI_INSPLOT_CREATE",
+        "import_params": [
+            {"name": "INSPECTIONLOTHEADER", "type": "struct", "fields": ["PLANT", "INSPLOT_ORIGIN", "MATERIAL", "MATERIAL_EXTERNAL", "BATCH"]},
+        ],
+        "tables": ["INSPECTIONLOTCHARACTERISTIC", "RETURN"],
+        "description": "Create inspection lot via BAPI_INSPLOT_CREATE",
+    },
+    "CREATE_INTERNAL_ORDER": {
+        "bapi": "BAPI_INTERNALORDER_CREATE",
+        "import_params": [
+            {"name": "ORDERDATA", "type": "struct", "fields": ["ORDER_TYPE", "DESCRIPTION", "START_DATE", "END_DATE", "COMP_CODE", "BUS_AREA", "COST_CENTER", "OBJECT_CLASS", "RESPONSIBLE"]},
+        ],
+        "tables": ["RETURN"],
+        "description": "Create internal order via BAPI_INTERNALORDER_CREATE",
+    },
+    "CREATE_PROD_ORDER": {
+        "bapi": "BAPI_PRODORD_CREATE",
+        "import_params": [
+            {"name": "ORDERDATA", "type": "struct", "fields": ["ORDER_TYPE", "MATERIAL", "PLANT", "TOTAL_QUANTITY", "BASE_ENTRY_DATE", "COMPLETION_DATE", "PROD_VERSION"]},
+        ],
+        "tables": ["RETURN"],
+        "description": "Create production order via BAPI_PRODORD_CREATE",
+    },
 }
 
 # SAP GUI fallback map: action → transaction code for ADT-unavailable operations
@@ -217,6 +364,7 @@ class SapRouter:
         self.memory_file = os.path.abspath(memory_file)
         self.gui_fallback_enabled = True
         self.caveman_delegation_enabled = True
+        self.soap_rfc_fallback_enabled = True
 
     def scan_agent_registry(self):
         """v5.0: Discover agents from .claude/agents/*.md YAML frontmatter.
@@ -485,6 +633,14 @@ class SapRouter:
             if caveman_route:
                 return caveman_route
 
+        # Step 4.5: SOAP RFC BAPI — before GUI fallback, try SOAP-over-HTTP RFC
+        # This eliminates the JCo/pyrfc dependency: calls BAPI directly via
+        # /sap/bc/soap/rfc with HTTP POST + SOAP XML + Basic auth.
+        if self.soap_rfc_fallback_enabled and SOAP_RFC_FALLBACK_ENABLED:
+            soap_route = self._try_soap_rfc(action_upper, payload=None)
+            if soap_route:
+                return soap_route
+
         # Step 5: GUI fallback map (explicit GUI ops, reads, admin transactions)
         if allow_gui_fallback and self.gui_fallback_enabled:
             for gui_key, gui_info in GUI_FALLBACK_MAP.items():
@@ -621,6 +777,306 @@ class SapRouter:
             "method": data.get("method"),
             "chain": result.get("chain", []),
             "note": "ZROUTER improvement path (user opted in).",
+        }
+
+    # ------------------------------------------------------------------ #
+    #  SOAP RFC — no-JCo BAPI calls via /sap/bc/soap/rfc                 #
+    # ------------------------------------------------------------------ #
+
+    def _probe_soap_rfc(self):
+        """Probe /sap/bc/soap/rfc with a minimal call to RFC_PING.
+
+        Caches result in _soap_rfc_available. Returns True if the endpoint
+        responds with HTTP 200, False otherwise.
+        """
+        global _soap_rfc_available
+        if _soap_rfc_available is not None:
+            return _soap_rfc_available
+
+        sap_url = os.environ.get("ARC_SAP_URL", "").rstrip("/")
+        sap_user = os.environ.get("ARC_SAP_USER", "")
+        sap_pass = os.environ.get("ARC_SAP_PASSWORD", "")
+        sap_client = os.environ.get("ARC_SAP_CLIENT", "100")
+
+        if not sap_url or not sap_user:
+            _soap_rfc_available = False
+            return False
+
+        # Build minimal probe SOAP envelope
+        probe_xml = (
+            '<?xml version="1.0" encoding="utf-8"?>\n'
+            '<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" '
+            'xmlns:rfc="urn:sap-com:document:sap:rfc:functions">\n'
+            '  <soap:Body>\n'
+            '    <rfc:RFC_PING/>\n'
+            '  </soap:Body>\n'
+            '</soap:Envelope>'
+        )
+
+        try:
+            body = self._call_soap_rfc("RFC_PING", probe_xml)
+            if body is not None:
+                _soap_rfc_available = True
+                return True
+        except Exception:
+            pass
+
+        _soap_rfc_available = False
+        return False
+
+    def _build_soap_envelope(self, bapi_name, import_params, payload):
+        """Build SOAP XML envelope for an RFC BAPI call.
+
+        Args:
+            bapi_name: ABAP function module name (e.g. BAPI_MATERIAL_SAVEDATA)
+            import_params: list of dicts from SOAP_RFC_BAPI_MAP defining param structure
+            payload: dict of {param_name: value} — values can be scalars, dicts
+                     (structs), or lists of dicts (tables)
+
+        Returns:
+            SOAP XML string ready for POST
+        """
+        lines = []
+        lines.append('<?xml version="1.0" encoding="utf-8"?>')
+        lines.append('<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" '
+                     'xmlns:rfc="urn:sap-com:document:sap:rfc:functions">')
+        lines.append('  <soap:Body>')
+        lines.append('    <rfc:{}>'.format(bapi_name))
+
+        for param in (import_params or []):
+            pname = param["name"]
+            ptype = param.get("type", "scalar")
+            pfields = param.get("fields", [])
+            pvalue = (payload or {}).get(pname, {})
+
+            if ptype == "scalar":
+                val = str(pvalue) if pvalue not in (None, {}) else ""
+                lines.append('      <{}>{}</{}>'.format(pname, self._xml_escape(val), pname))
+
+            elif ptype == "struct":
+                lines.append('      <{}>'.format(pname))
+                for field in pfields:
+                    fval = str(pvalue.get(field, "")) if isinstance(pvalue, dict) else ""
+                    lines.append('        <{}>{}</{}>'.format(field, self._xml_escape(fval), field))
+                lines.append('      </{}>'.format(pname))
+
+            elif ptype == "table":
+                items = pvalue if isinstance(pvalue, list) else []
+                lines.append('      <{}>'.format(pname))
+                for item in items:
+                    lines.append('        <item>')
+                    for field in pfields:
+                        fval = str(item.get(field, "")) if isinstance(item, dict) else ""
+                        lines.append('          <{}>{}</{}>'.format(field, self._xml_escape(fval), field))
+                    lines.append('        </item>')
+                lines.append('      </{}>'.format(pname))
+
+        lines.append('    </rfc:{}>'.format(bapi_name))
+        lines.append('  </soap:Body>')
+        lines.append('</soap:Envelope>')
+        return '\n'.join(lines)
+
+    def _xml_escape(self, text):
+        """Escape special XML characters in a string."""
+        text = str(text)
+        text = text.replace("&", "&amp;")
+        text = text.replace("<", "&lt;")
+        text = text.replace(">", "&gt;")
+        text = text.replace('"', "&quot;")
+        text = text.replace("'", "&apos;")
+        return text
+
+    def _call_soap_rfc(self, bapi_name, soap_xml):
+        """POST SOAP XML to /sap/bc/soap/rfc and return (body, status_code).
+
+        Returns (response_body_string, http_status_code) tuple.
+        body is None on any error.
+        """
+        import base64
+        import urllib.request
+        import ssl
+
+        sap_url = os.environ.get("ARC_SAP_URL", "").rstrip("/")
+        sap_user = os.environ.get("ARC_SAP_USER", "")
+        sap_pass = os.environ.get("ARC_SAP_PASSWORD", "")
+        sap_client = os.environ.get("ARC_SAP_CLIENT", "100")
+
+        if not sap_url or not sap_user:
+            return (None, 0)
+
+        endpoint = "{}/sap/bc/soap/rfc?sap-client={}&sap-language=EN".format(sap_url, sap_client)
+        auth = base64.b64encode("{}:{}".format(sap_user, sap_pass).encode()).decode()
+        data_bytes = soap_xml.encode("utf-8")
+
+        headers = {
+            "Content-Type": "text/xml; charset=utf-8",
+            "Authorization": "Basic {}".format(auth),
+            "SOAPAction": "urn:sap-com:document:sap:rfc:functions:{}".format(bapi_name),
+            "Content-Length": str(len(data_bytes)),
+        }
+
+        try:
+            ctx = ssl.create_default_context()
+            # SSL verification controlled by ARC_SAP_SSL_VERIFY env var (default enabled)
+            ssl_verify = os.environ.get("ARC_SAP_SSL_VERIFY", "true").lower()
+            if ssl_verify == "false":
+                ctx.check_hostname = False
+                ctx.verify_mode = ssl.CERT_NONE
+                logger.warning("SSL verification DISABLED via ARC_SAP_SSL_VERIFY=false")
+
+            req = urllib.request.Request(endpoint, data=data_bytes, headers=headers, method="POST")
+            with urllib.request.urlopen(req, timeout=30, context=ctx) as resp:
+                if resp.status == 200:
+                    return (resp.read().decode("utf-8"), resp.status)
+                return (None, resp.status)
+        except Exception:
+            return (None, 0)
+
+    def _try_soap_rfc(self, action_upper, payload=None):
+        """Try routing a functional action through SOAP RFC.
+
+        Checks if the action has a BAPI mapping in SOAP_RFC_BAPI_MAP,
+        probes /sap/bc/soap/rfc availability, builds the SOAP XML,
+        and POSTs to the endpoint.
+
+        Returns:
+            Route dict on success (HTTP 200), None to cascade to GUI fallback.
+        """
+        # 1. Check if action is in BAPI map
+        bapi_info = None
+        for key, info in SOAP_RFC_BAPI_MAP.items():
+            if key in action_upper:
+                bapi_info = info
+                break
+        if bapi_info is None:
+            return None
+
+        # 2. Probe SOAP RFC endpoint (cached after first call)
+        if not self._probe_soap_rfc():
+            return None
+
+        # 3. Build SOAP envelope
+        bapi_name = bapi_info["bapi"]
+        import_params = bapi_info.get("import_params", [])
+        soap_xml = self._build_soap_envelope(bapi_name, import_params, payload)
+
+        # 4. POST to /sap/bc/soap/rfc
+        response_body = self._call_soap_rfc(bapi_name, soap_xml)
+        if response_body is None:
+            return None
+
+        # 5. Parse response for BAPI RETURN messages
+        return_messages = self._parse_soap_return(response_body, bapi_name)
+
+        return {
+            "destination": "SOAP RFC BAPI",
+            "strategy": "soap-rfc",
+            "bapi": bapi_name,
+            "soap_rfc_endpoint": "/sap/bc/soap/rfc?sap-client={}".format(
+                os.environ.get('ARC_SAP_CLIENT', '100')),
+            "http_status": 200,
+            "return_messages": return_messages,
+            "details": (
+                "SOAP RFC call to {} via /sap/bc/soap/rfc succeeded. "
+                "Return: {} message(s). "
+                "Check return_messages[0].type: S/A = success, E = error, W = warning."
+            ).format(bapi_name, len(return_messages)),
+        }
+
+    def _parse_soap_return(self, response_body, bapi_name):
+        """Extract BAPI RETURN table from SOAP response.
+
+        Returns list of dicts with keys: type, code, message, log_no, log_msg_no.
+        """
+        import re as _re
+        messages = []
+        if not response_body:
+            return messages
+
+        # Locate RETURN / BAPIRET2 / BAPIRETURN table section
+        return_section = None
+        for table_name in ("RETURN", "BAPIRET2", "BAPIRETURN"):
+            pattern = r'<{}>.*?</{}>'.format(table_name, table_name)
+            match = _re.search(pattern, response_body, _re.DOTALL)
+            if match:
+                return_section = match.group(0)
+                break
+
+        if not return_section:
+            # Fallback: extract items from anywhere in the response
+            items = _re.findall(r'<item>(.*?)</item>', response_body, _re.DOTALL)
+            for item_xml in items:
+                msg = {}
+                for field in ("TYPE", "CODE", "MESSAGE", "LOG_NO", "LOG_MSG_NO",
+                              "NUMBER", "ID", "MESSAGE_V1", "MESSAGE_V2",
+                              "MESSAGE_V3", "MESSAGE_V4"):
+                    f_match = _re.search(r'<{}[^>]*>(.*?)</{}>'.format(field, field), item_xml)
+                    if f_match:
+                        msg[field.lower()] = f_match.group(1)
+                if msg:
+                    messages.append(msg)
+            return messages
+
+        # Parse items inside the RETURN section
+        items = _re.findall(r'<item>(.*?)</item>', return_section, _re.DOTALL)
+        for item_xml in items:
+            msg = {}
+            for field in ("TYPE", "CODE", "MESSAGE", "LOG_NO", "LOG_MSG_NO",
+                          "NUMBER", "ID", "MESSAGE_V1", "MESSAGE_V2",
+                          "MESSAGE_V3", "MESSAGE_V4"):
+                f_match = _re.search(r'<{}[^>]*>(.*?)</{}>'.format(field, field), item_xml)
+                if f_match:
+                    msg[field.lower()] = f_match.group(1)
+            if msg:
+                messages.append(msg)
+
+        return messages
+
+    def _rfc_generate_report(self, program_name, source_code=None):
+        """Activate an ABAP program via RFC_GENERATE_REPORT over SOAP.
+
+        Use this when objects are inactive after ADT deployment. The call
+        goes to /sap/bc/soap/rfc as RFC_GENERATE_REPORT, which generates
+        the report from source stored in REPOSRC (or passed inline).
+
+        Args:
+            program_name: ABAP program/class name (e.g. ZCL_MY_CLASS)
+            source_code: Full ABAP source code (optional — if empty, the
+                        FM reads from REPOSRC)
+
+        Returns:
+            Route dict on success, None on failure.
+        """
+        if not self._probe_soap_rfc():
+            return None
+
+        import_params = []
+        payload = {}
+
+        # PROGRAM_NAME is a required IMPORT parameter
+        import_params.append({"name": "PROGRAM_NAME", "type": "scalar"})
+        payload["PROGRAM_NAME"] = program_name
+
+        # SOURCE is optional — if provided, generates from inline source
+        if source_code:
+            import_params.append({"name": "SOURCE", "type": "scalar"})
+            payload["SOURCE"] = source_code
+
+        soap_xml = self._build_soap_envelope("RFC_GENERATE_REPORT", import_params, payload)
+        response_body = self._call_soap_rfc("RFC_GENERATE_REPORT", soap_xml)
+
+        if response_body is None:
+            return None
+
+        return {
+            "destination": "RFC_GENERATE_REPORT (SOAP RFC)",
+            "strategy": "rfc-generate-report",
+            "program": program_name,
+            "http_status": 200,
+            "details": (
+                "ABAP program {} generated/activated via RFC_GENERATE_REPORT "
+                "over SOAP RFC."
+            ).format(program_name),
         }
 
     def _check_caveman_delegation(self, action_lower):

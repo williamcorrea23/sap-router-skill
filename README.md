@@ -1,4 +1,4 @@
-# SAP Router Orchestrator v4.2.0
+# SAP Router Orchestrator v4.5.0
 
 > **Build SAP applications from your IDE. No SAP GUI required.**
 >
@@ -6,6 +6,8 @@
 > deploy iFlows, run transports — all from VS Code. Self-learning router picks the
 > fastest path: ADT direct, SAP GUI fallback, or ZROUTER batch. Every action verified.
 > Every route learned. Every response compressed.
+>
+> **85 skills | 42 MCPs | 24 CLIs | 8-stage pipeline | v4.5.0**
 
 ---
 <img width="2816" height="1536" alt="Gemini_Generated_Image_fenqd2fenqd2fenq" src="https://github.com/user-attachments/assets/b93bb48a-a704-44f6-b4c0-437a21712be5" />
@@ -26,6 +28,8 @@ You type **"create material FERT with these fields"** in VS Code chat. The route
 
 
 ## Routing Decision Tree
+
+The router follows a prioritized decision chain: caveman scope, ADT, GUI, SOAP RFC (3.5 — no-JCo RFC calls via standard HTTPS, before GUI fallback), GUI fallback, BAPI batch/ZROUTER RFC, spec pipeline, LLM optimize, or default ZROUTER RFC.
 
 ```mermaid
 flowchart TD
@@ -84,7 +88,7 @@ python scripts/self_learn.py persist   # Preserve learned context
 ### Post-Install — Healthcheck + .env Setup
 
 ```bash
-# Run healthcheck — probes all 35 MCPs + verifies .env
+# Run healthcheck — probes all 42 MCPs + verifies .env
 npm run hc
 
 # If .env missing, generate interactive prompt
@@ -103,7 +107,7 @@ cp .env.template .env
 |---|---|---|
 | **Install** | `git clone ... && python scripts/healthcheck.py` | Clone + verify everything works |
 | **Update** | `git pull && npm install && npm run hc` | Pull latest + refresh deps + healthcheck |
-| **Health** | `npm run hc` | Probes 35 MCPs + .env completeness |
+| **Health** | `npm run hc` | Probes 42 MCPs + .env completeness |
 | **Health** | `npm run hc:prompt` | Interactive setup wizard for missing vars |
 | **Route** | `npm run router -- --action MM_CREATE_MATERIAL` | Route action: ADT → GUI → RFC |
 | **Route** | `npm run router:gui -- --action SPRO_CONFIG` | Force SAP GUI fallback |
@@ -131,19 +135,19 @@ cp .env.template .env
 
 | Domain | Count | Skills |
 |---|---|---|
-| **ABAP Core** | 17 | `abap`, `abap-cloud`, `abap-cloud-migration`, `abap-code-patterns`, `abap-sql-amdp`, `abap-unit-testing`, `abapgit`, `atc-cloudification`, `authorization-iam`, `badi-enhancement`, `clean-abap`, `rap`, `rap-business-events`, `cds-view-entities`, `released-abap-classes` |
-| **SAP BTP Platform** | 20 | `btp-abap-environment`, `btp-best-practices`, `btp-build-work-zone`, `btp-business-application-studio`, `btp-cias`, `btp-cloud-identity`, `btp-cloud-logging`, `btp-cloud-platform`, `btp-cloud-transport-management`, `btp-connectivity`, `btp-developer-guide`, `btp-diagram-generator`, `btp-integration-suite`, `btp-job-scheduling`, `btp-master-data-integration`, `btp-service-manager`, `sap-btp-audit-log`, `sap-btp-credential-store` |
-| **UI5 / Fiori / CAP** | 8 | `sapui5-framework`, `sap-fiori-tools`, `sap-fiori-apps-reference`, `sap-cap`, `sap-build`, `odata`, `odata-abap` |
-| **Integration** | 5 | `cpi-iflow-development`, `sap-bapi-integration`, `sap-code-search`, `sap-api-style` |
-| **HANA / AI / Data** | 11 | `sap-hana-sqlscript`, `sap-hana-cli`, `sap-hana-ml`, `sap-ai-core`, `sap-cloud-sdk-ai`, `sap-datasphere`, `sap-hana-cloud-data-intelligence`, `sap-sac-scripting`, `sap-sac-planning`, `sap-sac-custom-widget` |
-| **Security / Infra** | 8 | `sap-dependency-security`, `sap-btp-document-mgmt`, `sap-btp-feature-flags`, `sap-btp-html5-repo`, `sap-btp-kyma`, `sap-btp-launchpad`, `sap-btp-saas` |
-| **Router / Tooling** | 9 | `run-sap-router-skill`, `sap-transport-management`, `sap-crew-analysis`, `sap-rap-gen`, `sap-rpt1`, `sap-sac-test-automation`, `sap-api-policy`, `sap-workflow-pipeline` |
-| **v4.2.0 NEW** | 6 | **`karpathy-guidelines`**, **`sap-gui-scripting`**, **`sap-gui-web-enrich`**, **`sap-self-learn`**, **`sap-llm-engineering`** |
+| **ABAP Core** | 15 | `abap`, `abap-cloud`, `abap-cloud-migration`, `abap-code-patterns`, `abap-sql-amdp`, `abap-unit-testing`, `abapgit`, `atc-cloudification`, `authorization-iam`, `badi-enhancement`, `clean-abap`, `rap`, `rap-business-events`, `cds-view-entities`, `released-abap-classes` |
+| **SAP BTP Platform** | 18 | `btp-abap-environment`, `btp-best-practices`, `btp-build-work-zone`, `btp-business-application-studio`, `btp-cias`, `btp-cloud-identity`, `btp-cloud-logging`, `btp-cloud-platform`, `btp-cloud-transport-management`, `btp-connectivity`, `btp-developer-guide`, `btp-diagram-generator`, `btp-integration-suite`, `btp-job-scheduling`, `btp-master-data-integration`, `btp-service-manager`, `sap-btp-audit-log`, `sap-btp-credential-store` |
+| **UI5 / Fiori / CAP** | 7 | `sapui5-framework`, `sap-fiori-tools`, `sap-fiori-apps-reference`, `sap-cap`, `sap-build`, `odata`, `odata-abap` |
+| **Integration** | 5 | `cpi-iflow-development`, `sap-bapi-integration`, `sap-code-search`, `sap-api-style`, `sap-commerce-skill` |
+| **HANA / AI / Data** | 10 | `sap-hana-sqlscript`, `sap-hana-cli`, `sap-hana-ml`, `sap-ai-core`, `sap-cloud-sdk-ai`, `sap-datasphere`, `sap-hana-cloud-data-intelligence`, `sap-sac-scripting`, `sap-sac-planning`, `sap-sac-custom-widget` |
+| **Security / Infra** | 7 | `sap-dependency-security`, `sap-btp-document-mgmt`, `sap-btp-feature-flags`, `sap-btp-html5-repo`, `sap-btp-kyma`, `sap-btp-launchpad`, `sap-btp-saas` |
+| **Router / Tooling** | 8 | `run-sap-router-skill`, `sap-transport-management`, `sap-crew-analysis`, `sap-rap-gen`, `sap-rpt1`, `sap-sac-test-automation`, `sap-api-policy`, `sap-workflow-pipeline` |
+| **v4.5.0 NEW** | 5 | **`karpathy-guidelines`**, **`sap-gui-scripting`**, **`sap-gui-web-enrich`**, **`sap-self-learn`**, **`sap-llm-engineering`** |
 | **Shared** | 1 | `abap-code-review` (GitHub: `shrek-abaper/sap-engineering-skill`) |
 
 ---
 
-## MCP Server Reference (35 servers)
+## MCP Server Reference (42 servers)
 
 ### MCP Details
 
@@ -240,7 +244,7 @@ sap-router-skill/
 ├── SKILL.md                     ← Master dispatch (Karpathy wrapper)
 ├── COMPARISON.md                ← 72-repo cross-reference analysis
 ├── CHANGELOG.md                 ← Version history
-├── .mcp.json                    ← 35 MCP servers (3 GUI + 3 RAG)
+├── .mcp.json                    ← 42 MCP servers (3 GUI + 3 RAG)
 ├── .env.template                ← 40+ env vars grouped by domain
 ├── .abaplint.json               ← 60+ ABAP lint rules
 ├── package.json                 ← 63 npm scripts
@@ -255,9 +259,9 @@ sap-router-skill/
 │   ├── sap-api-policy/          ← API Management + OpenAPI specs
 │   └── ... (68 more domain skills)
 │
-├── scripts/                     ← 15 Python CLIs
+├── scripts/                     ← 24 Python CLIs
 │   ├── sap_router.py            ← Routing engine (ADT→GUI→RFC→Pipeline)
-│   ├── healthcheck.py           ← 35-MCP probe + .env guardian
+│   ├── healthcheck.py           ← 42-MCP probe + .env guardian
 │   ├── self_learn.py            ← Hermes-style context adaptation
 │   ├── memory_manager.py        ← MEMORY.md session lifecycle + ABAPLINT
 │   ├── xls_to_bapi.py           ← CSV/XLSX → BAPI JSON (29 actions)
@@ -325,7 +329,7 @@ git pull origin main
 npm install
 pip install --upgrade openpyxl  # if using XLSX features
 
-# Verify health — probes all 35 MCPs
+# Verify health — probes all 42 MCPs
 python scripts/healthcheck.py
 
 # Preserve learned context through update
@@ -371,6 +375,10 @@ Key integrations:
 - [shrek-abaper/sap-engineering-skill](https://github.com/shrek-abaper/sap-engineering-skill) — 4 skills: ADT CLI, review, transport gate, RAP gen
 - [JuliusBrussee/caveman](https://github.com/JuliusBrussee/caveman) — Caveman mode (integrated as default output)
 - [abaplint/abaplint](https://github.com/abaplint/abaplint) — ABAP linter (60+ rules configured)
+- [oisee/vibing-steampunk](https://github.com/oisee/vibing-steampunk) — ADT-to-MCP bridge, Go, 257+ stars, 147 MCP tools
+- [datazoode/erpl-adt](https://github.com/datazoode/erpl-adt) — Zero-dependency ADT CLI, Go, transport CRUD
+- [Lomtech/sap-transport-mcp](https://github.com/Lomtech/sap-transport-mcp) — Dedicated transport management MCP
+- [eduardoddddddd/sapmcp](https://github.com/eduardoddddddd/sapmcp) — Multi-protocol MCP (OData + IDoc + RFC/BAPI), 918 tests
 
 ---
 

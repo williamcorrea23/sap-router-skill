@@ -3,7 +3,7 @@ name: sap-router-skill
 description: >-
   SAP development orchestrator v5.0.0 — Karpathy command format (Think→Simplify→
   Surgical→Verify), healthcheck guardian, self-learning router, caveman-compressed
-  output default. 85 skills, 35 MCPs (+18 planned), 15 CLIs. Multi-protocol: HTTP/OData/RFC/BDC. ZROUTER v5 REST gateway. Install pipeline: YDOWN→ZABAPGIT→ZSAPLINK. BDC engine: YFG_SBDC. Test suites: ZODATA_TEST_AUTOMATION_FGR.
+  output default. 85 skills, 38 MCPs (+17 planned), 24 scripts. Multi-protocol: HTTP/OData/RFC/SOAP RFC/BDC. ZROUTER v5 REST gateway. Install pipeline: YDOWN→ZABAPGIT→ZSAPLINK. BDC engine: YFG_SBDC. Test suites: ZODATA_TEST_AUTOMATION_FGR.
   Use for any SAP task.
 ---
 
@@ -28,7 +28,7 @@ Before ANY operation, verify:
    → If missing: prompt user for ARC_SAP_URL, ARC_SAP_USER, ARC_SAP_PASSWORD, ARC_SAP_CLIENT
    → Show: `cp .env.template .env` + edit instructions
 
-2. **MCPs connected**: probes all 35 MCPs (+18 planned)
+2. **MCPs connected**: probes all 38 MCPs (+17 planned)
    → HIGH criticality: arc-1, aibap (block on failure)
    → MEDIUM: mcp-abap-adt, mcp-sap-gui, btp-sap-odata-to-mcp (warn)
    → OPTIONAL: RAG connectors (Pinecone, Supabase, Azure) — pre-ready, activate later
@@ -57,9 +57,11 @@ UNCERTAINTIES (if any):
 
 TRADEOFFS:
 - ADT direct: fastest for source read, cannot create materials
+- SOAP RFC: call ANY BAPI via plain HTTP POST, no JCo/pyrfc needed
 - ZROUTER RFC: batch BAPI execution, need RFC destination
 - GUI fallback: MM01 transaction, requires SAP GUI installed + scripting enabled
-→ RECOMMENDATION: ZROUTER RFC for batch, GUI for single material with config
+- OData BAPI wrapper: IWBEP/BAPI_* via Gateway OData V2
+→ RECOMMENDATION: SOAP RFC for single BAPI call, ZROUTER RFC for batch, GUI for single material with config
 ```
 
 If multiple BAPIs, transaction fallbacks, or routing options exist, always present them as an enumerated (numbered) list (1., 2., 3...) to facilitate user selection. If SAP config unclear → ask.
@@ -84,12 +86,18 @@ User Request
     │ YES → arc-1 (primary) or aibap (secondary)
     │ Self-learn picks best based on latency history.
     ▼
-3. GUI REQUIRED? (SPRO, SM30, SU01, MM01, VA01...)
+3. BAPI/RFC call? (create/read BAPI, FM execution)
+    │ Check if SOAP RFC available (/sap/bc/soap/rfc)
+    │ YES → Call BAPI via plain HTTP POST → No JCo/pyrfc needed
+    │ Resources: /sap/bc/soap/rfc + /sap/opu/odata/IWBEP/BAPI_*
+    │ for Gateway OData BAPI wrapper
+    ▼
+4. GUI REQUIRED? (SPRO, SM30, SU01, MM01, VA01...)
     │ YES → IMMEDIATE GUI fallback — skip ADT attempt
     │ Missing nav data? → sap-gui-web-enrich → web search for field IDs
     │ Try: mcp-sap-gui → mcp-sap-gui-kts → sapgui-mcp-go
     ▼
-4. Functional WRITE? (create material, post document, create order...)
+5. Functional WRITE? (create material, post document, create order...)
     │ Requires explicit functional context (--functional). Without it →
     │   needs-functional-context, NO BAPI fired (BAPIs fire only when a real
     │   functional action requires them).
@@ -97,11 +105,11 @@ User Request
     │   SAP GUI write transaction. Optional: --use-zrouter uses ZROUTER RFC
     │   ONLY if the user opted in (zrouter accept). Never the default.
     ▼
-5. Spec → code? (implement specification, full workflow)
+6. Spec → code? (implement specification, full workflow)
     │ YES → sap_router.py pipeline → 8 stages
     │ Stage 1: Spec Analysis → Stage 8: Transport Gate
     ▼
-6. LLM optimization? (prompt engineering, eval harness)
+7. LLM optimization? (prompt engineering, eval harness)
     │ YES → sap-llm-engineering → evaluate → optimize → retry
 ```
 
@@ -118,6 +126,22 @@ If a tool call to the primary `mcp_server` fails (due to connection timeout, mis
 
 **RAG pre-ready**: Pinecone, Supabase, Azure AI Search connectors configured in .mcp.json.
 Activate by uncommenting vars in .env. No code changes needed.
+
+---
+
+### SAP API Endpoints (No JCo Required)
+
+5 standard SAP HTTP endpoints enable API access WITHOUT JCo or pyrfc. Every endpoint uses plain HTTP(S) — no proprietary libraries needed. Any HTTP client (curl, fetch, axios) can interact with SAP directly.
+
+| Endpoint | Purpose | Method |
+|---|---|---|
+| `/sap/bc/soap/rfc` | Call ANY RFC-enabled FM via HTTP SOAP POST. Standard in SAP NetWeaver 7.00+. No add-ons required. | SOAP 1.1/1.2 POST — XML request/response |
+| `/sap/opu/odata/IWBEP/BAPI_*` | Gateway auto-exposes BAPIs as OData V2 services. Requires SEGW project or IW50 auto-provisioning. | OData V2 GET/POST |
+| `/sap/bc/adt/abapunit/` | Run ABAP Unit tests via REST. Returns test results as XML/JSON. ADT-enabled system. | REST GET |
+| `/sap/bc/adt/atc/` | ATC code quality checks via REST. Runs ATC on specified objects, returns findings with priority. ADT-enabled system. | REST GET/POST |
+| `/sap/bc/icf/` | SICF service registration and management via HTTP. Activate/deactivate services, list handlers. | REST (ICF framework) |
+
+**Integration with routing**: Step 3 of the decision tree above checks `/sap/bc/soap/rfc` availability first. If available, BAPIs are called via simple HTTP POST with SOAP XML payload — no JCo installation, no pyrfc compilation. If unavailable, the router falls through to GUI or functional dispatch as appropriate. ADT endpoints (`/sap/bc/adt/*`) are used by arc-1/aibap for development operations.
 
 ---
 
@@ -228,6 +252,7 @@ npm run learn:ctx
 | "write/activate Z*" | ADT direct | arc-1 SAPWrite → SAPActivate → syntax check |
 | "create material/order" (functional) | BAPI dispatch (--functional) | BAPI → BAPIRET2 check → MM03/VA03 verify. ZROUTER only if opted in. |
 | functional write w/o --functional | needs-functional-context | classify only — no BAPI fired out of context |
+| "call BAPI without JCo" / "BAPI via HTTP" | SOAP RFC | HTTP POST /sap/bc/soap/rfc → parse SOAP response → verify |
 | "run stages in parallel" / big spec | dispatch-plan / crew-dispatch | emit wave plan; same-wave agents launch concurrently |
 | "SPRO / SM30 / SU01 / MM01 / VA01..." | GUI IMMEDIATE | mcp-sap-gui navigate → execute → verify |
 | "GUI data missing for tcode X" | GUI + web enrich | WebSearch SAP Help → build BDC → cache |
@@ -246,117 +271,52 @@ npm run learn:ctx
 
 ### Skills (85 — v5.0.0)
 
-- abap
-- abap-cloud
-- abap-cloud-migration
-- abap-code-patterns
-- abap-code-review
-- abap-sql-amdp
-- abap-unit-testing
-- abapgit
-- arc-1-skills
-- atc-cloudification
-- authorization-iam
-- badi-enhancement
-- btp-abap-environment
-- btp-best-practices
-- btp-build-work-zone
-- btp-business-application-studio
-- btp-cias
-- btp-cloud-foundry
-- btp-cloud-identity
-- btp-cloud-logging
-- btp-cloud-platform
-- btp-cloud-transport-management
-- btp-connectivity
-- btp-developer-guide
-- btp-diagram-generator
-- btp-integration-suite
-- btp-job-scheduling
-- btp-master-data-integration
-- btp-service-manager
-- cds-view-entities
-- claude-abap-skills
-- clean-abap
-- cpi-iflow-development
-- karpathy-guidelines
-- odata
-- odata-abap
-- rap
-- rap-business-events
-- released-abap-classes
-- run-sap-router-skill
-- sap-ai-core
-- sap-api-policy
-- sap-api-style
-- sap-bapi-integration
-- sap-btp-audit-log
-- sap-btp-credential-store
-- sap-btp-devops
-- sap-btp-document-mgmt
-- sap-btp-feature-flags
-- sap-btp-html5-repo
-- sap-btp-kyma
-- sap-btp-launchpad
-- sap-btp-saas
-- sap-build
-- sap-cap
-- sap-claude-skills
-- sap-cloud-sdk-ai
-- sap-code-search
-- sap-commerce-skill
-- sap-crew-analysis
-- sap-datasphere
-- sap-datasphere-plugin
-- sap-dependency-security
-- sap-fiori-apps-reference
-- sap-fiori-tools
-- sap-gui-scripting
-- sap-gui-web-enrich
-- sap-hana-cli
-- sap-hana-cloud-data-intelligence
-- sap-hana-ml
-- sap-hana-sqlscript
-- sap-llm-engineering
-- sap-rap-gen
-- sap-rpt1
-- sap-sac-custom-widget
-- sap-sac-planning
-- sap-sac-scripting
-- sap-sac-test-automation
-- sap-self-learn
-- sap-skills
-- sap-transport-gate
-- sap-transport-management
-- sap-workflow-pipeline
-- sapui5-framework
-- superclaude-for-sap
+See [AGENTS.md](AGENTS.md) for the complete multi-IDE skill mapping table with routing rules, action-to-BAPI mappings, and agent descriptions.
+Covers: ABAP Core, BTP, CDS/RAP, OData, CPI, HANA, SAC, Fiori/UI5, Datasphere, Workflow, AI/LLM, Code Review, Transport, SAP GUI, Cloud Integration, Authorization, RAP Business Events.
 
-85 skills total (v5.0.0). Covers: ABAP Core, BTP, CDS/RAP, OData, CPI, HANA, SAC, Fiori/UI5, Datasphere, Workflow, AI/LLM, Code Review, Transport.
+### MCPs (39 configured, ~16 planned)
 
-### MCPs (35 MCPs (+18 planned))
+**Configured (39):** arc-1, aibap, mcp-abap-adt, mcp-sap-gui, mcp-sap-gui-kts, sap-gui-mcp-jduncan, sapgui-mcp-webgui, sapgui-mcp-go, abap-mcp-adt-powerup, mcp-sap-notes, btp-mcp, odata-mcp-proxy, btp-sap-odata-to-mcp, plugin:ui5:ui5-mcp-server, plugin:sap-fiori-mcp-server:fiori-mcp, plugin:mdk-mcp:mdk-mcp, plugin:cds-mcp:cds-mcp, pinecone-rag, supabase-rag, sf-mcp, sap-rfc-mcp-server, azure-ai-search, sap-pi-mcp, bw-modeling-mcp, erpl-adt, odata-mcp-go, cloud-alm-itsm, datasphere-mcp, sapient-mcp-py, sapient-mcp, vibing-steampunk, sap-cpi, cf-cli-mcp, sap-api-management, mcp-integration-suite, ci-mcp-server, abap-mcp, mcp-calm-server, sap-transport-mcp
 
-**Configured (35):** arc-1, aibap, mcp-abap-adt, mcp-sap-gui, mcp-sap-gui-kts, sapgui-mcp-go, mcp-sap-notes, btp-mcp, odata-mcp-proxy, btp-sap-odata-to-mcp, plugin:ui5:ui5-mcp-server, plugin:sap-fiori-mcp-server:fiori-mcp, plugin:mdk-mcp:mdk-mcp, plugin:cds-mcp:cds-mcp, pinecone-rag, supabase-rag, sf-mcp, sap-rfc-mcp-server, azure-ai-search, sap-pi-mcp, bw-modeling-mcp, erpl-adt, odata-mcp-go, cloud-alm-itsm, datasphere-mcp, steampunk-mcp, sapient-mcp, sap-cpi, cf-cli-mcp, sap-api-management, mcp-integration-suite, ci-mcp-server, abap-mcp, mcp-calm-server, sap-transport-mcp
+**Planned / Roadmap (~16):** mcp-abap-abap-adt-api, dassian-adt, adt-ls, sapgui-mcp, cpi-mcp-server, mcp-ci-python, btp-is-ci-mcp-server, sap-cpi-mcp-backup, cap-mcp-plugin, hana-mcp-server, guniweb-sap-mcp, sap-mcp, mcp-hub, sap-ai-mcp-servers, sap-mcp-config, mcp-sap-docs
 
-**Planned / Roadmap (18):** mcp-abap-abap-adt-api, dassian-adt, adt-ls, sapgui-mcp, sap-gui-mcp-jduncan, cpi-mcp-server, mcp-ci-python, btp-is-ci-mcp-server, sap-cpi-mcp-backup, cap-mcp-plugin, hana-mcp-server, vibing-steampunk, sap-mcp, abap-mcp-adt-powerup, mcp-hub, sap-ai-mcp-servers, sap-mcp-config, mcp-sap-docs
+#### Key MCP Server Details
 
-### CLIs (15 — v5.0.0)
+| MCP | Description |
+|---|---|
+| **vibing-steampunk** | ADT-to-MCP bridge, 257+ GitHub stars, written in Go. Translates ADT REST API into MCP tools. [Planned] |
+| **erpl-adt** | Single-binary ADT CLI with zero external dependencies. Lightweight ADT operations without npm/Node. [Configured] |
+| **sap-transport-mcp** | Dedicated transport management MCP — create, release, and manage SAP transport requests. [Configured] |
+| **guniweb-sap-mcp** | Multi-protocol MCP supporting OData + IDoc + RFC/BAPI. 918 automated tests. [Planned] |
 
-- `abap_serializer.py`
-- `btp_diagram.py`
-- `check_gui_scripting.py`
-- `cpi_client.py`
-- `cpi_iflow_packager.py`
-- `fallback_engine.py`
-- `hdi_lint.py`
-- `healthcheck.py`
-- `memory_manager.py`
-- `rag_ingest.py`
-- `sap_router.py`
-- `self_learn.py`
-- `template_repo.py`
-- `xls_to_bapi.py`
-- `zrouter_bootstrap.py`
+### Scripts (24 — v5.0.0)
+
+| Script | Description |
+|---|---|
+| `scripts/abap_serializer.py` | Multi-format ABAP packer: .nugg, abapGit, ZDOWNLOAD XML |
+| `scripts/adt_deploy.py` | ADT object deployment utility |
+| `scripts/btp_diagram.py` | BTP architecture diagram generator from skill references |
+| `scripts/check_gui_scripting.py` | SAP GUI scripting readiness probe (RZ11 + SAPLogon check) |
+| `scripts/cpi_client.py` | CPI iFlow HTTP client with OAuth and CSRF support |
+| `scripts/cpi_iflow_packager.py` | CPI iFlow ZIP create/validate/extract |
+| `scripts/deploy_all.py` | Batch deploy all ABAP objects |
+| `scripts/fallback_engine.py` | 6-tier cascading fallback with retry, verification, 36 mapped actions |
+| `scripts/hdi_lint.py` | SAP HANA HDI container linting and validation |
+| `scripts/healthcheck.py` | Probes 38 MCPs, validates .env, generates interactive prompts |
+| `scripts/memory_manager.py` | Session context file (MEMORY.md) lifecycle management |
+| `scripts/rag_ingest.py` | RAG ingestion pipeline for SAP documentation indexing |
+| `scripts/rag_search.py` | RAG search against indexed SAP documentation |
+| `scripts/sap_activate_v2.py` | SAP object activation v2 |
+| `scripts/sap_com_activate.py` | SAP COM object activation |
+| `scripts/sap_gui_activate.py` | SAP GUI scripting activation |
+| `scripts/sap_pyautogui_f8.py` | PyAutoGUI F8 execution for SAP GUI |
+| `scripts/sap_router.py` | Routing engine: ADT-first, GUI-fallback, caveman delegation, pipeline orchestration |
+| `scripts/self_learn.py` | Hermes-style context adaptation — tracks MCP latency/reliability, adapts routing |
+| `scripts/template_repo.py` | Offline ABAP template repository with {{placeholders}} |
+| `scripts/xls_to_bapi.py` | CSV/XLSX → BAPI JSON payload converter with field mapping validation |
+| `scripts/zrouter_bootstrap.py` | ZROUTER probe + install (ADT/GUI/Offline) + fallback mapping |
+| `scripts/zrouter_deploy.py` | ZROUTER ABAP class deployment |
+| `scripts/zrouter_deploy_http.py` | ZROUTER HTTP endpoint deployment |
 
 ---
 

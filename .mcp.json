@@ -71,7 +71,7 @@
       },
       "description": "SAP GUI MCP (jduncan8142/sap_gui_mcp v0.1.0) — FastMCP-based, Python. Installed editable from packages/sap_gui_mcp."
     },
-    "sapient-mcp": {
+    "sapient-mcp-py": {
       "type": "stdio",
       "command": "python",
       "args": ["-m", "sapient_mcp"],
@@ -281,17 +281,6 @@
       },
       "description": "SAP Datasphere MCP (MarioDeFelipe/sap-datasphere-mcp) - Datasphere data modeling, spaces, views, remote tables. Use for Datasphere analytics and data federation operations."
     },
-    "steampunk-mcp": {
-      "type": "stdio",
-      "command": "node",
-      "args": ["dist/index.js"],
-      "env": {
-        "STMPNK_HOST": "${STMPNK_HOST}",
-        "STMPNK_USER": "${STMPNK_USER}",
-        "STMPNK_PASSWORD": "${STMPNK_PASSWORD}"
-      },
-      "description": "Steampunk/ABAP Cloud MCP (oisee/vibing-steampunk) - ABAP Cloud development. Released APIs only, ADT-only, embedded Steampunk in S/4HANA. Use alongside abap-cloud skill for cloud-ready ABAP."
-    },
     "sapient-mcp": {
       "type": "stdio",
       "command": "node",
@@ -420,6 +409,52 @@
         "DRY_RUN": "${DRY_RUN}"
       },
       "description": "Nidhideep/sap-transport-mcp — CTS Transport Request management (list, inspect, release, delete) via SAP ADT REST API."
+    },
+    "vibing-steampunk": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@vibing/steampunk-mcp"],
+      "env": {
+        "SAP_SYSTEMS": "[{\"name\":\"DS4\",\"url\":\"https://10.57.203.136:44300\",\"username\":\"30356735869\",\"password\":\"Fodase@APPA2026\",\"client\":\"100\"}]",
+        "STEAMPUNK_MODE": "hyperfocused"
+      },
+      "description": "vibing-steampunk MCP — ADT-to-MCP bridge in Go, 257+ stars, 147 MCP tools, hyperfocused single-tool mode (~200 tokens). Covers debug/deploy/analyze ABAP, package health, dead code detection, ABAP LSP, WebSocket RFC handler."
+    },
+    "erpl-adt-mcp": {
+      "type": "stdio",
+      "command": "erpl-adt",
+      "args": ["mcp"],
+      "env": {
+        "ERPL_URL": "https://10.57.203.136:44300",
+        "ERPL_USER": "30356735869",
+        "ERPL_PASSWORD": "Fodase@APPA2026",
+        "ERPL_CLIENT": "100"
+      },
+      "description": "erpl-adt MCP — single-binary ADT CLI, zero-dependency, Go-based. Transport CRUD, ABAP source CRUD, ABAP Unit, ATC checks, object search. Latest release v2026.06.27."
+    },
+    "guniweb-sap-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "guniweb-sap-mcp"],
+      "env": {
+        "SAP_URL": "https://10.57.203.136:44300",
+        "SAP_USER": "30356735869",
+        "SAP_PASSWORD": "Fodase@APPA2026",
+        "SAP_CLIENT": "100"
+      },
+      "description": "guniweb-sap-mcp — multi-protocol MCP for OData V2/V4, IDocs, and RFC/BAPI. 22 tools across 4 tiers. 918 unit tests. 7 auth types. n8n-compatible."
+    },
+    "sap-gui-library-mcp": {
+      "type": "stdio",
+      "command": "python",
+      "args": ["-m", "sap_gui_library_mcp"],
+      "env": {
+        "SAPGUI_HOST": "10.57.203.136",
+        "SAPGUI_USER": "30356735869",
+        "SAPGUI_PASSWORD": "Fodase@APPA2026",
+        "SAPGUI_CLIENT": "100"
+      },
+      "description": "sap-gui-library MCP — Python abstraction over SAP GUI Scripting COM API. pip install sap-gui-library. Requires SAP GUI 770+ with Accessibility Mode."
     }
   },
   "routing": {
@@ -429,7 +464,7 @@
     "gui_web_enrich_enabled": true,
     "caveman_delegation_enabled": true,
     "self_learn_enabled": true,
-    "gui_mcp_priority": ["mcp-sap-gui", "mcp-sap-gui-kts", "sapgui-mcp-go"],
+    "gui_mcp_priority": ["mcp-sap-gui", "mcp-sap-gui-kts", "sapgui-mcp-go", "sapient-mcp-py", "sap-gui-library-mcp"],
     "rag_priority": ["pinecone-rag", "supabase-rag", "azure-ai-search"],
     "pipeline_automation": {
       "enabled": true,
@@ -457,6 +492,6 @@
     "self_learn": "python scripts/self_learn.py — Hermes-style context adaptation, auto-optimizes routing",
     "karpathy_format": "All operations follow Think→Simplify→Surgical→Verify. Caveman compression default.",
     "comparison_repos": "See COMPARISON.md for full 70+ repo analysis",
-    "planned_mcps": "18 additional MCPs documented in skills are planned for future configuration."
+    "planned_mcps": "22 additional MCPs documented in skills are planned for future configuration."
   }
 }

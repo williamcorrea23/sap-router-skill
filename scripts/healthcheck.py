@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 SAP Router Healthcheck — MCP connectivity probe, .env guardian, credential validator.
-v4.2.0: Probes 35 configured MCPs + 18 planned (roadmap) + ZROUTER, verifies .env completeness, prompts user for missing data.
+v4.2.0: Probes 42 configured MCPs + 18 planned (roadmap) + ZROUTER + SOAP RFC, verifies .env completeness, prompts user for missing data.
 Andrej-style: "eval first, then act" — diagnose before routing.
 """
 import os
@@ -10,6 +10,8 @@ import sys
 import json
 import argparse
 import subprocess
+import urllib.error
+import urllib.request
 from pathlib import Path
 from datetime import datetime
 
@@ -171,10 +173,10 @@ MCP_HEALTHCHECK_SPEC = {
         "criticality": "LOW",
         "description": "BW Modeling - DSO, InfoCube, DTP, transformations",
     },
-    "erpl-adt": {
-        "env_vars": ["ERPL_URL", "ERPL_USER", "ERPL_PASSWORD"],
+    "erpl-adt-mcp": {
+        "env_vars": ["ERPL_URL", "ERPL_USER", "ERPL_PASSWORD", "ERPL_CLIENT"],
         "probe_command": None,
-        "criticality": "LOW",
+        "criticality": "MEDIUM",
         "description": "ERPL ADT bridge - enterprise resource planning",
     },
     "odata-mcp-go": {
@@ -195,11 +197,11 @@ MCP_HEALTHCHECK_SPEC = {
         "criticality": "LOW",
         "description": "SAP Datasphere - spaces, views, remote tables",
     },
-    "steampunk-mcp": {
-        "env_vars": ["STMPNK_HOST", "STMPNK_USER", "STMPNK_PASSWORD"],
+    "sapient-mcp-py": {
+        "env_vars": ["SAPIENT_HOST", "SAPIENT_KEY"],
         "probe_command": None,
         "criticality": "LOW",
-        "description": "Steampunk/ABAP Cloud - released APIs, ADT-only",
+        "description": "Sapient MCP Python - RoboSAPiens-powered GUI automation",
     },
     "sapient-mcp": {
         "env_vars": ["SAPIENT_HOST", "SAPIENT_KEY"],
@@ -237,6 +239,18 @@ MCP_HEALTHCHECK_SPEC = {
         "criticality": "LOW",
         "description": "SAP CTS Transport Request management (Nidhideep)",
     },
+    "guniweb-sap-mcp": {
+        "env_vars": ["SAP_URL", "SAP_USERNAME", "SAP_PASSWORD", "SAP_CLIENT"],
+        "probe_command": None,
+        "criticality": "MEDIUM",
+        "description": "guniweb SAP MCP - SAP GUI web automation",
+    },
+    "sap-gui-library-mcp": {
+        "env_vars": ["SAPGUI_HOST", "SAPGUI_USER", "SAPGUI_PASSWORD", "SAPGUI_CLIENT"],
+        "probe_command": None,
+        "criticality": "LOW",
+        "description": "SAP GUI library MCP - GUI scripting library",
+    },
     "mcp-abap-abap-adt-api": {
         "env_vars": [],
         "probe_command": None,
@@ -252,11 +266,10 @@ MCP_HEALTHCHECK_SPEC = {
         "description": "MarkWu SAP MCP",
     },
     "vibing-steampunk": {
-        "env_vars": [],
+        "env_vars": ["SAP_URL", "SAP_USERNAME", "SAP_PASSWORD", "SAP_CLIENT"],
         "probe_command": None,
-        "criticality": "OPTIONAL",
-        "planned": True,
-        "description": "oisee vibing-steampunk MCP",
+        "criticality": "MEDIUM",
+        "description": "Vibing Steampunk MCP - Steampunk/ABAP Cloud development",
     },
     "dassian-adt": {
         "env_vars": [],
@@ -266,24 +279,21 @@ MCP_HEALTHCHECK_SPEC = {
         "description": "Dassian ADT MCP",
     },
     "abap-mcp-adt-powerup": {
-        "env_vars": [],
+        "env_vars": ["SAP_URL", "SAP_USERNAME", "SAP_PASSWORD", "SAP_CLIENT"],
         "probe_command": None,
         "criticality": "OPTIONAL",
-        "planned": True,
         "description": "ABAP ADT Powerup MCP (babamba2)",
     },
-    "sapgui-mcp": {
+    "sapgui-mcp-webgui": {
         "env_vars": [],
         "probe_command": None,
         "criticality": "OPTIONAL",
-        "planned": True,
-        "description": "Hochfrequenz SAP GUI MCP",
+        "description": "Hochfrequenz SAP GUI MCP (WebGUI)",
     },
     "sap-gui-mcp-jduncan": {
-        "env_vars": [],
+        "env_vars": ["SAPGUI_HOST", "SAPGUI_USER", "SAPGUI_PASSWORD", "SAPGUI_CLIENT"],
         "probe_command": None,
         "criticality": "OPTIONAL",
-        "planned": True,
         "description": "jduncan SAP GUI MCP",
     },
     "cpi-mcp-server": {
@@ -375,12 +385,14 @@ OPTIONAL_ENV_FILE_VARS = [
     "SAP_CONNECTION",
     "SAP_RFC_HOST", "SAP_RFC_USER", "SAP_RFC_PASSWORD", "SAP_RFC_CLIENT",
     "SAP_NOTES_USERNAME", "SAP_NOTES_PASSWORD",
+    "SOAP_RFC_URL",
+    "SAP_TRANSPORT_HOSTNAME", "SAP_TRANSPORT_USERNAME", "SAP_TRANSPORT_PASSWORD",
     "CF_API", "CF_USER", "CF_PASSWORD",
     "CPI_HOST", "CPI_USER", "CPI_PASSWORD",
     "APIM_HOST", "APIM_USER", "APIM_PASSWORD",
     "PI_HOST", "PI_USER", "PI_PASSWORD",
     "BW_HOST", "BW_USER", "BW_PASSWORD",
-    "ERPL_URL", "ERPL_USER", "ERPL_PASSWORD",
+    "ERPL_URL", "ERPL_USER", "ERPL_PASSWORD", "ERPL_CLIENT",
     "ALM_HOST", "ALM_USER", "ALM_PASSWORD",
     "DSPHERE_HOST", "DSPHERE_USER", "DSPHERE_PASSWORD",
     "STMPNK_HOST", "STMPNK_USER", "STMPNK_PASSWORD",
@@ -536,6 +548,55 @@ class HealthChecker:
         else:
             return {"status": "PARTIAL", "set": set_vars, "missing": missing}
 
+    def check_soap_rfc_endpoint(self):
+        """Probe SAP SOAP RFC endpoint /sap/bc/soap/rfc — expects 415 = success."""
+        self.log("\n=== SOAP RFC ENDPOINT PROBE ===")
+
+        # Determine base URL: try SOAP_RFC_URL env var, then construct from SAP_URL/ARC_SAP_URL
+        base_url = os.environ.get("SOAP_RFC_URL", "")
+        if not base_url:
+            arc_url = os.environ.get("ARC_SAP_URL", "").rstrip("/")
+            sap_url = os.environ.get("SAP_URL", "").rstrip("/")
+            if arc_url:
+                base_url = arc_url
+            elif sap_url:
+                base_url = sap_url
+
+        if not base_url:
+            self.log("  [SKIPPED] No SAP URL found (set SOAP_RFC_URL, ARC_SAP_URL, or SAP_URL)")
+            return {"status": "SKIPPED", "reason": "No SAP base URL configured"}
+
+        soap_url = base_url.rstrip("/") + "/sap/bc/soap/rfc"
+
+        req = urllib.request.Request(soap_url, method="GET")
+        try:
+            resp = urllib.request.urlopen(req, timeout=10)
+            # If we get any 2xx, endpoint exists but may not be SOAP-ready
+            status = resp.getcode()
+            self.log(f"  [OK] SOAP RFC endpoint responded with HTTP {status} (expected 415)")
+            return {"status": "AVAILABLE", "http_status": status, "url": soap_url}
+        except urllib.error.HTTPError as e:
+            code = e.code
+            if code == 415:
+                # 415 Unsupported Media Type = success — SOAP is active, we sent no valid SOAP envelope
+                self.log(f"  [OK] SOAP RFC endpoint confirmed active (HTTP 415 = expected)")
+                return {"status": "AVAILABLE", "http_status": code, "url": soap_url}
+            elif code == 404:
+                self.log(f"  [MISSING] SOAP RFC endpoint returned HTTP 404 — not available on this system")
+                return {"status": "NOT_FOUND", "http_status": code, "url": soap_url}
+            elif code == 405:
+                self.log(f"  [OK] SOAP RFC endpoint active (HTTP 405 Method Not Allowed = expected for GET)")
+                return {"status": "AVAILABLE", "http_status": code, "url": soap_url}
+            else:
+                self.log(f"  [WARN] SOAP RFC endpoint returned HTTP {code}")
+                return {"status": "UNEXPECTED", "http_status": code, "url": soap_url}
+        except urllib.error.URLError as e:
+            self.log(f"  [ERROR] SOAP RFC endpoint unreachable: {e.reason}")
+            return {"status": "UNREACHABLE", "error": str(e.reason)}
+        except Exception as e:
+            self.log(f"  [ERROR] SOAP RFC probe failed: {e}")
+            return {"status": "ERROR", "error": str(e)[:200]}
+
     def run_full_check(self):
         """Run complete healthcheck across all MCPs and .env."""
         # Load local .env into os.environ for verification
@@ -598,12 +659,16 @@ class HealthChecker:
             icon = "[OK]" if env_check["status"] in ("ALL_SET", "CONFIGURED", "NO_ENV_NEEDED") else "[WARN]"
             self.log(f"  {icon} {name:25s} ({criticality:8s}): env={env_check['status']:15s} binary={binary_check['status']}")
 
+        # SOAP RFC endpoint probe
+        soap_result = self.check_soap_rfc_endpoint()
+        self.results["soap_rfc_check"] = soap_result
+
         # 3. Project objects check
         self.log("\n=== PROJECT OBJECTS ===")
         checks = {
             "templates/": (SKILL_DIR / "templates").exists(),
             "templates/*.abap": len(list((SKILL_DIR / "templates").glob("*.abap"))) >= 4,
-            "scripts/*.py": len(list((SKILL_DIR / "scripts").glob("*.py"))) >= 15,
+            "scripts/*.py": len(list((SKILL_DIR / "scripts").glob("*.py"))) >= 24,
             ".claude/skills/": len(list((SKILL_DIR / ".claude" / "skills").glob("*/SKILL.md"))) >= 85,
             "zrouter_bootstrap.py": (SKILL_DIR / "scripts" / "zrouter_bootstrap.py").exists(),
             "packages/samples/": (SKILL_DIR / "packages" / "samples").exists(),

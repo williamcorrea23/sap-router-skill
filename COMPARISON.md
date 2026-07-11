@@ -93,7 +93,7 @@ All 70 repos analyzed across 3 subagent workflows. Results above. Covered/partia
 | [MarkWuRY168/SAP_MCP](https://github.com/MarkWuRY168/SAP_MCP) | Generic SAP MCP — multi-SAP system access hub | ⚡ | hermes-crewai + arc-1 + aibap cover all SAP system access patterns |
 | [derekvincent/mcp-sap-focusedrun](https://github.com/derekvincent/mcp-sap-focusedrun) | Focused Run MCP | ❌ | Out of scope (monitoring-specific) |
 | [marianfoo/mcp-sap-notes](https://github.com/marianfoo/mcp-sap-notes) | 2 tools: search + fetch SAP Notes | ✅ | Documented in .mcp.json |
-| [oisee/vibing-steampunk](https://github.com/oisee/vibing-steampunk) | Steampunk/ABAP Cloud MCP | ✅ | **NOW IN SCOPE (v4.0)** — `steampunk-mcp` in .mcp.json. Released APIs, ADT-only, embedded Steampunk. |
+| [oisee/vibing-steampunk](https://github.com/oisee/vibing-steampunk) | Steampunk/ABAP Cloud MCP | ✅ | **NOW IN SCOPE (v4.0)** — `vibing-steampunk` in .mcp.json. Released APIs, ADT-only, embedded Steampunk. |
 | [ClementRingot/sap-released-objects-server](https://github.com/ClementRingot/sap-released-objects-server) | SAP released objects server — authorisation-preserving ABAP released APIs | ⚡ | aibap.mcp object_exists tool verifies objects; sap-released-objects-server adds authorisation-gate layer |
 | [toni-ramchandani/sapient-mcp](https://github.com/toni-ramchandani/sapient-mcp) | Sapient MCP — SAP-focused AI agent with knowledge graph | ✅ | **NOW IN SCOPE (v4.0)** — `sapient-mcp` in .mcp.json. Self-learn selects between sapient and zrouter by latency. |
 

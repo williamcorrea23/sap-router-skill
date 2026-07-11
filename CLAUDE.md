@@ -5,13 +5,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-# Healthcheck — probes 35 MCPs (+18 planned) + .env completeness (run first)
+# Healthcheck — probes 42 MCPs (+18 planned) + .env completeness (run first)
 npm run hc
 npm run hc:prompt       # Interactive setup for missing .env vars
 
 # Routing
 npm run router -- --action MM_CREATE_MATERIAL
 npm run router:gui -- --action SPRO_CONFIG   # Force GUI fallback
+npm run router:soap -- --action MM_CREATE_MATERIAL  # Force SOAP RFC routing
+npm run router:bapi -- --action MM_CREATE_MATERIAL   # Try BAPI via SOAP RFC
 
 # Pipeline — spec to transport (8 stages)
 npm run pipeline -- requirements.md
@@ -31,6 +33,9 @@ npm run zrouter:probe             # Check if ZROUTER installed on SAP
 npm run zrouter:install:force     # Install via ADT
 npm run zrouter:http:test         # Test HTTP REST endpoint
 npm run zrouter:test -- --suite SMOKE  # Run test suite
+
+# SOAP RFC
+npm run soap:ping                 # Test SOAP RFC endpoint availability
 
 # BDC / Install tools
 npm run bdc:record -- --tcode MM01 --recording ZMM01_CREATE
@@ -61,25 +66,27 @@ npm run update          # git pull + npm install + healthcheck
 1. Caveman scope? → cavecrew-investigator/builder/reviewer
 2. ADT operation? → arc-1 (primary) or aibap (secondary)
 3. GUI required? → mcp-sap-gui (immediate, no ADT attempt)
-4. BAPI batch? → ZROUTER RFC via sap-rfc-mcp-server
+4. BAPI batch? → ZROUTER RFC via sap-rfc-mcp-server, or SOAP RFC BAPI dispatch
 5. Spec→code? → 8-stage pipeline
 6. Fallback: TieredFallback engine in `scripts/fallback_engine.py` (6 tiers: ADT→RFC→GUI→BDC→Offline→Manual)
 
 **ZROUTER availability** is cached in `_zrouter_state` (None=not checked, True=installed, False=missing). `sap_router.py` auto-probes on first route. When ZROUTER is missing, the router cascades through fallback tiers.
+
+**SOAP RFC BAPI Dispatch** — All actions can now call BAPIs via `/sap/bc/soap/rfc` without JCo/pyrfc/SAP RFC SDK. Uses HTTP POST with SOAP XML envelope. Supported BAPIs: `BAPI_MATERIAL_SAVEDATA`, `BAPI_PO_CREATE1`, `BAPI_SALESORDER_CREATEFROMDAT2`, `BAPI_GOODSMVT_CREATE`, `BAPI_INCOMINGINVOICE_CREATE`, `BAPI_PRODORD_CREATE_FROM_REF`, `BAPI_USER_CREATE1`. The SOAP RFC endpoint is probed by `scripts/healthcheck.py` and can be forced via `npm run router:soap -- --action <ACTION>` or `npm run router:bapi -- --action <ACTION>`.
 
 ## Key files
 
 | File | Purpose |
 |---|---|
 | `SKILL.md` | Master dispatch table, 4-principle Karpathy wrapper, routing decision tree |
-| `scripts/sap_router.py` | Routing engine with ADT-first/GUI-fallback/caveman delegation/pipeline orchestration |
+| `scripts/sap_router.py` | Routing engine with ADT-first/GUI-fallback/SOAP-RFC/caveman delegation/pipeline orchestration |
 | `scripts/fallback_engine.py` | 6-tier cascading fallback with retry, verification, 36 mapped actions |
-| `scripts/healthcheck.py` | Probes 35 MCPs (+18 planned), validates .env, generates interactive prompts |
+| `scripts/healthcheck.py` | Probes 42 MCPs (+18 planned) + SOAP RFC, validates .env, generates interactive prompts |
 | `scripts/self_learn.py` | Hermes-style context adaptation — tracks MCP latency/reliability, adapts routing |
 | `scripts/zrouter_bootstrap.py` | ZROUTER probe + install (ADT/GUI/Offline) + fallback mapping |
 | `scripts/xls_to_bapi.py` | CSV/XLSX → BAPI JSON with field mapping validation |
 | `scripts/memory_manager.py` | MEMORY.md session lifecycle + ABAPLINT section |
-| `.mcp.json` | 35 MCP server configs (+18 planned) — ADT, GUI (3 tiers), RFC, CPI, CF, APIM, RAG (3), PI/PO, BW, Datasphere, Steampunk, Sapient, Integration Suite, CPI OData Proxy, ABAP-MCP, Cloud ALM, CTS Transport + 4 plugins |
+| `.mcp.json` | 42 MCP server configs (+18 planned) — ADT, GUI (3 tiers), RFC, SOAP, CPI, CF, APIM, RAG (3), PI/PO, BW, Datasphere, Steampunk, Sapient, Integration Suite, CPI OData Proxy, ABAP-MCP, Cloud ALM, CTS Transport + 4 plugins |
 | `README.md` | GitHub landing page — 4 Mermaid diagrams, skill catalog, MCP reference, 130 topic tags, SEO footer |
 
 ## Cross-file consistency rules
@@ -97,7 +104,7 @@ When adding skills, MCPs, CLIs, or npm scripts, update ALL of these:
 
 - Windows cp1252 codec issues: use `.format()` or f-strings with ASCII-only characters. Avoid Unicode in print() output (arrows, emojis, curly quotes).
 - All imports from sibling scripts must handle `ModuleNotFoundError` with `sys.path.insert(0, str(SKILL_DIR))` fallback.
-- Count thresholds in `healthcheck.py` must match actual disk counts (skills >= 85, scripts >= 15).
+- Count thresholds in `healthcheck.py` must match actual disk counts (skills >= 89, scripts >= 24).
 
 ## Mermaid diagrams (README.md only)
 
