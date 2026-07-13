@@ -1,0 +1,8 @@
+{
+  "id": "sap-s4-migration-advisor",
+  "title": "SAP S/4HANA Migration Advisor",
+  "karpathy_wrapper": "mandatory",
+  "default_output": "caveman",
+  "capabilities": {"allow": ["sap.adt.source.read", "sap.adt.search.execute", "sap.gui.screen.read"], "gated": ["sap.gui.transaction.execute"], "deny": []},
+  "preferred_helpers": ["scripts/sap_router.py", "arc-1", "mcp-sap-gui"]
+}

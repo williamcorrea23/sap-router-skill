@@ -1,0 +1,702 @@
+{
+  "version": "2026.07.12",
+  "default_chains": {
+    "adt": [
+      "arc-1",
+      "abap-mcp",
+      "aibap",
+      "mcp-abap-adt",
+      "mcp-abap-abap-adt-api",
+      "dassian-adt",
+      "adt-ls"
+    ],
+    "advanced_abap": [
+      "abap-mcp",
+      "arc-1",
+      "aibap",
+      "mcp-abap-adt",
+      "abap-mcp-adt-powerup"
+    ],
+    "gui": [
+      "mcp-sap-gui",
+      "mcp-sap-gui-kts",
+      "sapgui-mcp-go",
+      "sapgui-mcp-webgui",
+      "sap-gui-mcp-jduncan",
+      "guniweb-sap-mcp",
+      "sap-gui-library-mcp"
+    ],
+    "cpi": [
+      "sap-cpi",
+      "ci-mcp-server",
+      "mcp-integration-suite",
+      "odata-mcp-proxy",
+      "integration-suite-ui-mcp",
+      "sapgui-mcp-webgui",
+      "guniweb-sap-mcp"
+    ],
+    "apim": [
+      "sap-api-management",
+      "mcp-integration-suite",
+      "apim-ui-mcp",
+      "integration-suite-ui-mcp",
+      "odata-mcp-proxy",
+      "sapgui-mcp-webgui",
+      "guniweb-sap-mcp"
+    ],
+    "fiori": [
+      "plugin:sap-fiori-mcp-server:fiori-mcp",
+      "plugin:ui5:ui5-mcp-server",
+      "integration-suite-ui-mcp",
+      "sapgui-mcp-webgui",
+      "guniweb-sap-mcp"
+    ],
+    "cap": [
+      "plugin:cds-mcp:cds-mcp",
+      "cap-mcp-plugin",
+      "btp-mcp",
+      "cf-cli-mcp"
+    ],
+    "transport": [
+      "sap-transport-mcp",
+      "abap-mcp",
+      "arc-1",
+      "aibap"
+    ],
+    "calm": [
+      "mcp-calm-server",
+      "cloud-alm-itsm"
+    ],
+    "rag": [
+      "pinecone-rag",
+      "supabase-rag",
+      "azure-ai-search",
+      "mcp-sap-docs"
+    ],
+    "docs": [
+      "mcp-sap-docs",
+      "mcp-sap-notes",
+      "sap-ai-mcp-servers"
+    ]
+  },
+  "mcps": {
+    "arc-1": {
+      "kind": "adt",
+      "status": "configured",
+      "criticality": "HIGH",
+      "env_vars": [
+        "ARC_SAP_URL",
+        "ARC_SAP_USER",
+        "ARC_SAP_PASSWORD",
+        "ARC_SAP_CLIENT"
+      ],
+      "probe_command": "npx arc-1 --help",
+      "probe_command_alt": "which arc-1",
+      "capabilities": [
+        "read_source",
+        "write_source",
+        "syntax_check",
+        "activate",
+        "where_used",
+        "transport"
+      ],
+      "auth": "basic_or_env",
+      "write_model": "direct_adt"
+    },
+    "aibap": {
+      "kind": "adt",
+      "status": "configured",
+      "criticality": "HIGH",
+      "env_vars": [],
+      "probe_command": "aibap.mcp --help",
+      "probe_command_alt": "where aibap.mcp",
+      "config_file": "~/.config/sap-mcp/systems.json",
+      "capabilities": [
+        "read_source",
+        "syntax_check",
+        "unit_tests",
+        "create_object",
+        "activate"
+      ],
+      "auth": "systems_json",
+      "write_model": "direct_adt"
+    },
+    "mcp-abap-adt": {
+      "kind": "adt",
+      "status": "configured",
+      "criticality": "MEDIUM",
+      "env_vars": [
+        "SAP_URL",
+        "SAP_USERNAME",
+        "SAP_PASSWORD",
+        "SAP_CLIENT"
+      ],
+      "capabilities": [
+        "read_source",
+        "search",
+        "syntax_check",
+        "activate"
+      ],
+      "auth": "basic_or_env",
+      "write_model": "direct_adt"
+    },
+    "abap-mcp": {
+      "kind": "adt",
+      "status": "configured",
+      "criticality": "LOW",
+      "env_vars": [
+        "SAP_URL",
+        "SAP_USER",
+        "SAP_PASSWORD",
+        "SAP_CLIENT"
+      ],
+      "capabilities": [
+        "method_surgery",
+        "ddic_validate",
+        "clean_abap_review",
+        "call_graph"
+      ],
+      "auth": "basic_or_env",
+      "write_model": "direct_adt"
+    },
+    "mcp-abap-abap-adt-api": {
+      "kind": "adt",
+      "status": "planned",
+      "criticality": "OPTIONAL",
+      "env_vars": [],
+      "planned": true,
+      "capabilities": [
+        "adt_api_reference",
+        "abap_metadata"
+      ]
+    },
+    "dassian-adt": {
+      "kind": "adt",
+      "status": "planned",
+      "criticality": "OPTIONAL",
+      "env_vars": [],
+      "planned": true,
+      "capabilities": [
+        "adt_bridge"
+      ]
+    },
+    "adt-ls": {
+      "kind": "adt",
+      "status": "planned",
+      "criticality": "OPTIONAL",
+      "env_vars": [],
+      "planned": true,
+      "capabilities": [
+        "language_server",
+        "adt_navigation"
+      ]
+    },
+    "abap-mcp-adt-powerup": {
+      "kind": "adt",
+      "status": "candidate",
+      "criticality": "OPTIONAL",
+      "env_vars": [
+        "SAP_URL",
+        "SAP_USERNAME",
+        "SAP_PASSWORD",
+        "SAP_CLIENT"
+      ],
+      "capabilities": [
+        "adt_power_tools"
+      ]
+    },
+    "mcp-sap-gui": {
+      "kind": "gui",
+      "status": "configured",
+      "criticality": "MEDIUM",
+      "env_vars": [
+        "SAPGUI_HOST",
+        "SAPGUI_USER",
+        "SAPGUI_PASSWORD",
+        "SAPGUI_CLIENT"
+      ],
+      "capabilities": [
+        "transaction",
+        "screen_read",
+        "field_write",
+        "screenshot",
+        "alv_read"
+      ],
+      "auth": "logged_user_or_env",
+      "write_model": "interactive_gui"
+    },
+    "mcp-sap-gui-kts": {
+      "kind": "gui",
+      "status": "configured",
+      "criticality": "LOW",
+      "env_vars": [
+        "SAP_CONNECTION"
+      ],
+      "capabilities": [
+        "transaction",
+        "screen_read",
+        "field_write"
+      ],
+      "auth": "sap_logon_connection",
+      "write_model": "interactive_gui"
+    },
+    "sapgui-mcp-go": {
+      "kind": "gui",
+      "status": "candidate",
+      "criticality": "LOW",
+      "env_vars": [],
+      "probe_command": "sapgui-mcp --help",
+      "capabilities": [
+        "transaction",
+        "gui_scripting"
+      ]
+    },
+    "sapgui-mcp-webgui": {
+      "kind": "web-ui",
+      "status": "candidate",
+      "criticality": "OPTIONAL",
+      "env_vars": [],
+      "capabilities": [
+        "webgui_transaction",
+        "browser_session",
+        "logged_user"
+      ],
+      "auth": "logged_browser_user",
+      "write_model": "interactive_web_ui"
+    },
+    "sap-gui-mcp-jduncan": {
+      "kind": "gui",
+      "status": "candidate",
+      "criticality": "OPTIONAL",
+      "env_vars": [
+        "SAPGUI_HOST",
+        "SAPGUI_USER",
+        "SAPGUI_PASSWORD",
+        "SAPGUI_CLIENT"
+      ],
+      "capabilities": [
+        "transaction",
+        "gui_scripting"
+      ]
+    },
+    "guniweb-sap-mcp": {
+      "kind": "web-ui",
+      "status": "configured",
+      "criticality": "MEDIUM",
+      "env_vars": [
+        "SAP_URL",
+        "SAP_USERNAME",
+        "SAP_PASSWORD",
+        "SAP_CLIENT"
+      ],
+      "capabilities": [
+        "web_ui_navigation",
+        "sap_webgui",
+        "fiori_navigation",
+        "logged_user"
+      ],
+      "auth": "logged_browser_user_or_env",
+      "write_model": "interactive_web_ui"
+    },
+    "sap-gui-library-mcp": {
+      "kind": "gui",
+      "status": "configured",
+      "criticality": "LOW",
+      "env_vars": [
+        "SAPGUI_HOST",
+        "SAPGUI_USER",
+        "SAPGUI_PASSWORD",
+        "SAPGUI_CLIENT"
+      ],
+      "capabilities": [
+        "gui_scripting_library",
+        "transaction"
+      ]
+    },
+    "sap-cpi": {
+      "kind": "cpi",
+      "status": "configured",
+      "criticality": "MEDIUM",
+      "env_vars": [
+        "CPI_HOST",
+        "CPI_USER",
+        "CPI_PASSWORD"
+      ],
+      "capabilities": [
+        "iflow_list",
+        "iflow_deploy",
+        "mpl_read",
+        "trace_read"
+      ],
+      "auth": "basic_or_oauth",
+      "official_apis": [
+        "Cloud Integration OData API"
+      ]
+    },
+    "ci-mcp-server": {
+      "kind": "cpi",
+      "status": "configured",
+      "criticality": "LOW",
+      "env_vars": [
+        "CPI_DESTINATION_BASE_URL",
+        "CPI_DESTINATION_TOKEN_URL",
+        "CPI_DESTINATION_CLIENT_ID",
+        "CPI_DESTINATION_CLIENT_SECRET"
+      ],
+      "capabilities": [
+        "odata_proxy",
+        "packages",
+        "iflow_artifacts",
+        "message_processing_logs"
+      ],
+      "auth": "oauth_destination"
+    },
+    "cpi-mcp-server": {
+      "kind": "cpi",
+      "status": "candidate",
+      "criticality": "OPTIONAL",
+      "env_vars": [],
+      "planned": true,
+      "source": "vadimklimov/cpi-mcp-server",
+      "capabilities": [
+        "iflow_discovery",
+        "iflow_read",
+        "tenant_operations"
+      ]
+    },
+    "mcp-ci-python": {
+      "kind": "cpi",
+      "status": "candidate",
+      "criticality": "OPTIONAL",
+      "env_vars": [],
+      "planned": true,
+      "capabilities": [
+        "cloud_integration_python"
+      ]
+    },
+    "btp-is-ci-mcp-server": {
+      "kind": "cpi",
+      "status": "candidate",
+      "criticality": "OPTIONAL",
+      "env_vars": [],
+      "planned": true,
+      "capabilities": [
+        "integration_suite_cloud_integration"
+      ]
+    },
+    "sap-cpi-mcp-backup": {
+      "kind": "cpi",
+      "status": "candidate",
+      "criticality": "OPTIONAL",
+      "env_vars": [],
+      "planned": true,
+      "capabilities": [
+        "iflow_backup",
+        "artifact_export"
+      ]
+    },
+    "mcp-integration-suite": {
+      "kind": "integration-suite",
+      "status": "configured",
+      "criticality": "LOW",
+      "env_vars": [
+        "API_BASE_URL",
+        "API_USER",
+        "API_PASS"
+      ],
+      "capabilities": [
+        "packages",
+        "iflow_artifacts",
+        "message_mapping",
+        "apim_proxy"
+      ],
+      "auth": "basic_or_oauth"
+    },
+    "odata-mcp-proxy": {
+      "kind": "odata",
+      "status": "configured",
+      "criticality": "LOW",
+      "env_vars": [],
+      "capabilities": [
+        "odata_proxy",
+        "metadata_discovery",
+        "generic_crud"
+      ]
+    },
+    "btp-sap-odata-to-mcp": {
+      "kind": "odata",
+      "status": "configured",
+      "criticality": "MEDIUM",
+      "env_vars": [],
+      "capabilities": [
+        "progressive_odata_discovery",
+        "metadata_to_tools"
+      ]
+    },
+    "sap-api-management": {
+      "kind": "apim",
+      "status": "configured",
+      "criticality": "LOW",
+      "env_vars": [
+        "APIM_HOST",
+        "APIM_USER",
+        "APIM_PASSWORD"
+      ],
+      "capabilities": [
+        "api_proxy",
+        "policy",
+        "product",
+        "application",
+        "analytics"
+      ],
+      "auth": "basic_or_oauth",
+      "official_apis": [
+        "apiportal-apiaccess"
+      ]
+    },
+    "plugin:sap-fiori-mcp-server:fiori-mcp": {
+      "kind": "fiori",
+      "status": "configured",
+      "criticality": "LOW",
+      "env_vars": [],
+      "capabilities": [
+        "fiori_app_generation",
+        "metadata_download",
+        "sap_help_docs"
+      ],
+      "auth": "plugin"
+    },
+    "plugin:ui5:ui5-mcp-server": {
+      "kind": "ui5",
+      "status": "configured",
+      "criticality": "LOW",
+      "env_vars": [],
+      "capabilities": [
+        "ui5_project",
+        "ui5_lint",
+        "api_reference"
+      ],
+      "auth": "plugin"
+    },
+    "plugin:cds-mcp:cds-mcp": {
+      "kind": "cap",
+      "status": "configured",
+      "criticality": "LOW",
+      "env_vars": [],
+      "capabilities": [
+        "cds_model_search",
+        "cap_snippets",
+        "service_model"
+      ],
+      "auth": "plugin"
+    },
+    "cap-mcp-plugin": {
+      "kind": "cap",
+      "status": "candidate",
+      "criticality": "OPTIONAL",
+      "env_vars": [],
+      "planned": true,
+      "capabilities": [
+        "cap_project_assist",
+        "cds_modeling"
+      ]
+    },
+    "btp-mcp": {
+      "kind": "btp",
+      "status": "configured",
+      "criticality": "LOW",
+      "env_vars": [],
+      "capabilities": [
+        "account",
+        "subaccount",
+        "service_instance"
+      ]
+    },
+    "cf-cli-mcp": {
+      "kind": "btp",
+      "status": "configured",
+      "criticality": "MEDIUM",
+      "env_vars": [
+        "CF_API",
+        "CF_USER",
+        "CF_PASSWORD"
+      ],
+      "capabilities": [
+        "cf_push",
+        "mta_ops",
+        "service_bindings",
+        "logs"
+      ]
+    },
+    "sap-rfc-mcp-server": {
+      "kind": "rfc",
+      "status": "configured",
+      "criticality": "MEDIUM",
+      "env_vars": [
+        "SAP_RFC_HOST",
+        "SAP_RFC_USER",
+        "SAP_RFC_PASSWORD",
+        "SAP_RFC_CLIENT"
+      ],
+      "capabilities": [
+        "bapi_execute",
+        "zrouter_dispatch"
+      ],
+      "auth": "rfc_env",
+      "write_model": "commit_in_backend"
+    },
+    "sap-transport-mcp": {
+      "kind": "transport",
+      "status": "configured",
+      "criticality": "LOW",
+      "env_vars": [
+        "SAP_HOSTNAME",
+        "SAP_USERNAME",
+        "SAP_PASSWORD"
+      ],
+      "capabilities": [
+        "transport_create",
+        "transport_release",
+        "import_queue"
+      ]
+    },
+    "mcp-calm-server": {
+      "kind": "alm",
+      "status": "configured",
+      "criticality": "LOW",
+      "env_vars": [
+        "CALM_BASE_URL"
+      ],
+      "capabilities": [
+        "cloud_alm"
+      ]
+    },
+    "cloud-alm-itsm": {
+      "kind": "alm",
+      "status": "configured",
+      "criticality": "LOW",
+      "env_vars": [
+        "ALM_HOST",
+        "ALM_USER",
+        "ALM_PASSWORD"
+      ],
+      "capabilities": [
+        "incident",
+        "problem",
+        "change"
+      ]
+    },
+    "sf-mcp": {
+      "kind": "successfactors",
+      "status": "configured",
+      "criticality": "LOW",
+      "env_vars": [
+        "SF_URL",
+        "SF_USERNAME",
+        "SF_PASSWORD"
+      ],
+      "capabilities": [
+        "odata_v2",
+        "employee_read",
+        "employee_update"
+      ]
+    },
+    "mcp-sap-notes": {
+      "kind": "docs",
+      "status": "configured",
+      "criticality": "LOW",
+      "env_vars": [
+        "SAP_NOTES_USERNAME",
+        "SAP_NOTES_PASSWORD"
+      ],
+      "capabilities": [
+        "sap_note_search",
+        "sap_note_fetch"
+      ]
+    },
+    "mcp-sap-docs": {
+      "kind": "docs",
+      "status": "candidate",
+      "criticality": "OPTIONAL",
+      "env_vars": [],
+      "planned": true,
+      "capabilities": [
+        "sap_help_search",
+        "sap_docs_rag"
+      ]
+    },
+    "pinecone-rag": {
+      "kind": "rag",
+      "status": "configured",
+      "criticality": "OPTIONAL",
+      "env_vars": [
+        "PINECONE_API_KEY",
+        "PINECONE_INDEX",
+        "PINECONE_ENVIRONMENT"
+      ],
+      "capabilities": [
+        "vector_search"
+      ]
+    },
+    "supabase-rag": {
+      "kind": "rag",
+      "status": "configured",
+      "criticality": "OPTIONAL",
+      "env_vars": [
+        "SUPABASE_URL",
+        "SUPABASE_SERVICE_KEY"
+      ],
+      "capabilities": [
+        "pgvector_search"
+      ]
+    },
+    "azure-ai-search": {
+      "kind": "rag",
+      "status": "configured",
+      "criticality": "OPTIONAL",
+      "env_vars": [
+        "AZURE_SEARCH_ENDPOINT",
+        "AZURE_SEARCH_KEY",
+        "AZURE_SEARCH_INDEX"
+      ],
+      "capabilities": [
+        "enterprise_search"
+      ]
+    },
+    "integration-suite-ui-mcp": {
+      "kind": "web-ui",
+      "status": "configured",
+      "criticality": "LOW",
+      "env_vars": [
+        "CPI_WEB_URL"
+      ],
+      "capabilities": [
+        "browser_session",
+        "logged_user",
+        "cpi_web_ui",
+        "apim_web_ui"
+      ],
+      "auth": "logged_browser_user",
+      "write_model": "plan_approve_commit",
+      "probe_command": "node scripts/web_ui_mcp_bridge.mjs --product cpi",
+      "description": "Local MCP bridge for Integration Suite Web UI using logged-in browser session."
+    },
+    "apim-ui-mcp": {
+      "kind": "web-ui",
+      "status": "configured",
+      "criticality": "LOW",
+      "env_vars": [
+        "APIM_WEB_URL"
+      ],
+      "capabilities": [
+        "browser_session",
+        "logged_user",
+        "apim_web_ui"
+      ],
+      "auth": "logged_browser_user",
+      "write_model": "plan_approve_commit",
+      "probe_command": "node scripts/web_ui_mcp_bridge.mjs --product apim",
+      "description": "Local MCP bridge for API Management Web UI using logged-in browser session."
+    }
+  }
+}

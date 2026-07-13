@@ -1,0 +1,8 @@
+{
+  "id": "sap-ui-integration-tester",
+  "title": "SAP UI Integration Tester",
+  "karpathy_wrapper": "mandatory",
+  "default_output": "caveman",
+  "capabilities": {"allow": ["sap.webui.status", "sap.webui.open", "sap.webui.plan", "sap.ui5.project.validate"], "gated": [], "deny": []},
+  "preferred_helpers": ["scripts/browser_session_probe.py", "ui5-mcp"]
+}

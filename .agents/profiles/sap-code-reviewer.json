@@ -1,0 +1,8 @@
+{
+  "id": "sap-code-reviewer",
+  "title": "SAP Code Reviewer",
+  "karpathy_wrapper": "mandatory",
+  "default_output": "caveman",
+  "capabilities": {"allow": ["sap.adt.source.read", "sap.adt.search.execute", "sap.cap.model.search", "sap.ui5.project.validate"], "gated": [], "deny": ["sap.adt.source.write", "sap.adt.object.activate"]},
+  "preferred_helpers": ["scripts/validate_catalog.py", "arc-1", "cap-mcp"]
+}

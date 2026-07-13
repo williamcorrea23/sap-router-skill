@@ -1,0 +1,8 @@
+{
+  "id": "sap-ui5-developer",
+  "title": "SAPUI5 Developer",
+  "karpathy_wrapper": "mandatory",
+  "default_output": "caveman",
+  "capabilities": {"allow": ["sap.ui5.project.validate"], "gated": [], "deny": []},
+  "preferred_helpers": ["ui5-mcp"]
+}

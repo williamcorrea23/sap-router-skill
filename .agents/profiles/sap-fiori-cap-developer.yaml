@@ -1,0 +1,17 @@
+version: 1
+id: sap-fiori-cap-developer
+skills:
+  - sap-fiori-tools
+  - sapui5-framework
+  - sap-cap
+mcps:
+  - sap-fiori-mcp-server
+  - ui5-mcp-server
+  - cds-mcp
+helpers:
+  python:
+    - scripts/mcp_launcher.py
+  javascript:
+    - scripts/cap_validate.mjs
+default_effect: read
+mutation_rule: local_diff_then_user_review

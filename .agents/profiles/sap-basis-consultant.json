@@ -1,0 +1,12 @@
+{
+  "id": "sap-basis-consultant",
+  "title": "SAP Basis Consultant",
+  "karpathy_wrapper": "mandatory",
+  "default_output": "caveman",
+  "capabilities": {
+    "allow": ["sap.gui.session.attach", "sap.gui.screen.read", "sap.transport.read"],
+    "gated": ["sap.gui.transaction.execute", "sap.transport.modify"],
+    "deny": ["sap.gui.control.modify.destructive"]
+  },
+  "preferred_helpers": ["scripts/check_gui_scripting.py", "mcp-sap-gui"]
+}

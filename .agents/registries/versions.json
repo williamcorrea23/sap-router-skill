@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "release_target": "6.0.0",
+  "skill_count_target": 85,
+  "profile_count_target": 38,
+  "caveman_workers": 3,
+  "official_mcp_versions": {
+    "sap-fiori-mcp-server": "1.8.1",
+    "ui5-mcp-server": "0.2.14",
+    "cap-mcp-server": "0.0.5",
+    "playwright-mcp": "0.0.78"
+  }
+}

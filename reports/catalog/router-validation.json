@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "checked_at": "2026-07-12T22:37:49Z",
+  "counts": {
+    "capabilities": 23,
+    "servers": 10,
+    "profiles": 8,
+    "routes": 7,
+    "caveman_workers": 3
+  },
+  "errors": []
+}

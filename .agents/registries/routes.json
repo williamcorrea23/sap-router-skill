@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "routes": [
+    {"match": ["read_source", "search", "syntax_check", "where_used", "code_search"], "capability": "sap.adt.source.read", "profile": "sap-abap-developer", "fallback_group": "adt"},
+    {"match": ["SPRO", "SM30", "SU01", "PFCG", "MM01", "VA01", "FB01"], "capability": "sap.gui.transaction.execute", "profile": "sap-basis-consultant", "fallback_group": "sap-gui"},
+    {"match": ["cpi", "iflow", "integration flow", "mpl"], "capability": "sap.cpi.artifact.read", "profile": "sap-cpi-developer", "fallback_group": "cpi"},
+    {"match": ["apim", "api management", "api proxy", "policy"], "capability": "sap.apim.proxy.read", "profile": "sap-api-management-consultant", "fallback_group": "apim"},
+    {"match": ["fiori"], "capability": "sap.fiori.app.generate", "profile": "sap-fiori-developer", "fallback_group": "fiori"},
+    {"match": ["ui5", "sapui5", "openui5"], "capability": "sap.ui5.project.validate", "profile": "sap-ui5-developer", "fallback_group": "ui5"},
+    {"match": ["cap", "cds"], "capability": "sap.cap.model.search", "profile": "sap-cap-developer", "fallback_group": "cap"}
+  ]
+}

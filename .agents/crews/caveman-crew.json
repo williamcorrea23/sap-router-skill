@@ -1,0 +1,27 @@
+{
+  "version": "6.0.0",
+  "mode": "caveman",
+  "token_policy": {
+    "default": "compressed",
+    "target_savings": "60%",
+    "preserve_code_blocks": true
+  },
+  "workers": [
+    {
+      "id": "cavecrew-investigator",
+      "purpose": "Read-only location, grep, ownership and call-chain discovery",
+      "triggers": ["find", "search", "locate", "where is", "grep", "scan"]
+    },
+    {
+      "id": "cavecrew-builder",
+      "purpose": "Surgical one or two file edits",
+      "triggers": ["fix", "edit", "rename", "typo", "small change"],
+      "refuses": ["3+ files", "new feature", "cross-module refactor"]
+    },
+    {
+      "id": "cavecrew-reviewer",
+      "purpose": "Severity-tagged review of diffs and PRs",
+      "triggers": ["review", "audit", "check diff", "code review"]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+version: 1
+id: sap-integration-expert
+skills:
+  - cpi-iflow-development
+  - btp-integration-suite
+  - sap-api-policy
+  - sap-api-style
+mcps:
+  - sap-cpi
+  - sap-api-management
+  - integration-suite-web-ui
+helpers:
+  python:
+    - scripts/cpi_client.py
+    - scripts/apim_client.py
+  javascript:
+    - packages/sap-cpi-mcp/dist/index.js
+    - packages/sap-apim-mcp/dist/index.js
+default_effect: read
+mutation_rule: plan_approval_commit

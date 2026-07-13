@@ -1,0 +1,8 @@
+{
+  "id": "sap-release-manager",
+  "title": "SAP Release Manager",
+  "karpathy_wrapper": "mandatory",
+  "default_output": "caveman",
+  "capabilities": {"allow": ["sap.transport.read", "sap.adt.source.read", "sap.cpi.artifact.read", "sap.apim.proxy.read"], "gated": ["sap.transport.modify", "sap.cpi.artifact.deploy", "sap.apim.proxy.deploy"], "deny": []},
+  "preferred_helpers": ["scripts/approval_broker.py", "sap-transport-mcp"]
+}

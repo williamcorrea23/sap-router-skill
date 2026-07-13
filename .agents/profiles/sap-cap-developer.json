@@ -1,0 +1,8 @@
+{
+  "id": "sap-cap-developer",
+  "title": "SAP CAP Developer",
+  "karpathy_wrapper": "mandatory",
+  "default_output": "caveman",
+  "capabilities": {"allow": ["sap.cap.model.search"], "gated": ["sap.cap.project.build"], "deny": []},
+  "preferred_helpers": ["cap-mcp"]
+}

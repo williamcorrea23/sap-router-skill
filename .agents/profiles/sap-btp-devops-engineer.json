@@ -1,0 +1,8 @@
+{
+  "id": "sap-btp-devops-engineer",
+  "title": "SAP BTP DevOps Engineer",
+  "karpathy_wrapper": "mandatory",
+  "default_output": "caveman",
+  "capabilities": {"allow": ["sap.cap.model.search", "sap.ui5.project.validate", "sap.cpi.package.read", "sap.apim.proxy.read"], "gated": ["sap.cap.project.build", "sap.cpi.artifact.deploy", "sap.apim.proxy.deploy"], "deny": []},
+  "preferred_helpers": ["scripts/cap_validate.mjs", "scripts/cpi_client.py", "scripts/apim_client.py"]
+}

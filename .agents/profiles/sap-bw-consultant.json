@@ -1,0 +1,8 @@
+{
+  "id": "sap-bw-consultant",
+  "title": "Senior SAP BW Consultant",
+  "karpathy_wrapper": "mandatory",
+  "default_output": "caveman",
+  "capabilities": {"allow": ["sap.adt.source.read", "sap.adt.search.execute", "sap.gui.screen.read"], "gated": ["sap.adt.source.write", "sap.adt.object.activate", "sap.gui.transaction.execute"], "deny": []},
+  "preferred_helpers": ["scripts/sap_router.py", "arc-1", "mcp-sap-gui"]
+}

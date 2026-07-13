@@ -1,0 +1,8 @@
+{
+  "id": "sap-mm-consultant",
+  "title": "Senior SAP MM Consultant",
+  "karpathy_wrapper": "mandatory",
+  "default_output": "caveman",
+  "capabilities": {"allow": ["sap.gui.session.attach", "sap.gui.screen.read"], "gated": ["sap.gui.transaction.execute", "sap.gui.control.modify"], "deny": []},
+  "preferred_helpers": ["scripts/xls_to_bapi.py", "scripts/sap_router.py", "mcp-sap-gui"]
+}

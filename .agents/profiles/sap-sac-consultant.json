@@ -1,0 +1,8 @@
+{
+  "id": "sap-sac-consultant",
+  "title": "Senior SAP SAC Consultant",
+  "karpathy_wrapper": "mandatory",
+  "default_output": "caveman",
+  "capabilities": {"allow": ["sap.webui.status", "sap.webui.open", "sap.webui.plan"], "gated": [], "deny": []},
+  "preferred_helpers": ["scripts/browser_session_probe.py"]
+}

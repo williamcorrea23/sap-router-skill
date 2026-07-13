@@ -358,6 +358,11 @@ _pipe_cfg = _load_yaml_config("pipeline_stages.yaml", None)
 if _pipe_cfg:
     PIPELINE_STAGES = _pipe_cfg.get("pipeline_stages", PIPELINE_STAGES)
 
+try:
+    from mcp_registry import get_chain, get_mcp, launcher_plan, list_mcps
+except Exception:
+    get_chain = get_mcp = launcher_plan = list_mcps = None
+
 
 class SapRouter:
     def __init__(self, memory_file="MEMORY.md"):
@@ -432,6 +437,28 @@ class SapRouter:
                     "strategy": "agent-dispatch"}
         return None
 
+    def _mcp_chain(self, profile, fallback):
+        if get_chain:
+            try:
+                chain = get_chain(profile)
+                if chain:
+                    return chain
+            except Exception:
+                pass
+        return fallback
+
+    def _route_registry_profile(self, profile, destination, strategy, details):
+        chain = self._mcp_chain(profile, [])
+        route = {
+            "destination": destination,
+            "strategy": strategy,
+            "details": details,
+            "mcp_servers": chain,
+        }
+        if chain:
+            route["mcp_server"] = chain[0]
+        return route
+
 
     def get_route(self, action, try_adt=True, allow_gui_fallback=True,
                   functional_context=False, use_zrouter=False):
@@ -496,10 +523,10 @@ class SapRouter:
     def _is_mcp_healthy_in_cache(self, mcp_name, cache):
         checks = cache.get("mcp_checks", {})
         if mcp_name not in checks:
-            return True # If not checked, assume healthy (fail-open)
+            return False
         mcp_data = checks[mcp_name]
         env_ok = mcp_data.get("env", {}).get("status") in ("ALL_SET", "CONFIGURED", "NO_ENV_NEEDED")
-        binary_ok = mcp_data.get("binary", {}).get("status") in ("AVAILABLE", "SKIPPED")
+        binary_ok = mcp_data.get("binary", {}).get("status") == "AVAILABLE"
         return env_ok and binary_ok
 
     def _load_healthcheck_cache(self):
@@ -532,6 +559,38 @@ class SapRouter:
         """
         action_lower = action.lower()
         action_upper = action.upper()
+
+        # Step 0: Integration Suite, APIM, Fiori, CAP profile routing from the
+        # shared MCP registry. Web UI/logged-user MCPs stay in these chains as
+        # explicit fallbacks when background APIs or CLI paths are blocked.
+        if any(kw in action_lower for kw in ["cpi", "iflow", "integration_flow", "mpl_", "message_processing_log"]):
+            return self._route_registry_profile(
+                "cpi",
+                "SAP Cloud Integration (CPI)",
+                "cpi-registry-chain",
+                "Cloud Integration via official OData/API MCPs, then Web UI fallback when needed."
+            )
+        if any(kw in action_lower for kw in ["apim", "api_management", "api_proxy", "apiportal", "policy"]):
+            return self._route_registry_profile(
+                "apim",
+                "SAP API Management",
+                "apim-registry-chain",
+                "API Management via apiportal APIs, then Integration Suite/Web UI fallback when needed."
+            )
+        if any(kw in action_lower for kw in ["fiori", "sapui5", "ui5", "launchpad"]):
+            return self._route_registry_profile(
+                "fiori",
+                "SAP Fiori/UI5",
+                "fiori-registry-chain",
+                "Fiori/UI5 plugin MCPs first, then browser/Web UI fallback."
+            )
+        if any(kw in action_lower for kw in ["cap_", "cds_", "cloud_application_programming", "srv/", "db/schema.cds"]):
+            return self._route_registry_profile(
+                "cap",
+                "SAP CAP/CDS",
+                "cap-registry-chain",
+                "CAP/CDS MCPs and BTP/CF operational fallback."
+            )
 
         # Step 0a: Cloud ALM (CALM) operations
         if any(kw in action_lower for kw in ["calm_", "alm_", "cloud_alm"]):
@@ -919,10 +978,12 @@ class SapRouter:
             ctx = ssl.create_default_context()
             # SSL verification controlled by ARC_SAP_SSL_VERIFY env var (default enabled)
             ssl_verify = os.environ.get("ARC_SAP_SSL_VERIFY", "true").lower()
-            if ssl_verify == "false":
+            if ssl_verify == "false" and os.environ.get("SAP_ENV", "").upper() not in {"PROD", "PRD", "PRODUCTION"}:
                 ctx.check_hostname = False
                 ctx.verify_mode = ssl.CERT_NONE
                 logger.warning("SSL verification DISABLED via ARC_SAP_SSL_VERIFY=false")
+            elif ssl_verify == "false":
+                raise ValueError("Refusing disabled TLS verification in production")
 
             req = urllib.request.Request(endpoint, data=data_bytes, headers=headers, method="POST")
             with urllib.request.urlopen(req, timeout=30, context=ctx) as resp:
@@ -1397,6 +1458,16 @@ def main():
                               help='Prefer ZROUTER RFC (honoured only if opted in via "zrouter accept")')
     route_parser.add_argument('--memory-file', default='MEMORY.md', help='Path to MEMORY.md')
 
+    # classify - canonical registry route decision
+    classify_parser = subparsers.add_parser('classify', help='Classify task through canonical capability registry')
+    classify_parser.add_argument('--task', required=True, help='Natural-language SAP task')
+    classify_parser.add_argument('--memory-file', default='MEMORY.md')
+
+    # catalog - validate canonical catalog
+    catalog_parser = subparsers.add_parser('catalog', help='Validate canonical SAP Router catalog')
+    catalog_parser.add_argument('--output', help='Write validation JSON to this path')
+    catalog_parser.add_argument('--memory-file', default='MEMORY.md')
+
     # pipeline
     pipeline_parser = subparsers.add_parser('pipeline', help='Execute spec-to-transport pipeline')
     pipeline_parser.add_argument('--spec', help='Path to specification file (.md, .txt, .pdf)')
@@ -1515,6 +1586,23 @@ def main():
     sap_crew_parser.add_argument('crew_action', choices=['status', 'install', 'run'])
     sap_crew_parser.add_argument('args', nargs=argparse.REMAINDER, help='Additional arguments for run')
 
+    # mcp — inspect declarative MCP registry and launcher plans
+    mcp_parser = subparsers.add_parser('mcp', help='Inspect MCP registry, fallback chains, and launcher plans')
+    mcp_subparsers = mcp_parser.add_subparsers(dest='mcp_command', required=True)
+    mcp_list = mcp_subparsers.add_parser('list', help='List registered MCPs')
+    mcp_list.add_argument('--kind', help='Filter by MCP kind, e.g. cpi, gui, cap')
+    mcp_list.add_argument('--capability', help='Filter by canonical capability')
+    mcp_list.add_argument('--active-only', action='store_true', help='Hide planned candidates')
+    mcp_probe = mcp_subparsers.add_parser('probe', help='Probe one canonical MCP server')
+    mcp_probe.add_argument('--server', required=True)
+    mcp_probe.add_argument('--execute', action='store_true')
+    mcp_show = mcp_subparsers.add_parser('show', help='Show one MCP definition')
+    mcp_show.add_argument('name')
+    mcp_chain = mcp_subparsers.add_parser('chain', help='Show fallback chain for a profile')
+    mcp_chain.add_argument('profile')
+    mcp_launcher = mcp_subparsers.add_parser('launcher', help='Emit launcher plan for a profile')
+    mcp_launcher.add_argument('profile')
+
     args = parser.parse_args()
     router = SapRouter(args.memory_file if hasattr(args, 'memory_file') else 'MEMORY.md')
 
@@ -1532,6 +1620,31 @@ def main():
             use_zrouter=args.use_zrouter
         )
         print(json.dumps(route_info, indent=2))
+
+    elif args.command == 'classify':
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "python"))
+        from sap_router_core.registry import classify_task, load_capabilities
+        decision = classify_task(args.task)
+        capabilities = load_capabilities()
+        cap = capabilities.get(decision.get("capability"))
+        if cap:
+            decision["risk"] = cap.get("effect")
+            decision["domain"] = cap.get("domain")
+            decision["confirmation_required"] = cap.get("effect") in ("mutating", "destructive")
+        print(json.dumps(decision, indent=2))
+
+    elif args.command == 'catalog':
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "python"))
+        from sap_router_core.registry import validate_catalog
+        result = validate_catalog()
+        if args.output:
+            os.makedirs(os.path.dirname(args.output) or ".", exist_ok=True)
+            with open(args.output, "w", encoding="utf-8") as f:
+                json.dump(result, f, indent=2)
+                f.write("\n")
+        print(json.dumps(result, indent=2))
+        if result["status"] != "PASS":
+            sys.exit(1)
 
     elif args.command == 'analyze-spec':
         spec_text = args.spec_text
@@ -1882,14 +1995,17 @@ def main():
             print(f"  .env       : {'[OK]' if os.path.isfile(env_file) else '[MISSING - copy .env.example]'}")
             print(f"  .venv      : {'[OK]' if os.path.isdir(venv_dir) else '[NOT FOUND - run install]'}")
             # Quick crewai import probe
-            probe = subprocess.run(
-                [sys.executable, '-c', 'import crewai; print("crewai", crewai.__version__)'],
-                capture_output=True, text=True, timeout=10
-            )
-            if probe.returncode == 0:
-                print(f"  crewai     : [OK] {probe.stdout.strip()}")
-            else:
-                print("  crewai     : [NOT INSTALLED - run install]")
+            try:
+                probe = subprocess.run(
+                    [sys.executable, '-c', 'import crewai; print("crewai", crewai.__version__)'],
+                    capture_output=True, text=True, timeout=10
+                )
+                if probe.returncode == 0:
+                    print(f"  crewai     : [OK] {probe.stdout.strip()}")
+                else:
+                    print("  crewai     : [NOT INSTALLED - run install]")
+            except subprocess.TimeoutExpired:
+                print("  crewai     : [TIMEOUT - import took more than 10s]")
             return True
 
         def _crew_install():
@@ -1938,6 +2054,42 @@ def main():
             _crew_install()
         elif args.crew_action == 'run':
             _crew_run(args.args)
+
+    elif args.command == 'mcp':
+        if args.mcp_command in ('list', 'probe') and os.path.exists(os.path.join(CONFIG_DIR, "..", ".agents", "registries", "mcps.json")):
+            sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "python"))
+            from sap_router_core.registry import load_servers, probe_server, resolve_servers_for_capability
+            if args.mcp_command == 'list' and args.capability:
+                servers = resolve_servers_for_capability(args.capability)
+                print(json.dumps([{
+                    "id": s["id"],
+                    "status": s["status"],
+                    "capabilities": s["capabilities"],
+                    "owner": s.get("owner")
+                } for s in servers], indent=2))
+                return
+            if args.mcp_command == 'probe':
+                result = probe_server(args.server, execute=args.execute)
+                print(json.dumps(result, indent=2))
+                if result["status"] != "READY":
+                    sys.exit(1)
+                return
+        if not list_mcps:
+            print("error: mcp_registry.py unavailable", file=sys.stderr)
+            sys.exit(1)
+        if args.mcp_command == 'list':
+            print(json.dumps(list_mcps(args.kind, not args.active_only), indent=2))
+        elif args.mcp_command == 'show':
+            spec = get_mcp(args.name) if get_mcp else None
+            if not spec:
+                print(f"error: unknown MCP: {args.name}", file=sys.stderr)
+                sys.exit(1)
+            print(json.dumps({"name": args.name, **spec}, indent=2))
+        elif args.mcp_command == 'chain':
+            print(json.dumps({"profile": args.profile,
+                              "chain": get_chain(args.profile) if get_chain else []}, indent=2))
+        elif args.mcp_command == 'launcher':
+            print(json.dumps(launcher_plan(args.profile), indent=2))
 
     else:
         parser.print_help()

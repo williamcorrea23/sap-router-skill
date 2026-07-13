@@ -4,23 +4,31 @@
   "description": "SAP Router Orchestrator v4.5.0 - Karpathy command format. 85 skills, 42 MCPs (+18 planned), 24 CLIs, 63 npm scripts, SOAP RFC dispatch, SICF auto-registration. All SAP domains covered.",
   "private": true,
   "scripts": {
-    "abap:lint": "abaplint templates/**/*.abap",
-    "abap:lint:fix": "abaplint --fix templates/**/*.abap",
-    "abap:lint:ci": "abaplint --format json templates/**/*.abap > abaplint-report.json",
+    "abap:lint": "abaplint templates/abaplint.json",
+    "abap:lint:fix": "abaplint templates/abaplint.json --fix",
+    "abap:lint:ci": "abaplint templates/abaplint.json --outformat json --outfile abaplint-report.json",
     "abap:lint:watch": "abaplint --watch templates/",
     "abap:lint:changed": "git diff --name-only HEAD | grep '\\.abap$' | xargs -r abaplint",
     "abap:review": "npm run abap:lint && npm run abap:review:security && npm run abap:review:clean",
-    "abap:review:security": "abaplint --format json templates/**/*.abap | node scripts/abap-review-gate.js --mode security",
-    "abap:review:clean": "abaplint --format json templates/**/*.abap | node scripts/abap-review-gate.js --mode clean",
-    "abap:review:transport": "abaplint --format json templates/**/*.abap | node scripts/abap-review-gate.js --mode transport",
-    "abap:review:report": "abaplint --format html templates/**/*.abap > abap-review-report.html && echo 'Report: abap-review-report.html'",
+    "abap:review:security": "abaplint templates/abaplint.json --outformat json | node scripts/abap-review-gate.js --mode security",
+    "abap:review:clean": "abaplint templates/abaplint.json --outformat json | node scripts/abap-review-gate.js --mode clean",
+    "abap:review:transport": "abaplint templates/abaplint.json --outformat json | node scripts/abap-review-gate.js --mode transport",
+    "abap:review:report": "abaplint templates/abaplint.json --outformat html --outfile abap-review-report.html && echo 'Report: abap-review-report.html'",
     "abap:review:ci": "npm run abap:lint:ci && npm run abap:review:report",
     "abap:review:full": "npm run abap:review && npm run abap:review:transport && npm run abap:review:report",
     "abap:memory:update": "npm run abap:lint:ci && python scripts/sap_router.py log-action --module REVIEW --action LINT --status OK || python scripts/sap_router.py log-action --module REVIEW --action LINT --status ERROR",
     "abap:dojo": "echo 'ABAP Dojo exercises from abap-code-patterns skill' && npm run abap:lint",
     "hc": "python scripts/healthcheck.py",
+    "hc:strict": "python scripts/healthcheck.py --strict --read-only --output reports/health/latest.json",
     "hc:json": "python scripts/healthcheck.py --json",
     "hc:prompt": "python scripts/healthcheck.py --prompt-missing",
+    "security:audit": "python scripts/secret_audit.py --strict",
+    "catalog:validate": "python scripts/validate_catalog.py --strict",
+    "mcp:list": "python scripts/mcp_launcher.py list",
+    "mcp:probe": "python scripts/mcp_launcher.py probe --server",
+    "approval": "python scripts/approval_broker.py",
+    "apim:health": "python scripts/apim_client.py health",
+    "cap:validate": "node scripts/cap_validate.mjs",
     "learn:mcp": "python scripts/self_learn.py record-mcp",
     "learn:route": "python scripts/self_learn.py record-route",
     "learn:best": "python scripts/self_learn.py best-mcp",
@@ -60,18 +68,23 @@
     "csv:validate": "python scripts/xls_to_bapi.py validate --input",
     "fallback:execute": "python scripts/fallback_engine.py execute --action",
     "fallback:map": "python scripts/fallback_engine.py map --action",
+    "approval:plan": "python scripts/approval_broker.py plan",
+    "crew:plan": "python scripts/crew_runtime.py plan --task",
     "cpi:template": "python scripts/cpi_iflow_packager.py template",
     "cpi:create": "python scripts/cpi_iflow_packager.py create",
     "cpi:validate": "python scripts/cpi_iflow_packager.py validate",
     "cpi:list": "python scripts/cpi_iflow_packager.py list",
     "validate:all": "python scripts/healthcheck.py --quiet --json && npm run abap:review:ci && python scripts/sap_router.py status",
     "spec:analyze": "python scripts/sap_router.py analyze-spec --spec",
-    "spec:pipeline": "python scripts/sap_router.py pipeline --spec"
+    "spec:pipeline": "python scripts/sap_router.py pipeline --spec",
+    "ide:generate": "python scripts/generate_ide_assets.py generate --targets all",
+    "ide:check": "python scripts/generate_ide_assets.py check"
   },
   "devDependencies": {
-    "@abaplint/cli": "^2.7.0",
-    "@abaplint/rules": "^2.7.0",
-    "@abaplint/database-sqlite": "^2.7.0"
+    "@abaplint/cli": "^2.119.65",
+    "@abaplint/core": "^2.119.65",
+    "@abaplint/database-sqlite": "^2.7.0",
+    "glob": "^13.0.6"
   },
   "abaplint": {
     "global": {
@@ -291,7 +304,10 @@
       },
       "unused_variables": {
         "enabled": true,
-        "skipNames": ["lv_result", "lv_dummy"]
+        "skipNames": [
+          "lv_result",
+          "lv_dummy"
+        ]
       },
       "use_bom": {
         "enabled": true

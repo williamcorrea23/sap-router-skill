@@ -1,0 +1,32 @@
+[shell_environment_policy]
+inherit = "core"
+
+[mcp_servers.arc-1]
+command = "npx"
+args = ["arc-1"]
+env_vars = ["ARC_SAP_URL", "ARC_SAP_USER", "ARC_SAP_PASSWORD", "ARC_SAP_CLIENT"]
+
+[mcp_servers.mcp-sap-gui]
+command = "python"
+args = ["-m", "sap_gui_server.server"]
+env_vars = ["SAP_SYSTEM", "SAP_CLIENT", "SAP_USER", "SAP_PASSWORD", "SAPGUI_HOST", "SAPGUI_USER", "SAPGUI_PASSWORD", "SAPGUI_CLIENT", "PYTHONPATH"]
+
+[mcp_servers.ci-mcp-server]
+command = "node"
+args = ["packages/ci-mcp-server/node_modules/odata-mcp-proxy/dist/index.js", "--config", "packages/ci-mcp-server/ci-api-config.json"]
+env_vars = ["CPI_DESTINATION_BASE_URL", "CPI_DESTINATION_TOKEN_URL", "CPI_DESTINATION_CLIENT_ID", "CPI_DESTINATION_CLIENT_SECRET"]
+
+[mcp_servers.sap-api-management]
+command = "node"
+args = ["dist/index.js"]
+env_vars = ["APIM_HOST", "APIM_USER", "APIM_PASSWORD"]
+
+[mcp_servers.integration-suite-ui-mcp]
+command = "node"
+args = ["scripts/web_ui_mcp_bridge.mjs", "--product", "cpi"]
+env_vars = ["CPI_WEB_URL", "BROWSER_CHANNEL"]
+
+[mcp_servers.apim-ui-mcp]
+command = "node"
+args = ["scripts/web_ui_mcp_bridge.mjs", "--product", "apim"]
+env_vars = ["APIM_WEB_URL", "BROWSER_CHANNEL"]

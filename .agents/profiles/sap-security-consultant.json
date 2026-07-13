@@ -1,0 +1,8 @@
+{
+  "id": "sap-security-consultant",
+  "title": "Senior SAP Security Consultant",
+  "karpathy_wrapper": "mandatory",
+  "default_output": "caveman",
+  "capabilities": {"allow": ["sap.gui.session.attach", "sap.gui.screen.read", "sap.adt.search.execute"], "gated": ["sap.gui.transaction.execute"], "deny": ["sap.gui.control.modify"]},
+  "preferred_helpers": ["scripts/secret_audit.py", "mcp-sap-gui"]
+}

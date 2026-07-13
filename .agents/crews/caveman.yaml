@@ -1,0 +1,29 @@
+version: 1
+default_output: caveman
+token_budget:
+  hard_output_tokens: 40000
+  warn_at_percent: 80
+  summarize_at_percent: 90
+  cancel_optional_at_percent: 100
+workers:
+  cavecrew-investigator:
+    role: readonly investigator
+    intents: [find, search, locate, where is, map]
+    effects: {read: true, write: false, execute: false, delete: false}
+    output: file_line_table
+  cavecrew-builder:
+    role: surgical builder
+    intents: [fix, edit, rename, typo]
+    scope_limit: "1-2 files"
+    effects: {read: true, write: true, execute: true, delete: false}
+    output: diff_receipt
+  cavecrew-reviewer:
+    role: severity reviewer
+    intents: [review, audit, code review]
+    effects: {read: true, write: false, execute: false, delete: false}
+    output: severity_findings
+waves:
+  default:
+    - [cavecrew-investigator]
+    - [cavecrew-builder, cavecrew-reviewer]
+single_writer: true

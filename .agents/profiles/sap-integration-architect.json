@@ -1,0 +1,12 @@
+{
+  "id": "sap-integration-architect",
+  "title": "SAP Integration Architect",
+  "karpathy_wrapper": "mandatory",
+  "default_output": "caveman",
+  "capabilities": {
+    "allow": ["sap.cpi.artifact.read", "sap.apim.proxy.read"],
+    "gated": ["sap.cpi.artifact.deploy", "sap.apim.proxy.deploy"],
+    "deny": []
+  },
+  "preferred_helpers": ["sap-cpi-mcp", "sap-apim-mcp", "integration-suite-ui-mcp"]
+}

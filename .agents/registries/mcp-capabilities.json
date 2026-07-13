@@ -1,0 +1,109 @@
+{
+  "version": "6.0.0",
+  "default_policy": "fail_closed",
+  "capabilities": {
+    "sap.abap.source.read": {
+      "primary": "arc-1",
+      "fallbacks": ["abap-mcp", "aibap", "mcp-abap-adt"],
+      "mutation": false
+    },
+    "sap.abap.source.modify": {
+      "primary": "arc-1",
+      "fallbacks": ["abap-mcp", "aibap", "mcp-abap-adt"],
+      "mutation": true,
+      "requires_approval": true
+    },
+    "sap.gui.transaction.run": {
+      "primary": "mcp-sap-gui",
+      "fallbacks": ["mcp-sap-gui-kts", "sapgui-mcp-go", "sapient-mcp-py", "sap-gui-library-mcp"],
+      "mutation": true,
+      "requires_approval": true
+    },
+    "sap.cpi.package.read": {
+      "primary": "ci-mcp-server",
+      "fallbacks": ["sap-cpi", "mcp-integration-suite", "integration-suite-ui-mcp"],
+      "mutation": false
+    },
+    "sap.cpi.artifact.read": {
+      "primary": "ci-mcp-server",
+      "fallbacks": ["sap-cpi", "mcp-integration-suite", "integration-suite-ui-mcp"],
+      "mutation": false
+    },
+    "sap.cpi.artifact.deploy": {
+      "primary": "sap-cpi",
+      "fallbacks": ["mcp-integration-suite", "integration-suite-ui-mcp"],
+      "mutation": true,
+      "requires_approval": true,
+      "plan_then_commit": true
+    },
+    "sap.cpi.message.read": {
+      "primary": "ci-mcp-server",
+      "fallbacks": ["sap-cpi", "mcp-integration-suite", "integration-suite-ui-mcp"],
+      "mutation": false
+    },
+    "sap.cpi.trace.read": {
+      "primary": "sap-cpi",
+      "fallbacks": ["mcp-integration-suite", "integration-suite-ui-mcp"],
+      "mutation": false
+    },
+    "sap.apim.proxy.read": {
+      "primary": "sap-api-management",
+      "fallbacks": ["mcp-integration-suite", "apim-ui-mcp"],
+      "mutation": false
+    },
+    "sap.apim.proxy.modify": {
+      "primary": "sap-api-management",
+      "fallbacks": ["apim-ui-mcp"],
+      "mutation": true,
+      "requires_approval": true,
+      "plan_then_commit": true
+    },
+    "sap.apim.proxy.deploy": {
+      "primary": "sap-api-management",
+      "fallbacks": ["apim-ui-mcp"],
+      "mutation": true,
+      "requires_approval": true,
+      "plan_then_commit": true
+    },
+    "sap.fiori.app.generate": {
+      "primary": "plugin:sap-fiori-mcp-server:fiori-mcp",
+      "fallbacks": ["plugin:ui5:ui5-mcp-server"],
+      "mutation": true,
+      "requires_approval": true,
+      "plan_then_commit": true
+    },
+    "sap.ui5.project.validate": {
+      "primary": "plugin:ui5:ui5-mcp-server",
+      "fallbacks": [],
+      "mutation": false
+    },
+    "sap.cap.model.search": {
+      "primary": "plugin:cds-mcp:cds-mcp",
+      "fallbacks": ["cap-mcp-plugin"],
+      "mutation": false
+    },
+    "sap.cap.project.build": {
+      "primary": "plugin:cds-mcp:cds-mcp",
+      "fallbacks": ["cap-mcp-plugin"],
+      "mutation": false
+    }
+  },
+  "profiles": {
+    "sap-cpi-developer": {
+      "skills": ["cpi-iflow-development", "btp-integration-suite"],
+      "capabilities": ["sap.cpi.package.read", "sap.cpi.artifact.read", "sap.cpi.artifact.deploy", "sap.cpi.message.read", "sap.cpi.trace.read"]
+    },
+    "sap-apim-architect": {
+      "skills": ["sap-api-policy", "sap-api-style"],
+      "capabilities": ["sap.apim.proxy.read", "sap.apim.proxy.modify", "sap.apim.proxy.deploy"]
+    },
+    "sap-fiori-ui5-developer": {
+      "skills": ["sap-fiori-tools", "sapui5-framework", "sap-fiori-apps-reference"],
+      "capabilities": ["sap.fiori.app.generate", "sap.ui5.project.validate"]
+    },
+    "sap-cap-developer": {
+      "skills": ["sap-cap", "btp-cloud-foundry", "btp-business-application-studio"],
+      "capabilities": ["sap.cap.model.search", "sap.cap.project.build"]
+    }
+  }
+}

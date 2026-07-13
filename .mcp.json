@@ -3,7 +3,9 @@
     "arc-1": {
       "type": "stdio",
       "command": "npx",
-      "args": ["arc-1"],
+      "args": [
+        "arc-1"
+      ],
       "env": {
         "ARC_SAP_URL": "${ARC_SAP_URL}",
         "ARC_SAP_USER": "${ARC_SAP_USER}",
@@ -22,7 +24,9 @@
     "mcp-abap-adt": {
       "type": "stdio",
       "command": "node",
-      "args": ["dist/index.js"],
+      "args": [
+        "dist/index.js"
+      ],
       "env": {
         "SAP_URL": "${SAP_URL}",
         "SAP_USERNAME": "${SAP_USERNAME}",
@@ -34,16 +38,19 @@
     "mcp-sap-gui": {
       "type": "stdio",
       "command": "python",
-      "args": ["-m", "sap_gui_server.server"],
+      "args": [
+        "-m",
+        "sap_gui_server.server"
+      ],
       "env": {
-        "SAP_SYSTEM": "10.57.203.136/00",
-        "SAP_CLIENT": "100",
-        "SAP_USER": "30356735869",
-        "SAP_PASSWORD": "Fodase@APPA2026",
-        "SAPGUI_HOST": "10.57.203.136",
-        "SAPGUI_USER": "30356735869",
-        "SAPGUI_PASSWORD": "Fodase@APPA2026",
-        "SAPGUI_CLIENT": "100",
+        "SAP_SYSTEM": "${SAP_SYSTEM}",
+        "SAP_CLIENT": "${SAP_CLIENT}",
+        "SAP_USER": "${SAP_USER}",
+        "SAP_PASSWORD": "${SAP_PASSWORD}",
+        "SAPGUI_HOST": "${SAPGUI_HOST}",
+        "SAPGUI_USER": "${SAPGUI_USER}",
+        "SAPGUI_PASSWORD": "${SAPGUI_PASSWORD}",
+        "SAPGUI_CLIENT": "${SAPGUI_CLIENT}",
         "PYTHONPATH": "packages/mcp-sap-gui-mario/src"
       },
       "description": "SAP GUI MCP (mario-andreschak/mcp-sap-gui v0.1.3) — Python, module sap_gui_server. Installed editable from packages/mcp-sap-gui-mario."
@@ -51,9 +58,12 @@
     "mcp-sap-gui-kts": {
       "type": "stdio",
       "command": "python",
-      "args": ["-m", "mcp_sap_gui"],
+      "args": [
+        "-m",
+        "mcp_sap_gui"
+      ],
       "env": {
-        "SAP_CONNECTION": "{\"host\":\"10.57.203.136\",\"sysnr\":\"00\",\"client\":\"100\",\"user\":\"30356735869\",\"passwd\":\"Fodase@APPA2026\"}",
+        "SAP_CONNECTION": "${SAP_CONNECTION}",
         "PYTHONPATH": "packages/mcp-sap-gui-kts-code/src"
       },
       "description": "SAP GUI MCP (kts982/mcp-sap-gui v0.1.3) — Python. Installed editable from packages/mcp-sap-gui-kts-code."
@@ -61,12 +71,15 @@
     "sap-gui-mcp-jduncan": {
       "type": "stdio",
       "command": "python",
-      "args": ["-m", "sap_gui_mcp.server"],
+      "args": [
+        "-m",
+        "sap_gui_mcp.server"
+      ],
       "env": {
-        "SAPGUI_HOST": "10.57.203.136",
-        "SAPGUI_USER": "30356735869",
-        "SAPGUI_PASSWORD": "Fodase@APPA2026",
-        "SAPGUI_CLIENT": "100",
+        "SAPGUI_HOST": "${SAPGUI_HOST}",
+        "SAPGUI_USER": "${SAPGUI_USER}",
+        "SAPGUI_PASSWORD": "${SAPGUI_PASSWORD}",
+        "SAPGUI_CLIENT": "${SAPGUI_CLIENT}",
         "PYTHONPATH": "packages/sap_gui_mcp/src"
       },
       "description": "SAP GUI MCP (jduncan8142/sap_gui_mcp v0.1.0) — FastMCP-based, Python. Installed editable from packages/sap_gui_mcp."
@@ -74,10 +87,13 @@
     "sapient-mcp-py": {
       "type": "stdio",
       "command": "python",
-      "args": ["-m", "sapient_mcp"],
+      "args": [
+        "-m",
+        "sapient_mcp"
+      ],
       "env": {
-        "SAPIENT_HOST": "10.57.203.136",
-        "SAPIENT_KEY": "default",
+        "SAPIENT_HOST": "${SAPIENT_HOST}",
+        "SAPIENT_KEY": "${SAPIENT_KEY}",
         "PYTHONPATH": "packages/sapient-mcp/src"
       },
       "description": "Sapient MCP (toni-ramchandani/sapient-mcp v1.0.0) — Intelligent SAP GUI automation, RoboSAPiens-powered. Python."
@@ -85,23 +101,28 @@
     "abap-mcp-adt-powerup": {
       "type": "stdio",
       "command": "node",
-      "args": ["packages/abap-mcp-adt-powerup/bin/mcp-abap-adt.js"],
+      "args": [
+        "packages/abap-mcp-adt-powerup/bin/mcp-abap-adt.js"
+      ],
       "env": {
-        "SAP_URL": "https://10.57.203.136:44300",
-        "SAP_USER": "30356735869",
-        "SAP_PASSWORD": "Fodase@APPA2026",
-        "SAP_CLIENT": "100"
+        "SAP_URL": "${SAP_URL}",
+        "SAP_USER": "${SAP_USER}",
+        "SAP_PASSWORD": "${SAP_PASSWORD}",
+        "SAP_CLIENT": "${SAP_CLIENT}"
       },
       "description": "ABAP MCP ADT PowerUp (babamba2/abap-mcp-adt-powerup) — Extended ADT MCP with advanced ABAP tools. Node.js."
     },
     "sapgui-mcp-webgui": {
       "type": "stdio",
       "command": "python",
-      "args": ["-m", "sapguimcp.server"],
+      "args": [
+        "-m",
+        "sapguimcp.server"
+      ],
       "env": {
         "BACKEND_TYPE": "webgui",
-        "SAP_SYSTEM": "DS4",
-        "SAPGUI_MCP_CONFIG_PATH": "C:/Users/William Correa/.config/sap-mcp"
+        "SAP_SYSTEM": "${SAP_SYSTEM}",
+        "SAPGUI_MCP_CONFIG_PATH": "${SAPGUI_MCP_CONFIG_PATH}"
       },
       "description": "SAP GUI MCP WebGUI (Hochfrequenz/sapgui.mcp v0.13.4) — Chrome/Playwright browser automation for SAP Web GUI. Linux/Mac/Windows."
     },
@@ -110,17 +131,19 @@
       "command": "sapgui-mcp",
       "args": [],
       "env": {
-        "SAPGUI_HOST": "10.57.203.136",
-        "SAPGUI_USER": "30356735869",
-        "SAPGUI_PASSWORD": "Fodase@APPA2026",
-        "SAPGUI_CLIENT": "100"
+        "SAPGUI_HOST": "${SAPGUI_HOST}",
+        "SAPGUI_USER": "${SAPGUI_USER}",
+        "SAPGUI_PASSWORD": "${SAPGUI_PASSWORD}",
+        "SAPGUI_CLIENT": "${SAPGUI_CLIENT}"
       },
       "description": "SAP GUI MCP in Go (Hochfrequenz/sapgui.mcp v0.13.3) — TERTIARY fallback. Requires: go install github.com/Hochfrequenz/sapgui.mcp/cmd/sapgui-mcp@latest (when fixed upstream)."
     },
     "mcp-sap-notes": {
       "type": "stdio",
       "command": "node",
-      "args": ["dist/index.js"],
+      "args": [
+        "dist/index.js"
+      ],
       "env": {
         "SAP_NOTES_USERNAME": "${SAP_NOTES_USERNAME}",
         "SAP_NOTES_PASSWORD": "${SAP_NOTES_PASSWORD}"
@@ -130,21 +153,27 @@
     "btp-mcp": {
       "type": "stdio",
       "command": "node",
-      "args": ["dist/index.js"],
+      "args": [
+        "dist/index.js"
+      ],
       "env": {},
       "description": "SAP BTP MCP — 7 entity sets: GlobalAccount, Subaccounts, Directories, Assignments, AllowedDataCenters, EnvironmentInstances, AvailableEnvironments. OData-based via btp-admin-api-config.json. Built on odata-mcp-proxy."
     },
     "odata-mcp-proxy": {
       "type": "stdio",
       "command": "node",
-      "args": ["dist/index.js"],
+      "args": [
+        "dist/index.js"
+      ],
       "env": {},
       "description": "SAP Cloud Integration OData MCP — 32 entity sets: IntegrationPackages, IntegrationDesigntimeArtifacts, MessageProcessingLogs, DataStoreEntries, KeystoreEntries, UserCredentials, OAuth2ClientCredentials, Partners, etc. npm package. Config-driven OData→MCP bridge. MIT license."
     },
     "btp-sap-odata-to-mcp": {
       "type": "stdio",
       "command": "node",
-      "args": ["dist/index.js"],
+      "args": [
+        "dist/index.js"
+      ],
       "env": {},
       "description": "BTP OData MCP — 3 progressive-discovery tools (discover-sap-data, get-entity-metadata, execute-sap-operation) instead of 200+ entity tools. S/4HANA/ECC via BTP Destination + Principal Propagation. Token-optimized."
     },
@@ -167,7 +196,9 @@
     "pinecone-rag": {
       "type": "stdio",
       "command": "node",
-      "args": ["dist/index.js"],
+      "args": [
+        "dist/index.js"
+      ],
       "env": {
         "PINECONE_API_KEY": "${PINECONE_API_KEY}",
         "PINECONE_INDEX": "${PINECONE_INDEX}",
@@ -178,7 +209,9 @@
     "supabase-rag": {
       "type": "stdio",
       "command": "node",
-      "args": ["dist/index.js"],
+      "args": [
+        "dist/index.js"
+      ],
       "env": {
         "SUPABASE_URL": "${SUPABASE_URL}",
         "SUPABASE_SERVICE_KEY": "${SUPABASE_SERVICE_KEY}"
@@ -188,7 +221,9 @@
     "sf-mcp": {
       "type": "stdio",
       "command": "node",
-      "args": ["dist/index.js"],
+      "args": [
+        "dist/index.js"
+      ],
       "env": {
         "SF_URL": "${SF_URL}",
         "SF_USERNAME": "${SF_USERNAME}",
@@ -199,7 +234,10 @@
     "sap-rfc-mcp-server": {
       "type": "stdio",
       "command": "python",
-      "args": ["-m", "sap_rfc_mcp"],
+      "args": [
+        "-m",
+        "sap_rfc_mcp"
+      ],
       "env": {
         "SAP_RFC_HOST": "${SAP_RFC_HOST}",
         "SAP_RFC_USER": "${SAP_RFC_USER}",
@@ -211,7 +249,9 @@
     "azure-ai-search": {
       "type": "stdio",
       "command": "node",
-      "args": ["dist/index.js"],
+      "args": [
+        "dist/index.js"
+      ],
       "env": {
         "AZURE_SEARCH_ENDPOINT": "${AZURE_SEARCH_ENDPOINT}",
         "AZURE_SEARCH_KEY": "${AZURE_SEARCH_KEY}",
@@ -222,7 +262,9 @@
     "sap-pi-mcp": {
       "type": "stdio",
       "command": "node",
-      "args": ["dist/index.js"],
+      "args": [
+        "dist/index.js"
+      ],
       "env": {
         "PI_HOST": "${PI_HOST}",
         "PI_USER": "${PI_USER}",
@@ -233,7 +275,9 @@
     "bw-modeling-mcp": {
       "type": "stdio",
       "command": "node",
-      "args": ["dist/index.js"],
+      "args": [
+        "dist/index.js"
+      ],
       "env": {
         "BW_HOST": "${BW_HOST}",
         "BW_USER": "${BW_USER}",
@@ -244,7 +288,9 @@
     "erpl-adt": {
       "type": "stdio",
       "command": "node",
-      "args": ["dist/index.js"],
+      "args": [
+        "dist/index.js"
+      ],
       "env": {
         "ERPL_URL": "${ERPL_URL}",
         "ERPL_USER": "${ERPL_USER}",
@@ -262,7 +308,9 @@
     "cloud-alm-itsm": {
       "type": "stdio",
       "command": "node",
-      "args": ["dist/index.js"],
+      "args": [
+        "dist/index.js"
+      ],
       "env": {
         "ALM_HOST": "${ALM_HOST}",
         "ALM_USER": "${ALM_USER}",
@@ -273,7 +321,9 @@
     "datasphere-mcp": {
       "type": "stdio",
       "command": "node",
-      "args": ["dist/index.js"],
+      "args": [
+        "dist/index.js"
+      ],
       "env": {
         "DSPHERE_HOST": "${DSPHERE_HOST}",
         "DSPHERE_USER": "${DSPHERE_USER}",
@@ -284,17 +334,56 @@
     "sapient-mcp": {
       "type": "stdio",
       "command": "node",
-      "args": ["dist/index.js"],
+      "args": [
+        "dist/index.js"
+      ],
       "env": {
         "SAPIENT_HOST": "${SAPIENT_HOST}",
         "SAPIENT_KEY": "${SAPIENT_KEY}"
       },
       "description": "Sapient MCP (toni-ramchandani/sapient-mcp) - SAP-focused AI agent with knowledge graph for faster lookups. Alternative orchestration path when speed priority over depth. Use when latency-critical: self-learn selects between sapient and zrouter paths based on MCP response times."
     },
+    "sap-cpi-mcp": {
+      "type": "stdio",
+      "command": "python",
+      "args": [
+        "scripts/sap_integration_mcp.py",
+        "--product",
+        "cpi"
+      ],
+      "env": {
+        "CPI_BASE_URL": "${CPI_BASE_URL}",
+        "CPI_TENANT_URL": "${CPI_TENANT_URL}",
+        "CPI_OAUTH_TOKEN_URL": "${CPI_OAUTH_TOKEN_URL}",
+        "CPI_TOKEN_URL": "${CPI_TOKEN_URL}",
+        "CPI_OAUTH_CLIENT_ID": "${CPI_OAUTH_CLIENT_ID}",
+        "CPI_CLIENT_ID": "${CPI_CLIENT_ID}",
+        "CPI_OAUTH_CLIENT_SECRET": "${CPI_OAUTH_CLIENT_SECRET}",
+        "CPI_CLIENT_SECRET": "${CPI_CLIENT_SECRET}"
+      },
+      "description": "Canonical local SAP CPI MCP stdio bridge. Exposes read tools plus gated deploy plan/commit with PUT and POST override fallback."
+    },
+    "sap-apim-mcp": {
+      "type": "stdio",
+      "command": "python",
+      "args": [
+        "scripts/sap_integration_mcp.py",
+        "--product",
+        "apim"
+      ],
+      "env": {
+        "APIM_HOST": "${APIM_HOST}",
+        "APIM_USER": "${APIM_USER}",
+        "APIM_PASSWORD": "${APIM_PASSWORD}"
+      },
+      "description": "Canonical local SAP API Management MCP stdio bridge. Exposes proxy read and gated deploy/modify plan/commit with CSRF and method override fallback."
+    },
     "sap-cpi": {
       "type": "stdio",
       "command": "node",
-      "args": ["dist/index.js"],
+      "args": [
+        "dist/index.js"
+      ],
       "env": {
         "CPI_HOST": "${CPI_HOST}",
         "CPI_USER": "${CPI_USER}",
@@ -305,7 +394,9 @@
     "cf-cli-mcp": {
       "type": "stdio",
       "command": "node",
-      "args": ["dist/index.js"],
+      "args": [
+        "dist/index.js"
+      ],
       "env": {
         "CF_API": "${CF_API}",
         "CF_USER": "${CF_USER}",
@@ -316,7 +407,9 @@
     "sap-api-management": {
       "type": "stdio",
       "command": "node",
-      "args": ["dist/index.js"],
+      "args": [
+        "dist/index.js"
+      ],
       "env": {
         "APIM_HOST": "${APIM_HOST}",
         "APIM_USER": "${APIM_USER}",
@@ -327,7 +420,9 @@
     "mcp-integration-suite": {
       "type": "stdio",
       "command": "node",
-      "args": ["packages/mcp-integration-suite/dist/index.js"],
+      "args": [
+        "packages/mcp-integration-suite/dist/index.js"
+      ],
       "env": {
         "API_OAUTH_CLIENT_ID": "${API_OAUTH_CLIENT_ID}",
         "API_OAUTH_CLIENT_SECRET": "${API_OAUTH_CLIENT_SECRET}",
@@ -345,7 +440,11 @@
     "ci-mcp-server": {
       "type": "stdio",
       "command": "node",
-      "args": ["packages/ci-mcp-server/node_modules/odata-mcp-proxy/dist/index.js", "--config", "packages/ci-mcp-server/ci-api-config.json"],
+      "args": [
+        "packages/ci-mcp-server/node_modules/odata-mcp-proxy/dist/index.js",
+        "--config",
+        "packages/ci-mcp-server/ci-api-config.json"
+      ],
       "env": {
         "CPI_DESTINATION_BASE_URL": "${CPI_DESTINATION_BASE_URL}",
         "CPI_DESTINATION_TOKEN_URL": "${CPI_DESTINATION_TOKEN_URL}",
@@ -357,31 +456,35 @@
     "abap-mcp": {
       "type": "stdio",
       "command": "node",
-      "args": ["packages/ABAP-MCP/dist/index.js"],
+      "args": [
+        "packages/ABAP-MCP/dist/index.js"
+      ],
       "env": {
-        "SAP_URL": "https://10.57.203.136:44300",
-        "SAP_USER": "30356735869",
-        "SAP_PASSWORD": "Fodase@APPA2026",
-        "SAP_CLIENT": "100",
-        "SAP_LANGUAGE": "EN",
-        "ALLOW_WRITE": "true",
-        "ALLOW_DELETE": "true",
-        "ALLOW_EXECUTE": "true",
-        "BLOCKED_PACKAGES": "",
-        "SYNTAX_CHECK_BEFORE_ACTIVATE": "true",
-        "DEFER_TOOLS": "false",
-        "SAP_ABAP_VERSION": "latest",
-        "TAVILY_API_KEY": "",
-        "SAP_ROLE": "DEVELOPER",
-        "DEFAULT_TRANSPORT": "",
-        "SAP_ALLOW_UNAUTHORIZED": "true"
+        "SAP_URL": "${SAP_URL}",
+        "SAP_USER": "${SAP_USER}",
+        "SAP_PASSWORD": "${SAP_PASSWORD}",
+        "SAP_CLIENT": "${SAP_CLIENT}",
+        "SAP_LANGUAGE": "${SAP_LANGUAGE}",
+        "ALLOW_WRITE": "${ALLOW_WRITE}",
+        "ALLOW_DELETE": "${ALLOW_DELETE}",
+        "ALLOW_EXECUTE": "${ALLOW_EXECUTE}",
+        "BLOCKED_PACKAGES": "${BLOCKED_PACKAGES}",
+        "SYNTAX_CHECK_BEFORE_ACTIVATE": "${SYNTAX_CHECK_BEFORE_ACTIVATE}",
+        "DEFER_TOOLS": "${DEFER_TOOLS}",
+        "SAP_ABAP_VERSION": "${SAP_ABAP_VERSION}",
+        "TAVILY_API_KEY": "${TAVILY_API_KEY}",
+        "SAP_ROLE": "${SAP_ROLE}",
+        "DEFAULT_TRANSPORT": "${DEFAULT_TRANSPORT}",
+        "SAP_ALLOW_UNAUTHORIZED": "${SAP_ALLOW_UNAUTHORIZED}"
       },
       "description": "DimiDR/ABAP-MCP — Standalone MCP Server for agentic ABAP development (68 tools, method surgery, DDIC validation, Clean ABAP workflow). Credentials hardcoded — ${SAP_URL} resolution fixed."
     },
     "mcp-calm-server": {
       "type": "stdio",
       "command": "node",
-      "args": ["packages/mcp-calm-server/dist/bin/stdio.js"],
+      "args": [
+        "packages/mcp-calm-server/dist/bin/stdio.js"
+      ],
       "env": {
         "CALM_MODE": "${CALM_MODE}",
         "CALM_BASE_URL": "${CALM_BASE_URL}",
@@ -395,7 +498,9 @@
     "sap-transport-mcp": {
       "type": "stdio",
       "command": "node",
-      "args": ["packages/sap-transport-mcp/dist/src/index.js"],
+      "args": [
+        "packages/sap-transport-mcp/dist/src/index.js"
+      ],
       "env": {
         "SAP_HOSTNAME": "${SAP_HOSTNAME}",
         "SAP_SYSNR": "${SAP_SYSNR}",
@@ -413,48 +518,95 @@
     "vibing-steampunk": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "@vibing/steampunk-mcp"],
+      "args": [
+        "-y",
+        "@vibing/steampunk-mcp"
+      ],
       "env": {
-        "SAP_SYSTEMS": "[{\"name\":\"DS4\",\"url\":\"https://10.57.203.136:44300\",\"username\":\"30356735869\",\"password\":\"Fodase@APPA2026\",\"client\":\"100\"}]",
-        "STEAMPUNK_MODE": "hyperfocused"
+        "SAP_SYSTEMS": "${SAP_SYSTEMS}",
+        "STEAMPUNK_MODE": "${STEAMPUNK_MODE}"
       },
       "description": "vibing-steampunk MCP — ADT-to-MCP bridge in Go, 257+ stars, 147 MCP tools, hyperfocused single-tool mode (~200 tokens). Covers debug/deploy/analyze ABAP, package health, dead code detection, ABAP LSP, WebSocket RFC handler."
     },
     "erpl-adt-mcp": {
       "type": "stdio",
       "command": "erpl-adt",
-      "args": ["mcp"],
+      "args": [
+        "mcp"
+      ],
       "env": {
-        "ERPL_URL": "https://10.57.203.136:44300",
-        "ERPL_USER": "30356735869",
-        "ERPL_PASSWORD": "Fodase@APPA2026",
-        "ERPL_CLIENT": "100"
+        "ERPL_URL": "${ERPL_URL}",
+        "ERPL_USER": "${ERPL_USER}",
+        "ERPL_PASSWORD": "${ERPL_PASSWORD}",
+        "ERPL_CLIENT": "${ERPL_CLIENT}"
       },
       "description": "erpl-adt MCP — single-binary ADT CLI, zero-dependency, Go-based. Transport CRUD, ABAP source CRUD, ABAP Unit, ATC checks, object search. Latest release v2026.06.27."
     },
     "guniweb-sap-mcp": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "guniweb-sap-mcp"],
+      "args": [
+        "-y",
+        "guniweb-sap-mcp"
+      ],
       "env": {
-        "SAP_URL": "https://10.57.203.136:44300",
-        "SAP_USER": "30356735869",
-        "SAP_PASSWORD": "Fodase@APPA2026",
-        "SAP_CLIENT": "100"
+        "SAP_URL": "${SAP_URL}",
+        "SAP_USER": "${SAP_USER}",
+        "SAP_PASSWORD": "${SAP_PASSWORD}",
+        "SAP_CLIENT": "${SAP_CLIENT}"
       },
       "description": "guniweb-sap-mcp — multi-protocol MCP for OData V2/V4, IDocs, and RFC/BAPI. 22 tools across 4 tiers. 918 unit tests. 7 auth types. n8n-compatible."
     },
     "sap-gui-library-mcp": {
       "type": "stdio",
       "command": "python",
-      "args": ["-m", "sap_gui_library_mcp"],
+      "args": [
+        "-m",
+        "sap_gui_library_mcp"
+      ],
       "env": {
-        "SAPGUI_HOST": "10.57.203.136",
-        "SAPGUI_USER": "30356735869",
-        "SAPGUI_PASSWORD": "Fodase@APPA2026",
-        "SAPGUI_CLIENT": "100"
+        "SAPGUI_HOST": "${SAPGUI_HOST}",
+        "SAPGUI_USER": "${SAPGUI_USER}",
+        "SAPGUI_PASSWORD": "${SAPGUI_PASSWORD}",
+        "SAPGUI_CLIENT": "${SAPGUI_CLIENT}"
       },
       "description": "sap-gui-library MCP — Python abstraction over SAP GUI Scripting COM API. pip install sap-gui-library. Requires SAP GUI 770+ with Accessibility Mode."
+    },
+    "integration-suite-ui-mcp": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "scripts/web_ui_mcp_bridge.mjs",
+        "--product",
+        "cpi"
+      ],
+      "env": {
+        "CPI_WEB_URL": "${CPI_WEB_URL}",
+        "BROWSER_CHANNEL": "${BROWSER_CHANNEL}",
+        "BROWSER_CDP_URL": "${BROWSER_CDP_URL}",
+        "CHROME_DEBUGGING_PORT": "${CHROME_DEBUGGING_PORT}"
+      },
+      "description": "Playwright-ready Web UI fallback for SAP Integration Suite/CPI. Uses logged-in user browser session; no credential parameters accepted."
+    },
+    "apim-ui-mcp": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "scripts/web_ui_mcp_bridge.mjs",
+        "--product",
+        "apim"
+      ],
+      "env": {
+        "APIM_WEB_URL": "${APIM_WEB_URL}",
+        "BROWSER_CHANNEL": "${BROWSER_CHANNEL}",
+        "BROWSER_CDP_URL": "${BROWSER_CDP_URL}",
+        "CHROME_DEBUGGING_PORT": "${CHROME_DEBUGGING_PORT}"
+      },
+      "description": "Playwright-ready Web UI fallback for SAP API Management. Uses logged-in user browser session; no credential parameters accepted."
+    },
+    "cap-mcp-plugin": {
+      "type": "plugin",
+      "description": "SAP CAP MCP plugin fallback for CAP model search/build guidance."
     }
   },
   "routing": {
@@ -464,8 +616,18 @@
     "gui_web_enrich_enabled": true,
     "caveman_delegation_enabled": true,
     "self_learn_enabled": true,
-    "gui_mcp_priority": ["mcp-sap-gui", "mcp-sap-gui-kts", "sapgui-mcp-go", "sapient-mcp-py", "sap-gui-library-mcp"],
-    "rag_priority": ["pinecone-rag", "supabase-rag", "azure-ai-search"],
+    "gui_mcp_priority": [
+      "mcp-sap-gui",
+      "mcp-sap-gui-kts",
+      "sapgui-mcp-go",
+      "sapient-mcp-py",
+      "sap-gui-library-mcp"
+    ],
+    "rag_priority": [
+      "pinecone-rag",
+      "supabase-rag",
+      "azure-ai-search"
+    ],
     "pipeline_automation": {
       "enabled": true,
       "default_mode": "full",
@@ -473,25 +635,30 @@
     },
     "healthcheck": {
       "run_on_startup": true,
-      "required_env_vars": ["ARC_SAP_URL", "ARC_SAP_USER", "ARC_SAP_PASSWORD", "ARC_SAP_CLIENT"],
+      "required_env_vars": [
+        "ARC_SAP_URL",
+        "ARC_SAP_USER",
+        "ARC_SAP_PASSWORD",
+        "ARC_SAP_CLIENT"
+      ],
       "prompt_missing_interactive": true
     }
   },
   "notes": {
-    "version": "v4.2.0 — Karpathy command format + healthcheck + self-learn + RAG",
+    "version": "v6.0.0 - capability registry + fail-closed MCP launcher + Web UI fallbacks",
     "arc-1_npm": "npm i -g arc-1",
     "aibap_install": "go install github.com/Hochfrequenz/aibap.mcp/cmd/aibap-mcp@latest",
     "mcp_abap_adt_install": "git clone + npm install + npm run build + configure .env",
     "mcp_sap_gui_install": "git clone https://github.com/mario-andreschak/mcp-sap-gui + npm install + npm run build",
     "mcp_sap_gui_kts_install": "git clone https://github.com/kts982/mcp-sap-gui + pip install -r requirements.txt",
-    "all_servers_readonly": "All servers support read-only mode. Write/transport tools gated behind capability flags.",
+    "all_servers_readonly": "Mutable tools are gated by registry, launcher and approval broker.",
     "gui_fallback_requires": "SAP GUI installed locally + RZ11 sapgui/user_scripting=TRUE + SAPLogon connection configured",
     "gui_web_enrich": "Auto-searches web for missing navigation data: field IDs, screen numbers, BDC sequences",
     "rag_connectors": "Pinecone, Supabase pgvector, Azure AI Search — pre-ready, activate via .env",
-    "healthcheck": "python scripts/healthcheck.py — verifies all 35 MCPs + .env completeness",
+    "healthcheck": "python scripts/healthcheck.py - verifies configured MCPs and .env completeness",
     "self_learn": "python scripts/self_learn.py — Hermes-style context adaptation, auto-optimizes routing",
     "karpathy_format": "All operations follow Think→Simplify→Surgical→Verify. Caveman compression default.",
     "comparison_repos": "See COMPARISON.md for full 70+ repo analysis",
-    "planned_mcps": "22 additional MCPs documented in skills are planned for future configuration."
+    "planned_mcps": "Planned servers must be added to .agents/registries/mcp-capabilities.json before routing."
   }
 }

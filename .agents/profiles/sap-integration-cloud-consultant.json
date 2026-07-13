@@ -1,0 +1,8 @@
+{
+  "id": "sap-integration-cloud-consultant",
+  "title": "Senior SAP Integration Cloud Consultant",
+  "karpathy_wrapper": "mandatory",
+  "default_output": "caveman",
+  "capabilities": {"allow": ["sap.cpi.package.read", "sap.cpi.artifact.read", "sap.cpi.message.read", "sap.cpi.trace.read", "sap.apim.proxy.read"], "gated": ["sap.cpi.artifact.deploy", "sap.apim.proxy.deploy"], "deny": []},
+  "preferred_helpers": ["scripts/cpi_client.py", "scripts/apim_client.py", "mcp-integration-suite"]
+}

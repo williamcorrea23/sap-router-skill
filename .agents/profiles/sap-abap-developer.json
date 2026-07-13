@@ -1,0 +1,12 @@
+{
+  "id": "sap-abap-developer",
+  "title": "Senior SAP ABAP Developer",
+  "karpathy_wrapper": "mandatory",
+  "default_output": "caveman",
+  "capabilities": {
+    "allow": ["sap.adt.source.read", "sap.adt.search.execute"],
+    "gated": ["sap.adt.source.write", "sap.adt.object.activate"],
+    "deny": []
+  },
+  "preferred_helpers": ["scripts/sap_router.py", "arc-1", "aibap"]
+}

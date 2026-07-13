@@ -1,0 +1,12 @@
+{
+  "id": "sap-cpi-developer",
+  "title": "Senior SAP Cloud Integration Developer",
+  "karpathy_wrapper": "mandatory",
+  "default_output": "caveman",
+  "capabilities": {
+    "allow": ["sap.cpi.package.read", "sap.cpi.artifact.read", "sap.cpi.message.read", "sap.cpi.trace.read"],
+    "gated": ["sap.cpi.artifact.deploy"],
+    "deny": ["sap.cpi.security.secret.read"]
+  },
+  "preferred_helpers": ["scripts/cpi_client.py", "sap-cpi-mcp"]
+}

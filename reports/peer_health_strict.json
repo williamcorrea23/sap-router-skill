@@ -1,0 +1,1108 @@
+﻿============================================================
+SAP ROUTER HEALTHCHECK v4.2.0
+Timestamp: 2026-07-13T01:08:58
+Project: C:\Users\William Correa\Downloads\sap-router-orchestrator-files\sap-router-skill
+============================================================
+
+=== .env FILE CHECK ===
+  Required: 4/4 set
+  Optional: 74/120 set
+
+=== MCP CONNECTION PROBES ===
+  [OK] arc-1                     (HIGH    ): env=ALL_SET         binary=AVAILABLE
+  [OK] aibap                     (HIGH    ): env=CONFIGURED      binary=AVAILABLE
+  [WARN] mcp-abap-adt              (MEDIUM  ): env=ALL_SET         binary=SKIPPED
+  [WARN] mcp-sap-gui               (MEDIUM  ): env=ALL_SET         binary=SKIPPED
+  [WARN] mcp-sap-gui-kts           (LOW     ): env=ALL_SET         binary=SKIPPED
+  [WARN] sapgui-mcp-go             (LOW     ): env=NO_ENV_NEEDED   binary=NOT_INSTALLED
+  [WARN] sf-mcp                    (LOW     ): env=PARTIAL         binary=SKIPPED
+  [WARN] sap-rfc-mcp-server        (MEDIUM  ): env=ALL_SET         binary=SKIPPED
+  [WARN] mcp-sap-notes             (LOW     ): env=PARTIAL         binary=SKIPPED
+  [WARN] btp-mcp                   (LOW     ): env=NO_ENV_NEEDED   binary=SKIPPED
+  [WARN] odata-mcp-proxy           (LOW     ): env=NO_ENV_NEEDED   binary=SKIPPED
+  [WARN] btp-sap-odata-to-mcp      (MEDIUM  ): env=NO_ENV_NEEDED   binary=SKIPPED
+  [WARN] pinecone-rag              (OPTIONAL): env=ALL_SET         binary=SKIPPED
+  [WARN] supabase-rag              (OPTIONAL): env=NONE_SET        binary=SKIPPED
+  [WARN] azure-ai-search           (OPTIONAL): env=NONE_SET        binary=SKIPPED
+  [WARN] zrouter                   (MEDIUM  ): env=NO_ENV_NEEDED   binary=ERROR
+  [WARN] sap-cpi                   (MEDIUM  ): env=PARTIAL         binary=SKIPPED
+  [WARN] cf-cli-mcp                (MEDIUM  ): env=PARTIAL         binary=SKIPPED
+  [WARN] sap-api-management        (LOW     ): env=ALL_SET         binary=SKIPPED
+  [WARN] plugin:ui5:ui5-mcp-server (LOW     ): env=NO_ENV_NEEDED   binary=SKIPPED
+  [WARN] plugin:sap-fiori-mcp-server:fiori-mcp (LOW     ): env=NO_ENV_NEEDED   binary=SKIPPED
+  [WARN] plugin:mdk-mcp:mdk-mcp    (LOW     ): env=NO_ENV_NEEDED   binary=SKIPPED
+  [WARN] plugin:cds-mcp:cds-mcp    (LOW     ): env=NO_ENV_NEEDED   binary=SKIPPED
+  [WARN] sap-pi-mcp                (LOW     ): env=PARTIAL         binary=SKIPPED
+  [WARN] bw-modeling-mcp           (LOW     ): env=PARTIAL         binary=SKIPPED
+  [WARN] erpl-adt-mcp              (MEDIUM  ): env=PARTIAL         binary=SKIPPED
+  [WARN] odata-mcp-go              (LOW     ): env=NO_ENV_NEEDED   binary=NOT_INSTALLED
+  [WARN] cloud-alm-itsm            (LOW     ): env=PARTIAL         binary=SKIPPED
+  [WARN] datasphere-mcp            (LOW     ): env=PARTIAL         binary=SKIPPED
+  [WARN] sapient-mcp-py            (LOW     ): env=PARTIAL         binary=SKIPPED
+  [WARN] sapient-mcp               (LOW     ): env=PARTIAL         binary=SKIPPED
+  [WARN] mcp-integration-suite     (LOW     ): env=PARTIAL         binary=SKIPPED
+  [WARN] ci-mcp-server             (LOW     ): env=ALL_SET         binary=SKIPPED
+  [WARN] abap-mcp                  (LOW     ): env=ALL_SET         binary=SKIPPED
+  [WARN] mcp-calm-server           (LOW     ): env=NONE_SET        binary=SKIPPED
+  [WARN] sap-transport-mcp         (LOW     ): env=ALL_SET         binary=SKIPPED
+  [WARN] guniweb-sap-mcp           (MEDIUM  ): env=ALL_SET         binary=SKIPPED
+  [WARN] sap-gui-library-mcp       (LOW     ): env=ALL_SET         binary=SKIPPED
+  [WARN] mcp-abap-abap-adt-api     (OPTIONAL): env=NO_ENV_NEEDED   binary=SKIPPED
+  [WARN] sap-mcp                   (OPTIONAL): env=NO_ENV_NEEDED   binary=SKIPPED
+  [WARN] vibing-steampunk          (MEDIUM  ): env=ALL_SET         binary=SKIPPED
+  [WARN] dassian-adt               (OPTIONAL): env=NO_ENV_NEEDED   binary=SKIPPED
+  [WARN] abap-mcp-adt-powerup      (OPTIONAL): env=ALL_SET         binary=SKIPPED
+  [WARN] sapgui-mcp-webgui         (OPTIONAL): env=NO_ENV_NEEDED   binary=SKIPPED
+  [WARN] sap-gui-mcp-jduncan       (OPTIONAL): env=ALL_SET         binary=SKIPPED
+  [WARN] cpi-mcp-server            (OPTIONAL): env=NO_ENV_NEEDED   binary=SKIPPED
+  [WARN] mcp-ci-python             (OPTIONAL): env=NO_ENV_NEEDED   binary=SKIPPED
+  [WARN] btp-is-ci-mcp-server      (OPTIONAL): env=NO_ENV_NEEDED   binary=SKIPPED
+  [WARN] sap-cpi-mcp-backup        (OPTIONAL): env=NO_ENV_NEEDED   binary=SKIPPED
+  [WARN] cap-mcp-plugin            (OPTIONAL): env=NO_ENV_NEEDED   binary=SKIPPED
+  [WARN] hana-mcp-server           (OPTIONAL): env=NO_ENV_NEEDED   binary=SKIPPED
+  [WARN] mcp-sap-docs              (OPTIONAL): env=NO_ENV_NEEDED   binary=SKIPPED
+  [WARN] mcp-hub                   (OPTIONAL): env=NO_ENV_NEEDED   binary=SKIPPED
+  [WARN] sap-ai-mcp-servers        (OPTIONAL): env=NO_ENV_NEEDED   binary=SKIPPED
+  [WARN] adt-ls                    (OPTIONAL): env=NO_ENV_NEEDED   binary=SKIPPED
+  [WARN] sap-mcp-config            (OPTIONAL): env=NO_ENV_NEEDED   binary=SKIPPED
+  [WARN] integration-suite-ui-mcp  (LOW     ): env=NONE_SET        binary=AVAILABLE
+  [WARN] apim-ui-mcp               (LOW     ): env=NONE_SET        binary=AVAILABLE
+
+=== SOAP RFC ENDPOINT PROBE ===
+  [ERROR] SOAP RFC endpoint unreachable: [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1081)
+
+=== PROJECT OBJECTS ===
+  [OK] templates/
+  [OK] templates/*.abap
+  [OK] scripts/*.py
+  [OK] .claude/skills/
+  [OK] zrouter_bootstrap.py
+  [OK] packages/samples/
+
+[DEGRADED] 2/12 high-criticality MCPs ready
+{
+  "timestamp": "2026-07-13T01:08:58",
+  "overall_status": "DEGRADED",
+  "mcp_checks": {
+    "arc-1": {
+      "env": {
+        "status": "ALL_SET",
+        "details": "All 4 vars set"
+      },
+      "binary": {
+        "status": "AVAILABLE",
+        "exit_code": 0,
+        "stderr": ""
+      },
+      "criticality": "HIGH",
+      "description": "arc-1 (adt): read_source, write_source, syntax_check, activate"
+    },
+    "aibap": {
+      "env": {
+        "status": "CONFIGURED",
+        "details": "Config file ~/.config/sap-mcp/systems.json found"
+      },
+      "binary": {
+        "status": "AVAILABLE",
+        "exit_code": 0,
+        "stderr": "Usage of C:\\Users\\William Correa\\go\\bin\\aibap.mcp.EXE:\n  -tools string\n    \tComma-separated tool groups to enable (default: all except debug; 'all' for everything)\n"
+      },
+      "criticality": "HIGH",
+      "description": "aibap (adt): read_source, syntax_check, unit_tests, create_object"
+    },
+    "mcp-abap-adt": {
+      "env": {
+        "status": "ALL_SET",
+        "details": "All 4 vars set"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "MEDIUM",
+      "description": "mcp-abap-adt (adt): read_source, search, syntax_check, activate"
+    },
+    "mcp-sap-gui": {
+      "env": {
+        "status": "ALL_SET",
+        "details": "All 4 vars set"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "MEDIUM",
+      "description": "mcp-sap-gui (gui): transaction, screen_read, field_write, screenshot"
+    },
+    "mcp-sap-gui-kts": {
+      "env": {
+        "status": "ALL_SET",
+        "details": "All 1 vars set"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "LOW",
+      "description": "mcp-sap-gui-kts (gui): transaction, screen_read, field_write"
+    },
+    "sapgui-mcp-go": {
+      "env": {
+        "status": "NO_ENV_NEEDED",
+        "details": "No env vars or config required"
+      },
+      "binary": {
+        "status": "NOT_INSTALLED",
+        "reason": "Command not found: sapgui-mcp"
+      },
+      "criticality": "LOW",
+      "description": "sapgui-mcp-go (gui): transaction, gui_scripting"
+    },
+    "sf-mcp": {
+      "env": {
+        "status": "PARTIAL",
+        "set": [
+          "SF_URL",
+          "SF_USERNAME"
+        ],
+        "missing": [
+          "SF_PASSWORD"
+        ]
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "LOW",
+      "description": "sf-mcp (successfactors): odata_v2, employee_read, employee_update"
+    },
+    "sap-rfc-mcp-server": {
+      "env": {
+        "status": "ALL_SET",
+        "details": "All 4 vars set"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "MEDIUM",
+      "description": "sap-rfc-mcp-server (rfc): bapi_execute, zrouter_dispatch"
+    },
+    "mcp-sap-notes": {
+      "env": {
+        "status": "PARTIAL",
+        "set": [
+          "SAP_NOTES_USERNAME"
+        ],
+        "missing": [
+          "SAP_NOTES_PASSWORD"
+        ]
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "LOW",
+      "description": "mcp-sap-notes (docs): sap_note_search, sap_note_fetch"
+    },
+    "btp-mcp": {
+      "env": {
+        "status": "NO_ENV_NEEDED",
+        "details": "No env vars or config required"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "LOW",
+      "description": "btp-mcp (btp): account, subaccount, service_instance"
+    },
+    "odata-mcp-proxy": {
+      "env": {
+        "status": "NO_ENV_NEEDED",
+        "details": "No env vars or config required"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "LOW",
+      "description": "odata-mcp-proxy (odata): odata_proxy, metadata_discovery, generic_crud"
+    },
+    "btp-sap-odata-to-mcp": {
+      "env": {
+        "status": "NO_ENV_NEEDED",
+        "details": "No env vars or config required"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "MEDIUM",
+      "description": "btp-sap-odata-to-mcp (odata): progressive_odata_discovery, metadata_to_tools"
+    },
+    "pinecone-rag": {
+      "env": {
+        "status": "ALL_SET",
+        "details": "All 3 vars set"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "OPTIONAL",
+      "description": "pinecone-rag (rag): vector_search"
+    },
+    "supabase-rag": {
+      "env": {
+        "status": "NONE_SET",
+        "missing": [
+          "SUPABASE_URL",
+          "SUPABASE_SERVICE_KEY"
+        ]
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "OPTIONAL",
+      "description": "supabase-rag (rag): pgvector_search"
+    },
+    "azure-ai-search": {
+      "env": {
+        "status": "NONE_SET",
+        "missing": [
+          "AZURE_SEARCH_ENDPOINT",
+          "AZURE_SEARCH_KEY",
+          "AZURE_SEARCH_INDEX"
+        ]
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "OPTIONAL",
+      "description": "azure-ai-search (rag): enterprise_search"
+    },
+    "zrouter": {
+      "env": {
+        "status": "NO_ENV_NEEDED",
+        "details": "No env vars or config required"
+      },
+      "binary": {
+        "status": "ERROR",
+        "exit_code": 1,
+        "stderr": ""
+      },
+      "criticality": "MEDIUM",
+      "description": "ZROUTER ABAP framework \u2014 probe install state on SAP system"
+    },
+    "sap-cpi": {
+      "env": {
+        "status": "PARTIAL",
+        "set": [
+          "CPI_HOST",
+          "CPI_USER"
+        ],
+        "missing": [
+          "CPI_PASSWORD"
+        ]
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "MEDIUM",
+      "description": "sap-cpi (cpi): iflow_list, iflow_deploy, mpl_read, trace_read"
+    },
+    "cf-cli-mcp": {
+      "env": {
+        "status": "PARTIAL",
+        "set": [
+          "CF_API"
+        ],
+        "missing": [
+          "CF_USER",
+          "CF_PASSWORD"
+        ]
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "MEDIUM",
+      "description": "cf-cli-mcp (btp): cf_push, mta_ops, service_bindings, logs"
+    },
+    "sap-api-management": {
+      "env": {
+        "status": "ALL_SET",
+        "details": "All 3 vars set"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "LOW",
+      "description": "sap-api-management (apim): api_proxy, policy, product, application"
+    },
+    "plugin:ui5:ui5-mcp-server": {
+      "env": {
+        "status": "NO_ENV_NEEDED",
+        "details": "No env vars or config required"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "LOW",
+      "description": "plugin:ui5:ui5-mcp-server (ui5): ui5_project, ui5_lint, api_reference"
+    },
+    "plugin:sap-fiori-mcp-server:fiori-mcp": {
+      "env": {
+        "status": "NO_ENV_NEEDED",
+        "details": "No env vars or config required"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "LOW",
+      "description": "plugin:sap-fiori-mcp-server:fiori-mcp (fiori): fiori_app_generation, metadata_download, sap_help_docs"
+    },
+    "plugin:mdk-mcp:mdk-mcp": {
+      "env": {
+        "status": "NO_ENV_NEEDED",
+        "details": "No env vars or config required"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "LOW",
+      "description": "MDK project creation, build, deploy (plugin)"
+    },
+    "plugin:cds-mcp:cds-mcp": {
+      "env": {
+        "status": "NO_ENV_NEEDED",
+        "details": "No env vars or config required"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "LOW",
+      "description": "plugin:cds-mcp:cds-mcp (cap): cds_model_search, cap_snippets, service_model"
+    },
+    "sap-pi-mcp": {
+      "env": {
+        "status": "PARTIAL",
+        "set": [
+          "PI_HOST",
+          "PI_USER"
+        ],
+        "missing": [
+          "PI_PASSWORD"
+        ]
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "LOW",
+      "description": "SAP PI/PO - legacy integration, channel mgmt"
+    },
+    "bw-modeling-mcp": {
+      "env": {
+        "status": "PARTIAL",
+        "set": [
+          "BW_HOST",
+          "BW_USER"
+        ],
+        "missing": [
+          "BW_PASSWORD"
+        ]
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "LOW",
+      "description": "BW Modeling - DSO, InfoCube, DTP, transformations"
+    },
+    "erpl-adt-mcp": {
+      "env": {
+        "status": "PARTIAL",
+        "set": [
+          "ERPL_URL",
+          "ERPL_USER"
+        ],
+        "missing": [
+          "ERPL_PASSWORD",
+          "ERPL_CLIENT"
+        ]
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "MEDIUM",
+      "description": "ERPL ADT bridge - enterprise resource planning"
+    },
+    "odata-mcp-go": {
+      "env": {
+        "status": "NO_ENV_NEEDED",
+        "details": "No env vars or config required"
+      },
+      "binary": {
+        "status": "NOT_INSTALLED",
+        "reason": "Command not found: odata-mcp-go"
+      },
+      "criticality": "LOW",
+      "description": "OData MCP in Go - lightweight low-latency bridge"
+    },
+    "cloud-alm-itsm": {
+      "env": {
+        "status": "PARTIAL",
+        "set": [
+          "ALM_HOST",
+          "ALM_USER"
+        ],
+        "missing": [
+          "ALM_PASSWORD"
+        ]
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "LOW",
+      "description": "cloud-alm-itsm (alm): incident, problem, change"
+    },
+    "datasphere-mcp": {
+      "env": {
+        "status": "PARTIAL",
+        "set": [
+          "DSPHERE_HOST",
+          "DSPHERE_USER"
+        ],
+        "missing": [
+          "DSPHERE_PASSWORD"
+        ]
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "LOW",
+      "description": "SAP Datasphere - spaces, views, remote tables"
+    },
+    "sapient-mcp-py": {
+      "env": {
+        "status": "PARTIAL",
+        "set": [
+          "SAPIENT_HOST"
+        ],
+        "missing": [
+          "SAPIENT_KEY"
+        ]
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "LOW",
+      "description": "Sapient MCP Python - RoboSAPiens-powered GUI automation"
+    },
+    "sapient-mcp": {
+      "env": {
+        "status": "PARTIAL",
+        "set": [
+          "SAPIENT_HOST"
+        ],
+        "missing": [
+          "SAPIENT_KEY"
+        ]
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "LOW",
+      "description": "Sapient AI agent - faster alternative orchestrator"
+    },
+    "mcp-integration-suite": {
+      "env": {
+        "status": "PARTIAL",
+        "set": [
+          "API_BASE_URL"
+        ],
+        "missing": [
+          "API_USER",
+          "API_PASS"
+        ]
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "LOW",
+      "description": "mcp-integration-suite (integration-suite): packages, iflow_artifacts, message_mapping, apim_proxy"
+    },
+    "ci-mcp-server": {
+      "env": {
+        "status": "ALL_SET",
+        "details": "All 4 vars set"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "LOW",
+      "description": "ci-mcp-server (cpi): odata_proxy, packages, iflow_artifacts, message_processing_logs"
+    },
+    "abap-mcp": {
+      "env": {
+        "status": "ALL_SET",
+        "details": "All 4 vars set"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "LOW",
+      "description": "abap-mcp (adt): method_surgery, ddic_validate, clean_abap_review, call_graph"
+    },
+    "mcp-calm-server": {
+      "env": {
+        "status": "NONE_SET",
+        "missing": [
+          "CALM_BASE_URL"
+        ]
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "LOW",
+      "description": "mcp-calm-server (alm): cloud_alm"
+    },
+    "sap-transport-mcp": {
+      "env": {
+        "status": "ALL_SET",
+        "details": "All 3 vars set"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "LOW",
+      "description": "sap-transport-mcp (transport): transport_create, transport_release, import_queue"
+    },
+    "guniweb-sap-mcp": {
+      "env": {
+        "status": "ALL_SET",
+        "details": "All 4 vars set"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "MEDIUM",
+      "description": "guniweb-sap-mcp (web-ui): web_ui_navigation, sap_webgui, fiori_navigation, logged_user"
+    },
+    "sap-gui-library-mcp": {
+      "env": {
+        "status": "ALL_SET",
+        "details": "All 4 vars set"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "LOW",
+      "description": "sap-gui-library-mcp (gui): gui_scripting_library, transaction"
+    },
+    "mcp-abap-abap-adt-api": {
+      "env": {
+        "status": "NO_ENV_NEEDED",
+        "details": "No env vars or config required"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "OPTIONAL",
+      "description": "mcp-abap-abap-adt-api (adt): adt_api_reference, abap_metadata"
+    },
+    "sap-mcp": {
+      "env": {
+        "status": "NO_ENV_NEEDED",
+        "details": "No env vars or config required"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "OPTIONAL",
+      "description": "MarkWu SAP MCP"
+    },
+    "vibing-steampunk": {
+      "env": {
+        "status": "ALL_SET",
+        "details": "All 4 vars set"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "MEDIUM",
+      "description": "Vibing Steampunk MCP - Steampunk/ABAP Cloud development"
+    },
+    "dassian-adt": {
+      "env": {
+        "status": "NO_ENV_NEEDED",
+        "details": "No env vars or config required"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "OPTIONAL",
+      "description": "dassian-adt (adt): adt_bridge"
+    },
+    "abap-mcp-adt-powerup": {
+      "env": {
+        "status": "ALL_SET",
+        "details": "All 4 vars set"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "OPTIONAL",
+      "description": "abap-mcp-adt-powerup (adt): adt_power_tools"
+    },
+    "sapgui-mcp-webgui": {
+      "env": {
+        "status": "NO_ENV_NEEDED",
+        "details": "No env vars or config required"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "OPTIONAL",
+      "description": "sapgui-mcp-webgui (web-ui): webgui_transaction, browser_session, logged_user"
+    },
+    "sap-gui-mcp-jduncan": {
+      "env": {
+        "status": "ALL_SET",
+        "details": "All 4 vars set"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "OPTIONAL",
+      "description": "sap-gui-mcp-jduncan (gui): transaction, gui_scripting"
+    },
+    "cpi-mcp-server": {
+      "env": {
+        "status": "NO_ENV_NEEDED",
+        "details": "No env vars or config required"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "OPTIONAL",
+      "description": "cpi-mcp-server (cpi): iflow_discovery, iflow_read, tenant_operations"
+    },
+    "mcp-ci-python": {
+      "env": {
+        "status": "NO_ENV_NEEDED",
+        "details": "No env vars or config required"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "OPTIONAL",
+      "description": "mcp-ci-python (cpi): cloud_integration_python"
+    },
+    "btp-is-ci-mcp-server": {
+      "env": {
+        "status": "NO_ENV_NEEDED",
+        "details": "No env vars or config required"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "OPTIONAL",
+      "description": "btp-is-ci-mcp-server (cpi): integration_suite_cloud_integration"
+    },
+    "sap-cpi-mcp-backup": {
+      "env": {
+        "status": "NO_ENV_NEEDED",
+        "details": "No env vars or config required"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "OPTIONAL",
+      "description": "sap-cpi-mcp-backup (cpi): iflow_backup, artifact_export"
+    },
+    "cap-mcp-plugin": {
+      "env": {
+        "status": "NO_ENV_NEEDED",
+        "details": "No env vars or config required"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "OPTIONAL",
+      "description": "cap-mcp-plugin (cap): cap_project_assist, cds_modeling"
+    },
+    "hana-mcp-server": {
+      "env": {
+        "status": "NO_ENV_NEEDED",
+        "details": "No env vars or config required"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "OPTIONAL",
+      "description": "HatriGt HANA MCP server"
+    },
+    "mcp-sap-docs": {
+      "env": {
+        "status": "NO_ENV_NEEDED",
+        "details": "No env vars or config required"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "OPTIONAL",
+      "description": "mcp-sap-docs (docs): sap_help_search, sap_docs_rag"
+    },
+    "mcp-hub": {
+      "env": {
+        "status": "NO_ENV_NEEDED",
+        "details": "No env vars or config required"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "OPTIONAL",
+      "description": "arc-mcp MCP Hub"
+    },
+    "sap-ai-mcp-servers": {
+      "env": {
+        "status": "NO_ENV_NEEDED",
+        "details": "No env vars or config required"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "OPTIONAL",
+      "description": "marianfoo SAP AI MCP servers"
+    },
+    "adt-ls": {
+      "env": {
+        "status": "NO_ENV_NEEDED",
+        "details": "No env vars or config required"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "OPTIONAL",
+      "description": "adt-ls (adt): language_server, adt_navigation"
+    },
+    "sap-mcp-config": {
+      "env": {
+        "status": "NO_ENV_NEEDED",
+        "details": "No env vars or config required"
+      },
+      "binary": {
+        "status": "SKIPPED",
+        "reason": "No probe command defined"
+      },
+      "criticality": "OPTIONAL",
+      "description": "Hochfrequenz SAP MCP Config Model"
+    },
+    "integration-suite-ui-mcp": {
+      "env": {
+        "status": "NONE_SET",
+        "missing": [
+          "CPI_WEB_URL"
+        ]
+      },
+      "binary": {
+        "status": "AVAILABLE",
+        "exit_code": 0,
+        "stderr": ""
+      },
+      "criticality": "LOW",
+      "description": "Local MCP bridge for Integration Suite Web UI using logged-in browser session."
+    },
+    "apim-ui-mcp": {
+      "env": {
+        "status": "NONE_SET",
+        "missing": [
+          "APIM_WEB_URL"
+        ]
+      },
+      "binary": {
+        "status": "AVAILABLE",
+        "exit_code": 0,
+        "stderr": ""
+      },
+      "criticality": "LOW",
+      "description": "Local MCP bridge for API Management Web UI using logged-in browser session."
+    }
+  },
+  "env_check": {
+    "file_exists": true,
+    "ARC_SAP_URL": "SET",
+    "ARC_SAP_USER": "SET",
+    "ARC_SAP_PASSWORD": "SET",
+    "ARC_SAP_CLIENT": "SET",
+    "SAP_URL": "SET",
+    "SAP_USERNAME": "SET",
+    "SAP_PASSWORD": "SET",
+    "SAP_CLIENT": "SET",
+    "SAPGUI_HOST": "SET",
+    "SAPGUI_USER": "SET",
+    "SAPGUI_PASSWORD": "SET",
+    "SAPGUI_CLIENT": "SET",
+    "SAP_CONNECTION": "SET",
+    "SAP_RFC_HOST": "SET",
+    "SAP_RFC_USER": "SET",
+    "SAP_RFC_PASSWORD": "SET",
+    "SAP_RFC_CLIENT": "SET",
+    "SAP_NOTES_USERNAME": "SET",
+    "SAP_NOTES_PASSWORD": "MISSING_OR_EMPTY",
+    "SOAP_RFC_URL": "MISSING_OR_EMPTY",
+    "SAP_TRANSPORT_HOSTNAME": "MISSING_OR_EMPTY",
+    "SAP_TRANSPORT_USERNAME": "MISSING_OR_EMPTY",
+    "SAP_TRANSPORT_PASSWORD": "MISSING_OR_EMPTY",
+    "CF_API": "SET",
+    "CF_USER": "MISSING_OR_EMPTY",
+    "CF_PASSWORD": "MISSING_OR_EMPTY",
+    "CPI_HOST": "SET",
+    "CPI_USER": "SET",
+    "CPI_PASSWORD": "MISSING_OR_EMPTY",
+    "CPI_WEB_URL": "MISSING_OR_EMPTY",
+    "BROWSER_CHANNEL": "MISSING_OR_EMPTY",
+    "APIM_HOST": "SET",
+    "APIM_USER": "SET",
+    "APIM_PASSWORD": "SET",
+    "APIM_WEB_URL": "MISSING_OR_EMPTY",
+    "PI_HOST": "SET",
+    "PI_USER": "SET",
+    "PI_PASSWORD": "MISSING_OR_EMPTY",
+    "BW_HOST": "SET",
+    "BW_USER": "SET",
+    "BW_PASSWORD": "MISSING_OR_EMPTY",
+    "ERPL_URL": "SET",
+    "ERPL_USER": "SET",
+    "ERPL_PASSWORD": "MISSING_OR_EMPTY",
+    "ERPL_CLIENT": "MISSING_OR_EMPTY",
+    "ALM_HOST": "SET",
+    "ALM_USER": "SET",
+    "ALM_PASSWORD": "MISSING_OR_EMPTY",
+    "DSPHERE_HOST": "SET",
+    "DSPHERE_USER": "SET",
+    "DSPHERE_PASSWORD": "MISSING_OR_EMPTY",
+    "STMPNK_HOST": "SET",
+    "STMPNK_USER": "SET",
+    "STMPNK_PASSWORD": "MISSING_OR_EMPTY",
+    "SAPIENT_HOST": "SET",
+    "SAPIENT_KEY": "MISSING_OR_EMPTY",
+    "PINECONE_API_KEY": "SET",
+    "PINECONE_INDEX": "SET",
+    "PINECONE_ENVIRONMENT": "SET",
+    "SUPABASE_URL": "MISSING_OR_EMPTY",
+    "SUPABASE_SERVICE_KEY": "MISSING_OR_EMPTY",
+    "AZURE_SEARCH_ENDPOINT": "MISSING_OR_EMPTY",
+    "AZURE_SEARCH_KEY": "MISSING_OR_EMPTY",
+    "AZURE_SEARCH_INDEX": "MISSING_OR_EMPTY",
+    "OPENAI_API_KEY": "MISSING_OR_EMPTY",
+    "DEEPSEEK_API_KEY": "SET",
+    "OPENROUTER_API_KEY": "SET",
+    "TAVILY_API_KEY": "MISSING_OR_EMPTY",
+    "API_OAUTH_CLIENT_ID": "SET",
+    "API_OAUTH_CLIENT_SECRET": "SET",
+    "API_OAUTH_TOKEN_URL": "SET",
+    "API_BASE_URL": "SET",
+    "API_USER": "MISSING_OR_EMPTY",
+    "API_PASS": "MISSING_OR_EMPTY",
+    "CPI_BASE_URL": "SET",
+    "CPI_OAUTH_CLIENT_ID": "SET",
+    "CPI_OAUTH_CLIENT_SECRET": "SET",
+    "CPI_OAUTH_TOKEN_URL": "SET",
+    "CPI_DESTINATION_BASE_URL": "SET",
+    "CPI_DESTINATION_TOKEN_URL": "SET",
+    "CPI_DESTINATION_CLIENT_ID": "SET",
+    "CPI_DESTINATION_CLIENT_SECRET": "SET",
+    "SAP_USER": "SET",
+    "SAP_LANGUAGE": "SET",
+    "ALLOW_WRITE": "SET",
+    "ALLOW_DELETE": "SET",
+    "ALLOW_EXECUTE": "SET",
+    "BLOCKED_PACKAGES": "SET",
+    "SYNTAX_CHECK_BEFORE_ACTIVATE": "SET",
+    "DEFER_TOOLS": "SET",
+    "SAP_ABAP_VERSION": "SET",
+    "CALM_MODE": "MISSING_OR_EMPTY",
+    "CALM_BASE_URL": "MISSING_OR_EMPTY",
+    "CALM_UAA_URL": "MISSING_OR_EMPTY",
+    "CALM_UAA_CLIENT_ID": "MISSING_OR_EMPTY",
+    "CALM_UAA_CLIENT_SECRET": "MISSING_OR_EMPTY",
+    "CALM_API_KEY": "MISSING_OR_EMPTY",
+    "SAP_HOSTNAME": "SET",
+    "SAP_SYSNR": "SET",
+    "SAP_SYSTEM_ID": "SET",
+    "AUTH_METHOD": "SET",
+    "LOG_LEVEL": "SET",
+    "DRY_RUN": "SET",
+    "SAP_ROLE": "SET",
+    "DEFAULT_TRANSPORT": "MISSING_OR_EMPTY",
+    "SAP_ALLOW_UNAUTHORIZED": "SET",
+    "SAP_BTP_CONNECTIVITY_PROXY": "MISSING_OR_EMPTY",
+    "SAP_BTP_CONNECTIVITY_LOCATION_ID": "MISSING_OR_EMPTY",
+    "SAP_BTP_CONNECTIVITY_DEBUG": "SET",
+    "SAP_BTP_CONNECTIVITY_CREDS_FILE": "MISSING_OR_EMPTY",
+    "SAP_BTP_CONNECTIVITY_CDS_BIND_FILE": "MISSING_OR_EMPTY",
+    "SAP_BTP_CONNECTIVITY_CDS_BIND_NAME": "SET",
+    "SAP_BTP_CF_HOME": "MISSING_OR_EMPTY",
+    "SAP_BTP_CONNECTIVITY_CLIENT_ID": "MISSING_OR_EMPTY",
+    "SAP_BTP_CONNECTIVITY_CLIENT_SECRET": "MISSING_OR_EMPTY",
+    "SAP_BTP_CONNECTIVITY_TOKEN_URL": "MISSING_OR_EMPTY",
+    "SAP_ROUTER": "MISSING_OR_EMPTY",
+    "SAP_ROUTER_PASSWORD": "MISSING_OR_EMPTY",
+    "SAP_ROUTER_DEBUG": "SET",
+    "SAP_PROXY_URL": "MISSING_OR_EMPTY",
+    "MAX_DUMPS": "SET",
+    "SOURCE_CACHE_TTL_MS": "SET",
+    "WEB_ALLOW_UNAUTHORIZED": "SET"
+  },
+  "missing_critical": [],
+  "missing_optional": [],
+  "recommendations": [],
+  "soap_rfc_check": {
+    "status": "UNREACHABLE",
+    "error": "[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1081)"
+  },
+  "readiness_v6": {
+    "status": "PASS",
+    "execute": false,
+    "servers": {
+      "arc-1": {
+        "DECLARED": true,
+        "INSTALLED": true,
+        "CONFIGURED": true,
+        "INITIALIZED": "NOT_EXECUTED",
+        "DOMAIN_READY": false,
+        "MUTATION_READY": false,
+        "missing_env": []
+      },
+      "aibap": {
+        "DECLARED": true,
+        "INSTALLED": true,
+        "CONFIGURED": true,
+        "INITIALIZED": "NOT_EXECUTED",
+        "DOMAIN_READY": false,
+        "MUTATION_READY": false,
+        "missing_env": []
+      },
+      "mcp-sap-gui": {
+        "DECLARED": true,
+        "INSTALLED": true,
+        "CONFIGURED": true,
+        "INITIALIZED": "NOT_EXECUTED",
+        "DOMAIN_READY": false,
+        "MUTATION_READY": false,
+        "missing_env": []
+      },
+      "sap-cpi-mcp": {
+        "DECLARED": true,
+        "INSTALLED": true,
+        "CONFIGURED": true,
+        "INITIALIZED": "NOT_EXECUTED",
+        "DOMAIN_READY": false,
+        "MUTATION_READY": false,
+        "missing_env": []
+      },
+      "sap-apim-mcp": {
+        "DECLARED": true,
+        "INSTALLED": true,
+        "CONFIGURED": true,
+        "INITIALIZED": "NOT_EXECUTED",
+        "DOMAIN_READY": false,
+        "MUTATION_READY": false,
+        "missing_env": []
+      },
+      "integration-suite-ui-mcp": {
+        "DECLARED": true,
+        "INSTALLED": true,
+        "CONFIGURED": false,
+        "INITIALIZED": "NOT_EXECUTED",
+        "DOMAIN_READY": false,
+        "MUTATION_READY": false,
+        "missing_env": [
+          "CPI_WEB_URL"
+        ]
+      },
+      "ui5-mcp": {
+        "DECLARED": true,
+        "INSTALLED": true,
+        "CONFIGURED": true,
+        "INITIALIZED": "NOT_EXECUTED",
+        "DOMAIN_READY": false,
+        "MUTATION_READY": false,
+        "missing_env": []
+      },
+      "fiori-mcp": {
+        "DECLARED": true,
+        "INSTALLED": true,
+        "CONFIGURED": true,
+        "INITIALIZED": "NOT_EXECUTED",
+        "DOMAIN_READY": false,
+        "MUTATION_READY": false,
+        "missing_env": []
+      },
+      "cap-mcp": {
+        "DECLARED": true,
+        "INSTALLED": true,
+        "CONFIGURED": true,
+        "INITIALIZED": "NOT_EXECUTED",
+        "DOMAIN_READY": false,
+        "MUTATION_READY": false,
+        "missing_env": []
+      },
+      "apim-ui-mcp": {
+        "DECLARED": true,
+        "INSTALLED": true,
+        "CONFIGURED": false,
+        "INITIALIZED": "NOT_EXECUTED",
+        "DOMAIN_READY": false,
+        "MUTATION_READY": false,
+        "missing_env": [
+          "APIM_WEB_URL"
+        ]
+      }
+    }
+  },
+  "high_mcp_ok": "2/12",
+  "strict": true,
+  "policy_mode": "read_only"
+}

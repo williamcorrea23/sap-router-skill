@@ -1,0 +1,12 @@
+{
+  "id": "sap-api-management-consultant",
+  "title": "SAP API Management Consultant",
+  "karpathy_wrapper": "mandatory",
+  "default_output": "caveman",
+  "capabilities": {
+    "allow": ["sap.apim.proxy.read"],
+    "gated": ["sap.apim.proxy.modify", "sap.apim.proxy.deploy"],
+    "deny": ["sap.apim.secret.read"]
+  },
+  "preferred_helpers": ["scripts/apim_client.py", "sap-apim-mcp"]
+}

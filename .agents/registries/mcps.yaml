@@ -1,0 +1,106 @@
+version: 1
+default_policy: fail_closed
+servers:
+  arc-1:
+    type: stdio
+    source: npm:arc-1
+    command: npx
+    args: ["arc-1"]
+    env:
+      ARC_SAP_URL: ${ARC_SAP_URL}
+      ARC_SAP_USER: ${ARC_SAP_USER}
+      ARC_SAP_PASSWORD: ${ARC_SAP_PASSWORD}
+      ARC_SAP_CLIENT: ${ARC_SAP_CLIENT}
+    capabilities: [sap.abap.read, sap.abap.write, sap.abap.search, sap.transport.read]
+    effects: {read: true, write: true, execute: true, delete: false}
+    approval_required: true
+    health: {mode: command, command: ["npx", "arc-1", "--help"]}
+  aibap:
+    type: stdio
+    source: go:aibap.mcp
+    command: aibap.mcp
+    args: []
+    env: {}
+    capabilities: [sap.abap.read, sap.abap.write, sap.abap.test, sap.transport.read]
+    effects: {read: true, write: true, execute: true, delete: false}
+    approval_required: true
+    health: {mode: command, command: ["aibap.mcp", "--help"]}
+  mcp-sap-gui:
+    type: stdio
+    source: github:mario-andreschak/mcp-sap-gui
+    command: python
+    args: ["-m", "sap_gui_server.server"]
+    env:
+      SAP_SYSTEM: ${SAP_SYSTEM}
+      SAP_CLIENT: ${SAP_CLIENT}
+      SAP_USER: ${SAP_USER}
+      SAP_PASSWORD: ${SAP_PASSWORD}
+      SAPGUI_HOST: ${SAPGUI_HOST}
+      SAPGUI_USER: ${SAPGUI_USER}
+      SAPGUI_PASSWORD: ${SAPGUI_PASSWORD}
+      SAPGUI_CLIENT: ${SAPGUI_CLIENT}
+      PYTHONPATH: ${MCP_SAP_GUI_MARIO_PYTHONPATH}
+    capabilities: [sap.gui.read, sap.gui.write, sap.transaction.execute]
+    effects: {read: true, write: true, execute: true, delete: false}
+    approval_required: true
+    health: {mode: env_and_binary}
+  sap-cpi:
+    type: stdio
+    source: local:packages/sap-cpi-mcp
+    command: node
+    args: ["packages/sap-cpi-mcp/dist/index.js"]
+    env:
+      CPI_BASE_URL: ${CPI_BASE_URL}
+      CPI_OAUTH_TOKEN_URL: ${CPI_OAUTH_TOKEN_URL}
+      CPI_OAUTH_CLIENT_ID: ${CPI_OAUTH_CLIENT_ID}
+      CPI_OAUTH_CLIENT_SECRET: ${CPI_OAUTH_CLIENT_SECRET}
+    capabilities: [sap.cpi.package.read, sap.cpi.artifact.read, sap.cpi.message.read, sap.cpi.plan.write]
+    effects: {read: true, write: false, execute: false, delete: false}
+    approval_required: true
+    health: {mode: http, path: /api/v1/IntegrationPackages?$top=1}
+  sap-api-management:
+    type: stdio
+    source: local:packages/sap-apim-mcp
+    command: node
+    args: ["packages/sap-apim-mcp/dist/index.js"]
+    env:
+      APIM_API_BASE_URL: ${APIM_API_BASE_URL}
+      APIM_TOKEN_URL: ${APIM_TOKEN_URL}
+      APIM_CLIENT_ID: ${APIM_CLIENT_ID}
+      APIM_CLIENT_SECRET: ${APIM_CLIENT_SECRET}
+    capabilities: [sap.apim.proxy.read, sap.apim.product.read, sap.apim.policy.read, sap.apim.plan.write]
+    effects: {read: true, write: false, execute: false, delete: false}
+    approval_required: true
+    health: {mode: http, path: /apiportal/api/1.0/Management.svc/APIProxies?$top=1}
+  sap-fiori-mcp-server:
+    type: plugin
+    source: npm:@sap-ux/fiori-mcp-server@1.8.1
+    capabilities: [sap.fiori.app.generate, sap.fiori.app.modify, sap.fiori.docs.search]
+    effects: {read: true, write: true, execute: false, delete: false}
+    approval_required: true
+    health: {mode: tools_list}
+  ui5-mcp-server:
+    type: plugin
+    source: npm:@ui5/mcp-server@0.2.14
+    capabilities: [sap.ui5.project.create, sap.ui5.lint, sap.ui5.api.search]
+    effects: {read: true, write: true, execute: false, delete: false}
+    approval_required: true
+    health: {mode: tools_list}
+  cds-mcp:
+    type: plugin
+    source: npm:@cap-js/mcp-server@0.0.5
+    capabilities: [sap.cap.model.search, sap.cap.docs.search]
+    effects: {read: true, write: false, execute: false, delete: false}
+    approval_required: false
+    health: {mode: tools_list}
+  integration-suite-web-ui:
+    type: browser
+    source: local:packages/integration-suite-web-ui-mcp
+    command: node
+    args: ["packages/integration-suite-web-ui-mcp/dist/index.js"]
+    env:
+      IS_WEB_ALLOWED_ORIGINS: ${IS_WEB_ALLOWED_ORIGINS}
+    capabilities: [sap.cpi.ui.read, sap.apim.ui.read, sap.webui.evidence.capture]
+    effects: {read: true, write: false, execute: false, delete: false}
+    approval_required: true
+    health: {mode: browser_session}

@@ -11,6 +11,37 @@
 >
 > All skills auto-trigger by file context and keyword. See SKILL.md for master dispatch.
 
+## Implemented v6 operating model
+
+Canonical source is `.agents/skills` plus `.agents/registries/mcp-capabilities.json`.
+Claude and Gemini skill trees are generated mirrors; Codex and Cursor reuse `.agents/skills`
+through AGENTS/rules/agent assets instead of maintaining duplicate skill trees.
+
+Generate/check IDE assets:
+
+```bash
+python scripts/generate_ide_assets.py generate --targets all
+python scripts/generate_ide_assets.py check
+```
+
+Capability routing is fail-closed:
+
+```bash
+python scripts/validate_catalog.py --strict
+python scripts/mcp_launcher.py list --capability sap.cpi.message.read
+python scripts/mcp_launcher.py list --capability sap.apim.proxy.read
+```
+
+CPI/APIM/Fiori/UI5/CAP now route through API/CLI/plugin MCPs first and use Web UI MCP
+fallbacks (`integration-suite-ui-mcp`, `apim-ui-mcp`) only when background access is blocked.
+The Web UI bridge uses the logged-in browser session and does not accept credential values.
+
+Mutating capabilities use plan/approval/commit semantics. Local approval state is handled by:
+
+```bash
+python scripts/approval_broker.py plan --capability sap.apim.proxy.deploy --target DEV
+```
+
 ## What this project is
 
 15 standalone Python 3 CLIs + one Node.js review gate — no live SAP system required

@@ -1,0 +1,8 @@
+{
+  "id": "sap-clean-core-architect",
+  "title": "SAP Clean Core Architect",
+  "karpathy_wrapper": "mandatory",
+  "default_output": "caveman",
+  "capabilities": {"allow": ["sap.adt.source.read", "sap.adt.search.execute", "sap.cap.model.search", "sap.apim.proxy.read"], "gated": [], "deny": []},
+  "preferred_helpers": ["scripts/validate_catalog.py", "arc-1", "cap-mcp"]
+}

@@ -1,0 +1,8 @@
+{
+  "id": "sap-fiori-developer",
+  "title": "SAP Fiori Developer",
+  "karpathy_wrapper": "mandatory",
+  "default_output": "caveman",
+  "capabilities": {"allow": [], "gated": ["sap.fiori.app.generate", "sap.fiori.app.modify"], "deny": []},
+  "preferred_helpers": ["fiori-mcp"]
+}

@@ -1,0 +1,18 @@
+---
+description: SAP Router skill discovery and Karpathy command format
+globs: ["**/*"]
+alwaysApply: true
+---
+
+Use `.agents/skills` as the canonical skill directory. Do not duplicate `.cursor/skills`.
+
+Apply Karpathy format for SAP work:
+
+1. Think: state assumptions and uncertainty.
+2. Simplify: choose the smallest verified route.
+3. Surgical: touch only requested files or SAP objects.
+4. Verify: run the relevant CLI, MCP probe, lint, or smoke test.
+
+For SAP tasks, route through `scripts/sap_router.py` and the MCP capability registry at `.agents/registries/mcp-capabilities.json`.
+
+Caveman mode is default for small find/fix/review tasks.

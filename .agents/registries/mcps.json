@@ -1,0 +1,497 @@
+{
+  "schema_version": 1,
+  "servers": [
+    {
+      "id": "arc-1",
+      "display_name": "ARC-1 ADT",
+      "status": "enabled",
+      "source": {
+        "repository": "https://github.com/arc-mcp/arc-1",
+        "license": "UNKNOWN",
+        "version": "pinned-by-local-install"
+      },
+      "runtime": {
+        "command": "npx",
+        "args": [
+          "arc-1",
+          "--help"
+        ],
+        "transport": "stdio",
+        "platforms": [
+          "windows",
+          "linux",
+          "macos"
+        ]
+      },
+      "auth": {
+        "mode": "env",
+        "env_refs": [
+          "ARC_SAP_URL",
+          "ARC_SAP_USER",
+          "ARC_SAP_CLIENT"
+        ]
+      },
+      "capabilities": [
+        "sap.adt.source.read",
+        "sap.adt.source.write",
+        "sap.adt.object.activate",
+        "sap.adt.search.execute"
+      ],
+      "safety": {
+        "default_mode": "read_only",
+        "mutations": "explicit"
+      },
+      "probes": {
+        "initialize": true,
+        "tools_list": true,
+        "domain_probe": "help_command"
+      },
+      "routing": {
+        "priority": 10,
+        "fallback_group": "adt"
+      },
+      "owner": "sap-abap-developer"
+    },
+    {
+      "id": "aibap",
+      "display_name": "AIBAP ADT MCP",
+      "status": "enabled",
+      "source": {
+        "repository": "local-or-user-installed",
+        "license": "UNKNOWN",
+        "version": "pinned-by-local-install"
+      },
+      "runtime": {
+        "command": "aibap.mcp",
+        "args": [
+          "--help"
+        ],
+        "transport": "stdio",
+        "platforms": [
+          "windows",
+          "linux",
+          "macos"
+        ]
+      },
+      "auth": {
+        "mode": "config_file",
+        "env_refs": []
+      },
+      "capabilities": [
+        "sap.adt.source.read",
+        "sap.adt.source.write",
+        "sap.adt.object.activate",
+        "sap.adt.search.execute"
+      ],
+      "safety": {
+        "default_mode": "read_only",
+        "mutations": "explicit"
+      },
+      "probes": {
+        "initialize": true,
+        "tools_list": true,
+        "domain_probe": "help_command"
+      },
+      "routing": {
+        "priority": 20,
+        "fallback_group": "adt"
+      },
+      "owner": "sap-abap-developer"
+    },
+    {
+      "id": "mcp-sap-gui",
+      "display_name": "Mario SAP GUI MCP",
+      "status": "enabled",
+      "source": {
+        "repository": "https://github.com/mario-andreschak/mcp-sap-gui",
+        "license": "UNKNOWN",
+        "version": "source-assessment-required"
+      },
+      "runtime": {
+        "command": "python",
+        "args": [
+          "packages/mcp-sap-gui-mario/server.py"
+        ],
+        "transport": "stdio",
+        "platforms": [
+          "windows"
+        ]
+      },
+      "auth": {
+        "mode": "logged_in_user_or_env",
+        "env_refs": [
+          "SAPGUI_HOST",
+          "SAPGUI_CLIENT"
+        ]
+      },
+      "capabilities": [
+        "sap.gui.session.attach",
+        "sap.gui.screen.read",
+        "sap.gui.transaction.execute",
+        "sap.gui.control.modify"
+      ],
+      "safety": {
+        "default_mode": "read_only",
+        "mutations": "approval_required",
+        "visual_coordinates": "last_resort"
+      },
+      "probes": {
+        "initialize": true,
+        "tools_list": true,
+        "domain_probe": "sap_gui_session_probe"
+      },
+      "routing": {
+        "priority": 10,
+        "fallback_group": "sap-gui"
+      },
+      "owner": "sap-basis-consultant"
+    },
+    {
+      "id": "sap-cpi-mcp",
+      "display_name": "SAP CPI MCP",
+      "status": "enabled",
+      "source": {
+        "repository": "local-wrapper-from-official-api",
+        "license": "project",
+        "version": "0.1.0"
+      },
+      "runtime": {
+        "command": "python",
+        "args": [
+          "scripts/sap_integration_mcp.py",
+          "--product",
+          "cpi"
+        ],
+        "transport": "stdio",
+        "platforms": [
+          "windows",
+          "linux",
+          "macos"
+        ]
+      },
+      "auth": {
+        "mode": "credential_provider_or_env_ref",
+        "env_refs": [
+          "CPI_BASE_URL",
+          "CPI_OAUTH_TOKEN_URL",
+          "CPI_OAUTH_CLIENT_ID",
+          "CPI_OAUTH_CLIENT_SECRET"
+        ]
+      },
+      "capabilities": [
+        "sap.cpi.package.read",
+        "sap.cpi.artifact.read",
+        "sap.cpi.message.read",
+        "sap.cpi.trace.read",
+        "sap.cpi.artifact.deploy"
+      ],
+      "safety": {
+        "default_mode": "read_only",
+        "mutations": "plan_approve_commit"
+      },
+      "probes": {
+        "initialize": true,
+        "tools_list": true,
+        "domain_probe": "jsonrpc_tools"
+      },
+      "routing": {
+        "priority": 10,
+        "fallback_group": "cpi"
+      },
+      "owner": "sap-cpi-developer"
+    },
+    {
+      "id": "sap-apim-mcp",
+      "display_name": "SAP APIM MCP",
+      "status": "enabled",
+      "source": {
+        "repository": "local-wrapper-from-official-api",
+        "license": "project",
+        "version": "0.1.0"
+      },
+      "runtime": {
+        "command": "python",
+        "args": [
+          "scripts/sap_integration_mcp.py",
+          "--product",
+          "apim"
+        ],
+        "transport": "stdio",
+        "platforms": [
+          "windows",
+          "linux",
+          "macos"
+        ]
+      },
+      "auth": {
+        "mode": "credential_provider_or_env_ref",
+        "env_refs": [
+          "APIM_HOST",
+          "APIM_USER",
+          "APIM_PASSWORD"
+        ]
+      },
+      "capabilities": [
+        "sap.apim.proxy.read",
+        "sap.apim.proxy.modify",
+        "sap.apim.proxy.deploy"
+      ],
+      "safety": {
+        "default_mode": "read_only",
+        "mutations": "plan_approve_commit"
+      },
+      "probes": {
+        "initialize": true,
+        "tools_list": true,
+        "domain_probe": "jsonrpc_tools"
+      },
+      "routing": {
+        "priority": 10,
+        "fallback_group": "apim"
+      },
+      "owner": "sap-api-management-consultant"
+    },
+    {
+      "id": "integration-suite-ui-mcp",
+      "display_name": "Integration Suite Web UI MCP",
+      "status": "enabled",
+      "source": {
+        "repository": "local-playwright-wrapper",
+        "license": "project",
+        "version": "0.1.0"
+      },
+      "runtime": {
+        "command": "node",
+        "args": [
+          "scripts/web_ui_mcp_bridge.mjs",
+          "--product",
+          "cpi"
+        ],
+        "transport": "stdio",
+        "platforms": [
+          "windows",
+          "linux",
+          "macos"
+        ]
+      },
+      "auth": {
+        "mode": "logged_in_browser_session",
+        "env_refs": [
+          "CPI_WEB_URL"
+        ]
+      },
+      "capabilities": [
+        "sap.webui.status",
+        "sap.webui.open",
+        "sap.webui.plan",
+        "sap.webui.evidence.capture"
+      ],
+      "safety": {
+        "default_mode": "read_only",
+        "mutations": "plan_approve_commit",
+        "cookies_export": "deny"
+      },
+      "probes": {
+        "initialize": true,
+        "tools_list": true,
+        "domain_probe": "browser_session_probe"
+      },
+      "routing": {
+        "priority": 90,
+        "fallback_group": "integration-suite-ui"
+      },
+      "owner": "sap-integration-architect"
+    },
+    {
+      "id": "ui5-mcp",
+      "display_name": "UI5 MCP Server",
+      "status": "enabled",
+      "source": {
+        "repository": "https://github.com/UI5/mcp-server",
+        "license": "Apache-2.0",
+        "package": "@ui5/mcp-server",
+        "version": "0.2.14"
+      },
+      "runtime": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@ui5/mcp-server@0.2.14",
+          "--help"
+        ],
+        "transport": "stdio",
+        "platforms": [
+          "windows",
+          "linux",
+          "macos"
+        ]
+      },
+      "auth": {
+        "mode": "none",
+        "env_refs": []
+      },
+      "capabilities": [
+        "sap.ui5.project.validate"
+      ],
+      "safety": {
+        "default_mode": "read_only",
+        "mutations": "explicit"
+      },
+      "probes": {
+        "initialize": true,
+        "tools_list": true,
+        "domain_probe": "help_command"
+      },
+      "routing": {
+        "priority": 10,
+        "fallback_group": "ui5"
+      },
+      "owner": "sap-ui5-developer"
+    },
+    {
+      "id": "fiori-mcp",
+      "display_name": "SAP Fiori MCP Server",
+      "status": "enabled",
+      "source": {
+        "repository": "https://github.com/SAP/open-ux-tools/tree/main/packages/fiori-mcp-server",
+        "license": "Apache-2.0",
+        "package": "@sap-ux/fiori-mcp-server",
+        "version": "1.8.1"
+      },
+      "runtime": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@sap-ux/fiori-mcp-server@1.8.1",
+          "--help"
+        ],
+        "transport": "stdio",
+        "platforms": [
+          "windows",
+          "linux",
+          "macos"
+        ]
+      },
+      "auth": {
+        "mode": "none_or_destination",
+        "env_refs": []
+      },
+      "capabilities": [
+        "sap.fiori.app.generate",
+        "sap.fiori.app.modify"
+      ],
+      "safety": {
+        "default_mode": "read_only",
+        "mutations": "explicit"
+      },
+      "probes": {
+        "initialize": true,
+        "tools_list": true,
+        "domain_probe": "help_command"
+      },
+      "routing": {
+        "priority": 10,
+        "fallback_group": "fiori"
+      },
+      "owner": "sap-fiori-developer"
+    },
+    {
+      "id": "cap-mcp",
+      "display_name": "CAP MCP Server",
+      "status": "enabled",
+      "source": {
+        "repository": "https://github.com/cap-js/mcp-server",
+        "license": "Apache-2.0",
+        "package": "@cap-js/mcp-server",
+        "version": "0.0.5"
+      },
+      "runtime": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@cap-js/mcp-server@0.0.5",
+          "--help"
+        ],
+        "transport": "stdio",
+        "platforms": [
+          "windows",
+          "linux",
+          "macos"
+        ]
+      },
+      "auth": {
+        "mode": "none",
+        "env_refs": []
+      },
+      "capabilities": [
+        "sap.cap.model.search",
+        "sap.cap.project.build"
+      ],
+      "safety": {
+        "default_mode": "read_only",
+        "mutations": "explicit"
+      },
+      "probes": {
+        "initialize": true,
+        "tools_list": true,
+        "domain_probe": "help_command"
+      },
+      "routing": {
+        "priority": 10,
+        "fallback_group": "cap"
+      },
+      "owner": "sap-cap-developer"
+    },
+    {
+      "id": "apim-ui-mcp",
+      "display_name": "API Management Web UI MCP",
+      "status": "enabled",
+      "source": {
+        "repository": "local-playwright-ready-wrapper",
+        "license": "project",
+        "version": "0.1.0"
+      },
+      "runtime": {
+        "command": "node",
+        "args": [
+          "scripts/web_ui_mcp_bridge.mjs",
+          "--product",
+          "apim"
+        ],
+        "transport": "stdio",
+        "platforms": [
+          "windows",
+          "linux",
+          "macos"
+        ]
+      },
+      "auth": {
+        "mode": "logged_in_browser_session",
+        "env_refs": [
+          "APIM_WEB_URL"
+        ]
+      },
+      "capabilities": [
+        "sap.webui.status",
+        "sap.webui.open",
+        "sap.webui.plan",
+        "sap.webui.evidence.capture"
+      ],
+      "safety": {
+        "default_mode": "read_only",
+        "mutations": "plan_approve_commit",
+        "cookies_export": "deny"
+      },
+      "probes": {
+        "initialize": true,
+        "tools_list": true,
+        "domain_probe": "browser_session_probe"
+      },
+      "routing": {
+        "priority": 90,
+        "fallback_group": "apim"
+      },
+      "owner": "sap-api-management-consultant"
+    }
+  ]
+}

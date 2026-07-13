@@ -34,10 +34,12 @@ try:
 except ImportError:
     pass
 
-SAP_URL = os.environ.get("ARC_SAP_URL", "https://10.57.203.136:44300")
-SAP_USER = os.environ.get("ARC_SAP_USER", "30356735869")
-SAP_PASSWORD = os.environ.get("ARC_SAP_PASSWORD", "Fodase@APPA2026")
-SAP_CLIENT = os.environ.get("ARC_SAP_CLIENT", "100")
+SAP_URL = os.environ.get("ARC_SAP_URL") or os.environ.get("SAP_URL")
+SAP_USER = os.environ.get("ARC_SAP_USER") or os.environ.get("SAP_USER")
+SAP_PASSWORD = os.environ.get("ARC_SAP_PASSWORD") or os.environ.get("SAP_PASSWORD")
+SAP_CLIENT = os.environ.get("ARC_SAP_CLIENT") or os.environ.get("SAP_CLIENT")
+if not all([SAP_URL, SAP_USER, SAP_PASSWORD, SAP_CLIENT]):
+    raise SystemExit("Missing ARC_SAP_URL/ARC_SAP_USER/ARC_SAP_PASSWORD/ARC_SAP_CLIENT for ZROUTER HTTP deploy.")
 
 # --- ADT REST API helpers ---
 AUTH_HEADER = "Basic " + base64.b64encode(f"{SAP_USER}:{SAP_PASSWORD}".encode()).decode()
@@ -46,11 +48,13 @@ BASE_HEADERS = {
     "Content-Type": "application/xml",
     "Accept": "application/xml",
 }
-# Disable SSL verification for self-signed certs
 import ssl
 SSL_CTX = ssl.create_default_context()
-SSL_CTX.check_hostname = False
-SSL_CTX.verify_mode = ssl.CERT_NONE
+if os.environ.get("SAP_ALLOW_UNAUTHORIZED", "").lower() == "true":
+    if os.environ.get("SAP_ENV", "").upper() in {"PROD", "PRD", "PRODUCTION"}:
+        raise SystemExit("Refusing insecure TLS in production. Configure a trusted CA instead.")
+    SSL_CTX.check_hostname = False
+    SSL_CTX.verify_mode = ssl.CERT_NONE
 
 
 # CSRF token cache + session cookies
@@ -81,7 +85,7 @@ def _get_csrf_token():
     try:
         with opener.open(req, timeout=30) as resp:
             _csrf_token = resp.headers.get("x-csrf-token", "")
-            print(f"  CSRF token obtained: {_csrf_token[:20]}...")
+            print("  CSRF token obtained.")
             return _csrf_token
     except urllib.error.HTTPError as e:
         token = e.headers.get("x-csrf-token", "") if hasattr(e, 'headers') else ""

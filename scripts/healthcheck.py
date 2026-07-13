@@ -12,10 +12,19 @@ import argparse
 import subprocess
 import urllib.error
 import urllib.request
+import shutil
 from pathlib import Path
 from datetime import datetime
 
 SKILL_DIR = Path(__file__).resolve().parent.parent
+
+try:
+    from scripts.mcp_registry import healthcheck_spec as _registry_healthcheck_spec
+except Exception:
+    try:
+        from mcp_registry import healthcheck_spec as _registry_healthcheck_spec
+    except Exception:
+        _registry_healthcheck_spec = None
 
 MCP_HEALTHCHECK_SPEC = {
     "arc-1": {
@@ -375,6 +384,12 @@ MCP_HEALTHCHECK_SPEC = {
     },
 }
 
+if _registry_healthcheck_spec:
+    try:
+        MCP_HEALTHCHECK_SPEC.update(_registry_healthcheck_spec())
+    except Exception:
+        pass
+
 REQUIRED_ENV_FILE_VARS = [
     "ARC_SAP_URL", "ARC_SAP_USER", "ARC_SAP_PASSWORD", "ARC_SAP_CLIENT",
 ]
@@ -388,8 +403,8 @@ OPTIONAL_ENV_FILE_VARS = [
     "SOAP_RFC_URL",
     "SAP_TRANSPORT_HOSTNAME", "SAP_TRANSPORT_USERNAME", "SAP_TRANSPORT_PASSWORD",
     "CF_API", "CF_USER", "CF_PASSWORD",
-    "CPI_HOST", "CPI_USER", "CPI_PASSWORD",
-    "APIM_HOST", "APIM_USER", "APIM_PASSWORD",
+    "CPI_HOST", "CPI_USER", "CPI_PASSWORD", "CPI_WEB_URL", "BROWSER_CHANNEL",
+    "APIM_HOST", "APIM_USER", "APIM_PASSWORD", "APIM_WEB_URL",
     "PI_HOST", "PI_USER", "PI_PASSWORD",
     "BW_HOST", "BW_USER", "BW_PASSWORD",
     "ERPL_URL", "ERPL_USER", "ERPL_PASSWORD", "ERPL_CLIENT",
@@ -416,6 +431,8 @@ class HealthChecker:
     def __init__(self, project_root=None, verbose=True):
         self.project_root = Path(project_root or str(SKILL_DIR))
         self.verbose = verbose
+        self.strict = False
+        self.v6_execute = False
         self.results = {
             "timestamp": datetime.now().isoformat()[:19],
             "overall_status": "UNKNOWN",
@@ -488,8 +505,12 @@ class HealthChecker:
             return {"status": "SKIPPED", "reason": "No probe command defined"}
 
         try:
+            probe_args = probe.split()
+            resolved = shutil.which(probe_args[0])
+            if resolved:
+                probe_args[0] = resolved
             result = subprocess.run(
-                probe.split(), capture_output=True, text=True, timeout=10
+                probe_args, capture_output=True, text=True, timeout=10
             )
             return {
                 "status": "AVAILABLE" if result.returncode == 0 else "ERROR",
@@ -597,6 +618,59 @@ class HealthChecker:
             self.log(f"  [ERROR] SOAP RFC probe failed: {e}")
             return {"status": "ERROR", "error": str(e)[:200]}
 
+    def check_canonical_v6_readiness(self):
+        """Report v6 readiness stages for canonical .agents MCP registry."""
+        registry_path = self.project_root / ".agents" / "registries" / "mcps.json"
+        if not registry_path.exists():
+            self.results["readiness_v6"] = {"status": "SKIPPED", "reason": "canonical registry missing"}
+            return self.results["readiness_v6"]
+        sys.path.insert(0, str(self.project_root / "python"))
+        try:
+            from sap_router_core.registry import load_capabilities, load_servers, probe_server
+        except Exception as exc:
+            self.results["readiness_v6"] = {"status": "ERROR", "reason": str(exc)}
+            return self.results["readiness_v6"]
+
+        capabilities = load_capabilities()
+        servers = load_servers()
+        readiness = {}
+        for server_id, server in servers.items():
+            runtime = server.get("runtime", {})
+            command = runtime.get("command", "")
+            env_refs = server.get("auth", {}).get("env_refs", [])
+            concrete_refs = [
+                ref for ref in env_refs
+                if not ref.endswith("_REF") and "PASSWORD" not in ref and "SECRET" not in ref and "TOKEN" not in ref
+            ]
+            missing_env = [ref for ref in concrete_refs if not os.environ.get(ref)]
+            installed = bool(shutil.which(command)) if command else False
+            stage = {
+                "DECLARED": True,
+                "INSTALLED": installed,
+                "CONFIGURED": not missing_env,
+                "INITIALIZED": "NOT_EXECUTED",
+                "DOMAIN_READY": False,
+                "MUTATION_READY": False,
+                "missing_env": missing_env,
+            }
+            if self.v6_execute:
+                probe = probe_server(server_id, execute=True, timeout=10)
+                stage["probe_status"] = probe.get("status")
+                checks = probe.get("checks", {})
+                stage["INITIALIZED"] = checks.get("initialize") in ("PASS", "NOT_APPLICABLE")
+                stage["DOMAIN_READY"] = probe.get("status") == "READY"
+                stage["MUTATION_READY"] = stage["DOMAIN_READY"] and any(
+                    capabilities.get(cap, {}).get("effect") in ("mutating", "destructive")
+                    for cap in server.get("capabilities", [])
+                )
+            readiness[server_id] = stage
+        self.results["readiness_v6"] = {
+            "status": "PASS",
+            "execute": self.v6_execute,
+            "servers": readiness,
+        }
+        return self.results["readiness_v6"]
+
     def run_full_check(self):
         """Run complete healthcheck across all MCPs and .env."""
         # Load local .env into os.environ for verification
@@ -651,17 +725,25 @@ class HealthChecker:
             if criticality in ("HIGH", "MEDIUM"):
                 high_total += 1
                 env_ok_mcp = env_check["status"] in ("ALL_SET", "CONFIGURED", "NO_ENV_NEEDED")
-                binary_ok = binary_check["status"] in ("AVAILABLE", "SKIPPED")
+                binary_ready_states = ("AVAILABLE",) if self.strict else ("AVAILABLE", "SKIPPED")
+                binary_ok = binary_check["status"] in binary_ready_states
                 if env_ok_mcp and binary_ok:
                     high_ok += 1
 
             # Log status
-            icon = "[OK]" if env_check["status"] in ("ALL_SET", "CONFIGURED", "NO_ENV_NEEDED") else "[WARN]"
+            ready = (
+                env_check["status"] in ("ALL_SET", "CONFIGURED", "NO_ENV_NEEDED")
+                and binary_check["status"] in (("AVAILABLE",) if self.strict else ("AVAILABLE", "SKIPPED"))
+            )
+            icon = "[OK]" if ready else "[WARN]"
             self.log(f"  {icon} {name:25s} ({criticality:8s}): env={env_check['status']:15s} binary={binary_check['status']}")
 
         # SOAP RFC endpoint probe
         soap_result = self.check_soap_rfc_endpoint()
         self.results["soap_rfc_check"] = soap_result
+
+        # v6 canonical readiness stages
+        self.check_canonical_v6_readiness()
 
         # 3. Project objects check
         self.log("\n=== PROJECT OBJECTS ===")
@@ -679,6 +761,7 @@ class HealthChecker:
 
         # 4. Overall assessment
         self.results["high_mcp_ok"] = f"{high_ok}/{high_total}"
+        self.results["strict"] = self.strict
         if not env_ok:
             self.results["overall_status"] = "BLOCKED"
             self.log(f"\n[BLOCKED] Critical env vars missing: {self.results['missing_critical']}")
@@ -764,15 +847,29 @@ def main():
     parser.add_argument("--prompt-missing", action="store_true", help="Show interactive setup prompts for missing config")
     parser.add_argument("--project-root", default=None, help="Override project root path")
     parser.add_argument("--check-mcp", help="Check specific MCP only")
+    parser.add_argument("--strict", action="store_true", help="Fail closed: SKIPPED probes are not READY")
+    parser.add_argument("--read-only", action="store_true", help="Record read-only policy mode in output")
+    parser.add_argument("--output", help="Write JSON results to this path")
+    parser.add_argument("--v6", action="store_true", help="Include canonical v6 MCP readiness stages")
+    parser.add_argument("--execute-v6", action="store_true", help="Execute canonical v6 initialize/domain probes")
 
     args = parser.parse_args()
 
     project_root = args.project_root or str(SKILL_DIR)
-    checker = HealthChecker(project_root=project_root, verbose=not args.quiet)
+    # JSON mode is a machine contract: diagnostics belong on stderr, never stdout.
+    checker = HealthChecker(project_root=project_root, verbose=(not args.quiet and not args.json))
+    checker.strict = args.strict
+    checker.v6_execute = args.execute_v6
     results = checker.run_full_check()
+    if args.read_only:
+        results["policy_mode"] = "read_only"
 
     if args.json:
         print(json.dumps(results, indent=2))
+    if args.output:
+        output_path = Path(args.output)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        output_path.write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")
 
     if args.prompt_missing:
         print(checker.prompt_missing())

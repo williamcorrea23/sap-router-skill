@@ -2,8 +2,16 @@
 import subprocess, os, sys
 from pathlib import Path
 
-SAP_URL = 'https://10.57.203.136:44300'
-CURL_BASE = ['curl', '-sk', '-u', '30356735869:Fodase@APPA2026']
+SAP_URL = os.environ.get("ARC_SAP_URL") or os.environ.get("SAP_URL")
+SAP_USER = os.environ.get("ARC_SAP_USER") or os.environ.get("SAP_USER")
+SAP_PASSWORD = os.environ.get("ARC_SAP_PASSWORD") or os.environ.get("SAP_PASSWORD")
+if not SAP_URL or not SAP_USER or not SAP_PASSWORD:
+    raise SystemExit("Missing ARC_SAP_URL/ARC_SAP_USER/ARC_SAP_PASSWORD for deploy_all.")
+
+CURL_BASE = ['curl', '-sS', '-u', f'{SAP_USER}:{SAP_PASSWORD}']
+if (os.environ.get("SAP_ALLOW_UNAUTHORIZED", "").lower() == "true"
+        and os.environ.get("SAP_ENV", "").upper() not in {"PROD", "PRD", "PRODUCTION"}):
+    CURL_BASE.insert(1, "-k")
 DEPLOY_DIR = Path(__file__).resolve().parent.parent / 'deploy' / 'split2'
 
 def curl_get(path):

@@ -1,0 +1,8 @@
+{
+  "id": "sap-cloud-consultant",
+  "title": "Senior SAP Cloud Consultant",
+  "karpathy_wrapper": "mandatory",
+  "default_output": "caveman",
+  "capabilities": {"allow": ["sap.cpi.package.read", "sap.cpi.artifact.read", "sap.apim.proxy.read", "sap.cap.model.search"], "gated": ["sap.cpi.artifact.deploy", "sap.apim.proxy.deploy", "sap.cap.project.build"], "deny": []},
+  "preferred_helpers": ["scripts/cpi_client.py", "scripts/apim_client.py", "cap-mcp"]
+}

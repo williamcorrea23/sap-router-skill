@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "defaults": {
+    "ALLOW_WRITE": false,
+    "ALLOW_DELETE": false,
+    "ALLOW_EXECUTE": false,
+    "DRY_RUN": true,
+    "SAP_ALLOW_UNAUTHORIZED": false,
+    "WEB_ALLOW_UNAUTHORIZED": false,
+    "fail_closed_unknown_mcp": true,
+    "skipped_probe_is_ready": false
+  },
+  "effects": {
+    "read": {"approval": "not_required"},
+    "mutating": {"approval": "external_broker_required", "pattern": "plan_approve_commit"},
+    "destructive": {"approval": "external_broker_required", "strong_confirmation": true}
+  },
+  "environments": {
+    "DEV": {"allow_mutation": true},
+    "QA": {"allow_mutation": true},
+    "PRD": {"allow_mutation": false}
+  }
+}

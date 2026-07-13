@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "default_output": "caveman",
+  "workers": [
+    {"id": "cavecrew-investigator", "effect": "read", "budget_tokens": 2500, "triggers": ["find", "search", "locate", "where is"]},
+    {"id": "cavecrew-builder", "effect": "mutating", "budget_tokens": 3500, "max_files": 2, "triggers": ["fix", "edit", "rename", "typo"]},
+    {"id": "cavecrew-reviewer", "effect": "read", "budget_tokens": 3000, "triggers": ["review", "audit", "code review"]}
+  ],
+  "waves": [
+    {"id": "investigate", "parallel": true, "roles": ["cavecrew-investigator"]},
+    {"id": "build", "parallel": true, "roles": ["cavecrew-builder"]},
+    {"id": "review", "parallel": true, "roles": ["cavecrew-reviewer"]}
+  ]
+}

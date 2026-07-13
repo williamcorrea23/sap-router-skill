@@ -1,9 +1,18 @@
 #!/usr/bin/env python3
-"""Deploy ABAP source files to SAP via ADT REST API (curl, with ETag + CSRF)"""
-import subprocess, os
+"""Deploy ABAP source files to SAP via ADT REST API (curl, with ETag + CSRF)."""
+import os
+import subprocess
 
-SAP_URL = 'https://10.57.203.136:44300'
-CURL = ['curl', '-sk', '-u', '30356735869:Fodase@APPA2026']
+SAP_URL = os.environ.get("ARC_SAP_URL") or os.environ.get("SAP_URL")
+SAP_USER = os.environ.get("ARC_SAP_USER") or os.environ.get("SAP_USER")
+SAP_PASSWORD = os.environ.get("ARC_SAP_PASSWORD") or os.environ.get("SAP_PASSWORD")
+if not SAP_URL or not SAP_USER or not SAP_PASSWORD:
+    raise SystemExit("Missing ARC_SAP_URL/ARC_SAP_USER/ARC_SAP_PASSWORD for ADT deploy.")
+
+CURL = ["curl", "-sS", "-u", f"{SAP_USER}:{SAP_PASSWORD}"]
+if (os.environ.get("SAP_ALLOW_UNAUTHORIZED", "").lower() == "true"
+        and os.environ.get("SAP_ENV", "").upper() not in {"PROD", "PRD", "PRODUCTION"}):
+    CURL.insert(1, "-k")
 
 def curl(method, path, data=None, content_type=None, cookie='', csrf='', etag=''):
     """Generic curl request. Returns (status_code, body)."""

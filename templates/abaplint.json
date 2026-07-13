@@ -1,0 +1,12 @@
+{
+  "global": {"files": "/*.abap"},
+  "syntax": {"version": "v757", "errorNamespace": "^(Z|Y|/.*)"},
+  "rules": {
+    "check_syntax": {"enabled": true},
+    "check_obsolete": {"enabled": true},
+    "clean_code": {"enabled": true},
+    "rfc_error_handling": {"enabled": true},
+    "sql_escape_host_variables": {"enabled": true},
+    "unused_variables": {"enabled": true}
+  }
+}

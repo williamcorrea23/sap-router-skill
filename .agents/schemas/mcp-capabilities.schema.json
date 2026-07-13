@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["version", "default_policy", "capabilities"],
+  "properties": {
+    "version": {"type": "string"},
+    "default_policy": {"const": "fail_closed"},
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["primary", "fallbacks", "mutation"],
+        "properties": {
+          "primary": {"type": "string"},
+          "fallbacks": {"type": "array", "items": {"type": "string"}},
+          "mutation": {"type": "boolean"},
+          "requires_approval": {"type": "boolean"},
+          "plan_then_commit": {"type": "boolean"}
+        }
+      }
+    },
+    "profiles": {"type": "object"}
+  }
+}

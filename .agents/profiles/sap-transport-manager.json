@@ -1,0 +1,8 @@
+{
+  "id": "sap-transport-manager",
+  "title": "SAP Transport Manager",
+  "karpathy_wrapper": "mandatory",
+  "default_output": "caveman",
+  "capabilities": {"allow": ["sap.transport.read", "sap.adt.source.read"], "gated": ["sap.transport.modify", "sap.adt.object.activate"], "deny": []},
+  "preferred_helpers": ["scripts/sap_router.py", "sap-transport-mcp"]
+}
