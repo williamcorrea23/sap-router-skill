@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-14T18:47:36",
+  "timestamp": "2026-07-15T18:53:21",
   "overall_status": "DEGRADED",
   "mcp_checks": {
     "arc-1": {
@@ -8,8 +8,9 @@
         "details": "All 4 vars set"
       },
       "binary": {
-        "status": "TIMEOUT",
-        "reason": "Probe timed out"
+        "status": "AVAILABLE",
+        "exit_code": 0,
+        "stderr": ""
       },
       "criticality": "HIGH",
       "description": "arc-1 (adt): read_source, write_source, syntax_check, activate"
@@ -1018,6 +1019,6 @@
       }
     }
   },
-  "high_mcp_ok": "7/12",
+  "high_mcp_ok": "8/12",
   "strict": false
 }
