@@ -589,9 +589,18 @@ class HealthChecker:
 
         soap_url = base_url.rstrip("/") + "/sap/bc/soap/rfc"
 
+        import ssl
+        ctx = None
+        ssl_verify = os.environ.get("ARC_SAP_SSL_VERIFY", "true").lower()
+        sap_allow = os.environ.get("SAP_ALLOW_UNAUTHORIZED", "false").lower()
+        if ssl_verify == "false" or sap_allow in ("true", "1"):
+            ctx = ssl.create_default_context()
+            ctx.check_hostname = False
+            ctx.verify_mode = ssl.CERT_NONE
+
         req = urllib.request.Request(soap_url, method="GET")
         try:
-            resp = urllib.request.urlopen(req, timeout=10)
+            resp = urllib.request.urlopen(req, timeout=10, context=ctx)
             # If we get any 2xx, endpoint exists but may not be SOAP-ready
             status = resp.getcode()
             self.log(f"  [OK] SOAP RFC endpoint responded with HTTP {status} (expected 415)")

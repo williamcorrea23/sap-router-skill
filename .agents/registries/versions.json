@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "release_target": "6.0.0",
-  "skill_count_target": 85,
+  "skill_count_target": 88,
   "profile_count_target": 38,
   "caveman_workers": 3,
   "official_mcp_versions": {

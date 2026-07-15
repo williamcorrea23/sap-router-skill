@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
   "source": ".agents",
-  "skill_count": 85,
-  "skill_count_target": 85,
+  "skill_count": 88,
+  "skill_count_target": 88,
   "profile_count": 38,
   "profile_count_target": 38,
   "registry_count": 6,
-  "skills_hash": "c2bd73eb188d8bec642ace53e95fa2b5a56f6f22ad93ee2d2a61a23fc25fe74b",
+  "skills_hash": "59fed9594bb89ac23502e0eacc2f581b8a70bddcd0d542299c6b1900a4ca89c3",
   "profiles_hash": "6f0e2c46679d2daebcfeda21f126dd8aea758e20dbe29f23b3669d4ed3293144",
-  "registries_hash": "937122819ede08cd47b75098957d5fc899f13d201ae4266e7b6562e92ba6f7f4"
+  "registries_hash": "595b36b2dd2804e04e45e30fe92fbd60bff0257e0130421f18e33226591d04e1"
 }

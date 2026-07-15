@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-13T01:23:37",
+  "timestamp": "2026-07-14T18:47:36",
   "overall_status": "DEGRADED",
   "mcp_checks": {
     "arc-1": {
@@ -763,9 +763,8 @@
         ]
       },
       "binary": {
-        "status": "AVAILABLE",
-        "exit_code": 0,
-        "stderr": ""
+        "status": "TIMEOUT",
+        "reason": "Probe timed out"
       },
       "criticality": "LOW",
       "description": "Local MCP bridge for Integration Suite Web UI using logged-in browser session."
@@ -778,9 +777,8 @@
         ]
       },
       "binary": {
-        "status": "AVAILABLE",
-        "exit_code": 0,
-        "stderr": ""
+        "status": "TIMEOUT",
+        "reason": "Probe timed out"
       },
       "criticality": "LOW",
       "description": "Local MCP bridge for API Management Web UI using logged-in browser session."
@@ -916,8 +914,9 @@
   "missing_optional": [],
   "recommendations": [],
   "soap_rfc_check": {
-    "status": "UNREACHABLE",
-    "error": "[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate (_ssl.c:1081)"
+    "status": "UNEXPECTED",
+    "http_status": 401,
+    "url": "https://10.57.203.136:44300/sap/bc/soap/rfc"
   },
   "readiness_v6": {
     "status": "PASS",
