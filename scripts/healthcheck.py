@@ -510,10 +510,30 @@ class HealthChecker:
             if resolved:
                 probe_args[0] = resolved
             result = subprocess.run(
-                probe_args, capture_output=True, text=True, timeout=10
+                probe_args, capture_output=True, text=True, stdin=subprocess.DEVNULL, timeout=10
             )
+            status = "AVAILABLE" if result.returncode == 0 else "ERROR"
+
+            # For Web UI MCPs, also probe CDP session port
+            if "ui-mcp" in name:
+                import urllib.request
+                import json
+                cdp_port = os.environ.get("CHROME_DEBUGGING_PORT", "9222")
+                cdp_url = os.environ.get("BROWSER_CDP_URL", f"http://127.0.0.1:{cdp_port}").rstrip("/")
+                endpoint = cdp_url + "/json/version"
+                try:
+                    with urllib.request.urlopen(endpoint, timeout=3) as cdp_response:
+                        payload = json.loads(cdp_response.read().decode("utf-8", errors="replace") or "{}")
+                    if status == "ERROR":
+                        status = "DEGRADED"
+                except Exception as e:
+                    return {
+                        "status": "DEGRADED",
+                        "reason": f"Chrome/CDP not reachable: {e}. Start Chrome with remote debugging on port 9222."
+                    }
+
             return {
-                "status": "AVAILABLE" if result.returncode == 0 else "ERROR",
+                "status": status,
                 "exit_code": result.returncode,
                 "stderr": result.stderr[:200] if result.stderr else "",
             }
@@ -523,7 +543,7 @@ class HealthChecker:
             if alt_probe:
                 try:
                     result = subprocess.run(
-                        alt_probe.split(), capture_output=True, text=True, timeout=10
+                        alt_probe.split(), capture_output=True, text=True, stdin=subprocess.DEVNULL, timeout=10
                     )
                     return {
                         "status": "AVAILABLE" if result.returncode == 0 else "ERROR",
@@ -593,6 +613,9 @@ class HealthChecker:
         ctx = None
         ssl_verify = os.environ.get("ARC_SAP_SSL_VERIFY", "true").lower()
         sap_allow = os.environ.get("SAP_ALLOW_UNAUTHORIZED", "false").lower()
+        if self.strict and (ssl_verify == "false" or sap_allow in ("true", "1")):
+            self.log("  [BLOCKED] Strict mode requires TLS verification! (Cannot disable verify via ARC_SAP_SSL_VERIFY or SAP_ALLOW_UNAUTHORIZED)")
+            return {"status": "BLOCKED", "reason": "TLS verification disabled in strict mode"}
         if ssl_verify == "false" or sap_allow in ("true", "1"):
             ctx = ssl.create_default_context()
             ctx.check_hostname = False
@@ -771,15 +794,24 @@ class HealthChecker:
         # 4. Overall assessment
         self.results["high_mcp_ok"] = f"{high_ok}/{high_total}"
         self.results["strict"] = self.strict
-        if not env_ok:
+        if not env_ok or (self.strict and soap_result.get("status") == "BLOCKED"):
             self.results["overall_status"] = "BLOCKED"
-            self.log(f"\n[BLOCKED] Critical env vars missing: {self.results['missing_critical']}")
-            self.results["recommendations"].append({
-                "priority": "CRITICAL",
-                "action": "Create .env file",
-                "detail": f"Missing: {', '.join(self.results['missing_critical'])}",
-                "fix": "cp .env.template .env && # edit .env with your credentials",
-            })
+            if not env_ok:
+                self.log(f"\n[BLOCKED] Critical env vars missing: {self.results['missing_critical']}")
+                self.results["recommendations"].append({
+                    "priority": "CRITICAL",
+                    "action": "Create .env file",
+                    "detail": f"Missing: {', '.join(self.results['missing_critical'])}",
+                    "fix": "cp .env.template .env && # edit .env with your credentials",
+                })
+            else:
+                self.log("\n[BLOCKED] Strict mode requires TLS verification! (Cannot disable verify via ARC_SAP_SSL_VERIFY or SAP_ALLOW_UNAUTHORIZED)")
+                self.results["recommendations"].append({
+                    "priority": "CRITICAL",
+                    "action": "Enable TLS verification",
+                    "detail": "Strict mode requires TLS verification to prevent compromised releases.",
+                    "fix": "Set ARC_SAP_SSL_VERIFY=true and SAP_ALLOW_UNAUTHORIZED=false in .env",
+                })
         elif high_ok < high_total:
             self.results["overall_status"] = "DEGRADED"
             self.log(f"\n[DEGRADED] {high_ok}/{high_total} high-criticality MCPs ready")

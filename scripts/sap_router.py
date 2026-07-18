@@ -403,6 +403,12 @@ class SapRouter:
                 continue
         return agents
 
+    def decide_model(self, complexity):
+        """v5.0: Multi-model routing. Load model_routing.yaml or fallback to sonnet."""
+        cfg = _load_yaml_config("model_routing.yaml", None) or {}
+        tiers = cfg.get("model_tiers", {})
+        return tiers.get(complexity, "sonnet")
+
     def _normalize_text(self, text):
         import unicodedata
         # Convert to string and normalize accents / strip characters
@@ -513,10 +519,21 @@ class SapRouter:
 
         # v5.0 Complexity model routing
         complexity = self._assess_complexity(action)
-        if complexity in ["VERY_COMPLEX", "COMPLEX"]:
-            route["model"] = "sonnet"
-        else:
-            route["model"] = "haiku"
+        route["model"] = self.decide_model(complexity)
+
+        # v5.0 RAG Context Integration (P3.3)
+        try:
+            rag_index_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".rag_index.json"))
+            if os.path.exists(rag_index_path):
+                from rag_ingest import PureRAG
+                rag = PureRAG()
+                rag.load_index(rag_index_path)
+                hits = rag.search(action, top_n=5)
+                filtered_hits = [h for h in hits if h["score"] > 0.8]
+                if filtered_hits:
+                    route["rag_context"] = [h["doc"] for h in filtered_hits]
+        except Exception as e:
+            logger.warning(f"RAG search failed: {e}")
 
         return route
 
@@ -1883,7 +1900,7 @@ def main():
                 print(f"Error loading RAG index: {e}", file=sys.stderr)
                 sys.exit(1)
             results = rag.search(args.query, top_n=args.top)
-            print(json.dumps(results, indent=2, ensure_ascii=False))
+            print(json.dumps(results, indent=2, ensure_ascii=True))
 
     elif args.command == 'gui-fallback':
         module_filter = args.module.upper() if args.module else None

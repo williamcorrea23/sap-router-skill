@@ -114,8 +114,8 @@ ADT_INSTALL_SEQUENCE = [
      "cmd": "aibap: create_object(type='TABL', name='ZROUTER_TMPL_PKG_T')",
      "desc": "ZROUTER_TMPL_PKG_T - Export package items table"},
     {"action": "deploy_class",
-     "cmd": "python scripts/abap_serializer.py package --source templates/ZROUTER_DISPATCH.abap --name ZCL_ZROUTER_DISPATCH --type CLAS --output deploy/",
-     "desc": "Serialize ZROUTER_DISPATCH.abap -> deploy/abapgit/ files"},
+     "cmd": "python scripts/abap_serializer.py package --source templates/zrouter_dispatch.prog.abap --name ZCL_ZROUTER_DISPATCH --type CLAS --output deploy/",
+     "desc": "Serialize zrouter_dispatch.prog.abap -> deploy/abapgit/ files"},
     {"action": "write_class",
      "cmd": "arc-1: SAPWrite(uri='/sap/bc/adt/oo/classes/zcl_zrouter_dispatch/source/main')",
      "desc": "Write ZCL_ZROUTER_DISPATCH source to SAP via ADT"},
@@ -318,7 +318,7 @@ def _install_offline(args):
         serializer = SKILL_DIR / "scripts" / "abap_serializer.py"
         result = subprocess.run([
             sys.executable, str(serializer), "package",
-            "--source", str(templates_dir / "ZROUTER_DISPATCH.abap"),
+            "--source", str(templates_dir / "zrouter_dispatch.prog.abap"),
             "--name", "ZCL_ZROUTER_DISPATCH", "--type", "CLAS",
             "--output", str(output_dir)
         ], capture_output=True, text=True)

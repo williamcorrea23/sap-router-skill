@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-15T18:53:21",
+  "timestamp": "2026-07-17T01:16:35",
   "overall_status": "DEGRADED",
   "mcp_checks": {
     "arc-1": {
@@ -764,8 +764,8 @@
         ]
       },
       "binary": {
-        "status": "TIMEOUT",
-        "reason": "Probe timed out"
+        "status": "DEGRADED",
+        "reason": "Chrome/CDP not reachable: <urlopen error [WinError 10061] Nenhuma conex\u00e3o p\u00f4de ser feita porque a m\u00e1quina de destino as recusou ativamente>. Start Chrome with remote debugging on port 9222."
       },
       "criticality": "LOW",
       "description": "Local MCP bridge for Integration Suite Web UI using logged-in browser session."
@@ -778,8 +778,8 @@
         ]
       },
       "binary": {
-        "status": "TIMEOUT",
-        "reason": "Probe timed out"
+        "status": "DEGRADED",
+        "reason": "Chrome/CDP not reachable: <urlopen error [WinError 10061] Nenhuma conex\u00e3o p\u00f4de ser feita porque a m\u00e1quina de destino as recusou ativamente>. Start Chrome with remote debugging on port 9222."
       },
       "criticality": "LOW",
       "description": "Local MCP bridge for API Management Web UI using logged-in browser session."

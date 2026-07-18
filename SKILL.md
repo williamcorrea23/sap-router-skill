@@ -333,7 +333,7 @@ aibap: create_object(type="DEVC", name="ZROUTER")
 
 # 2. Create DDIC + deploy ABAP classes
 aibap: create_object(type="TABL", name="ZROUTER_TMPL_HD")
-python scripts/abap_serializer.py package --source templates/ZROUTER_DISPATCH.abap \
+python scripts/abap_serializer.py package --source templates/zrouter_dispatch.prog.abap \
   --name ZCL_ZROUTER_DISPATCH --type CLAS --output deploy/
 
 # 3. Create Function Module

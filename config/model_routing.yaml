@@ -1,0 +1,6 @@
+# Complexity -> model tier configuration
+model_tiers:
+  SIMPLE:       haiku      # T-code lookup, table read, display
+  MODERATE:     sonnet     # BAPI single-call, config check, report
+  COMPLEX:      sonnet     # enhancement, BADI, interface
+  VERY_COMPLEX: sonnet     # sonnet instead of opus to prevent unexpected Anthropic costs in this environment

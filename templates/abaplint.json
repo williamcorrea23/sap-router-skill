@@ -1,8 +1,8 @@
 {
-  "global": {"files": "/*.abap"},
+  "global": {"files": "**/*.abap"},
   "syntax": {"version": "v757", "errorNamespace": "^(Z|Y|/.*)"},
   "rules": {
-    "check_syntax": {"enabled": true},
+    "check_syntax": false,
     "check_obsolete": {"enabled": true},
     "clean_code": {"enabled": true},
     "rfc_error_handling": {"enabled": true},

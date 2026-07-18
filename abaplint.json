@@ -1,6 +1,6 @@
 {
   "global": {
-    "files": "/templates/*.abap"
+    "files": "templates/**/*.abap"
   },
   "syntax": {
     "version": "v757",

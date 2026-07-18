@@ -23,7 +23,7 @@ import argparse
 from pathlib import Path
 
 SKILL_DIR = Path(__file__).resolve().parent.parent
-TEMPLATE = SKILL_DIR / "templates" / "ZROUTER_DISPATCH.abap"
+TEMPLATE = SKILL_DIR / "templates" / "zrouter_dispatch.prog.abap"
 DEPLOY_DIR = SKILL_DIR / "deploy" / "zrouter" / "split"
 DEPLOY_DIR.mkdir(parents=True, exist_ok=True)
 

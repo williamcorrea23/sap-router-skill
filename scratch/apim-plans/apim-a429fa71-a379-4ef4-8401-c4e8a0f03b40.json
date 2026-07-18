@@ -1,0 +1,20 @@
+{
+  "plan_id": "apim-a429fa71-a379-4ef4-8401-c4e8a0f03b40",
+  "action": "apim.deploy",
+  "mutation": true,
+  "requires_approval": true,
+  "arguments": {
+    "bundle": "C:\\Users\\William Correa\\AppData\\Local\\Temp\\cpi_deploy_smoke_rvk29xax\\smoke-iflow.zip",
+    "target": "smoke-proxy",
+    "path": "/apiportal/api/1.0/Management.svc/APIProxies('smoke-proxy')/$value",
+    "method": "PUT",
+    "strategy": "auto",
+    "content_type": "application/zip"
+  },
+  "preconditions": {
+    "bundle_exists": true,
+    "host_configured": true,
+    "user_configured": true,
+    "password_configured": true
+  }
+}

@@ -460,7 +460,7 @@ ENDCLASS.
 *& 3. BASIS Handler Extension — CODE_SEARCH Actions
 *&---------------------------------------------------------------------*
 * Paste the methods below into zcl_zrouter_handler_basis
-* (see ZROUTER_DISPATCH.abap lines 990-1080) and register
+* (see zrouter_dispatch.prog.abap lines 990-1080) and register
 * new CASE branches in handle_custom_action.
 *----------------------------------------------------------------------*
 
