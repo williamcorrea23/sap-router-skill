@@ -49,26 +49,15 @@ CLASS zcl_zrouter_handler_sd IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD create_order.
-    " Composite request: header, header-X and the item / partner tables come from
-    " the payload in one deserialize, so the order is created with its line items
-    " and partners instead of header-only (golden rule nested-table-deser).
-    TYPES: BEGIN OF ty_req,
-             order_header_in  TYPE bapisdhd1,
-             order_header_inx TYPE bapisdhd1x,
-             order_items_in   TYPE STANDARD TABLE OF bapisditm WITH DEFAULT KEY,
-             order_items_inx  TYPE STANDARD TABLE OF bapisditmx WITH DEFAULT KEY,
-             order_partners   TYPE STANDARD TABLE OF bapiparnr WITH DEFAULT KEY,
-           END OF ty_req.
-    DATA: ls_req       TYPE ty_req,
-          lv_sales_doc TYPE vbeln_va,
-          ls_ret       TYPE bapiret2,
-          lt_ret       TYPE TABLE OF bapiret2.
-    /ui2/cl_json=>deserialize( EXPORTING json = iv_payload CHANGING data = ls_req ).
+    DATA: ls_header_in  TYPE bapisdhd1, ls_header_inx TYPE bapisdhd1x,
+          lt_items      TYPE TABLE OF bapisditm, lt_partners TYPE TABLE OF bapiparnr,
+          lv_sales_doc  TYPE vbeln_va, ls_ret TYPE bapiret2, lt_ret TYPE TABLE OF bapiret2.
+    /ui2/cl_json=>deserialize( EXPORTING json = iv_payload CHANGING data = ls_header_in ).
+    CLEAR lt_ret.
     CALL FUNCTION 'BAPI_SALESORDER_CREATEFROMDAT2'
-      EXPORTING order_header_in = ls_req-order_header_in order_header_inx = ls_req-order_header_inx
+      EXPORTING order_header_in = ls_header_in order_header_inx = ls_header_inx
       IMPORTING salesdocument = lv_sales_doc return = ls_ret
-      TABLES   return = lt_ret order_items_in = ls_req-order_items_in
-               order_items_inx = ls_req-order_items_inx order_partners = ls_req-order_partners.
+      TABLES   return = lt_ret order_items_in = lt_items order_partners = lt_partners.
     IF ls_ret-type CA 'EA' OR line_exists( lt_ret[ type = 'E' ] )
                              OR line_exists( lt_ret[ type = 'A' ] ).
       CALL FUNCTION 'BAPI_TRANSACTION_ROLLBACK'.
@@ -87,11 +76,9 @@ CLASS zcl_zrouter_handler_sd IMPLEMENTATION.
       EXPORTING salesdocument = ls_header_in-salesdocument
                 order_header_in = ls_header_in order_header_inx = ls_header_inx
       TABLES   return = lt_ret.
-    " Full RETURN scan (any E/A row), not just the first line.
-    IF line_exists( lt_ret[ type = 'E' ] ) OR line_exists( lt_ret[ type = 'A' ] ).
+    READ TABLE lt_ret INTO ls_ret INDEX 1.
+    IF sy-subrc = 0 AND ls_ret-type CA 'EA'.
       CALL FUNCTION 'BAPI_TRANSACTION_ROLLBACK'.
-      READ TABLE lt_ret INTO ls_ret WITH KEY type = 'E'.
-      IF sy-subrc <> 0. READ TABLE lt_ret INTO ls_ret WITH KEY type = 'A'. ENDIF.
       rs_result = build_result( iv_status = 'ERROR' iv_message = |Sales order change failed: { ls_ret-message }| ).
     ELSE.
       CALL FUNCTION 'BAPI_TRANSACTION_COMMIT' EXPORTING wait = 'X'.

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0"
+          serializer="LCL_OBJECT_INTF">
+  <asx:abap xmlns:asx="http://www.sap.com/abapxml">
+    <asx:values>
+      <VSEOINTERF>
+        <CLSNAME>ZIF_ZROUTER_HANDLER</CLSNAME>
+        <LANGU>E</LANGU>
+        <DESCRIPT>ZIF_ZROUTER_HANDLER</DESCRIPT>
+        <STATE>1</STATE>
+        <UNICODE>X</UNICODE>
+      </VSEOINTERF>
+    </asx:values>
+  </asx:abap>
+</abapGit>

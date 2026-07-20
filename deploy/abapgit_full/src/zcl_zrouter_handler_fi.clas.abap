@@ -34,42 +34,33 @@ CLASS zcl_zrouter_handler_fi IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD post_document.
-    " Composite request: header plus the GL / payable / receivable line-item tables
-    " AND the currency-amount table. Without the line items and amounts the posting
-    " has nothing to balance and always fails (golden rule nested-table-deser).
-    TYPES: BEGIN OF ty_req,
-             documentheader    TYPE bapiache09,
-             accountgl         TYPE STANDARD TABLE OF bapiacgl09 WITH DEFAULT KEY,
-             accountpayable    TYPE STANDARD TABLE OF bapiacap09 WITH DEFAULT KEY,
-             accountreceivable TYPE STANDARD TABLE OF bapiacar09 WITH DEFAULT KEY,
-             currencyamount    TYPE STANDARD TABLE OF bapiaccr09 WITH DEFAULT KEY,
-           END OF ty_req.
-    DATA: ls_req      TYPE ty_req,
-          lt_ret      TYPE TABLE OF bapiret2,
-          lv_obj_type TYPE bapiache09-obj_type,
-          lv_obj_key  TYPE bapiache09-obj_key.
+    DATA: ls_doc_header TYPE bapiache09,
+          lt_gl         TYPE TABLE OF bapiacgl09,
+          lt_ap         TYPE TABLE OF bapiacap09,
+          lt_ar         TYPE TABLE OF bapiacar09,
+          lt_ret        TYPE TABLE OF bapiret2,
+          lv_obj_type   TYPE bapiache09-obj_type,
+          lv_obj_key    TYPE bapiache09-obj_key.
 
+    " Parse JSON payload into BAPI structures
     /ui2/cl_json=>deserialize(
       EXPORTING json = iv_payload
-      CHANGING  data = ls_req ).
+      CHANGING  data = ls_doc_header ).
 
     CALL FUNCTION 'BAPI_ACC_DOCUMENT_POST'
       EXPORTING
-        documentheader = ls_req-documentheader
+        documentheader = ls_doc_header
       IMPORTING
         obj_type       = lv_obj_type
         obj_key        = lv_obj_key
       TABLES
-        accountgl      = ls_req-accountgl
-        accountpayable = ls_req-accountpayable
-        accountreceivable = ls_req-accountreceivable
-        currencyamount = ls_req-currencyamount
+        accountgl      = lt_gl
+        accountpayable = lt_ap
+        accountreceivable = lt_ar
         return         = lt_ret.
-    " Full RETURN scan (any E/A row), not just the first line.
-    IF line_exists( lt_ret[ type = 'E' ] ) OR line_exists( lt_ret[ type = 'A' ] ).
+    READ TABLE lt_ret INTO DATA(ls_ret) INDEX 1.
+    IF sy-subrc = 0 AND ls_ret-type CA 'EA'.
       CALL FUNCTION 'BAPI_TRANSACTION_ROLLBACK'.
-      READ TABLE lt_ret INTO DATA(ls_ret) WITH KEY type = 'E'.
-      IF sy-subrc <> 0. READ TABLE lt_ret INTO ls_ret WITH KEY type = 'A'. ENDIF.
       rs_result = build_result( iv_status = 'ERROR' iv_message = |Accounting doc posting failed: { ls_ret-message }| ).
     ELSE.
       CALL FUNCTION 'BAPI_TRANSACTION_COMMIT' EXPORTING wait = 'X'.

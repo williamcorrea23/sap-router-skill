@@ -123,26 +123,18 @@ CLASS zcl_zrouter_handler_mm IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD create_po.
-    " Composite request: header, header-X and the item tables from the payload, so
-    " the PO is created with its line items instead of header-only.
-    TYPES: BEGIN OF ty_req,
-             poheader  TYPE bapimeoutheader,
-             poheaderx TYPE bapimeoutheaderx,
-             poitem    TYPE STANDARD TABLE OF bapimeoutitem WITH DEFAULT KEY,
-             poitemx   TYPE STANDARD TABLE OF bapimeoutitemx WITH DEFAULT KEY,
-           END OF ty_req.
-    DATA: ls_req TYPE ty_req,
-          lt_ret TYPE TABLE OF bapiret2,
-          lv_po  TYPE ebeln.
-    /ui2/cl_json=>deserialize( EXPORTING json = iv_payload CHANGING data = ls_req ).
+    DATA: ls_header TYPE bapimeoutheader,
+          lt_items  TYPE TABLE OF bapimeoutitem,
+          lt_ret    TYPE TABLE OF bapiret2,
+          lv_po     TYPE ebeln.
+    /ui2/cl_json=>deserialize( EXPORTING json = iv_payload CHANGING data = ls_header ).
     CALL FUNCTION 'BAPI_PO_CREATE1'
-      EXPORTING poheader = ls_req-poheader poheaderx = ls_req-poheaderx
+      EXPORTING poheader   = ls_header
       IMPORTING exppurchaseorder = lv_po
-      TABLES   return = lt_ret poitem = ls_req-poitem poitemx = ls_req-poitemx.
-    IF line_exists( lt_ret[ type = 'E' ] ) OR line_exists( lt_ret[ type = 'A' ] ).
+      TABLES   return      = lt_ret poitem = lt_items.
+    READ TABLE lt_ret INTO DATA(ls_ret) INDEX 1.
+    IF sy-subrc = 0 AND ls_ret-type CA 'EA'.
       CALL FUNCTION 'BAPI_TRANSACTION_ROLLBACK'.
-      READ TABLE lt_ret INTO DATA(ls_ret) WITH KEY type = 'E'.
-      IF sy-subrc <> 0. READ TABLE lt_ret INTO ls_ret WITH KEY type = 'A'. ENDIF.
       rs_result = build_result( iv_status = 'ERROR' iv_message = |PO creation failed: { ls_ret-message }| ).
     ELSE.
       CALL FUNCTION 'BAPI_TRANSACTION_COMMIT' EXPORTING wait = 'X'.
@@ -151,30 +143,20 @@ CLASS zcl_zrouter_handler_mm IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD change_po.
-    " Composite request: the PO number (previously never set, so the BAPI got an
-    " empty key and always failed), plus header, header-X and item tables.
-    TYPES: BEGIN OF ty_req,
-             purchaseorder TYPE ebeln,
-             poheader      TYPE bapimeoutheader,
-             poheaderx     TYPE bapimeoutheaderx,
-             poitem        TYPE STANDARD TABLE OF bapimeoutitem WITH DEFAULT KEY,
-             poitemx       TYPE STANDARD TABLE OF bapimeoutitemx WITH DEFAULT KEY,
-           END OF ty_req.
-    DATA: ls_req TYPE ty_req,
-          lt_ret TYPE TABLE OF bapiret2.
-    /ui2/cl_json=>deserialize( EXPORTING json = iv_payload CHANGING data = ls_req ).
+    DATA: ls_header TYPE bapimeoutheader,
+          lt_ret    TYPE TABLE OF bapiret2,
+          lv_po     TYPE ebeln.
+    /ui2/cl_json=>deserialize( EXPORTING json = iv_payload CHANGING data = ls_header ).
     CALL FUNCTION 'BAPI_PO_CHANGE'
-      EXPORTING purchaseorder = ls_req-purchaseorder
-                poheader = ls_req-poheader poheaderx = ls_req-poheaderx
-      TABLES   return = lt_ret poitem = ls_req-poitem poitemx = ls_req-poitemx.
-    IF line_exists( lt_ret[ type = 'E' ] ) OR line_exists( lt_ret[ type = 'A' ] ).
+      EXPORTING purchaseorder = lv_po poheader = ls_header
+      TABLES   return = lt_ret.
+    READ TABLE lt_ret INTO DATA(ls_ret) INDEX 1.
+    IF sy-subrc = 0 AND ls_ret-type CA 'EA'.
       CALL FUNCTION 'BAPI_TRANSACTION_ROLLBACK'.
-      READ TABLE lt_ret INTO DATA(ls_ret) WITH KEY type = 'E'.
-      IF sy-subrc <> 0. READ TABLE lt_ret INTO ls_ret WITH KEY type = 'A'. ENDIF.
       rs_result = build_result( iv_status = 'ERROR' iv_message = |PO change failed: { ls_ret-message }| ).
     ELSE.
       CALL FUNCTION 'BAPI_TRANSACTION_COMMIT' EXPORTING wait = 'X'.
-      rs_result = build_result( iv_status = 'SUCCESS' iv_message = 'Purchase order changed' iv_data = ls_req-purchaseorder ).
+      rs_result = build_result( iv_status = 'SUCCESS' iv_message = 'Purchase order changed' iv_data = lv_po ).
     ENDIF.
   ENDMETHOD.
 

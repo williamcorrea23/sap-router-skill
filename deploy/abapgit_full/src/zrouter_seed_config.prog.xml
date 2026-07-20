@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0"
+          serializer="LCL_OBJECT_PROG">
+  <asx:abap xmlns:asx="http://www.sap.com/abapxml">
+    <asx:values>
+      <PROGDIR>
+        <NAME>ZROUTER_SEED_CONFIG</NAME>
+        <SUBC>1</SUBC>
+        <DESCRIPT>ZROUTER_SEED_CONFIG</DESCRIPT>
+        <FIXPT>X</FIXPT>
+        <UCCHECK>X</UCCHECK>
+      </PROGDIR>
+    </asx:values>
+  </asx:abap>
+</abapGit>

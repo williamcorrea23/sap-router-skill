@@ -126,6 +126,8 @@ results.append(('YFG_SBDC', deploy_fugr('yfg_sbdc', str(DEPLOY_DIR / 'yfg_sbdc.f
 
 # 2. DDIC tables - try DDL files first, then .tabl.abap
 for table_name, ddl_file in [
+    ('zrouter_config', 'zrouter_config.tabl.ddl'),
+    ('zrouter_log', 'zrouter_log.tabl.ddl'),
     ('ysbdc_session', 'ysbdc_session.tabl.ddl'),
     ('ysbdc_result', 'ysbdc_result.tabl.ddl'),
     ('zrouter_template', 'zrouter_template.tabl.ddl'),

@@ -1,0 +1,64 @@
+{
+  "version": "1.0",
+  "package": "$ZMODEL",
+  "rename_token": "TMPL",
+  "templates": [
+    {
+      "id": "exception",
+      "title": "Static-check exception with free-text message",
+      "category": "core",
+      "path": "src/zcx_tmpl.clas.abap",
+      "objectType": "CLAS",
+      "value_slots": [],
+      "golden_rules": [],
+      "lint": "clean"
+    },
+    {
+      "id": "handler-contract",
+      "title": "Handler interface (action -> result)",
+      "category": "core",
+      "path": "src/zif_tmpl_handler.intf.abap",
+      "objectType": "INTF",
+      "requires_paths": ["src/zcx_tmpl.clas.abap"],
+      "value_slots": [],
+      "golden_rules": [],
+      "lint": "clean"
+    },
+    {
+      "id": "table-audit",
+      "title": "Transparent table (client + GUID key + audit fields)",
+      "category": "ddic",
+      "path": "src/ztmpl_table.tabl.ddl",
+      "objectType": "TABL",
+      "format": "ddl",
+      "value_slots": [
+        { "name": "LABEL", "required": true, "example": "My audit table" }
+      ],
+      "golden_rules": ["client-first-key", "guid-key"],
+      "lint": "n/a"
+    },
+    {
+      "id": "handler-concrete",
+      "title": "Concrete module handler with golden BAPI pattern",
+      "category": "handler",
+      "path": "src/zcl_tmpl_handler.clas.abap",
+      "objectType": "CLAS",
+      "requires_paths": [
+        "src/zcx_tmpl.clas.abap",
+        "src/zif_tmpl_handler.intf.abap"
+      ],
+      "value_slots": [
+        { "name": "MODULE",    "required": true,  "example": "MM" },
+        { "name": "ENTITY",    "required": true,  "example": "MATERIAL" },
+        { "name": "BAPI_NAME", "required": true,  "example": "BAPI_MATERIAL_SAVEDATA" }
+      ],
+      "golden_rules": [
+        "commit-after-bapi-return",
+        "bapiret2-full-scan",
+        "no-batch-double-commit",
+        "no-eval-expression"
+      ],
+      "lint": "clean"
+    }
+  ]
+}
