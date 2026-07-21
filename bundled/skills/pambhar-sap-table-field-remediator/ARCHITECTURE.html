@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SAP Table &amp; Field Remediator — Architecture</title>
+<style>
+:root{
+  --ink:#0f172a; --ink-soft:#334155; --muted:#64748b; --line:#e2e8f0;
+  --line-soft:#f1f5f9; --bg:#f8fafc; --bg-tint:#f1f5f9; --card:#ffffff;
+  --accent:#4f46e5; --accent-700:#4338ca; --accent-soft:#eef2ff;
+  --t1:#059669; --t1-bg:#d1fae5; --t2:#d97706; --t2-bg:#fef3c7;
+  --t3:#e11d48; --t3-bg:#ffe4e6;
+  --good:#047857; --good-bg:#d1fae5; --warn:#b91c1c; --warn-bg:#fee2e2;
+  --crv:#0369a1; --crv-bg:#e0f2fe;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --ink:#f1f5f9; --ink-soft:#cbd5e1; --muted:#94a3b8; --line:#334155;
+    --line-soft:#1e293b; --bg:#0b1120; --bg-tint:#111827; --card:#131c2e;
+    --accent:#818cf8; --accent-700:#a5b4fc; --accent-soft:#1e2540;
+    --t1:#34d399; --t1-bg:#064e3b; --t2:#fbbf24; --t2-bg:#4a2f06;
+    --t3:#fb7185; --t3-bg:#4c0f1c;
+    --good:#34d399; --good-bg:#064e3b; --warn:#f87171; --warn-bg:#450a0a;
+    --crv:#38bdf8; --crv-bg:#0c3350;
+  }
+}
+:root[data-theme="light"]{
+  --ink:#0f172a; --ink-soft:#334155; --muted:#64748b; --line:#e2e8f0;
+  --line-soft:#f1f5f9; --bg:#f8fafc; --bg-tint:#f1f5f9; --card:#ffffff;
+  --accent:#4f46e5; --accent-700:#4338ca; --accent-soft:#eef2ff;
+  --t1:#059669; --t1-bg:#d1fae5; --t2:#d97706; --t2-bg:#fef3c7;
+  --t3:#e11d48; --t3-bg:#ffe4e6; --good:#047857; --good-bg:#d1fae5;
+  --warn:#b91c1c; --warn-bg:#fee2e2; --crv:#0369a1; --crv-bg:#e0f2fe;
+}
+:root[data-theme="dark"]{
+  --ink:#f1f5f9; --ink-soft:#cbd5e1; --muted:#94a3b8; --line:#334155;
+  --line-soft:#1e293b; --bg:#0b1120; --bg-tint:#111827; --card:#131c2e;
+  --accent:#818cf8; --accent-700:#a5b4fc; --accent-soft:#1e2540;
+  --t1:#34d399; --t1-bg:#064e3b; --t2:#fbbf24; --t2-bg:#4a2f06;
+  --t3:#fb7185; --t3-bg:#4c0f1c; --good:#34d399; --good-bg:#064e3b;
+  --warn:#f87171; --warn-bg:#450a0a; --crv:#38bdf8; --crv-bg:#0c3350;
+}
+*{box-sizing:border-box;}
+body{margin:0;font-family:var(--sans);font-size:15px;line-height:1.65;
+  color:var(--ink-soft);background:var(--bg);}
+.wrap{width:min(1080px,92vw);margin:0 auto;padding:2.5rem 0 5rem;}
+h1{color:var(--ink);font-size:2.1rem;margin:0 0 .3rem;letter-spacing:-.02em;line-height:1.15;}
+h2{color:var(--ink);font-size:1.35rem;margin:2.8rem 0 .9rem;letter-spacing:-.01em;
+  padding-bottom:.4rem;border-bottom:2px solid var(--line);}
+h3{color:var(--ink);font-size:1.05rem;margin:1.6rem 0 .5rem;}
+p{margin:.7rem 0;}
+.sub{color:var(--muted);margin:0 0 1.2rem;font-size:1.05rem;}
+.lead{font-size:1.05rem;}
+code,.mono{font-family:var(--mono);font-size:.86em;background:var(--accent-soft);
+  color:var(--accent-700);padding:.12em .42em;border-radius:6px;}
+a{color:var(--accent-700);}
+.badges{display:flex;gap:.5rem;flex-wrap:wrap;margin:1rem 0 0;}
+.badge{display:inline-block;padding:.25em .7em;border-radius:999px;font-size:.78rem;
+  font-weight:600;background:var(--bg-tint);border:1px solid var(--line);color:var(--ink-soft);}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  padding:1.2rem 1.4rem;margin:1rem 0;box-shadow:0 1px 3px rgba(15,23,42,.05);}
+.callout{border-left:4px solid var(--accent);background:var(--accent-soft);
+  border-radius:10px;padding:.9rem 1.2rem;margin:1.2rem 0;}
+.callout.warn{border-left-color:var(--warn);background:var(--warn-bg);}
+.callout.good{border-left-color:var(--good);background:var(--good-bg);}
+.callout.crv{border-left-color:var(--crv);background:var(--crv-bg);}
+.callout p:first-child{margin-top:0;} .callout p:last-child{margin-bottom:0;}
+table{width:100%;border-collapse:collapse;background:var(--card);
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;
+  box-shadow:0 1px 3px rgba(15,23,42,.05);margin:1rem 0;font-size:.92rem;}
+.scroll{overflow-x:auto;}
+th,td{text-align:left;padding:.6rem .8rem;border-bottom:1px solid var(--line-soft);
+  vertical-align:top;}
+th{background:var(--bg-tint);color:var(--ink);font-weight:600;
+  font-size:.76rem;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;}
+tr:last-child td{border-bottom:none;}
+.pill{display:inline-block;padding:.12em .6em;border-radius:999px;
+  font-size:.76rem;font-weight:700;white-space:nowrap;}
+.p-t1{background:var(--t1-bg);color:var(--t1);}
+.p-t2{background:var(--t2-bg);color:var(--t2);}
+.p-t3{background:var(--t3-bg);color:var(--t3);}
+.p-crv{background:var(--crv-bg);color:var(--crv);}
+.p-new{background:var(--good-bg);color:var(--good);}
+.p-mod{background:var(--t2-bg);color:var(--t2);}
+/* CRV state = a different axis from our tiers → neutral slate, never the tier ramp */
+.p-state{background:var(--bg-tint);color:var(--muted);border:1px solid var(--line);}
+/* pipeline diagram */
+.flow{display:flex;align-items:stretch;gap:.5rem;flex-wrap:wrap;margin:1.2rem 0;}
+.node{flex:1 1 130px;min-width:120px;background:var(--card);border:1px solid var(--line);
+  border-radius:12px;padding:.8rem .7rem;text-align:center;box-shadow:0 1px 2px rgba(15,23,42,.05);}
+.node .t{font-weight:700;color:var(--ink);font-size:.9rem;}
+.node .d{color:var(--muted);font-size:.75rem;margin-top:.2rem;}
+.node.hl{border-color:var(--crv);box-shadow:0 0 0 3px var(--crv-bg);}
+.arrow{align-self:center;color:var(--muted);font-weight:700;font-size:1.2rem;}
+.legend{display:flex;gap:1rem;flex-wrap:wrap;font-size:.82rem;color:var(--muted);margin:.4rem 0;}
+.dot{display:inline-block;width:.7em;height:.7em;border-radius:50%;margin-right:.35em;vertical-align:baseline;}
+pre{background:var(--bg-tint);border:1px solid var(--line);border-radius:10px;
+  padding:.9rem 1.1rem;overflow-x:auto;font-family:var(--mono);font-size:.82rem;
+  color:var(--ink-soft);line-height:1.5;}
+pre .c{color:var(--muted);}
+pre .k{color:var(--accent-700);font-weight:600;}
+ul,ol{margin:.6rem 0;padding-left:1.3rem;} li{margin:.35rem 0;}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+@media (max-width:720px){.two{grid-template-columns:1fr;}}
+.branch{border:1px solid var(--line);border-radius:12px;padding:1rem 1.2rem;background:var(--card);}
+.branch h3{margin-top:0;}
+.tag{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
+  padding:.15em .55em;border-radius:6px;}
+.tag.a{background:var(--accent-soft);color:var(--accent-700);}
+.tag.b{background:var(--crv-bg);color:var(--crv);}
+footer{margin-top:3rem;padding-top:1.2rem;border-top:1px solid var(--line);
+  color:var(--muted);font-size:.82rem;}
+hr{border:none;border-top:1px solid var(--line);margin:2rem 0;}
+.small{font-size:.85rem;color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>SAP Table &amp; Field Remediator</h1>
+  <p class="sub">Architecture &amp; the Cloudification Repository integration</p>
+  <div class="badges">
+    <span class="badge">Claude Code plugin</span>
+    <span class="badge">ECC → S/4HANA brownfield</span>
+    <span class="badge">Deterministic + LLM residue</span>
+    <span class="badge">branch: dogukan_cloudificationrepo</span>
+  </div>
+
+  <p class="lead">This tool scans a company's custom <strong>ABAP</strong> code and flags every
+  database access that will break when they upgrade from the old SAP <strong>ECC</strong> system
+  to <strong>S/4HANA</strong>. It rates each issue by how much human judgment the fix needs,
+  and writes a machine-readable report. Detection is deterministic; the LLM only touches the
+  hard residue; a human signs off.</p>
+
+  <div class="callout">
+    <p><strong>Moving-house analogy.</strong> You have a notebook of instructions like
+    <em>"spare keys are in the blue room's top drawer."</em> You move house — some rooms are
+    renamed, some furniture is thrown out. This tool reads your notebook and highlights every
+    instruction that won't work in the new house, <em>before</em> you move.</p>
+  </div>
+
+  <h2>1. Vocabulary (3 words)</h2>
+  <div class="scroll"><table>
+    <tr><th>Term</th><th>Plain meaning</th><th>Example</th></tr>
+    <tr><td><strong>Table</strong></td><td>a big spreadsheet inside SAP</td><td><code>BSEG</code> = accounting line items</td></tr>
+    <tr><td><strong>Field</strong></td><td>a column in that spreadsheet</td><td><code>HKONT</code> = account number</td></tr>
+    <tr><td><strong>Successor / CDS view</strong></td><td>the <em>new place</em> to read the same data after the upgrade</td><td><code>BKPF</code> → <code>I_JournalEntry</code></td></tr>
+  </table></div>
+  <p class="small">A <strong>CDS view</strong> is SAP's modern "ready-made counter" layer on top of raw
+  tables — a pre-built query that joins tables, fixes field names, and is a stable contract. S/4HANA
+  wants new code to read the CDS view, not the raw table.</p>
+
+  <h2>2. The three "Simplification" sources (don't confuse them)</h2>
+  <div class="scroll"><table>
+    <tr><th>Name</th><th>What it is</th><th>File / location</th><th>Consulted when</th></tr>
+    <tr>
+      <td><strong>Remediation Catalog</strong></td>
+      <td>OUR hand-curated list (~37 rows). The authority on <em>"does it break? how hard?"</em></td>
+      <td><code>references/simplification-list.yaml</code></td>
+      <td><strong>Every run</strong> (deterministic core)</td>
+    </tr>
+    <tr>
+      <td><strong>Simplification KB</strong></td>
+      <td>SAP's official Simplification List document, chunked + page-cited, served over MCP</td>
+      <td><code>mcp/</code> (server + chunks)</td>
+      <td>Only the <strong>LLM escalation</strong> step (optional)</td>
+    </tr>
+    <tr>
+      <td><strong>CRV successors</strong> <span class="pill p-new">new</span></td>
+      <td>SAP's official object → released-successor map (from the Cloudification Repository)</td>
+      <td><code>references/crv-successors.json</code></td>
+      <td><strong>Every run</strong>, for the <em>target</em> only (optional)</td>
+    </tr>
+  </table></div>
+
+  <h2>3. The pipeline</h2>
+  <p>The existing chain is <strong>detect → classify → guard → emit</strong>. The Cloudification
+  Repository plugs into the <strong>classify</strong> step only.</p>
+
+  <div class="flow">
+    <div class="node"><div class="t">detect.js</div><div class="d">abaplint AST → DB accesses + field faults</div></div>
+    <div class="arrow">→</div>
+    <div class="node hl"><div class="t">classify.py</div><div class="d">catalog → world/tier/action<br><b>+ CRV target enrichment</b></div></div>
+    <div class="arrow">→</div>
+    <div class="node"><div class="t">guard.py</div><div class="d">downgrade unsafe auto-applies (0-guarantee)</div></div>
+    <div class="arrow">→</div>
+    <div class="node"><div class="t">analyze.py</div><div class="d">validate + write <code>remediation-report.json</code></div></div>
+  </div>
+  <div class="legend"><span><span class="dot" style="background:var(--crv)"></span>highlighted = where CRV was integrated</span></div>
+
+  <div class="callout good">
+    <p><strong>Decision vs. target — the key split.</strong> The <em>decision</em> ("does it break?
+    how hard?") always comes from the <strong>Catalog</strong>. CRV never touches world/tier — it
+    only helps with the <em>target</em> ("what do I use instead?").</p>
+  </div>
+
+  <h2>4. How the Cloudification Repository was added</h2>
+  <p>Four parts: <strong>source → builder → data → loader</strong>, then two wiring points in
+  <code>classify.py</code>.</p>
+
+  <h3>Build time (run rarely, by hand)</h3>
+  <pre><span class="c"># 1. download SAP's full open dataset (Apache-2.0, 44,541 objects)</span>
+curl -sSLo objectReleaseInfo_PCELatest.json \
+  https://raw.githubusercontent.com/SAP/abap-atc-cr-cv-s4hc/main/src/objectReleaseInfo_PCELatest.json
+
+<span class="c"># 2. distil it into a small target dictionary (262 tables with a successor)</span>
+python3 mcp/build/<span class="k">crv_ingest.py</span> --crv objectReleaseInfo_PCELatest.json \
+  --out skills/.../references/<span class="k">crv-successors.json</span> --types TABL</pre>
+
+  <p>The builder does three things: <strong>filter</strong> (keep only <code>TABL</code> that are
+  <code>notToBeReleased</code> and have a successor), <strong>pick the best successor</strong>
+  (preference order <code>CDS_STOB &gt; TABL &gt; FUNC &gt; CLAS &gt; INTF</code>), and
+  <strong>write</strong> the JSON. Result: 44,541 → 2,832 tables → <strong>262</strong> with targets.</p>
+
+  <h3>Run time (every analysis)</h3>
+  <pre><span class="c"># crv.py loads the dictionary; returns {} if the file is absent (→ catalog-only)</span>
+CRV = crv_mod.load()
+
+<span class="c"># finding(): the catalog target WINS; CRV fills a gap / confirms / flags a divergence</span>
+replacement = preferred_replacement(entry, tier)   <span class="c"># catalog first</span>
+crv_hit = CRV.get(obj)
+<span class="k">if</span> crv_hit:
+    <span class="k">if</span> replacement <span class="k">is</span> None:      replacement = crv_hit["preferred"]   <span class="c"># fill</span>
+    <span class="k">elif</span> crv_tgt != replacement:  note = "CRV lists X; confirm"         <span class="c"># flag</span>
+    <span class="k">else</span>:                       note = "confirmed by CRV"            <span class="c"># confirm</span></pre>
+
+  <div class="scroll"><table>
+    <tr><th>File</th><th>Role</th><th>Layer</th><th>Status</th></tr>
+    <tr><td><code>mcp/build/crv_ingest.py</code></td><td>builder: SAP JSON → dictionary</td><td>build-time</td><td><span class="pill p-new">new</span></td></tr>
+    <tr><td><code>references/crv-successors.json</code></td><td>the data (262 tables)</td><td>data</td><td><span class="pill p-new">new</span></td></tr>
+    <tr><td><code>scripts/crv.py</code></td><td>loader (optional)</td><td>run-time</td><td><span class="pill p-new">new</span></td></tr>
+    <tr><td><code>scripts/classify.py</code></td><td>uses CRV: fill/verify target + hint unknowns</td><td>run-time</td><td><span class="pill p-mod">changed</span></td></tr>
+    <tr><td><code>SKILL.md</code>, <code>mcp/build/README.md</code></td><td>documentation</td><td>docs</td><td><span class="pill p-mod">changed</span></td></tr>
+  </table></div>
+  <p class="small">Note: <code>detect.js</code> was also changed, but that is a <em>separate</em> demo
+  bug fix (accept any <code>.abap</code> filename), not part of the CRV integration.</p>
+
+  <h2>5. The logic — two flows</h2>
+  <p>Everything hinges on one question: <strong>is the table in the Catalog?</strong> CRV behaves
+  differently in each branch — but in <em>both</em> it only ever concerns the target, never the
+  decision.</p>
+
+  <div class="two">
+    <div class="branch">
+      <h3><span class="tag a">Flow A</span> Table IS in the catalog</h3>
+      <p>A finding is produced. Decision &amp; tier come from the catalog. CRV is
+      <strong>always</strong> consulted here (not "only on a miss") — to check the target:</p>
+      <ul>
+        <li><strong>CRV empty</strong> → leave the catalog target as-is</li>
+        <li><strong>CRV = catalog</strong> → note <em>"confirmed by CRV"</em></li>
+        <li><strong>CRV ≠ catalog</strong> → note <em>"CRV lists X; confirm"</em> (keep catalog, flag both)</li>
+        <li><strong>catalog empty, CRV set</strong> → fill from CRV</li>
+      </ul>
+      <p class="small"><b>Example — BSEG.</b> Catalog says <code>I_JournalEntryItem</code>; CRV says
+      <code>I_OperationalAcctgDocItem</code> → different → the report keeps ours and adds
+      <em>"CRV lists I_OperationalAcctgDocItem; confirm."</em></p>
+    </div>
+    <div class="branch">
+      <h3><span class="tag b">Flow B</span> Table is NOT in the catalog</h3>
+      <p>No finding — it goes to the <strong>review-queue</strong> (unknown ≠ safe). This is the
+      "after a catalog miss" case. CRV attaches a suggested target so a reviewer doesn't start
+      from a blank.</p>
+      <pre>{
+  "object": "MARD",
+  "reason": "not_in_catalog",
+  <span class="k">"crv_successor"</span>: "I_ProductStorageLocationBasic",
+  "crv_successor_type": "CDS_STOB",
+  "crv_state": "notToBeReleased"
+}</pre>
+      <p class="small">The verified item stays in the queue until a human says fix / skip. It never
+      auto-enters the scored report.</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <p><strong>In one line.</strong> <span class="tag a">A</span> in catalog → CRV
+    <em>verifies / completes</em> the target. <span class="tag b">B</span> not in catalog → CRV
+    <em>suggests</em> a target. In both, the <strong>decision (does it break / tier) is always the
+    Catalog</strong> — CRV never overrides it. And what CRV verifies is the
+    <strong>successor (what to use instead)</strong>, not the table name itself.</p>
+  </div>
+
+  <h2>6. Why CRV is a target dictionary, not a break-list</h2>
+
+  <h3>What the CRV <code>state</code> values mean</h3>
+  <p>These are <strong>clean-core / ABAP Cloud API-governance</strong> labels — <em>"are you
+  allowed to use this object in released ABAP Cloud code?"</em> — <strong>not</strong> <em>"does it
+  still physically exist / work after a brownfield conversion?"</em></p>
+  <div class="scroll"><table>
+    <tr><th>State</th><th>Meaning</th></tr>
+    <tr><td><span class="pill p-state">released</span></td>
+      <td>SAP published this as an official, stable <strong>public API</strong> — usable in ABAP
+      Cloud / clean-core code. Usually a CDS view (e.g. <code>I_JournalEntry</code>).</td></tr>
+    <tr><td><span class="pill p-state">notToBeReleased</span></td>
+      <td>SAP will <strong>not</strong> release it as an API — use its <code>successor</code> in clean
+      core. <strong>Not the same as "removed":</strong> most raw tables (<code>BKPF</code>,
+      <code>MARA</code>) still exist and a classic <code>SELECT</code> still works after a brownfield
+      conversion; SAP just steers new code to the successor.</td></tr>
+    <tr><td><span class="pill p-state">notToBeReleasedStable</span></td>
+      <td>Same as <code>notToBeReleased</code>, but not expected to change soon (stable).</td></tr>
+    <tr><td><span class="pill p-state">deprecated</span></td>
+      <td>On its way out of use.</td></tr>
+  </table></div>
+  <div class="callout">
+    <p><strong>Analogy.</strong> <code>released</code> = "on the shelf, warranted — use it."
+    <code>notToBeReleased</code> = "we no longer sell this; buy the newer model" — the old one may
+    still work at home, but the store won't recommend it for new work.</p>
+  </div>
+
+  <h3>Two different questions</h3>
+  <p>CRV's <code>state</code> answers a <em>different question</em> than ours. Importing it as a
+  break-list would wreck precision.</p>
+  <div class="scroll"><table>
+    <tr><th>Source</th><th>Question it answers</th></tr>
+    <tr><td>Our Catalog</td><td>Does this table <strong>break</strong> in an ECC → S/4HANA brownfield conversion?</td></tr>
+    <tr><td>CRV <code>state</code></td><td>Is this a <strong>released, clean-core API</strong> for ABAP Cloud?</td></tr>
+  </table></div>
+  <div class="scroll"><table>
+    <tr><th>Table</th><th>CRV state</th><th>Reads fine in brownfield?</th><th>Our catalog</th></tr>
+    <tr><td><code>MARA</code>, <code>VBAK</code>, <code>BKPF</code>, <code>T001</code></td><td>notToBeReleased</td><td class="mono" style="color:var(--good)">yes — works</td><td>VALID (suppress)</td></tr>
+    <tr><td><code>BSEG</code></td><td>notToBeReleased → I_OperationalAcctgDocItem</td><td class="mono" style="color:var(--t2)">runs, but data moved</td><td>must-fix (restructured)</td></tr>
+    <tr><td><code>VBUK</code>, <code>RFBLG</code>, LIS</td><td class="mono" style="color:var(--warn)">absent from CRV</td><td class="mono" style="color:var(--warn)">no — empty/removed</td><td>must-fix (abolished)</td></tr>
+  </table></div>
+  <div class="callout warn">
+    <p><strong>Proof it can't be the break-list.</strong> <code>MARA</code>, <code>VBAK</code> and
+    <code>BKPF</code> are all <code>notToBeReleased</code> yet still read fine — trusting CRV as a
+    break-list would raise false alarms. Note <code>BKPF</code> (document header) and <code>BSEG</code>
+    (line items) share the <em>same</em> CRV state, but our catalog rates BKPF <strong>VALID</strong>
+    and BSEG <strong>must-fix</strong> — CRV can't tell them apart; only the catalog can. And the
+    tables that <em>truly</em> break (<code>VBUK</code>) are <strong>absent</strong> from CRV, because
+    a deleted table can't be a "non-released API."</p>
+  </div>
+  <div class="callout good">
+    <p><strong>Verified safe.</strong> After the integration, <code>MARA</code> is still correctly
+    suppressed, and findings/tiers are identical to the pre-CRV run. CRV is purely additive — remove
+    the dictionary and behaviour is unchanged.</p>
+  </div>
+
+  <h2>7. Design boundaries (locked in)</h2>
+  <ol>
+    <li><strong>Classify only.</strong> detect / guard / analyze / the report schema are untouched. Minimal surface.</li>
+    <li><strong>Optional.</strong> No dictionary → <code>{}</code> → catalog-only behaviour. Zero breakage risk.</li>
+    <li><strong>Catalog wins.</strong> CRV never sets world/tier — only <code>replacement</code> and review-queue hints.</li>
+    <li><strong>Layered by construction.</strong> data (json) / builder (ingest) / loader (crv.py) are separate; refreshing SAP data is just re-running the builder.</li>
+  </ol>
+
+  <h2>8. What it does NOT do (yet)</h2>
+  <ul>
+    <li><strong>No ready-to-paste ABAP.</strong> Findings carry a target <em>name</em> + guidance +
+    an intent question — not a rewritten <code>SELECT</code>. The <code>patch</code> field is always
+    <code>null</code>; apply-mode is roadmap.</li>
+    <li><strong>Tables only.</strong> The dictionary currently keeps <code>TABL</code> (262). Views /
+    data elements could be added via <code>--types</code>.</li>
+    <li><strong>No field-level in CRV.</strong> Renames like <code>HKONT → RACCT</code> and the
+    difficulty tier stay in the hand catalog — CRV has neither.</li>
+  </ul>
+
+  <footer>
+    SAP Table &amp; Field Remediator — architecture &amp; Cloudification Repository integration.
+    Data source: <code>SAP/abap-atc-cr-cv-s4hc</code> (Apache-2.0). Built entirely from public SAP
+    material + synthetic sample data. Branch <code>dogukan_cloudificationrepo</code>.
+  </footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,74 @@
+_schema-version: "3.3.0"
+ID: btp-sap-odata-to-mcp-server
+description: "SAP OData to MCP Server Multi-target application"
+version: 1.0.0
+
+parameters:
+  enable-parallel-deployments: true
+
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - npm i
+
+modules:
+  - name: sap-mcp-server
+    type: nodejs
+    path: ./
+    parameters:
+      app-name: sap-mcp-server-${space}
+      memory: 512M
+      disk-quota: 1G
+      buildpack: nodejs_buildpack
+      command: npm run start
+      keep-existing-routes: true
+      health-check-type: http
+      health-check-http-endpoint: /health
+      timeout: 180
+    properties:
+      LOG_LEVEL: debug
+      SAP_DISCOVERY_DESTINATION_NAME: SAP_SYSTEM_TECH_SBX
+      SAP_EXECUTION_DESTINATION_NAME: SAP_SYSTEM_SSO_SBX
+      
+    build-parameters:
+      builder: custom
+      commands:
+        - npm run build
+      ignore:
+        - node_modules/
+        - .git/
+        - tests/
+    requires:
+      - name: sap-mcp-destination
+      - name: sap-mcp-connectivity
+      - name: sap-mcp-xsuaa
+
+resources:
+  # Destination Service
+  - name: sap-mcp-destination
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: destination
+      service-name: sap-mcp-destination-${space}
+      service-plan: lite
+
+  # Connectivity Service
+  - name: sap-mcp-connectivity
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service-name: sap-mcp-connectivity-${space}
+      service: connectivity
+      service-plan: lite
+
+  # XSUAA Service
+  - name: sap-mcp-xsuaa
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service-name: sap-mcp-xsuaa-${space}
+      service: xsuaa
+      service-plan: application
+      path: ./xs-security.json
+      config:
+        xsappname: btp-sap-odata-to-mcp-server-${space}
+        tenant-mode: dedicated

@@ -29,8 +29,8 @@ CLASS zcl_zrouter_handler_abstract DEFINITION PUBLIC ABSTRACT CREATE PUBLIC.
       RAISING
         zcx_zrouter.
 
-    " SECURITY: the former evaluate_expression (GENERATE SUBROUTINE POOL over
-    " request-derived text) was removed. Dynamic execution of caller input is a
+    " SECURITY: the former runtime evaluator over request-derived text was
+    " removed. Dynamic execution of caller input is a
     " code-injection risk a blocklist cannot close. Config-driven transforms must
     " use explicit ABAP mapping, never runtime code generation.
 ENDCLASS.

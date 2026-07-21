@@ -29,17 +29,10 @@ CLASS zcl_zrouter_handler_abstract DEFINITION PUBLIC ABSTRACT CREATE PUBLIC.
       RAISING
         zcx_zrouter.
 
-    " evaluate_expression — GENERATE SUBROUTINE POOL dynamic eval
-    " Wraps iv_expression in FORM/ENDFORM, compiles as subroutine pool,
-    " PERFORMs it passing optional CHANGING parameter.
-    " Use for dynamic field mapping / config-driven transformations.
-    METHODS evaluate_expression
-      IMPORTING
-        iv_expression   TYPE string
-      CHANGING
-        cv_result       TYPE string
-      RAISING
-        zcx_zrouter.
+    " SECURITY: the former runtime evaluator over request-derived text was
+    " removed. Dynamic execution of caller input is a
+    " code-injection risk a blocklist cannot close. Config-driven transforms must
+    " use explicit ABAP mapping, never runtime code generation.
 ENDCLASS.
 
 
@@ -82,53 +75,5 @@ CLASS zcl_zrouter_handler_abstract IMPLEMENTATION.
       iv_action  = lv_action_upper
       iv_status  = rs_result-status
       iv_message = rs_result-message ).
-  ENDMETHOD.
-
-  METHOD evaluate_expression.
-    " Wrap expression in a FORM that sets cv_result
-    DATA: lt_source TYPE TABLE OF string,
-          lv_pool   TYPE string.
-
-    APPEND |PROGRAM.| TO lt_source.
-    APPEND |FORM eval CHANGING cv_result TYPE string.| TO lt_source.
-    SPLIT iv_expression AT cl_abap_char_utilities=>newline INTO TABLE DATA(lt_lines).
-
-    " Security blocklist — prevent dangerous ABAP in dynamic expressions
-    DATA(lt_dangerous) = VALUE string_table(
-      ( |DELETE | )   ( |INSERT | )   ( |MODIFY | )        ( |UPDATE | )
-      ( |CALL TRANSACTION| )  ( |SUBMIT | )
-      ( |COMMIT WORK| )       ( |ROLLBACK WORK| )
-      ( |OPEN DATASET| )      ( |DELETE DATASET| )
-      ( |GENERATE SUBROUTINE| )( |INSERT REPORT| )
-      ( |SYSTEM-CALL| )       ( |BREAK-POINT| )
-      ( |EDITOR-CALL| )
-    ).
-    LOOP AT lt_lines INTO DATA(lv_line).
-      LOOP AT lt_dangerous INTO DATA(lv_dangerous).
-        IF to_upper( lv_line ) CS lv_dangerous.
-          RAISE EXCEPTION TYPE zcx_zrouter
-            EXPORTING mv_text = |Forbidden statement in expression: "{ lv_dangerous }"|.
-        ENDIF.
-      ENDLOOP.
-    ENDLOOP.
-
-    APPEND LINES OF lt_lines TO lt_source.
-    APPEND |ENDFORM.| TO lt_source.
-
-    GENERATE SUBROUTINE POOL lt_source
-      NAME lv_pool
-      MESSAGE DATA(lv_msg) LINE DATA(lv_line) WORD DATA(lv_word).
-
-    IF sy-subrc <> 0 OR lv_pool IS INITIAL.
-      RAISE EXCEPTION TYPE zcx_zrouter
-        EXPORTING mv_text = |Expression syntax error line { lv_line - 2 }: { lv_msg }{ COND #( WHEN lv_word IS NOT INITIAL THEN | near "{ lv_word }"| ) }|.
-    ENDIF.
-
-    " Define a FORM name inside pool — always 'eval'
-    PERFORM ('EVAL') IN PROGRAM (lv_pool) IF FOUND
-      CHANGING cv_result.
-
-    " Pool released when internal session ends — no explicit cleanup needed
-    FREE lt_source.
   ENDMETHOD.
 ENDCLASS.

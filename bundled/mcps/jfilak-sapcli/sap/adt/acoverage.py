@@ -1,0 +1,188 @@
+"""ABAP Unit Test Coverage framework ADT wrappers"""
+import xml
+from typing import NamedTuple, List
+from xml.sax.handler import ContentHandler
+
+from sap import get_logger
+from sap.adt.annotations import XmlNodeProperty, XmlElementProperty, OrderedClassMembers
+from sap.adt.marshalling import Marshal
+from sap.adt.objects import XMLNamespace, ADTObjectType
+
+XMLNS_COV = XMLNamespace('cov', 'http://www.sap.com/adt/cov')
+
+
+def mod_log():
+    """ADT Module logger"""
+
+    return get_logger()
+
+
+# pylint: disable=too-few-public-methods
+class Query(metaclass=OrderedClassMembers):
+    """ABAP Coverage Query
+    """
+
+    objtype = ADTObjectType(None,
+                            'runtime/traces/coverage/measurements/{identifier}',
+                            XMLNS_COV,
+                            'application/xml',
+                            None,
+                            'query')
+
+    objects = XmlNodeProperty(XmlElementProperty.NAME_FROM_OBJECT)
+
+    def __init__(self, identifier, objects):
+        self.objtype.basepath = self.objtype.basepath.format(identifier=identifier)
+        self.objects = objects
+
+
+# pylint: disable=too-few-public-methods
+class ACoverage:
+    """ABAP Coverage
+    """
+
+    def __init__(self, connection):
+        self._connection = connection
+
+    def execute(self, identifier, adt_object_sets, additional_type_info=False):
+        """Executes ABAP Coverage on the given ADT object set"""
+
+        query = Query(identifier, adt_object_sets)
+        coverage_config = Marshal().serialize(query)
+
+        params = None
+        if additional_type_info:
+            params = {'withAdditionalTypeInfo': 'true'}
+
+        return self._connection.execute(
+            'POST',
+            query.objtype.basepath,
+            params=params,
+            content_type=query.objtype.mimetype,
+            body=coverage_config
+        )
+
+    def parse_response(self, acoverage_response):
+        """Parse the response and follow rel=next links in coverage response and merge child nodes"""
+
+        parsed_acoverage_response = parse_acoverage_response(acoverage_response.text)
+
+        for uri in parsed_acoverage_response.next_uris:
+            child_response = self._fetch_measurements(uri)
+            child_parsed = parse_acoverage_response(child_response.text)
+            parent_node = parsed_acoverage_response.next_uri_to_node[uri]
+            parent_node.nodes.extend(child_parsed.root_node.nodes)
+            parsed_acoverage_response.statement_uris.extend(child_parsed.statement_uris)
+
+        return parsed_acoverage_response
+
+    def _fetch_measurements(self, uri):
+        """Fetches measurements"""
+
+        return self._connection.execute(
+            'GET',
+            uri,
+            accept=[
+                'application/vnd.sap.adt.coverage.measurements.v1+xml',
+                'application/xml'
+            ],
+        )
+
+
+# pylint: disable=too-few-public-methods
+class Node(NamedTuple):
+    """ABAP Unit Tests Framework Coverage ADT results Node node"""
+
+    name: str
+    type: str
+    uri: str
+    nodes: List
+    coverages: List
+    parent_node: object
+
+
+# pylint: disable=too-few-public-methods
+class CoverageNode(NamedTuple):
+    """ABAP Unit Tests Framework Coverage ADT results Coverage node"""
+
+    type: str
+    total: int
+    executed: int
+
+
+# pylint: disable=too-many-instance-attributes
+class CoverageResponseHandler(ContentHandler):
+    """ABAP Unit Test Framework Coverage ADT results XML parser"""
+
+    def __init__(self):
+        super().__init__()
+
+        self.root_node = None
+        self.statement_uris = []
+        self.next_uris = []
+        self.next_uri_to_node = {}
+        self._node = None
+        self._parent_node = None
+        self._save_uris = False
+
+    def startElement(self, name, attrs):
+        mod_log().debug('XML: %s', name)
+        if name == 'cov:result':
+            self.root_node = Node(
+                name=attrs.get('name'),
+                type=None,
+                uri=None,
+                nodes=[],
+                coverages=[],
+                parent_node=self._parent_node
+            )
+            self._node = self.root_node
+        elif name == 'nodes':
+            self._save_uris = True
+        elif name == 'adtcore:objectReference':
+            self._parent_node = self._node
+            self._node = Node(
+                name=attrs.get('adtcore:name'),
+                type=attrs.get('adtcore:type'),
+                uri=attrs.get('adtcore:uri'),
+                nodes=[],
+                coverages=[],
+                parent_node=self._parent_node
+            )
+            self._parent_node.nodes.append(self._node)
+            mod_log().debug('XML: %s: %s', name, self._node.name)
+        elif name == 'coverage':
+            coverage = CoverageNode(
+                type=attrs.get('type'),
+                total=int(attrs.get('total')),
+                executed=int(attrs.get('executed'))
+            )
+            self._node.coverages.append(coverage)
+            mod_log().debug('XML: %s: %s', name, coverage.type)
+        elif name == 'atom:link' and self._save_uris:
+            rel = attrs.get('rel', '')
+            link_type = attrs.get('type', '')
+            href = attrs.get('href')
+            if rel == 'next' and link_type == 'application/xml+scov':
+                adt_href = href
+                if href.startswith('/sap/bc/adt/'):
+                    adt_href = href[len('/sap/bc/adt/'):]
+                self.next_uris.append(adt_href)
+                self.next_uri_to_node[adt_href] = self._node
+            elif 'statements' in rel and link_type == 'application/xml+scov':
+                self.statement_uris.append(href)
+
+    def endElement(self, name):
+        mod_log().debug('XML: %s: CLOSING', name)
+        if name == 'node':
+            self._node = self._node.parent_node
+            self._parent_node = self._node.parent_node
+
+
+def parse_acoverage_response(coverage_results_xml):
+    """Converts XML results into Python representation"""
+
+    xml_handler = CoverageResponseHandler()
+    xml.sax.parseString(coverage_results_xml, xml_handler)
+
+    return xml_handler

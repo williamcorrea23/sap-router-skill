@@ -1,0 +1,14 @@
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
+.env
+.env.*.local
+
+# External skill installs — not part of this pack, users install via npx skills add
+.claude/
+.agents/
+skills-lock.json
+
+# Internal design docs and plans — kept local, not shipped to public repo
+docs/

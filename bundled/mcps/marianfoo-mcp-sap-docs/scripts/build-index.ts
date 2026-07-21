@@ -1,0 +1,1170 @@
+// Build pipeline step 1: Creates dist/data/index.json (bundle of all docs from submodules)
+import fg from "fast-glob";
+import fs from "fs/promises";
+import path, { join } from "path";
+import matter from "gray-matter";
+import { getAllowedSources, getVariantName } from "../src/lib/variant.js";
+import { materializeOpenUxGeneratedSources } from "./materialize-openux-generated.js";
+
+interface DocEntry {
+  id: string;              // "/sapui5/<rel-path>", "/cap/<rel-path>", "/openui5-api/<rel-path>", or "/openui5-samples/<rel-path>"
+  title: string;
+  description: string;
+  snippetCount: number;
+  relFile: string;         // path relative to sources/…
+  type?: "markdown" | "jsdoc" | "sample" | "markdown-section";  // type of documentation
+  controlName?: string;    // extracted UI5 control name (e.g., "Wizard", "Button")
+  namespace?: string;      // UI5 namespace (e.g., "sap.m", "sap.f")
+  keywords?: string[];     // searchable keywords and tags
+  properties?: string[];   // control properties for API docs
+  events?: string[];       // control events for API docs
+  aggregations?: string[]; // control aggregations for API docs
+  parentDocument?: string; // for sections, the ID of the parent document
+  sectionStartLine?: number; // for sections, the line number where the section starts
+  headingLevel?: number;   // for sections, the heading level (2=##, 3=###, 4=####)
+}
+
+interface LibraryBundle {
+  id: string;              // "/sapui5" | "/cap" | "/openui5-api" | "/openui5-samples"
+  name: string;            // "SAPUI5", "CAP", "OpenUI5 API", "OpenUI5 Samples"
+  description: string;
+  docs: DocEntry[];
+}
+
+interface SourceConfig {
+  repoName: string;
+  absDir: string;
+  id: string;
+  name: string;
+  description: string;
+  filePattern: string | string[];
+  exclude?: string | string[];
+  type: "markdown" | "jsdoc" | "sample";
+}
+
+const SOURCES: SourceConfig[] = [
+  {
+    repoName: "sapui5-docs",
+    absDir: join("sources", "sapui5-docs", "docs"),
+    id: "/sapui5",
+    name: "SAPUI5",
+    description: "Official SAPUI5 Markdown documentation",
+    filePattern: "**/*.md",
+    type: "markdown" as const
+  },
+  {
+    repoName: "cap-docs",
+    absDir: join("sources", "cap-docs"),
+    id: "/cap",
+    name: "SAP Cloud Application Programming Model (CAP)",
+    description: "CAP (Capire) reference & guides",
+    filePattern: "**/*.md",
+    type: "markdown" as const
+  },
+  {
+    repoName: "openui5",
+    absDir: join("sources", "openui5", "src"),
+    id: "/openui5-api",
+    name: "OpenUI5 API",
+    description: "OpenUI5 Control API documentation and JSDoc",
+    filePattern: "**/src/**/*.js",
+    exclude: "**/test/**/*",
+    type: "jsdoc" as const
+  },
+  {
+    repoName: "openui5",
+    absDir: join("sources", "openui5", "src"),
+    id: "/openui5-samples",
+    name: "OpenUI5 Samples", 
+    description: "OpenUI5 demokit sample applications and code examples",
+    filePattern: "**/demokit/sample/**/*.{js,xml,json,html}",
+    type: "sample" as const
+  },
+  {
+    repoName: "wdi5",
+    absDir: join("sources", "wdi5", "docs"),
+    id: "/wdi5",
+    name: "wdi5",
+    description: "wdi5 end-to-end test framework documentation",
+    filePattern: "**/*.md",
+    type: "markdown" as const
+  },
+  {
+    repoName: "ui5-tooling",
+    absDir: join("sources", "ui5-tooling", "docs"),
+    id: "/ui5-tooling",
+    name: "UI5 Tooling ",
+    description: "UI5 Tooling documentation",
+    filePattern: "**/*.md",
+    type: "markdown" as const
+  },
+  {
+    repoName: "btp-fiori-tools",
+    absDir: join("sources", "btp-fiori-tools", "docs"),
+    id: "/btp-fiori-tools",
+    name: "SAP Fiori Tools Documentation",
+    description: "Official SAP Fiori Tools documentation for app generation, development, preview, and deployment",
+    filePattern: "**/*.md",
+    type: "markdown" as const
+  },
+  {
+    repoName: "fiori-tools-samples",
+    absDir: join("sources", "fiori-tools-samples"),
+    id: "/fiori-tools-samples",
+    name: "SAP Fiori Tools Samples",
+    description: "SAP Fiori Tools sample applications and configuration examples",
+    filePattern: [
+      "**/*.md",
+      "**/ui5*.yaml",
+      "**/ui5*.yml",
+      "**/mta.yaml",
+      "**/mta.yml",
+      "**/manifest.json",
+      "**/package.json"
+    ],
+    exclude: [
+      ".github/**",
+      ".claude/**",
+      "prompts/**",
+      "scripts/**",
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/coverage/**",
+      "**/target/**",
+      "**/package-lock.json",
+      "**/pnpm-lock.yaml",
+      "**/yarn.lock"
+    ],
+    type: "markdown" as const
+  },
+  {
+    repoName: "sap-tutorials",
+    absDir: join("sources", "sap-tutorials", "tutorials", "fiori-tools-mockserver-opa-testing"),
+    id: "/fiori-tools-opa-guide",
+    name: "Fiori Tools OPA Guide",
+    description: "SAP tutorial for OPA tests with SAP Fiori elements and mock server tooling",
+    filePattern: "*.md",
+    type: "markdown" as const
+  },
+  {
+    repoName: "open-ux-tools",
+    absDir: join("sources", "open-ux-tools", "packages", "create"),
+    id: "/sap-ux-create",
+    name: "@sap-ux/create CLI Reference",
+    description: "SAP Fiori Tools create CLI documentation",
+    filePattern: "README.md",
+    type: "markdown" as const
+  },
+  {
+    repoName: "openux-generated",
+    absDir: join("sources", "openux-generated", "fiori-development-portal"),
+    id: "/fiori-development-portal",
+    name: "SAP Fiori Development Portal",
+    description: "Generated SAP Fiori elements development portal examples from Open UX",
+    filePattern: "*.md",
+    type: "markdown" as const
+  },
+  {
+    repoName: "openux-generated",
+    absDir: join("sources", "openux-generated", "sap-fe-test-api"),
+    id: "/sap-fe-test-api",
+    name: "sap.fe.test API",
+    description: "Generated sap.fe.test OPA5 API documentation from Open UX",
+    filePattern: "*.md",
+    type: "markdown" as const
+  },
+  {
+    repoName: "openux-generated",
+    absDir: join("sources", "openux-generated", "fiori-tools-suite"),
+    id: "/fiori-tools-suite",
+    name: "Fiori Tools Suite Commands",
+    description: "Generated SAP Fiori Tools command matrix from Open UX",
+    filePattern: "*.md",
+    type: "markdown" as const
+  },
+  {
+    repoName: "openux-generated",
+    absDir: join("sources", "openux-generated", "fiori-opa5-docu"),
+    id: "/fiori-opa5-docu",
+    name: "Fiori OPA5 Documentation",
+    description: "Curated OPA5 guidance for SAP Fiori elements applications from Open UX",
+    filePattern: "*.md",
+    type: "markdown" as const
+  },
+  {
+    repoName: "openux-generated",
+    absDir: join("sources", "openux-generated", "fiori-extension-instructions"),
+    id: "/fiori-extension-instructions",
+    name: "Fiori Extension Instructions",
+    description: "Curated SAP Fiori elements extension implementation instructions from Open UX",
+    filePattern: "*.md",
+    type: "markdown" as const
+  },
+  {
+    repoName: "openux-generated",
+    absDir: join("sources", "openux-generated", "ux-ui5-tooling"),
+    id: "/ux-ui5-tooling",
+    name: "@sap/ux-ui5-tooling",
+    description: "SAP Fiori Tools UI5 Tooling README materialized from Open UX",
+    filePattern: "*.md",
+    type: "markdown" as const
+  },
+  {
+    repoName: "cloud-mta-build-tool",
+    absDir: join("sources", "cloud-mta-build-tool", "docs", "docs"),
+    id: "/cloud-mta-build-tool",
+    name: "Cloud MTA Build Tool",
+    description: "Cloud MTA Build Tool documentation",
+    filePattern: "**/*.md",
+    type: "markdown" as const
+  },
+  {
+    repoName: "ui5-webcomponents",
+    absDir: join("sources", "ui5-webcomponents", "docs"),
+    id: "/ui5-webcomponents",
+    name: "UI5 Web Components",
+    description: "UI5 Web Components documentation",
+    filePattern: "**/*.md",
+    type: "markdown" as const
+  },
+  {
+    repoName: "cloud-sdk",
+    absDir: join("sources", "cloud-sdk", "docs-js"),
+    id: "/cloud-sdk-js",
+    name: "Cloud SDK (JavaScript)",
+    description: "Cloud SDK (JavaScript) documentation",
+    filePattern: "**/*.mdx",
+    type: "markdown" as const
+  },
+  {
+    repoName: "cloud-sdk",
+    absDir: join("sources", "cloud-sdk", "docs-java"),
+    id: "/cloud-sdk-java",
+    name: "Cloud SDK (Java)",
+    description: "Cloud SDK (Java) documentation",
+    filePattern: "**/*.mdx",
+    type: "markdown" as const
+  },
+  {
+    repoName: "cloud-sdk-ai",
+    absDir: join("sources", "cloud-sdk-ai", "docs-js"),
+    id: "/cloud-sdk-ai-js",
+    name: "Cloud SDK AI (JavaScript)",
+    description: "Cloud SDK AI (JavaScript) documentation",
+    filePattern: "**/*.mdx",
+    type: "markdown" as const
+  },
+  {
+    repoName: "cloud-sdk-ai",
+    absDir: join("sources", "cloud-sdk-ai", "docs-java"),
+    id: "/cloud-sdk-ai-java",
+    name: "Cloud SDK AI (Java)",
+    description: "Cloud SDK AI (Java) documentation",
+    filePattern: "**/*.mdx",
+    type: "markdown" as const
+  },
+  {
+    repoName: "ui5-typescript",
+    absDir: join("sources", "ui5-typescript"),
+    id: "/ui5-typescript",
+    name: "UI5 TypeScript",
+    description: "Official entry point to anything TypeScript related for UI5",
+    filePattern: "*.md",
+    type: "markdown" as const
+  },
+  {
+    repoName: "ui5-cc-spreadsheetimporter",
+    absDir: join("sources", "ui5-cc-spreadsheetimporter", "docs"),
+    id: "/ui5-cc-spreadsheetimporter",
+    name: "UI5 CC Spreadsheet Importer",
+    description: "UI5 Custom Control for importing spreadsheet data",
+    filePattern: "**/*.md",
+    type: "markdown" as const
+  },
+  {
+    repoName: "abap-cheat-sheets",
+    absDir: join("sources", "abap-cheat-sheets"),
+    id: "/abap-cheat-sheets",
+    name: "ABAP Cheat Sheets",
+    description: "Comprehensive ABAP syntax examples and cheat sheets",
+    filePattern: "*.md",
+    type: "markdown" as const
+  },
+  {
+    repoName: "sap-styleguides",
+    absDir: join("sources", "sap-styleguides"),
+    id: "/sap-styleguides",
+    name: "SAP Style Guides",
+    description: "SAP coding style guides and best practices including Clean ABAP",
+    filePattern: "**/*.md",
+    type: "markdown" as const
+  },
+  {
+    repoName: "dsag-abap-leitfaden",
+    absDir: join("sources", "dsag-abap-leitfaden", "docs"),
+    id: "/dsag-abap-leitfaden",
+    name: "DSAG ABAP Guide",
+    description: "ABAP guidelines and best practices by DSAG (English version)",
+    filePattern: "**/*.md",
+    type: "markdown" as const
+  },
+  {
+    repoName: "abap-fiori-showcase",
+    absDir: join("sources", "abap-fiori-showcase"),
+    id: "/abap-fiori-showcase",
+    name: "ABAP Platform Fiori Feature Showcase",
+    description: "Annotation-driven SAP Fiori Elements features for OData V4 using ABAP RAP",
+    filePattern: "*.md",
+    type: "markdown" as const
+  },
+  {
+    repoName: "cap-fiori-showcase", 
+    absDir: join("sources", "cap-fiori-showcase"),
+    id: "/cap-fiori-showcase",
+    name: "CAP Fiori Elements Feature Showcase",
+    description: "SAP Fiori Elements features and annotations showcase using CAP",
+    filePattern: "**/*.{md,cds}",
+    type: "markdown" as const
+  },
+  {
+    repoName: "abap-docs",
+    absDir: join("sources", "abap-docs", "docs", "standard", "md"),
+    id: "/abap-docs-standard",
+    name: "ABAP Keyword Documentation (Standard)",
+    description: "Official ABAP language reference for on-premise systems (full syntax) - individual files optimized for LLM consumption",
+    filePattern: "*.md",
+    type: "markdown" as const
+  },
+  {
+    repoName: "abap-docs",
+    absDir: join("sources", "abap-docs", "docs", "cloud", "md"),
+    id: "/abap-docs-cloud",
+    name: "ABAP Keyword Documentation (Cloud)",
+    description: "Official ABAP language reference for BTP/Cloud (restricted syntax) - individual files optimized for LLM consumption",
+    filePattern: "*.md",
+    type: "markdown" as const
+  },
+  {
+    repoName: "abap-platform-rap-opensap",
+    absDir: join("sources", "abap-platform-rap-opensap"),
+    id: "/abap-platform-rap-opensap",
+    name: "RAP openSAP Course Samples",
+    description: "Building Apps with ABAP RESTful Application Programming - openSAP course samples",
+    filePattern: "**/*.{md,abap,cds}",
+    type: "markdown" as const
+  },
+  {
+    repoName: "cloud-abap-rap",
+    absDir: join("sources", "cloud-abap-rap"),
+    id: "/cloud-abap-rap",
+    name: "ABAP Cloud + RAP Examples",
+    description: "RAP development examples in ABAP Cloud environment (BTP)",
+    filePattern: "**/*.{md,abap,cds}",
+    type: "markdown" as const
+  },
+  {
+    repoName: "abap-platform-reuse-services",
+    absDir: join("sources", "abap-platform-reuse-services"),
+    id: "/abap-platform-reuse-services",
+    name: "RAP Reuse Services",
+    description: "RAP reuse services examples - Number Ranges, Change Documents, Mail, Adobe Forms",
+    filePattern: "**/*.{md,abap,cds}",
+    type: "markdown" as const
+  },
+  {
+    repoName: "architecture-center",
+    absDir: join("sources", "architecture-center", "docs", "ref-arch"),
+    id: "/architecture-center",
+    name: "SAP Architecture Center",
+    description: "SAP Enterprise Architecture Reference Library - Reference architectures for SAP solutions",
+    filePattern: "**/readme.md",
+    type: "markdown" as const
+  },
+  {
+    repoName: "teched2025-dt260",
+    absDir: join("sources", "teched2025-dt260"),
+    id: "/teched2025-dt260",
+    name: "TechEd 2025 DT260 – ABAP Clean Core Modernization",
+    description: "Modernizing ABAP extensions with clean core principles, ATC transformation, and Cloudification Repository Viewer",
+    filePattern: "**/*.md",
+    type: "markdown" as const
+  },
+  {
+    repoName: "btp-cloud-platform",
+    absDir: join("sources", "btp-cloud-platform", "docs"),
+    id: "/btp-cloud-platform",
+    name: "SAP BTP Cloud Platform",
+    description: "SAP Business Technology Platform documentation - concepts, getting started, development, extensions, administration, security",
+    filePattern: "**/*.md",
+    type: "markdown" as const
+  },
+  {
+    repoName: "sap-artificial-intelligence",
+    absDir: join("sources", "sap-artificial-intelligence", "docs"),
+    id: "/sap-artificial-intelligence",
+    name: "SAP AI Core & AI Launchpad",
+    description: "SAP AI Core and SAP AI Launchpad documentation",
+    filePattern: "**/*.md",
+    type: "markdown" as const
+  },
+  {
+    repoName: "terraform-provider-btp",
+    absDir: join("sources", "terraform-provider-btp"),
+    id: "/terraform-provider-btp",
+    name: "Terraform Provider for SAP BTP",
+    description: "Terraform provider documentation for SAP BTP including resources, data sources, list resources, and functions",
+    filePattern: "docs/**/*.md",
+    type: "markdown" as const
+  }
+];
+
+const ALLOWED_SOURCE_IDS = new Set(getAllowedSources());
+const ACTIVE_SOURCES = SOURCES.filter((source) => ALLOWED_SOURCE_IDS.has(source.id));
+
+// Extract meaningful content from ABAP documentation files
+function extractAbapContent(content: string, filename: string): { title: string; description: string; snippetCount: number } {
+  const lines = content.split(/\r?\n/);
+  
+  // Skip attribution header (first few lines with "📖 Official SAP Documentation")
+  let contentStart = 0;
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].includes('📖 Official SAP Documentation') || lines[i].startsWith('> **📖')) {
+      // Skip until we find the actual content (after attribution and separators)
+      for (let j = i; j < lines.length; j++) {
+        if (lines[j].trim() === '' || lines[j].includes('* * *') || lines[j].includes('---')) {
+          continue;
+        }
+        if (!lines[j].startsWith('>')) {
+          contentStart = j;
+          break;
+        }
+      }
+      break;
+    }
+  }
+  
+  // Find the actual title (first non-metadata heading)
+  let title = filename.replace('.md', '').replace('aben', '');
+  for (let i = contentStart; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (line && !line.startsWith('AS ABAP Release') && !line.startsWith('[ABAP -') && !line.startsWith('[![') && !line.includes('Mail Feedback')) {
+      if (line.match(/^[A-Z][a-zA-Z\s]+$/)) {
+        // Found a proper title (like "Inline Declarations")
+        title = line;
+        contentStart = i + 1;
+        break;
+      }
+    }
+  }
+  
+  // Extract meaningful description from content
+  const contentLines = lines.slice(contentStart);
+  const meaningfulLines = [];
+  
+  for (const line of contentLines) {
+    const trimmed = line.trim();
+    
+    // Skip empty lines, separators, and navigation
+    if (!trimmed || trimmed === '---' || trimmed === '* * *' || trimmed.startsWith('[ABAP -') || trimmed.includes('Mail Feedback')) {
+      continue;
+    }
+    
+    // Skip metadata lines
+    if (trimmed.startsWith('AS ABAP Release') || trimmed.includes('©Copyright')) {
+      continue;
+    }
+    
+    // Stop at "Continue" or "Programming Guideline" sections
+    if (trimmed.startsWith('Continue') || trimmed.startsWith('Programming Guideline')) {
+      break;
+    }
+    
+    meaningfulLines.push(trimmed);
+    
+    // Stop when we have enough content for a good description
+    if (meaningfulLines.join(' ').length > 300) {
+      break;
+    }
+  }
+  
+  // Build description from meaningful content
+  let description = meaningfulLines.join(' ').trim();
+  
+  // If description is too short, add version info
+  if (description.length < 50) {
+    const versionMatch = filename.match(/abap-docs-(\d+)/);
+    const version = versionMatch ? versionMatch[1] : '7.58';
+    description = `${title} - ABAP ${version} language reference`;
+  }
+  
+  // Extract ABAP-specific terms for better searchability
+  const abapTerms: string[] = [];
+  const descriptionLower = description.toLowerCase();
+  
+  // Common ABAP statement keywords
+  const statements = ['data', 'final', 'field-symbol', 'select', 'loop', 'if', 'try', 'catch', 'class', 'method'];
+  statements.forEach(stmt => {
+    if (descriptionLower.includes(stmt)) {
+      abapTerms.push(stmt);
+    }
+  });
+  
+  // Add statement context if found
+  if (abapTerms.length > 0) {
+    description += ` | Statements: ${abapTerms.join(', ')}`;
+  }
+  
+  // Count code snippets (ABAP typically has fewer but more meaningful ones)
+  const snippetCount = (content.match(/```/g)?.length || 0) / 2;
+  
+  return {
+    title,
+    description: description.substring(0, 400), // Allow longer descriptions for ABAP
+    snippetCount
+  };
+}
+
+// Extract information from sample files (JS, XML, JSON, HTML)
+function extractSampleInfo(content: string, filePath: string) {
+  const fileName = path.basename(filePath);
+  const fileExt = path.extname(filePath);
+  const sampleDir = path.dirname(filePath);
+  
+  // Extract control name from the path (e.g., "Button", "Wizard", "Table")
+  const pathParts = sampleDir.split('/');
+  const sampleIndex = pathParts.findIndex(part => part === 'sample');
+  const controlName = sampleIndex >= 0 && sampleIndex < pathParts.length - 1 
+    ? pathParts[sampleIndex + 1] 
+    : path.basename(sampleDir);
+  
+  let title = `${controlName} Sample - ${fileName}`;
+  let description = `Sample implementation of ${controlName} control`;
+  let snippetCount = 0;
+  
+  // Extract specific information based on file type
+  if (fileExt === '.js') {
+    // JavaScript sample files
+    const jsContent = content.toLowerCase();
+    
+    // Look for common UI5 patterns
+    if (jsContent.includes('controller')) {
+      title = `${controlName} Sample Controller`;
+      description = `Controller implementation for ${controlName} sample`;
+    } else if (jsContent.includes('component')) {
+      title = `${controlName} Sample Component`;
+      description = `Component definition for ${controlName} sample`;
+    }
+    
+    // Count meaningful code patterns
+    const codePatterns = [
+      /function\s*\(/g,
+      /onPress\s*:/g,
+      /on[A-Z][a-zA-Z]*\s*:/g,
+      /\.attach[A-Z][a-zA-Z]*/g,
+      /new\s+sap\./g
+    ];
+    
+    snippetCount = codePatterns.reduce((count, pattern) => {
+      return count + (content.match(pattern)?.length || 0);
+    }, 0);
+    
+  } else if (fileExt === '.xml') {
+    // XML view files
+    title = `${controlName} Sample View`;
+    description = `XML view implementation for ${controlName} sample`;
+    
+    // Count XML controls and bindings
+    const xmlPatterns = [
+      /<[a-zA-Z][^>]*>/g,
+      /\{[^}]+\}/g,  // bindings
+      /press=/g,
+      /text=/g
+    ];
+    
+    snippetCount = xmlPatterns.reduce((count, pattern) => {
+      return count + (content.match(pattern)?.length || 0);
+    }, 0);
+    
+  } else if (fileExt === '.json') {
+    // Manifest or model files
+    if (fileName.includes('manifest')) {
+      title = `${controlName} Sample Manifest`;
+      description = `Application manifest for ${controlName} sample`;
+    } else {
+      title = `${controlName} Sample Data`;
+      description = `Sample data model for ${controlName} control`;
+    }
+    
+    try {
+      const jsonObj = JSON.parse(content);
+      snippetCount = Object.keys(jsonObj).length;
+    } catch {
+      snippetCount = 1;
+    }
+    
+  } else if (fileExt === '.html') {
+    // HTML files
+    title = `${controlName} Sample HTML`;
+    description = `HTML page for ${controlName} sample`;
+    
+    const htmlPatterns = [
+      /<script[^>]*>/g,
+      /<div[^>]*>/g,
+      /data-sap-ui-/g
+    ];
+    
+    snippetCount = htmlPatterns.reduce((count, pattern) => {
+      return count + (content.match(pattern)?.length || 0);
+    }, 0);
+  }
+  
+  // Add library information from path
+  const libraryMatch = filePath.match(/src\/([^\/]+)\/test/);
+  if (libraryMatch) {
+    const library = libraryMatch[1];
+    description += ` (${library} library)`;
+  }
+  
+  return {
+    title,
+    description,
+    snippetCount: Math.max(1, snippetCount) // Ensure at least 1
+  };
+}
+
+function extractSampleConfigInfo(content: string, filePath: string) {
+  const fileName = path.basename(filePath);
+  const ext = path.extname(fileName).toLowerCase();
+  const directory = path.dirname(filePath);
+  const pathTerms = filePath
+    .split(/[\/_.-]+/)
+    .map((term) => term.trim().toLowerCase())
+    .filter((term) => term.length > 1);
+
+  let title = `${filePath} configuration`;
+  let description = content
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line && !line.startsWith("#"))
+    .slice(0, 6)
+    .join(" ")
+    .replace(/\s+/g, " ")
+    .slice(0, 400);
+  const keywords = new Set<string>([
+    "fiori-tools",
+    "sample",
+    "configuration",
+    ...pathTerms
+  ]);
+
+  if (/^ui5.*\.ya?ml$/i.test(fileName)) {
+    title = `${directory}/ui5 tooling configuration (${fileName})`;
+    keywords.add("ui5");
+    keywords.add("yaml");
+    keywords.add("middleware");
+    keywords.add("task");
+    keywords.add("preview");
+    if (/deploy/i.test(fileName)) {
+      keywords.add("deploy");
+      keywords.add("deployment");
+    }
+    if (/mock/i.test(fileName)) {
+      keywords.add("mockserver");
+      keywords.add("opa5");
+    }
+  } else if (/^mta\.ya?ml$/i.test(fileName)) {
+    title = `${directory}/MTA deployment configuration`;
+    keywords.add("mta");
+    keywords.add("deployment");
+    keywords.add("cloud-foundry");
+  } else if (fileName === "manifest.json") {
+    title = `${directory}/SAPUI5 application manifest`;
+    keywords.add("manifest");
+    keywords.add("sap.ui5");
+    keywords.add("sap.app");
+    try {
+      const manifest = JSON.parse(content);
+      const appId = manifest?.["sap.app"]?.id;
+      if (appId) {
+        title = `${appId} manifest.json`;
+        keywords.add(String(appId));
+      }
+      const appTitle = manifest?.["sap.app"]?.title;
+      if (appTitle) {
+        description = `${appTitle} ${description}`.trim().slice(0, 400);
+      }
+    } catch {
+      // Keep path-derived metadata for malformed sample JSON.
+    }
+  } else if (fileName === "package.json") {
+    title = `${directory}/package.json`;
+    keywords.add("npm");
+    keywords.add("scripts");
+    keywords.add("dependencies");
+    try {
+      const pkg = JSON.parse(content);
+      if (pkg?.name) {
+        title = `${pkg.name} package.json`;
+        keywords.add(String(pkg.name));
+      }
+      const scripts = pkg?.scripts ? Object.keys(pkg.scripts).slice(0, 12).join(", ") : "";
+      if (scripts) {
+        description = `npm scripts: ${scripts}. ${description}`.slice(0, 400);
+      }
+    } catch {
+      // Keep path-derived metadata for malformed sample JSON.
+    }
+  } else if (ext === ".yaml" || ext === ".yml") {
+    keywords.add("yaml");
+  } else if (ext === ".json") {
+    keywords.add("json");
+  }
+
+  const identifierMatches = content.match(/[@A-Za-z_][A-Za-z0-9_.:-]{3,}/g) || [];
+  for (const term of identifierMatches.slice(0, 80)) {
+    keywords.add(term);
+  }
+
+  return {
+    title,
+    description: description || title,
+    snippetCount: Math.max(1, (content.match(/\n\s{2,}\S/g)?.length || 0)),
+    keywords: Array.from(keywords).slice(0, 120)
+  };
+}
+
+// Extract JSDoc information from JavaScript files with enhanced metadata
+function extractJSDocInfo(content: string, fileName: string) {
+  const lines = content.split(/\r?\n/);
+  
+  // Try to find the main class/control definition
+  const classMatch = content.match(/\.extend\s*\(\s*["']([^"']+)["']/);
+  const fullControlName = classMatch ? classMatch[1] : path.basename(fileName, ".js");
+  
+  // Extract namespace and control name
+  const namespaceMatch = fullControlName.match(/^(sap\.[^.]+)\.(.*)/);
+  const namespace = namespaceMatch ? namespaceMatch[1] : '';
+  const controlName = namespaceMatch ? namespaceMatch[2] : fullControlName;
+  
+  // Extract main class JSDoc comment
+  const jsdocMatch = content.match(/\/\*\*\s*([\s\S]*?)\*\//);
+  let description = "";
+  
+  if (jsdocMatch) {
+    // Clean up JSDoc comment and extract description
+    const jsdocContent = jsdocMatch[1]
+      .split('\n')
+      .map(line => line.replace(/^\s*\*\s?/, ''))
+      .join('\n')
+      .trim();
+    
+    // Extract the main description (everything before @tags)
+    const firstAtIndex = jsdocContent.indexOf('@');
+    description = firstAtIndex > -1 
+      ? jsdocContent.substring(0, firstAtIndex).trim()
+      : jsdocContent;
+    
+    // Clean up common JSDoc patterns
+    description = description
+      .replace(/^\s*Constructor for a new.*$/m, '')
+      .replace(/^\s*@param.*$/gm, '')
+      .replace(/^\s*@.*$/gm, '')
+      .replace(/\n\s*\n/g, '\n')
+      .trim();
+  }
+  
+  // Extract properties, events, aggregations with better parsing
+  const properties: string[] = [];
+  const events: string[] = [];
+  const aggregations: string[] = [];
+  const keywords: string[] = [];
+  
+  // Extract properties
+  const propertiesSection = content.match(/properties\s*:\s*\{([\s\S]*?)\n\s*\}/);
+  if (propertiesSection) {
+    const propMatches = propertiesSection[1].matchAll(/(\w+)\s*:\s*\{/g);
+    for (const match of propMatches) {
+      properties.push(match[1]);
+    }
+  }
+  
+  // Extract events  
+  const eventsSection = content.match(/events\s*:\s*\{([\s\S]*?)\n\s*\}/);
+  if (eventsSection) {
+    const eventMatches = eventsSection[1].matchAll(/(\w+)\s*:\s*\{/g);
+    for (const match of eventMatches) {
+      events.push(match[1]);
+    }
+  }
+  
+  // Extract aggregations
+  const aggregationsSection = content.match(/aggregations\s*:\s*\{([\s\S]*?)\n\s*\}/);
+  if (aggregationsSection) {
+    const aggMatches = aggregationsSection[1].matchAll(/(\w+)\s*:\s*\{/g);
+    for (const match of aggMatches) {
+      aggregations.push(match[1]);
+    }
+  }
+  
+  // Generate keywords based on control name and content
+  keywords.push(controlName.toLowerCase());
+  if (namespace) keywords.push(namespace);
+  if (fullControlName !== controlName) keywords.push(fullControlName);
+  
+  // Add common UI5 control keywords based on control name
+  const controlLower = controlName.toLowerCase();
+  if (controlLower.includes('wizard')) keywords.push('wizard', 'step', 'multi-step', 'process');
+  if (controlLower.includes('button')) keywords.push('button', 'click', 'press', 'action');
+  if (controlLower.includes('table')) keywords.push('table', 'grid', 'data', 'row', 'column');
+  if (controlLower.includes('dialog')) keywords.push('dialog', 'popup', 'modal', 'overlay');
+  if (controlLower.includes('input')) keywords.push('input', 'field', 'text', 'form');
+  if (controlLower.includes('list')) keywords.push('list', 'item', 'collection');
+  if (controlLower.includes('panel')) keywords.push('panel', 'container', 'layout');
+  if (controlLower.includes('page')) keywords.push('page', 'navigation', 'view');
+  
+  // Add property/event-based keywords
+  if (properties.includes('text')) keywords.push('text');
+  if (properties.includes('value')) keywords.push('value');
+  if (events.includes('press')) keywords.push('press', 'click');
+  if (events.includes('change')) keywords.push('change', 'update');
+  
+  // Count code blocks and property definitions
+  const codeBlockCount = (content.match(/```/g)?.length || 0) / 2;
+  const propertyCount = properties.length + events.length + aggregations.length;
+  
+  return {
+    title: fullControlName,
+    description: description || `OpenUI5 control: ${fullControlName}`,
+    snippetCount: Math.max(1, codeBlockCount + Math.floor(propertyCount / 3)),
+    controlName,
+    namespace,
+    keywords: [...new Set(keywords)],
+    properties,
+    events,
+    aggregations
+  };
+}
+
+function extractMarkdownSections(content: string, lines: string[], src: any, relFile: string, docs: DocEntry[]) {
+  const sections: { title: string; content: string; startLine: number; level: number }[] = [];
+  let currentSection: { title: string; content: string; startLine: number; level: number } | null = null;
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    
+    // Check for headings (##, ###, ####)
+    let headingLevel = 0;
+    let headingText = '';
+    
+    if (line.startsWith('#### ')) {
+      headingLevel = 4;
+      headingText = line.slice(5).trim();
+    } else if (line.startsWith('### ')) {
+      headingLevel = 3;
+      headingText = line.slice(4).trim();
+    } else if (line.startsWith('## ')) {
+      headingLevel = 2;
+      headingText = line.slice(3).trim();
+    }
+    
+    if (headingLevel > 0) {
+      // Save previous section if it exists
+      if (currentSection) {
+        sections.push(currentSection);
+      }
+      
+      // Start new section
+      currentSection = {
+        title: headingText,
+        content: '',
+        startLine: i,
+        level: headingLevel
+      };
+    } else if (currentSection) {
+      // Add content to current section
+      currentSection.content += line + '\n';
+    }
+  }
+  
+  // Add the last section
+  if (currentSection) {
+    sections.push(currentSection);
+  }
+  
+  // Create separate docs entries for meaningful sections
+  for (const section of sections) {
+    // Skip very short sections or those with placeholder titles
+    if (section.content.trim().length < 100 || section.title.length < 3) {
+      continue;
+    }
+    
+    // Generate description from section content, including code blocks for better searchability
+    const contentLines = section.content.split('\n').filter(l => l.trim() && !l.startsWith('#'));
+    
+    // Extract code blocks content for technical terms
+    const codeBlocks = section.content.match(/```[\s\S]*?```/g) || [];
+    const codeContent = codeBlocks
+      .map(block => block.replace(/```[\w]*\n?/g, '').replace(/```/g, ''))
+      .join(' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    
+    // Combine description with code content for better indexing
+    let description = contentLines.slice(0, 3).join(' ').trim() || section.title;
+    
+    // Include important technical terms from code blocks (like annotation qualifiers)
+    if (codeContent) {
+      // Extract meaningful technical terms (identifiers, annotation qualifiers, etc.)
+      const technicalTerms = (codeContent.match(/[@#]?\w+(?:\.\w+)*(?:#\w+)?/g) || [])
+        .filter((term: string) => term.length > 3 && !['true', 'false', 'null', 'undefined', 'function', 'return'].includes(term.toLowerCase()))
+        .slice(0, 10); // Limit to prevent bloating
+      
+      if (technicalTerms.length > 0) {
+        description += ' ' + technicalTerms.join(' ');
+      }
+    }
+    
+    // Count code snippets in this section
+    const snippetCount = (section.content.match(/```/g)?.length || 0) / 2;
+    
+    // Create section entry
+    const sectionId = `${src.id}/${relFile.replace(/\.md$/, "")}#${section.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+    
+    docs.push({
+      id: sectionId,
+      title: section.title,
+      description: description.substring(0, 300) + (description.length > 300 ? '...' : ''),
+      snippetCount,
+      relFile,
+      type: 'markdown-section' as any,
+      parentDocument: `${src.id}/${relFile.replace(/\.md$/, "")}`,
+      sectionStartLine: section.startLine,
+      headingLevel: section.level
+    });
+  }
+}
+
+async function main() {
+  await fs.mkdir("dist/data", { recursive: true });
+  if (ACTIVE_SOURCES.some((source) => source.repoName === "openux-generated")) {
+    await materializeOpenUxGeneratedSources();
+  }
+  console.log("Using MCP variant " + getVariantName() + " with " + ACTIVE_SOURCES.length + " active source bundles.");
+  const all: Record<string, LibraryBundle> = {};
+
+  for (const src of ACTIVE_SOURCES) {
+    try {
+      const stat = await fs.stat(src.absDir);
+      if (!stat.isDirectory()) {
+        console.warn(`⚠️  Skipping ${src.id}: ${src.absDir} is not a directory.`);
+        continue;
+      }
+    } catch {
+      console.warn(`⚠️  Skipping ${src.id}: source directory not found at ${src.absDir}.`);
+      continue;
+    }
+
+    const patterns = Array.isArray(src.filePattern) ? [...src.filePattern] : [src.filePattern];
+    if (src.exclude) {
+      const excludes = Array.isArray(src.exclude) ? src.exclude : [src.exclude];
+      patterns.push(...excludes.map((exclude) => `!${exclude}`));
+    }
+    const files = Array.from(new Set(await fg(patterns, { cwd: src.absDir, absolute: true }))).sort();
+
+    const docs: DocEntry[] = [];
+
+    for (const absPath of files) {
+      const rel = path.relative(src.absDir, absPath).replace(/\\/g, "/");
+      const raw = await fs.readFile(absPath, "utf8");
+
+
+      let title: string;
+      let description: string;
+      let snippetCount: number;
+      let id: string;
+
+      if (src.type === "markdown") {
+        const isMarkdownLike = /\.(md|mdx)$/i.test(rel);
+        if (src.id === "/fiori-tools-samples" && !isMarkdownLike) {
+          const sampleConfigInfo = extractSampleConfigInfo(raw, rel);
+          id = `${src.id}/${rel}`;
+          docs.push({
+            id,
+            title: sampleConfigInfo.title,
+            description: sampleConfigInfo.description,
+            snippetCount: sampleConfigInfo.snippetCount,
+            relFile: rel,
+            type: src.type,
+            keywords: sampleConfigInfo.keywords
+          });
+          continue;
+        }
+
+        // Handle markdown files with error handling for malformed frontmatter
+        let frontmatter, content;
+        try {
+          const parsed = matter(raw);
+          frontmatter = parsed.data;
+          content = parsed.content;
+        } catch (yamlError: any) {
+          console.warn(`YAML parsing failed for ${rel}, using fallback:`, yamlError?.message || yamlError);
+          // Fallback: extract content without frontmatter
+          const lines = raw.split('\n');
+          const contentStartIndex = lines.findIndex((line, index) => line.trim() === '---' && index > 0) + 1;
+          frontmatter = {};
+          content = contentStartIndex > 0 ? lines.slice(contentStartIndex).join('\n') : raw;
+        }
+        const lines = content.split(/\r?\n/);
+
+        // Use frontmatter for title and description (works for ABAP and other sources)
+        title = frontmatter?.title || 
+                lines.find((l) => l.startsWith("# "))?.slice(2).trim() ||
+                path.basename(rel, ".md");
+        
+        // Enhanced description from frontmatter or content
+        // For ABAP docs, prefer actual content over generic frontmatter description
+        const isAbapDocs = src.id.includes('abap-docs-standard') || src.id.includes('abap-docs-cloud');
+        
+        if (isAbapDocs) {
+          // Extract meaningful content from ABAP docs (skip navigation links and metadata)
+          const contentLines = lines.filter(l => {
+            const trimmed = l.trim();
+            return trimmed && 
+                   !trimmed.startsWith('#') && 
+                   !trimmed.startsWith('[') && 
+                   !trimmed.startsWith('``') &&
+                   !trimmed.startsWith('|') &&
+                   trimmed.length > 20;
+          });
+          description = contentLines.slice(0, 3).join(' ').substring(0, 400).trim() || 
+                        frontmatter?.description || 
+                        `${title} - ABAP language reference`;
+        } else if (frontmatter?.description) {
+          description = frontmatter.description;
+        } else if (frontmatter?.synopsis && content.includes("{{ $frontmatter.synopsis }}")) {
+          description = frontmatter.synopsis;
+        } else {
+          // Fallback to content extraction
+          const rawDescription = lines.find((l) => l.trim() && !l.startsWith("#"))?.trim() || "";
+          description = rawDescription;
+        }
+        
+        // Extract keywords from frontmatter (especially important for ABAP docs)
+        let markdownKeywords: string[] = [];
+        if (frontmatter?.keywords && Array.isArray(frontmatter.keywords)) {
+          markdownKeywords = frontmatter.keywords;
+        }
+        // Add title as a keyword for better searchability
+        if (title && !markdownKeywords.includes(title.toLowerCase())) {
+          markdownKeywords.push(title.toLowerCase());
+        }
+        
+        snippetCount = (content.match(/```/g)?.length || 0) / 2;
+        
+        id = `${src.id}/${rel.replace(/\.mdx?$/, "")}`;
+        
+        // Extract individual sections as separate entries for all markdown docs
+        if (content.includes('##')) {
+          extractMarkdownSections(content, lines, src, rel, docs);
+        }
+        
+        // Push markdown doc with keywords
+        docs.push({ 
+          id, 
+          title, 
+          description, 
+          snippetCount, 
+          relFile: rel,
+          type: src.type,
+          keywords: markdownKeywords.length > 0 ? markdownKeywords : undefined
+        });
+      } else if (src.type === "jsdoc") {
+        // Handle JavaScript files with JSDoc
+        const jsDocInfo = extractJSDocInfo(raw, path.basename(absPath));
+        title = jsDocInfo.title;
+        description = jsDocInfo.description;
+        snippetCount = jsDocInfo.snippetCount;
+        id = `${src.id}/${rel.replace(/\.js$/, "")}`;
+        
+        // Skip files that don't look like UI5 controls
+        if (!raw.includes('.extend') || !raw.includes('metadata')) {
+          continue;
+        }
+        
+        docs.push({ 
+          id, 
+          title, 
+          description, 
+          snippetCount, 
+          relFile: rel,
+          type: src.type,
+          controlName: jsDocInfo.controlName,
+          namespace: jsDocInfo.namespace,
+          keywords: jsDocInfo.keywords,
+          properties: jsDocInfo.properties,
+          events: jsDocInfo.events,
+          aggregations: jsDocInfo.aggregations
+        });
+        
+      } else if (src.type === "sample") {
+        // Handle sample files (JS, XML, JSON, HTML)
+        const sampleInfo = extractSampleInfo(raw, rel);
+        title = sampleInfo.title;
+        description = sampleInfo.description;
+        snippetCount = sampleInfo.snippetCount;
+        id = `${src.id}/${rel.replace(/\.(js|xml|json|html)$/, "")}`;
+        
+        // Skip empty files or non-meaningful samples
+        if (raw.trim().length < 50) {
+          continue;
+        }
+        
+        // Extract control name from sample path for better searchability
+        const pathParts = rel.split('/');
+        const sampleIndex = pathParts.findIndex(part => part === 'sample');
+        const controlName = sampleIndex >= 0 && sampleIndex < pathParts.length - 1 
+          ? pathParts[sampleIndex + 1] 
+          : path.basename(path.dirname(rel));
+        
+        // Generate sample keywords
+        const keywords = [controlName.toLowerCase(), 'sample', 'example'];
+        if (rel.includes('.xml')) keywords.push('view', 'xml');
+        if (rel.includes('.js')) keywords.push('controller', 'javascript');
+        if (rel.includes('.json')) keywords.push('model', 'data', 'configuration');
+        if (rel.includes('manifest')) keywords.push('manifest', 'app');
+        
+        docs.push({ 
+          id, 
+          title, 
+          description, 
+          snippetCount, 
+          relFile: rel,
+          type: src.type,
+          controlName,
+          keywords: [...new Set(keywords)]
+        });
+        
+      } else {
+        continue; // Skip unknown file types
+      }
+    }
+
+    const bundle: LibraryBundle = {
+      id: src.id,
+      name: src.name,
+      description: src.description,
+      docs
+    };
+
+    all[src.id] = bundle;
+    await fs.writeFile(
+      path.join("dist", "data", `data${src.id}.json`.replace(/\//g, "_")),
+      JSON.stringify(bundle, null, 2)
+    );
+  }
+
+  await fs.writeFile("dist/data/index.json", JSON.stringify(all, null, 2));
+  console.log("✅  Index built with", Object.keys(all).length, "libraries.");
+}
+
+main();

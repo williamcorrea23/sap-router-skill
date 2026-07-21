@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SAP Table &amp; Field Remediator — At a glance</title>
+  <meta name="description" content="One-picture overview of the SAP Table &amp; Field Remediator skill: knowledge in, trust out, and the human loop that teaches the skill.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+/* SAP Table & Field Remediator — single-page presentation
+   Refined-light, elevated. Self-contained, offline-friendly. */
+
+/* ---- tokens ---------------------------------------------------------- */
+:root {
+  --ink:        #0f172a;   /* slate-900 — headings */
+  --ink-soft:   #334155;   /* slate-700 — body      */
+  --muted:      #64748b;   /* slate-500 — labels    */
+  --line:       #e2e8f0;   /* slate-200 — borders   */
+  --line-soft:  #f1f5f9;   /* slate-100             */
+  --bg:         #f8fafc;   /* page                  */
+  --bg-tint:    #f1f5f9;   /* alt sections          */
+  --card:       #ffffff;
+
+  --accent:     #4f46e5;   /* indigo-600            */
+  --accent-700: #4338ca;
+  --accent-soft:#eef2ff;
+
+  /* tiers — the visual through-line: cool -> warm = rising human judgment */
+  --t1:    #059669;  --t1-bg: #d1fae5;  --t1-soft: #ecfdf5;
+  --t2:    #d97706;  --t2-bg: #fef3c7;  --t2-soft: #fffbeb;
+  --t3:    #e11d48;  --t3-bg: #ffe4e6;  --t3-soft: #fff1f2;
+
+  /* worlds */
+  --a-color: #b45309;  --a-bg: #fef3c7;
+  --b-color: #1d4ed8;  --b-bg: #dbeafe;
+
+  /* actors (system flow) */
+  --det:   #0f766e;  --det-bg: #ccfbf1;   /* deterministic — teal  */
+  --llm:   #7c3aed;  --llm-bg: #ede9fe;   /* Claude        — violet */
+  --human: #b91c1c;  --human-bg:#fee2e2;  /* human         — red    */
+
+  --good:  #047857;  --good-bg: #d1fae5;
+  --warn:  #b91c1c;  --warn-bg: #fee2e2;
+
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --display: "Space Grotesk", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  --shadow-sm: 0 1px 2px rgba(15,23,42,.05), 0 1px 3px rgba(15,23,42,.06);
+  --shadow-md: 0 4px 12px rgba(15,23,42,.06), 0 12px 28px rgba(15,23,42,.07);
+  --shadow-lg: 0 12px 40px rgba(15,23,42,.10), 0 2px 8px rgba(15,23,42,.05);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+
+/* ---- base ------------------------------------------------------------ */
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 84px; }
+body {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, .display { font-family: var(--display); color: var(--ink); letter-spacing: -.02em; line-height: 1.1; }
+h1 { font-size: clamp(2.2rem, 5.2vw, 4rem); font-weight: 700; margin: 0 0 .5rem; }
+h2 { font-size: clamp(1.6rem, 3.4vw, 2.6rem); font-weight: 600; margin: 0 0 .4rem; }
+h3 { font-size: 1.1rem; font-weight: 600; margin: 0 0 .35rem; font-family: var(--sans); letter-spacing: 0; color: var(--ink); }
+p  { margin: 0 0 1rem; }
+a  { color: var(--accent); text-decoration: none; }
+/* visible keyboard focus — keyboard users get a clear ring on every interactive element */
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 8px; }
+.tier:focus-visible { outline-offset: 4px; }
+code { font-family: var(--mono); font-size: .85em; background: var(--accent-soft); color: var(--accent-700); padding: .1em .4em; border-radius: 6px; }
+strong { color: var(--ink); }
+
+.container { width: min(1120px, 92vw); margin: 0 auto; }
+.muted { color: var(--muted); }
+.center { text-align: center; }
+.lead { font-size: clamp(1.05rem, 1.6vw, 1.3rem); color: var(--ink-soft); max-width: 60ch; }
+
+/* section rhythm */
+section { padding: clamp(3.5rem, 8vw, 6.5rem) 0; position: relative; }
+section.alt { background: var(--bg-tint); border-block: 1px solid var(--line); }
+.eyebrow {
+  font: 600 .8rem/1 var(--sans);
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--accent); margin: 0 0 1rem;
+  display: inline-flex; align-items: center; gap: .5rem;
+}
+.eyebrow::before { content: ""; width: 22px; height: 2px; background: var(--accent); display: inline-block; border-radius: 2px; }
+.section-head { max-width: 64ch; margin-bottom: clamp(1.8rem, 4vw, 3rem); }
+.section-head p { color: var(--ink-soft); font-size: 1.08rem; margin: 0; }
+
+/* ---- top nav --------------------------------------------------------- */
+.topnav {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(248,250,252,.82);
+  backdrop-filter: saturate(160%) blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+.nav-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+.brand { font-family: var(--display); font-weight: 700; color: var(--ink); font-size: 1.02rem; letter-spacing: -.01em; }
+.brand span { color: var(--muted); font-weight: 500; }
+.topnav nav { display: flex; gap: .35rem; }
+.topnav nav a {
+  color: var(--ink-soft); font-size: .92rem; font-weight: 500;
+  padding: .45rem .8rem; border-radius: 8px; transition: background .15s, color .15s;
+}
+.topnav nav a:hover { background: var(--accent-soft); color: var(--accent-700); }
+.topnav nav a.active { background: var(--accent); color: #fff; }
+@media (max-width: 720px) { .topnav nav { display: none; } }
+
+/* ---- hero ------------------------------------------------------------ */
+.hero { padding-top: clamp(3rem, 7vw, 5.5rem); padding-bottom: clamp(2.5rem, 6vw, 4.5rem); overflow: hidden; }
+.hero-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: clamp(2rem, 5vw, 4rem); align-items: center; }
+@media (max-width: 900px) { .hero-grid { grid-template-columns: 1fr; } }
+.hero h1 .grad {
+  background: linear-gradient(100deg, var(--accent) 0%, #7c3aed 60%, var(--t3) 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.hero .lead { margin: 0 0 1.6rem; }
+.cta { display: flex; gap: .7rem; flex-wrap: wrap; }
+.btn { display: inline-flex; align-items: center; gap: .5rem; font: 600 .95rem var(--sans); padding: .7rem 1.2rem; border-radius: 10px; cursor: pointer; transition: transform .12s, box-shadow .15s, background .15s; border: 1px solid transparent; }
+.btn-primary { background: var(--accent); color: #fff; box-shadow: var(--shadow-sm); }
+.btn-primary:hover { background: var(--accent-700); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.btn-ghost { background: var(--card); color: var(--ink); border-color: var(--line); }
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent-700); }
+.pills { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: 1.6rem; }
+.pill { font: 500 .82rem var(--sans); color: var(--muted); border: 1px solid var(--line); background: var(--card); padding: .35rem .8rem; border-radius: 999px; transition: .15s; }
+.pill:hover { color: var(--accent-700); border-color: var(--accent); }
+
+/* ---- generic cards/grid --------------------------------------------- */
+.grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+.grid-2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.4rem; box-shadow: var(--shadow-sm); }
+.card .ic { font-size: 1.5rem; line-height: 1; margin-bottom: .6rem; display: block; }
+.card p { margin: 0; font-size: .95rem; }
+
+.callout { border-left: 4px solid var(--accent); background: var(--accent-soft); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; padding: 1rem 1.2rem; margin: 1.4rem 0 0; }
+.callout.good { border-color: var(--good); background: var(--good-bg); }
+.callout.warn { border-color: var(--warn); background: var(--warn-bg); }
+.callout p { margin: 0; font-size: .96rem; }
+
+.badge { display: inline-flex; align-items: center; gap: .35rem; font: 600 .72rem var(--mono); padding: .22rem .55rem; border-radius: 999px; letter-spacing: .02em; }
+
+/* ---- problem: before/after ------------------------------------------ */
+.ba { display: grid; grid-template-columns: 1fr auto 1fr; gap: 1.2rem; align-items: stretch; margin-top: .5rem; }
+@media (max-width: 760px) { .ba { grid-template-columns: 1fr; } .ba .ba-arrow { transform: rotate(90deg); justify-self: center; } }
+.ba-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.3rem; box-shadow: var(--shadow-sm); }
+.ba-card h3 { display: flex; align-items: center; justify-content: space-between; }
+.ba-card .tag { font: 600 .7rem var(--mono); color: var(--muted); }
+.ba-card.ecc { border-top: 3px solid var(--muted); }
+.ba-card.s4  { border-top: 3px solid var(--accent); }
+.ba-list { list-style: none; padding: 0; margin: .6rem 0 0; font-size: .92rem; }
+.ba-list li { padding: .35rem 0; border-top: 1px dashed var(--line); display: flex; gap: .5rem; align-items: baseline; }
+.ba-list li:first-child { border-top: none; }
+.ba-list code { background: var(--bg-tint); color: var(--ink); }
+.ba-list .x { color: var(--warn); }
+.ba-list .ok { color: var(--good); }
+.ba-arrow { display: flex; align-items: center; color: var(--muted); font-size: 1.6rem; }
+
+/* ---- tier ladder (centerpiece) -------------------------------------- */
+.ladder { display: grid; gap: .9rem; }
+.tier {
+  --c: var(--accent); --c-bg: var(--accent-soft);
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 1.2rem;
+  background: var(--card); border: 1px solid var(--line); border-left: 6px solid var(--c);
+  border-radius: var(--radius); padding: 1.2rem 1.4rem; box-shadow: var(--shadow-sm);
+  cursor: pointer; transition: box-shadow .18s, transform .12s, border-color .15s;
+}
+.tier:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+.tier.open { box-shadow: var(--shadow-md); }
+.tier.t1 { --c: var(--t1); --c-bg: var(--t1-bg); }
+.tier.t2 { --c: var(--t2); --c-bg: var(--t2-bg); }
+.tier.t3 { --c: var(--t3); --c-bg: var(--t3-bg); }
+.tier-key { width: 58px; height: 58px; border-radius: 14px; background: var(--c-bg); color: var(--c); display: grid; place-items: center; font: 700 1.35rem var(--display); }
+.tier-main h3 { font-family: var(--display); font-size: 1.2rem; margin: 0 0 .15rem; }
+.tier-main h3 .what { color: var(--muted); font-weight: 500; font-size: .95rem; font-family: var(--sans); }
+.tier-main .sub { font-size: .92rem; color: var(--ink-soft); margin: 0; }
+.tier-action { text-align: right; min-width: 140px; }
+.tier-action .act { font: 600 .8rem var(--mono); color: var(--c); background: var(--c-bg); padding: .3rem .6rem; border-radius: 8px; white-space: nowrap; }
+.tier-action .human { display: block; font-size: .76rem; color: var(--muted); margin-top: .4rem; }
+.tier-detail { grid-column: 1 / -1; display: none; padding-top: 1rem; margin-top: .4rem; border-top: 1px dashed var(--line); }
+.tier.open .tier-detail { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+.tier-detail .d h4 { font: 600 .72rem var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); margin: 0 0 .3rem; }
+.tier-detail .d p { font-size: .9rem; margin: 0; }
+.tier-detail code { font-size: .82em; }
+@media (max-width: 680px) {
+  .tier { grid-template-columns: auto 1fr; }
+  .tier-action { grid-column: 2; text-align: left; margin-top: .3rem; }
+}
+
+.involve { display: flex; align-items: center; gap: .8rem; margin-top: 1.4rem; font-size: .85rem; color: var(--muted); }
+.involve .bar { flex: 1; height: 8px; border-radius: 999px; background: linear-gradient(90deg, var(--t1) 0%, var(--t2) 50%, var(--t3) 100%); }
+
+/* ---- system flow ----------------------------------------------------- */
+.legend { display: flex; gap: 1.2rem; flex-wrap: wrap; margin-bottom: 1.6rem; font-size: .85rem; }
+.legend span { display: inline-flex; align-items: center; gap: .45rem; color: var(--ink-soft); }
+.dot { width: 12px; height: 12px; border-radius: 4px; display: inline-block; }
+.dot.det { background: var(--det); } .dot.llm { background: var(--llm); } .dot.human { background: var(--human); }
+
+.flow { display: flex; align-items: stretch; gap: .4rem; flex-wrap: wrap; }
+.node {
+  --c: var(--det); --c-bg: var(--det-bg);
+  flex: 1 1 150px; background: var(--card); border: 1px solid var(--line);
+  border-top: 3px solid var(--c); border-radius: var(--radius-sm);
+  padding: .9rem 1rem; box-shadow: var(--shadow-sm); position: relative; transition: .18s;
+}
+.node.det { --c: var(--det); --c-bg: var(--det-bg); }
+.node.llm { --c: var(--llm); --c-bg: var(--llm-bg); }
+.node.human { --c: var(--human); --c-bg: var(--human-bg); }
+.node .step { font: 600 .68rem var(--mono); color: var(--c); background: var(--c-bg); padding: .12rem .4rem; border-radius: 6px; }
+.node h4 { margin: .5rem 0 .25rem; font-size: .95rem; color: var(--ink); }
+.node p { margin: 0; font-size: .82rem; color: var(--ink-soft); }
+.node.active { box-shadow: 0 0 0 3px var(--c-bg), var(--shadow-md); transform: translateY(-2px); }
+.flow-arrow { align-self: center; color: var(--line); font-size: 1.1rem; flex: 0 0 auto; }
+@media (max-width: 820px) { .flow { flex-direction: column; } .flow-arrow { transform: rotate(90deg); align-self: center; } .node { flex-basis: auto; } }
+
+.guard-note { margin-top: 1.4rem; }
+.guard-note .badge { background: var(--good-bg); color: var(--good); margin-right: .5rem; }
+
+.walk { margin-top: 1.6rem; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.2rem 1.4rem; box-shadow: var(--shadow-sm); }
+.walk-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.walk-head h3 { margin: 0; }
+.walk-controls { display: flex; gap: .5rem; }
+.walk-controls button { font: 600 .82rem var(--sans); border: 1px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 8px; padding: .4rem .8rem; cursor: pointer; transition: .15s; }
+.walk-controls button:hover { border-color: var(--accent); color: var(--accent-700); }
+.walk-stage { margin-top: 1rem; font-size: .95rem; min-height: 3.2em; }
+.walk-stage .lbl { font: 600 .72rem var(--mono); color: var(--llm); text-transform: uppercase; letter-spacing: .04em; }
+
+/* ---- two axes -------------------------------------------------------- */
+.worlds { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 680px) { .worlds { grid-template-columns: 1fr; } }
+.world { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.4rem; box-shadow: var(--shadow-sm); }
+.world.a { border-top: 3px solid var(--a-color); }
+.world.b { border-top: 3px solid var(--b-color); }
+.world .badge.a { background: var(--a-bg); color: var(--a-color); }
+.world .badge.b { background: var(--b-bg); color: var(--b-color); }
+.world ul { margin: .8rem 0 0; padding-left: 1.1rem; font-size: .92rem; }
+.world ul li { margin: .3rem 0; }
+
+.cats { display: grid; grid-template-columns: repeat(4, 1fr); gap: .7rem; margin-top: 1.2rem; }
+@media (max-width: 760px) { .cats { grid-template-columns: repeat(2, 1fr); } }
+.cat { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: .9rem 1rem; box-shadow: var(--shadow-sm); border-bottom: 3px solid var(--c, var(--accent)); }
+.cat.c1 { --c: var(--t1); } .cat.c2 { --c: var(--t2); } .cat.c3 { --c: var(--t3); } .cat.c4 { --c: var(--t3); }
+.cat .name { font: 600 .95rem var(--sans); color: var(--ink); }
+.cat .arrow { font: 600 .72rem var(--mono); color: var(--c); margin: .25rem 0; }
+.cat .ex { font-size: .8rem; color: var(--muted); }
+.cat .ex code { background: var(--bg-tint); color: var(--ink); }
+
+/* ---- proof / stats --------------------------------------------------- */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+@media (max-width: 760px) { .stats { grid-template-columns: 1fr; } }
+.stat { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.6rem; box-shadow: var(--shadow-sm); text-align: center; }
+.stat .num { font: 700 clamp(2.4rem, 5vw, 3.4rem)/1 var(--display); color: var(--accent); letter-spacing: -.03em; }
+.stat .lbl { font-size: .92rem; color: var(--ink); font-weight: 600; margin-top: .3rem; }
+.stat .sub { font-size: .8rem; color: var(--muted); margin-top: .2rem; }
+
+.metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: .8rem; margin-top: 1.4rem; }
+.metric { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 1rem; box-shadow: var(--shadow-sm); }
+.metric .mi { font-size: 1.3rem; }
+.metric .mt { font-weight: 600; color: var(--ink); font-size: .92rem; margin-top: .3rem; }
+.metric .md { font-size: .8rem; color: var(--muted); margin-top: .15rem; }
+.metric.zero { border-color: var(--good); background: var(--good-bg); }
+.metric.zero .mt { color: var(--good); }
+.metric .num0 { font: 700 1.6rem var(--display); color: var(--good); }
+
+/* ---- differentiators / close ---------------------------------------- */
+.diffs { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-top: 1.4rem; }
+.diff { display: flex; gap: .8rem; align-items: flex-start; }
+.diff .ck { color: var(--good); font-weight: 700; flex: 0 0 auto; margin-top: .1rem; }
+.diff p { margin: 0; font-size: .92rem; }
+.diff strong { display: block; }
+
+/* ---- footer ---------------------------------------------------------- */
+.site-footer { background: var(--ink); color: #cbd5e1; padding: 2.4rem 0; font-size: .9rem; }
+.site-footer strong { color: #fff; }
+.site-footer .container { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+
+/* ---- reveal animation ------------------------------------------------ */
+.reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
+.reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .tier, .btn, .node { transition: none; }
+}
+
+/* ===== ARCHITECTURE — the whole skill in one picture ================== */
+.arch { display: flex; flex-direction: column; align-items: stretch; gap: .5rem; margin-top: 1.6rem; }
+
+/* shared rail (knowledge + trust) */
+.arch-rail { border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); padding: 1rem 1.1rem 1.15rem; box-shadow: var(--shadow-sm); }
+.rail-tag { font: 700 .72rem var(--sans); text-transform: uppercase; letter-spacing: .09em; color: var(--ink); margin-bottom: .8rem; }
+.rail-tag span { color: var(--muted); font-weight: 500; text-transform: none; letter-spacing: 0; }
+
+/* knowledge ladder */
+.arch-knowledge { border-top: 3px solid var(--accent); }
+.k-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; }
+.kcard { display: flex; gap: .7rem; align-items: flex-start; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: .7rem .8rem; background: var(--bg); }
+.kcard .kk { flex: 0 0 auto; width: 26px; height: 26px; border-radius: 8px; display: grid; place-items: center; font: 700 .9rem var(--display); color: #fff; background: var(--accent); }
+.kcard.k0 .kk { background: var(--accent-700); } .kcard.k1 .kk { background: var(--accent); } .kcard.k2 .kk { background: #818cf8; }
+.kcard h4 { font: 600 .92rem var(--sans); margin: .05rem 0 .15rem; color: var(--ink); }
+.kcard p { margin: 0; font-size: .8rem; color: var(--ink-soft); line-height: 1.35; }
+
+/* connector labels between bands */
+.arch-link { text-align: center; font: 600 .74rem var(--sans); text-transform: uppercase; letter-spacing: .1em; color: var(--muted); padding: .15rem 0; }
+
+/* pipeline spine */
+.arch-spine { display: flex; flex-wrap: nowrap; overflow-x: auto; align-items: stretch; justify-content: center; gap: .28rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg-tint); padding: 1rem .7rem 1.1rem; scrollbar-width: thin; }
+.sp { flex: 0 0 auto; width: 112px; border: 1px solid var(--line); border-left: 3px solid var(--c, var(--line)); border-radius: var(--radius-sm); background: var(--card); padding: .5rem .6rem; box-shadow: var(--shadow-sm); }
+.sp .sp-k { display: block; font: 700 .66rem var(--mono); text-transform: uppercase; letter-spacing: .04em; color: var(--c, var(--muted)); margin-bottom: .2rem; }
+.sp h4 { font: 600 .92rem var(--sans); margin: 0 0 .1rem; color: var(--ink); }
+.sp p { margin: 0; font-size: .76rem; color: var(--ink-soft); line-height: 1.3; }
+.sp.det { --c: var(--det); } .sp.llm { --c: var(--llm); } .sp.human { --c: var(--human); }
+.sp.in, .sp.out { --c: var(--muted); background: var(--card); }
+.sp.out { border-style: dashed; }
+.sp-arr { align-self: center; color: var(--muted); font-size: .95rem; font-weight: 700; flex: 0 0 auto; }
+
+/* deterministic-core bracket around 3 nodes */
+.sp-group { flex: 0 0 auto; border: 1.5px dashed var(--det); border-radius: var(--radius); background: var(--det-bg); padding: .45rem .45rem .5rem; position: relative; }
+.grp-tag { display: block; font: 700 .66rem var(--sans); text-transform: uppercase; letter-spacing: .07em; color: var(--det); margin: 0 0 .5rem .1rem; }
+.grp-nodes { display: flex; flex-wrap: nowrap; align-items: stretch; justify-content: center; gap: .25rem; }
+.sp-group .sp { background: var(--card); }
+
+/* trust ladder */
+.arch-trust { border-top: 3px solid var(--t2); }
+.t-lanes { display: grid; grid-template-columns: repeat(4, 1fr); gap: .8rem; }
+.tlane { display: flex; gap: .7rem; align-items: flex-start; border: 1px solid var(--line); border-left: 3px solid var(--c, var(--line)); border-radius: var(--radius-sm); padding: .7rem .8rem; background: var(--bg); }
+.tlane .tk { flex: 0 0 auto; width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; font: 700 .82rem var(--display); color: #fff; background: var(--c, var(--muted)); }
+.tlane h4 { font: 600 .9rem var(--sans); margin: .1rem 0 .15rem; color: var(--ink); }
+.tlane h4 code { font-size: .82em; }
+.tlane p { margin: 0; font-size: .78rem; color: var(--ink-soft); line-height: 1.3; }
+.tlane.t1 { --c: var(--t1); } .tlane.t2 { --c: var(--t2); } .tlane.t3 { --c: var(--t3); } .tlane.unk { --c: var(--muted); }
+
+.arch-guarantee { margin-top: .9rem; display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; font: 600 .9rem var(--sans); color: var(--good); background: var(--good-bg); border-radius: var(--radius-sm); padding: .6rem .9rem; }
+.arch-guarantee .badge { background: var(--good); color: #fff; font: 700 .7rem var(--sans); padding: .18rem .5rem; border-radius: 999px; text-transform: uppercase; letter-spacing: .04em; }
+
+/* legend */
+.arch-legend { display: flex; flex-wrap: wrap; gap: 1.2rem; justify-content: center; margin-top: .4rem; font-size: .82rem; color: var(--ink-soft); }
+.arch-legend i.d { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: .35rem; vertical-align: middle; }
+.arch-legend i.det { background: var(--det); } .arch-legend i.llm { background: var(--llm); } .arch-legend i.human { background: var(--human); }
+
+@media (max-width: 860px) {
+  .k-cards { grid-template-columns: 1fr; }
+  .t-lanes { grid-template-columns: 1fr 1fr; }
+  .arch-spine { flex-wrap: wrap; overflow-x: visible; justify-content: center; }
+  .arch-spine > .sp-arr { display: none; }
+  .arch-spine > .sp, .sp-group { flex-basis: 100%; width: 100%; }
+  .grp-nodes { flex-direction: column; }
+  .grp-nodes .sp { width: 100%; }
+  .grp-nodes .sp-arr { transform: rotate(90deg); }
+}
+@media (max-width: 520px) {
+  .t-lanes { grid-template-columns: 1fr; }
+}
+
+/* ---- architecture: post-report loop band -------------------------------- */
+.arch-loop { border-top: 3px solid var(--accent); }
+.loop-spine { margin-top: 0; }
+.sp.learn { --c: var(--accent); background: var(--accent-soft); }
+.loop-note { margin: .8rem 0 0; font-size: .8rem; color: var(--ink-soft); line-height: 1.4; }
+.loop-note strong { color: var(--ink); }
+.loop-note span { color: var(--muted); }
+
+
+/* standalone: no scroll-reveal JS, so keep everything visible */
+.reveal { opacity: 1 !important; transform: none !important; }
+body { padding: clamp(1rem, 4vw, 3rem) 0; }
+#architecture { padding-top: 0; padding-bottom: 0; }
+  </style>
+</head>
+<body>
+  <main>
+<section id="architecture">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">The whole skill</p>
+          <h2>One picture: knowledge in, trust out.</h2>
+          <p>Two ideas run the skill. <strong>Knowledge</strong> decides <em>where an answer comes from</em> — a higher source wins. <strong>Trust</strong> decides <em>how much the tool acts on its own</em>. Between them sits a fixed pipeline: deterministic where it's safe, Claude only on the judgment calls, a human gating anything that changes the system. Afterwards the human works the findings as a <strong>worklist</strong> and signs off — and every review <strong>teaches the skill</strong> (a fixed gap becomes a regression-locked test).</p>
+        </div>
+
+        <div class="arch">
+
+          <!-- KNOWLEDGE LADDER (top) -->
+          <div class="arch-rail arch-knowledge">
+            <div class="rail-tag">Knowledge · where the answer comes from <span>— higher wins</span></div>
+            <div class="k-cards">
+              <div class="kcard k0"><span class="kk">0</span><div><h4>Custom overrides</h4><p>The client's own mappings. Beats everything below.</p></div></div>
+              <div class="kcard k1"><span class="kk">1</span><div><h4>Structured SAP data</h4><p>Cloudification Repository (object) · released CDS (field).</p></div></div>
+              <div class="kcard k2"><span class="kk">2</span><div><h4>Narrative evidence</h4><p>Simplification List over MCP · <code>lookup · by_note · search</code>.</p></div></div>
+            </div>
+          </div>
+
+          <div class="arch-link">consulted by ↓</div>
+
+          <!-- PIPELINE SPINE (middle) -->
+          <div class="arch-spine">
+            <div class="sp in"><span class="sp-k">in</span><h4>Custom ABAP</h4><p>programs · FMs · classes</p></div>
+            <span class="sp-arr">→</span>
+            <div class="sp-group">
+              <span class="grp-tag">Deterministic core · runs alone</span>
+              <div class="grp-nodes">
+                <div class="sp det"><span class="sp-k">detect</span><h4>Detector</h4><p>abaplint AST · DB + field faults</p></div>
+                <span class="sp-arr">→</span>
+                <div class="sp det"><span class="sp-k">classify</span><h4>Classifier</h4><p>catalog → tier · action</p></div>
+                <span class="sp-arr">→</span>
+                <div class="sp det"><span class="sp-k">guard</span><h4>Guard</h4><p>blocks unsafe auto-apply</p></div>
+              </div>
+            </div>
+            <span class="sp-arr">→</span>
+            <div class="sp llm"><span class="sp-k">T2/T3</span><h4>Claude</h4><p>reads KB → correct fix</p></div>
+            <span class="sp-arr">→</span>
+            <div class="sp det"><span class="sp-k">verify</span><h4>Verify</h4><p>re-parse · residual</p></div>
+            <span class="sp-arr">→</span>
+            <div class="sp out"><span class="sp-k">report</span><h4>report.json</h4><p>proposed fixes · not applied</p></div>
+            <span class="sp-arr">→</span>
+            <div class="sp human"><span class="sp-k">sign-off</span><h4>Human</h4><p>approves → apply in ADT</p></div>
+          </div>
+
+          <div class="arch-link">routed by ↓</div>
+
+          <!-- TRUST LADDER (bottom) -->
+          <div class="arch-rail arch-trust">
+            <div class="rail-tag">Trust · how much we act on it</div>
+            <div class="t-lanes">
+              <div class="tlane t1"><span class="tk">T1</span><div><h4>Mechanical → <code>auto_apply</code></h4><p>no human — safe 1:1 swap</p></div></div>
+              <div class="tlane t2"><span class="tk">T2</span><div><h4>Bounded → <code>propose</code></h4><p>human signs off</p></div></div>
+              <div class="tlane t3"><span class="tk">T3</span><div><h4>Intent → <code>escalate</code></h4><p>asks the human</p></div></div>
+              <div class="tlane unk"><span class="tk">?</span><div><h4>Unknown → <code>review-queue</code></h4><p>never dropped silently</p></div></div>
+            </div>
+            <div class="arch-guarantee"><span class="badge">★ guarantee</span> 0 unsafe auto-applies — by construction, not by prompt.</div>
+          </div>
+
+          <div class="arch-link">then worked by a human ↓</div>
+
+          <!-- POST-REPORT LOOP (human resolves + the skill learns) -->
+          <div class="arch-rail arch-loop">
+            <div class="rail-tag">After the report · the human loop that also teaches the skill</div>
+            <div class="arch-spine loop-spine">
+              <div class="sp out"><span class="sp-k">report</span><h4>report.json</h4><p>the worklist input</p></div>
+              <span class="sp-arr">→</span>
+              <div class="sp human"><span class="sp-k">worklist</span><h4>Resolve in-session</h4><p>T1 batch · T2 diff · T3 answer</p></div>
+              <span class="sp-arr">→</span>
+              <div class="sp human"><span class="sp-k">sign-off</span><h4>Sign-off</h4><p>who · when · counts</p></div>
+              <span class="sp-arr">→</span>
+              <div class="sp out"><span class="sp-k">out</span><h4>After-action</h4><p>md + styled html</p></div>
+              <span class="sp-arr">→</span>
+              <div class="sp det"><span class="sp-k">retro</span><h4>Retro</h4><p>spots a human-vs-tool gap</p></div>
+              <span class="sp-arr">↺</span>
+              <div class="sp learn"><span class="sp-k">learns</span><h4>Catalog + eval</h4><p>gap → regression-locked test</p></div>
+            </div>
+            <p class="loop-note"><strong>Built (demo-grade):</strong> worklist · sign-off · after-action · retro (one worked example). <span>Roadmap: applying the fix in ADT · a non-session review surface · a general learning engine.</span></p>
+          </div>
+
+          <!-- legend -->
+          <div class="arch-legend">
+            <span><i class="d det"></i> Deterministic (code)</span>
+            <span><i class="d llm"></i> Claude (judgment)</span>
+            <span><i class="d human"></i> Human (sign-off)</span>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

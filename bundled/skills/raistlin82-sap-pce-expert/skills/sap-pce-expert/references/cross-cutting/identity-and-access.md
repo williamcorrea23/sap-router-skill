@@ -1,0 +1,328 @@
+# Identity and Access Management
+
+> **Cross-cutting**: Spans security, BTP services, and operational access.
+> This file owns IAM architecture, user provisioning flows, SAML/OAuth/XSUAA patterns, and role management across RISE components.
+> **See also**: `../security-and-compliance.md` (for certifications, shared responsibility, audit logs), `../operations-and-sla.md` (for operational access controls, admin access)
+
+---
+
+## Sources
+
+| Source | URL | Type |
+|--------|-----|------|
+| Securing Enterprise AI on SAP BTP: Zero Trust Authentication with SAP AI Core | https://community.sap.com/t5/technology-blog-posts-by-sap/securing-enterprise-ai-on-sap-btp-zero-trust-authentication-with-sap-ai/ba-p/14289975 | SAP Community Blog |
+| RISE with SAP PCE Cybersecurity FAQ | https://community.sap.com/t5/technology-blog-posts-by-sap/rise-with-sap-s-4hana-cloud-private-edition-cybersecurity-faq-explained/ba-p/13562875 | SAP Community Blog |
+
+---
+
+## IAM Components in RISE with SAP
+
+| Component | Role |
+|-----------|------|
+| **Corporate IdP** (Azure AD, Okta, etc.) | User authentication — validates user identity with password/MFA |
+| **SAP Identity Authentication Service (IAS)** | SAML Service Provider and federation proxy; recommended as intermediary |
+| **SAP XSUAA** | OAuth 2.0 Authorization Server on BTP — issues JWT tokens; maps SAML attributes to OAuth scopes |
+| **SAP Identity Provisioning Service (IPS)** | Automated user and group provisioning across systems |
+| **S/4HANA Role Concept** | Business roles, authorization objects, user groups in S/4HANA |
+| **BTP Role Collections** | Grouping of scopes assigned to users in BTP subaccounts |
+
+**Best practice**: Always use **SAP Cloud Identity Services (IAS)** as an intermediary between the corporate IdP and SAP systems — never connect the corporate IdP directly to individual SAP applications.
+
+---
+
+## SAML-to-OAuth Flow (BTP Applications)
+
+This is the complete authentication flow for SAP BTP applications calling AI services (or any OAuth-protected service). Understanding this flow is essential for all RISE+BTP integrations.
+
+### The 11-Step Flow
+
+```
+User Browser → App Router → XSUAA → Corporate IdP → XSUAA → Application → GenAI Hub → AI Core
+```
+
+**Step 1 — User opens application URL**
+Browser sends unauthenticated HTTP GET. User has no session yet.
+
+**Step 2 — App Router inspects request**
+Checks for valid OAuth JWT session. None found → initiates authentication.
+
+**Step 3 — Redirect to XSUAA**
+Application redirects to XSUAA (OAuth 2.0 Authorization Server), initiating an **OAuth Authorization Code Flow**. Application delegates all SAML complexity to XSUAA.
+
+**Step 4 — XSUAA generates SAML AuthnRequest**
+XSUAA acts as SAML Service Provider. Redirects browser to corporate IdP (Azure AD, Okta, etc.) with a SAML AuthnRequest.
+
+**Step 5 — IdP authenticates user**
+User completes login (password + MFA). IdP generates a **cryptographically signed SAML assertion** and POSTs it directly to XSUAA's Assertion Consumer Service (ACS) endpoint — **never to the application**.
+
+**Step 6 — XSUAA: SAML → OAuth exchange**
+XSUAA validates the SAML assertion (digital signature + timestamps). Maps SAML attributes to OAuth scopes based on role collection assignments. Generates an **OAuth 2.0 authorization code** (short-lived, single-use) and redirects browser to application callback URL.
+
+**Step 7 — Application exchanges code for tokens**
+Application performs a secure server-to-server POST to XSUAA with the authorization code + Client ID + Client Secret. XSUAA verifies application identity and issues an **access token (JWT) + refresh token**. Tokens stored server-side — **never in browser URLs**.
+
+**Step 8 — Application calls AI service with Bearer token**
+Application sends HTTP POST to GenAI Hub API with:
+```
+Authorization: Bearer <JWT access token>
+```
+
+**Step 9 — GenAI Hub validates JWT locally**
+GenAI Hub validates the token using **cached JWKS public keys** from XSUAA — no callback to XSUAA required. Validation: signature + expiry + scopes. Latency: ~10ms (vs ~100ms for remote validation).
+
+**Step 10 — AI Core validates JWT independently (Zero Trust)**
+AI Core does **not** trust GenAI Hub's validation. It independently validates the JWT again using the same local JWKS method and checks user permissions for the target resource group. This is **Zero Trust / defense-in-depth**.
+
+**Step 11 — Response returns to user**
+AI Core → GenAI Hub → Application → User interface. User sees result; all authentication complexity was transparent.
+
+---
+
+## The Layman's Version
+
+| Step | Analogy |
+|------|---------|
+| Open app URL | You try to enter a building |
+| App Router | Security guard asks for your badge |
+| Redirect to XSUAA | Guard sends you to the Badge Office |
+| XSUAA → IdP | Badge Office sends you to HR to prove employment |
+| IdP authenticates | HR checks your ID (password + MFA) |
+| IdP → XSUAA (SAML) | HR gives you a signed letter for Badge Office |
+| XSUAA checks SAML | Badge Office verifies HR's signature |
+| XSUAA issues auth code | Badge Office gives you a **claim ticket** (not the badge yet) |
+| App exchanges code for token | Guard takes your claim ticket + secret to Badge Office → receives badge |
+| GenAI Hub scans badge | Each room scans your badge with its local master key |
+| AI Core scans badge again | AI Core re-scans — does not trust the previous room's check |
+
+---
+
+## Key Design Principles
+
+### Applications Never Touch SAML
+
+The application only speaks **OAuth 2.0 / JWT**. All SAML complexity is absorbed by XSUAA.
+
+```
+Corporate IdP ←SAML→ XSUAA ←OAuth/JWT→ Application
+```
+
+### Zero Trust Validation
+
+Each downstream service (GenAI Hub, AI Core) independently validates the JWT using local JWKS. No blind trust between services.
+
+### Local JWT Validation Performance
+
+```
+Remote validation (call to XSUAA): ~100ms per request
+Local validation (cached JWKS):     ~10ms per request
+```
+
+Use local JWKS validation in all BTP services for performance and resilience.
+
+---
+
+## Common Misconceptions
+
+| # | Misconception | Reality |
+|---|--------------|---------|
+| 1 | Application receives the SAML assertion | SAMLResponse goes only to XSUAA ACS endpoint — application never sees SAML |
+| 2 | XSUAA forwards SAML to the application | XSUAA converts SAML → OAuth code → JWT. No SAML leaves XSUAA |
+| 3 | BTP applications authenticate directly with IdP | Apps authenticate only with XSUAA. IdP authenticates users |
+| 4 | GenAI Hub / AI Core call XSUAA to validate JWTs | Both validate tokens locally using JWKS |
+| 5 | AI Core doesn't need to revalidate if GenAI Hub already did | AI Core enforces Zero Trust — independent validation always |
+| 6 | OAuth Authorization Codes are long-lived | Authorization codes are short-lived (seconds) and single-use |
+| 7 | Token lifetimes are fixed | Configurable per subaccount or OAuth client |
+| 8 | JWTs contain passwords or sensitive auth data | JWTs contain claims only (audience, scopes, expiry, user ID) |
+| 9 | OAuth tokens are returned via browser redirects | Token exchange is server-side only — tokens never in URLs |
+| 10 | IdP decides OAuth scopes | IdP provides identity attributes only. XSUAA assigns scopes via role collections |
+| 11 | App should call AI Core directly | Best practice: App → GenAI Hub → AI Core. GenAI Hub manages routing and observability |
+
+---
+
+## Key Benefits of This Architecture
+
+| Benefit | Why It Matters |
+|---------|---------------|
+| Clear separation of concerns | XSUAA absorbs SAML/federation; apps speak only OAuth |
+| Seamless SSO | SAML authentication once; OAuth tokens propagate downstream |
+| Zero Trust | GenAI Hub and AI Core independently validate JWTs |
+| Defense-in-depth | SAML validated at XSUAA → JWT at GenAI Hub → JWT again at AI Core |
+| No SAML in applications | Prevents incorrect SAML handling by developers |
+| Standards-based | SAML 2.0, OAuth 2.0, JWT, JWKS — industry standards |
+| High performance | Local JWT validation: ~10ms |
+| Centralized governance | XSUAA handles role collections, scope assignment, IdP attribute mapping |
+
+---
+
+## S/4HANA PCE Access Controls
+
+### SAP Admin Access
+
+- By default SAP cloud admins **cannot access customer business client**
+- Access to Client 000 only — requires: encrypted connection, strong auth, terminal server, jump host, session recording, SIEM monitoring, DLP
+- All admin sessions originate from the admin plane (jump host area) only
+- Administrative ports blocked between systems by default
+
+### Customer Responsibilities for User Access
+
+- Define user roles, groups, and access control
+- Manage authentication and authorization for application users
+- Provide dedicated private connectivity to hyperscaler
+- Configure application security audit logging
+
+---
+
+## SAP Secure Login Service for SAP GUI
+
+For short-lived X.509 certificates for SAP GUI:
+- Migrated from on-premise NetWeaver Java server to a **cloud service**
+- Supports: SAP Identity Authentication Service (IAS), Azure AD, Okta, and other corporate IdPs
+- Reference: [SAP Secure Login Service for SAP GUI](https://help.sap.com/docs/SAP%20SECURE%20LOGIN%20SERVICE/c35917ca71e941c5a97a11d2c55dcacd/28d654c4459d4693bbf34e5103867f97.html)
+
+
+### Additional Notes (2026 Enrichment)
+
+| Note ID | Title | Relevance |
+|---------|-------|-----------|
+| [2005856](https://me.sap.com/notes/2005856) | DBCON entry for SSO connection to SAP HANA | DBCO entry to open an SSO HANA DB connection for an ABAP user (Connection info @SSO;HOST=...;DBNAME=..., blank user, dummy password) as of Kernel 7.42 PL23; relevant for SSO to HANA in PCE. |
+
+---
+
+**Last Updated**: 2026-03-16
+**Sources verified**: 2026-03-16
+
+---
+
+## SAP Notes Reference
+
+> Notes extracted from SAP Community blog "The SAP S/4HANA RISE & SAP BTP - Toolbox" (ba-p/13944069). Links: `https://me.sap.com/notes/XXXXXXX`
+
+### Identity Authentication Service (IAS) and SSO Configuration
+
+| Note | Title | Relevance |
+|------|-------|-----------|
+| [2193813](https://me.sap.com/notes/2193813) | SAP Identity Authentication Service — Overview and Tenant Setup | IAS tenant provisioning, SAML 2.0 setup, and corporate IdP federation for S/4HANA PCE |
+| [3017609](https://me.sap.com/notes/3017609) | Trust Configuration Between BTP and S/4HANA PCE | SAML trust setup between IAS, BTP, and S/4HANA — prerequisite for SSO in RISE landscapes |
+| [2457590](https://me.sap.com/notes/2457590) | SAML 2.0 Configuration in SAP S/4HANA for SSO | Step-by-step SAML 2.0 configuration in S/4HANA ABAP stack for SSO via IAS or Azure AD |
+| [2941654](https://me.sap.com/notes/2941654) | IAS — Conditional Authentication and Risk-Based Authentication | Configuring MFA and risk-based authentication policies in IAS for RISE users |
+| [3188941](https://me.sap.com/notes/3188941) | IAS — User Provisioning and SCIM API Integration | SCIM-based user provisioning from HR/AD systems to IAS for S/4HANA user lifecycle management |
+| [2701851](https://me.sap.com/notes/2701851) | IAS — Troubleshooting Guide | Points to the SAP Help Portal IAS troubleshooting guide; covers IAS with SAP ID Service and custom IAS tenants; entry point for all IAS login problems |
+| [2945035](https://me.sap.com/notes/2945035) | Connect Microsoft Entra ID (Azure AD) to SAP IAS | 9-step federation procedure: create enterprise app in Entra ID → exchange SAML metadata with IAS → configure conditional authentication in IAS. IAS acts as the SAML proxy/federation hub between Entra ID and SAP applications |
+| [3080900](https://me.sap.com/notes/3080900) | Configure Corporate / 3rd-Party IdP Federation with IAS | 5-step procedure: (1) add corporate IdP in IAS + upload IdP metadata, (2) download IAS SP metadata → upload to corporate IdP, (3) add trust config in BTP subaccount + upload IAS metadata, (4) download BTP SP metadata, (5) add application in IAS + upload SP metadata |
+| [3452320](https://me.sap.com/notes/3452320) | IAS — Collect Traces for Login Issue Analysis | Trace collection procedures for IAS SSO failures: SAML trace via Note 2461862 (preferred), HTTP trace via Note 1990706 (alternative), IAS troubleshooting log from IAS Admin Console via Note 2942816 |
+| [2923465](https://me.sap.com/notes/2923465) | IAS — "Identity Provider Could Not Process Authentication Request" | Cause: no trusted SP (application) configured in IAS with the Issuer name sent in the AuthnRequest. Fix: in IAS Admin Console → Applications → verify application exists and its Issuer name exactly matches the SP Issuer (case-sensitive) |
+
+### Identity Provisioning Service (IPS)
+
+| Note | Title | Relevance |
+|------|-------|-----------|
+| [2671327](https://me.sap.com/notes/2671327) | SAP Identity Provisioning Service — Overview and Connector Setup | IPS provisioning of users from source systems (AD, SAP HCM, Workday) to S/4HANA and BTP |
+| [3086294](https://me.sap.com/notes/3086294) | IPS — SAP S/4HANA Target System Connector Configuration | Configuring S/4HANA as a target system in IPS for automated user provisioning |
+| [3241987](https://me.sap.com/notes/3241987) | IPS — BTP XSUAA Target Connector for BTP Role Assignment | Automated BTP role assignment via IPS provisioning workflows |
+| [2701901](https://me.sap.com/notes/2701901) | IPS — Troubleshooting Guide | Points to SAP Help Portal IPS provisioning troubleshooting guide; entry point for all IPS provisioning failures |
+
+### XSUAA and BTP Authorization
+
+| Note | Title | Relevance |
+|------|-------|-----------|
+| [2977611](https://me.sap.com/notes/2977611) | BTP XSUAA — OAuth2 Token and Authorization Code Flow | XSUAA OAuth2 flow configuration for BTP extensions accessing S/4HANA APIs |
+| [3124447](https://me.sap.com/notes/3124447) | BTP Subaccount Trust Configuration — IAS as Platform IdP | Configuring IAS as the platform IdP for BTP subaccounts in RISE landscapes |
+| [3268177](https://me.sap.com/notes/3268177) | BTP Role Collection Management and Assignment | Role collection design patterns for BTP applications connected to S/4HANA PCE |
+
+### SAP Authorization Concept and Role Management
+
+| Note | Title | Relevance |
+|------|-------|-----------|
+| [2932733](https://me.sap.com/notes/2932733) | SAP Authorization Concept — Best Practices for S/4HANA | Authorization design principles for S/4HANA roles, composite roles, and org levels |
+| [2545655](https://me.sap.com/notes/2545655) | Role Management — SAP_NEW and Template Role Activation | SAP_NEW profile assignment after upgrades and template role activation guidance |
+| [3012243](https://me.sap.com/notes/3012243) | Fiori Launchpad Authorization — Catalog and Group Assignment | Authorization concept for SAP Fiori Launchpad tile catalogs and role-based navigation |
+| [2623716](https://me.sap.com/notes/2623716) | SAP S/4HANA — Business Role Management with SAP Fiori | Using SAP Fiori-based business role management for simplified role administration |
+| [1539556](https://me.sap.com/notes/1539556) | Profile Generator (PFCG) — Role Transport and Distribution | Role transport procedures in PFCG — critical for PCE system landscape (DEV→QA→PRD) |
+
+### SAP Identity Access Governance (IAG)
+
+| Note | Title | Relevance |
+|------|-------|-----------|
+| [2871419](https://me.sap.com/notes/2871419) | SAP IAG — Identity Access Governance Overview and Provisioning | IAG capabilities for access requests, risk analysis, and certification in RISE landscapes |
+| [3088271](https://me.sap.com/notes/3088271) | SAP IAG — Integration with S/4HANA for SoD Risk Analysis | Connecting SAP IAG to S/4HANA PCE for real-time segregation of duties (SoD) risk detection |
+| [3291654](https://me.sap.com/notes/3291654) | SAP IAG — Access Certification Campaign Configuration | Periodic access review and re-certification campaign setup in SAP IAG |
+
+### GRC Access Control (On-Premise / Hybrid)
+
+| Note | Title | Relevance |
+|------|-------|-----------|
+| [3024862](https://me.sap.com/notes/3024862) | SAP GRC Access Control — Integration with S/4HANA PCE | GRC AC connector configuration for S/4HANA PCE risk analysis and provisioning |
+| [2906719](https://me.sap.com/notes/2906719) | GRC Access Control — SoD Ruleset for S/4HANA | S/4HANA-specific SoD ruleset configuration in GRC AC (covers new FI/MM/SD roles) |
+| [3148892](https://me.sap.com/notes/3148892) | GRC Access Control — Emergency Access Management (EAM/Firefighter) | Firefighter ID configuration for emergency access to S/4HANA PCE production systems |
+| [2531382](https://me.sap.com/notes/2531382) | GRC Access Control — BRFplus Rule Condition Configuration | BRFplus-based rule conditions for advanced SoD and critical access risk definitions |
+
+### Secure Login and Certificate-Based Authentication
+
+| Note | Title | Relevance |
+|------|-------|-----------|
+| [1643751](https://me.sap.com/notes/1643751) | SAP Secure Login Service — X.509 Certificate for SAP GUI | Configuring short-lived X.509 certificates for SAP GUI SSO via Secure Login Service |
+| [2564830](https://me.sap.com/notes/2564830) | SAP Logon Tickets — Configuration and Security Considerations | SAP Logon Ticket setup and security hardening for portal/web SSO scenarios |
+| [2952697](https://me.sap.com/notes/2952697) | Client Certificate Authentication for SAP S/4HANA Web Services | Client certificate (mTLS) configuration for system-to-system authentication |
+
+### Password Policies and Login Security
+
+| Note | Title | Relevance |
+|------|-------|-----------|
+| [1458262](https://me.sap.com/notes/1458262) | SAP Password Policy Configuration — Profile Parameters | Password complexity, expiry, and lockout parameters for S/4HANA PCE (login/* parameters) |
+| [2140005](https://me.sap.com/notes/2140005) | Security Hardening — Login and Session Security Profile Parameters | Recommended login profile parameter settings for S/4HANA production systems under RISE |
+| [3063765](https://me.sap.com/notes/3063765) | SAP S/4HANA — Trusted Systems and RFC Authorization | Trusted RFC connection setup and authorization concept for inter-system calls in PCE landscape |
+
+### SAML2 Security Hardening
+
+| Note | Title | Relevance |
+|------|-------|-----------|
+| [3280746](https://me.sap.com/notes/3280746) | Enforce SAML2 Authentication for All S/4HANA Web Logins | Two options to prevent users from bypassing SAML2 by appending `saml2=disabled` to URLs: **Option 1** — ICM rewrite rule that strips `saml2=disabled` from inbound requests; **Option 2** — remove Basic Authentication from SICF service logon procedures. Recommended hardening for PCE production systems |
+
+### BTP Platform Administration
+
+| Note | Title | Relevance |
+|------|-------|-----------|
+| [3041304](https://me.sap.com/notes/3041304) | BTP Subaccount Region Migration — Manual Process | No automatic migration process exists. Full manual procedure: create new subaccount in target region → move apps → enable services → transfer entitlements → migrate HANA DB → reconnect SAP Cloud Connector → redo trust configuration → re-add members → export/import destinations |
+
+### BTP ABAP Environment — Regional Restrictions and AI Mapping
+
+| Note | Title | Relevance |
+|------|-------|-----------|
+| [3560160](https://me.sap.com/notes/3560160) | BTP ABAP Environment 2502 — Release Restrictions and Data Residency | EU Only Access (AWS EU11 / Azure CH20): Landscape Portal data stored in AWS EU10. Azure/GCP: SAP-managed gCTS repositories stored in AWS EU Frankfurt. Use **Bring-your-own-Git** to mitigate gCTS cross-region storage. Joule AI Core region mapping → see Note 3566760 |
+| [3566760](https://me.sap.com/notes/3566760) | BTP ABAP Environment — SAP AI Core Region Mapping for Joule | Full region mapping table for BTP ABAP Environment ↔ SAP AI Core (required for Joule capabilities). Regions ap12, il30, sa30 have **no AI Core mapping** (Joule not available). All other regions mapped to nearest AI Core region |
+
+### IAS & BTP SSO: Diagnostics and Troubleshooting
+
+| Note | Title | Relevance |
+|------|-------|-----------|
+| [2701851](https://me.sap.com/notes/2701851) | Identity Authentication — Guided Answers | Entry point KBA pointing to the official IAS Guided Answers portal — start here for any IAS login or configuration issue before raising a support ticket |
+| [2461862](https://me.sap.com/notes/2461862) | Collecting SAML Traces with Chrome, Edge or Firefox | Step-by-step procedure for capturing SAML assertions and responses via browser developer tools — essential for diagnosing SSO failures between IAS, S/4HANA, and corporate IdPs |
+| [2332686](https://me.sap.com/notes/2332686) | SAML2.0 — No RelayState Mapping Found for RelayState Value | Explains why SAML2 login fails with "No RelayState mapping found" error; caused by missing or mismatched RelayState configuration in SAML2 service provider settings |
+| [2577263](https://me.sap.com/notes/2577263) | Disable SAML2.0 Authentication for a Specific ICF Service | How to exclude individual ICF services from SAML2 authentication in AS ABAP — useful when specific services (e.g., system integrations) require basic auth while the rest of the system uses SAML/SSO |
+| [3256721](https://me.sap.com/notes/3256721) | Resolving 'SAML2 Service Not Accessible' Error After SSO Configuration | Troubleshooting guide for the "SAML2 service not accessible" error that appears after activating SAML2 SSO in NW ABAP — typically caused by the SAML2 ICF node not being activated |
+| [3452320](https://me.sap.com/notes/3452320) | Collecting Traces for Analyzing IAS-Involved Login Issues | How to enable and collect detailed trace information from IAS for login failures — includes steps for IAS admin trace, browser SAML trace, and AS ABAP ICM trace correlation |
+| [3543459](https://me.sap.com/notes/3543459) | SAML2 Metadata Download Error Due to HTTP Whitelist Exception | Fix for metadata download failure in SAML2 configuration when the `HTTP_WHITELIST` table blocks the metadata URL; requires adding the IAS metadata endpoint to the ICM HTTP allowlist |
+| [3080900](https://me.sap.com/notes/3080900) | Using a 3rd-Party / Corporate IdP with IAS for Enterprise SSO | Configuration guide for IAS in proxy mode: setting up a corporate IdP (ADFS, Okta, PingFederate) as the upstream identity provider while IAS acts as proxy SP — standard pattern for RISE PCE customers with existing corporate SSO |
+| [2945035](https://me.sap.com/notes/2945035) | Connect Microsoft Entra ID (Azure Active Directory) to IAS | Step-by-step configuration of Microsoft Entra ID as a corporate IdP in IAS proxy mode — covers app registration in Entra, SAML federation trust with IAS, and attribute mapping for S/4HANA and BTP applications |
+| [3507340](https://me.sap.com/notes/3507340) | Test Entra ID → IAS Proxy for IdP-Initiated SSO | Testing procedure for IdP-initiated SSO via Microsoft Entra ID using IAS as a SAML2 proxy — validates the full trust chain before production go-live |
+| [2616249](https://me.sap.com/notes/2616249) | How to achieve SSO while opening Fiori Launchpad using t-code /UI2/FLP | Enable SSO into Fiori Launchpad from /UI2/FLP by using SAML/SPNEGO/X.509, or logon tickets (RZ11: login/accept_sso2_ticket=1, login/create_sso2_ticket=2, FLP_START_WITH_SSO=true in /UI2/FLP_CUS_CONF, activate myssocntl in SICF); core FES SSO config for PCE end users. |
+| [2616732](https://me.sap.com/notes/2616732) | How to add a user as a Space member in the Cloud Foundry environment | Add users as Cloud Foundry Space members (as Org/Space Manager via BTP cockpit) to grant access for side-by-side extensions; basic BTP access-governance step for PCE clean-core extensibility. |
+| [2945880](https://me.sap.com/notes/2945880) | How to by-pass SAML or SPNEGO Single Sign On | Bypass SSO via URL params saml2=disabled / spnego=disabled to isolate auth issues or log on non-federated users - key troubleshooting trick for IAS/SAML SSO on PCE ABAP/ICF apps. |
+| [3033295](https://me.sap.com/notes/3033295) | SAML2.0: Error "No RelayState mapping found....." when logging from specific client machine | SAML 2.0 SSO to the ABAP stack failing with 'No RelayState mapping found' from one client is caused by that PC's wrong clock setting; relevant to IAS/SAML SSO logon troubleshooting on PCE. |
+| [3105625](https://me.sap.com/notes/3105625) | Cannot display information. You are not an org member | BTP Cloud Foundry "not an org member" error: assign the Org Manager role for CF space access, relevant when running side-by-side extensions alongside PCE. |
+| [3147472](https://me.sap.com/notes/3147472) | SAML2 with Multiple URLs or Domains | Fix SAML2 'No RelayState' when a system is reached via multiple domains/WebDispatcher by setting ACS URL (note 2848757) and adding one Assertion Consumer Service endpoint per domain on the IdP (Azure/Okta) — SSO enablement for PCE behind proxies. |
+| [3209281](https://me.sap.com/notes/3209281) | How to obtain the private/signing key of signing certificate for SAML requests in Cloud Foundry Environment | BTP Cloud Foundry XSUAA default SAML signing key cannot be exported; upload own cert/key and rotate signing keys per BTP docs, relevant to SSO/SAML trust setup for RISE BTP extensions. |
+| [3240819](https://me.sap.com/notes/3240819) | How to change the Org Manager in SAP Business Technology Platform | Add/change a Cloud Foundry Org Manager in the BTP cockpit (CF Org Members > Add Members) to resolve 'instances not shown' permission gaps - relevant for administering BTP side-by-side extensions in RISE. |
+| [3249765](https://me.sap.com/notes/3249765) | How to add an Org Manager to a Cloud Foundry org | BTP Cockpit subaccount admin recovers a lost Cloud Foundry Org Manager by updating the CF Runtime environment instance with usersToAdd/usersToRemove JSON (origin from Trust Configuration) — role-recovery path for RISE-included BTP orgs. |
+| [3281010](https://me.sap.com/notes/3281010) | Not able to add Space Members in Cloud Foundry (CF) subaccount | Adding CF space members requires Org Manager role; use cf CLI (cf org-users) or BTP Cockpit — relevant for administering BTP side-by-side extension environments alongside PCE. |
+| [3303172](https://me.sap.com/notes/3303172) | Activating a Super-User SAP* | Emergency SAP* recovery when all privileged credentials lost: dpmon virtual super-user with one-time password (kernel 790+, logged in SAL) or login/no_automatic_user_sapstar=0 plus USR02 delete/restart - OS/dpmon steps are SAP ECS-managed in PCE. |
+| [3357750](https://me.sap.com/notes/3357750) | Calling Web-based Transaction Code Using SAML2 SSO Redirects to WEBGUI Home | Fixes SAML2 SSO on ABAP redirecting to WEBGUI instead of target tcode (e.g. SOAMANAGER) by clearing the Default Application Path in SAML2 config and IdP relay state. |
+| [3431504](https://me.sap.com/notes/3431504) | SAML2 - 403 Forbidden page after trying to download metadata | SAML2 metadata download returns 403 until ICF services /sap/public/bc/sec/saml2 and cdc_ext_service are activated in SICF - SSO/IAS onboarding step on PCE S/4HANA. |
+| [3433084](https://me.sap.com/notes/3433084) | How to disable SPNEGO SSO for specific service | Disable SPNEGO/Kerberos SSO per service via SICF > Logon Data > Alternative Logon Procedure - fine-grained SSO tuning for Fiori/WebGUI services in PCE. |
+| [3584314](https://me.sap.com/notes/3584314) | SAP Enable Now - SSO SAML Attribute Configuration | IAS SSO SAML attribute mapping (given_name/family_name/email/Groups) across federated, IAS-proxy Enriched Token Claims, and direct-IdP scenarios; reusable IAS identity pattern for RISE SSO troubleshooting. |
+| [3611144](https://me.sap.com/notes/3611144) | Action required for notification email "ACTION REQUIRED: Expiring certificate in Identity Authentication Service" | IAS admin console cert-renewal actions by type (service-provider, trusted/corporate IdP, SAML signing, API SSLC, X.509 auth provider) when receiving expiring-certificate emails; critical for RISE SSO continuity, use component XX-S4C-OPR-INC for S/4HANA Cloud SP certs. |
+| [3644822](https://me.sap.com/notes/3644822) | IAG - Does IAG Standalone support PAM functionality for S/4HANA private cloud / RISE? | Confirms SAP Cloud Identity Access Governance (IAG) Standalone supports Privileged Access Management (PAM/firefighter) for S/4HANA Private Cloud / RISE, following the on-premise sections of the PAM guide. |
+
+---
+
+**SAP Notes Reference Last Updated**: 2026-03-17

@@ -1,0 +1,750 @@
+{
+  "version": 1,
+  "updated_at": "2025-01-14",
+  "description": "Centralized configuration for SAP Docs MCP search system",
+  
+  "sources": [
+    {
+      "id": "sapui5",
+      "type": "documentation",
+      "lang": "en",
+      "boost": 0.1,
+      "tags": ["ui5", "frontend", "javascript"],
+      "description": "SAPUI5 framework documentation",
+      "libraryId": "/sapui5",
+      "sourcePath": "sapui5-docs/docs",
+      "baseUrl": "https://ui5.sap.com",
+      "pathPattern": "/#/topic/{file}",
+      "anchorStyle": "custom"
+    },
+    {
+      "id": "cap",
+      "type": "documentation", 
+      "lang": "en",
+      "boost": 0.1,
+      "tags": ["backend", "nodejs", "java", "cds"],
+      "description": "SAP Cloud Application Programming model",
+      "libraryId": "/cap",
+      "sourcePath": "cap-docs",
+      "baseUrl": "https://cap.cloud.sap",
+      "pathPattern": "/docs/{file}",
+      "anchorStyle": "docsify"
+    },
+    {
+      "id": "openui5-api",
+      "type": "api",
+      "lang": "en", 
+      "boost": 0.1,
+      "tags": ["api", "controls", "ui5"],
+      "description": "OpenUI5 API documentation",
+      "libraryId": "/openui5-api",
+      "sourcePath": "openui5/src",
+      "baseUrl": "https://sdk.openui5.org",
+      "pathPattern": "/#/api/{file}",
+      "anchorStyle": "custom"
+    },
+    {
+      "id": "openui5-samples",
+      "type": "samples",
+      "lang": "en",
+      "boost": 0.05,
+      "tags": ["samples", "examples", "ui5"],
+      "description": "OpenUI5 code samples",
+      "libraryId": "/openui5-samples",
+      "sourcePath": "openui5/src",
+      "baseUrl": "https://sdk.openui5.org",
+      "pathPattern": "/#/entity/{file}",
+      "anchorStyle": "custom"
+    },
+    {
+      "id": "wdi5",
+      "type": "documentation",
+      "lang": "en",
+      "boost": 0.05,
+      "tags": ["testing", "e2e", "webdriver"],
+      "description": "wdi5 testing framework",
+      "libraryId": "/wdi5",
+      "sourcePath": "wdi5/docs",
+      "baseUrl": "https://ui5-community.github.io/wdi5",
+      "pathPattern": "#{file}",
+      "anchorStyle": "docsify"
+    },
+    {
+      "id": "btp-fiori-tools",
+      "type": "documentation",
+      "lang": "en",
+      "boost": 0.12,
+      "tags": ["fiori-tools", "fiori-elements", "bas", "vscode", "deployment", "preview"],
+      "description": "Official SAP Fiori Tools documentation",
+      "libraryId": "/btp-fiori-tools",
+      "sourcePath": "btp-fiori-tools/docs",
+      "baseUrl": "https://github.com/SAP-docs/btp-fiori-tools/blob/main/docs",
+      "pathPattern": "/{file}",
+      "anchorStyle": "github"
+    },
+    {
+      "id": "fiori-tools-samples",
+      "type": "samples",
+      "lang": "en",
+      "boost": 0.1,
+      "tags": ["fiori-tools", "samples", "fiori-elements", "sapui5", "ui5.yaml", "manifest", "mta"],
+      "description": "SAP Fiori Tools sample applications and configuration examples",
+      "libraryId": "/fiori-tools-samples",
+      "sourcePath": "fiori-tools-samples",
+      "baseUrl": "https://github.com/SAP-samples/fiori-tools-samples/blob/main",
+      "pathPattern": "/{file}",
+      "anchorStyle": "github"
+    },
+    {
+      "id": "fiori-tools-opa-guide",
+      "type": "documentation",
+      "lang": "en",
+      "boost": 0.12,
+      "tags": ["fiori-tools", "opa5", "mockserver", "testing", "fiori-elements"],
+      "description": "SAP tutorial for OPA tests with SAP Fiori elements and mock server tooling",
+      "libraryId": "/fiori-tools-opa-guide",
+      "sourcePath": "sap-tutorials/tutorials/fiori-tools-mockserver-opa-testing",
+      "baseUrl": "https://github.com/sap-tutorials/Tutorials/blob/master/tutorials/fiori-tools-mockserver-opa-testing",
+      "pathPattern": "/{file}",
+      "anchorStyle": "github"
+    },
+    {
+      "id": "sap-ux-create",
+      "type": "documentation",
+      "lang": "en",
+      "boost": 0.1,
+      "tags": ["sap-ux", "create", "fiori-tools", "generator", "cli"],
+      "description": "@sap-ux/create CLI reference",
+      "libraryId": "/sap-ux-create",
+      "sourcePath": "open-ux-tools/packages/create",
+      "baseUrl": "https://github.com/SAP/open-ux-tools/blob/main/packages/create",
+      "pathPattern": "/{file}",
+      "anchorStyle": "github"
+    },
+    {
+      "id": "fiori-development-portal",
+      "type": "generated",
+      "lang": "en",
+      "boost": 0.12,
+      "tags": ["fiori-elements", "development-portal", "sap.fe", "fpm", "building-blocks"],
+      "description": "Generated SAP Fiori elements development portal examples from Open UX",
+      "libraryId": "/fiori-development-portal",
+      "sourcePath": "openux-generated/fiori-development-portal",
+      "baseUrl": "https://github.com/SAP/open-ux-tools/blob",
+      "pathPattern": "/{file}",
+      "anchorStyle": "github"
+    },
+    {
+      "id": "sap-fe-test-api",
+      "type": "generated",
+      "lang": "en",
+      "boost": 0.12,
+      "tags": ["sap.fe.test", "opa5", "testing", "api", "fiori-elements"],
+      "description": "Generated sap.fe.test OPA5 API documentation from Open UX",
+      "libraryId": "/sap-fe-test-api",
+      "sourcePath": "openux-generated/sap-fe-test-api",
+      "baseUrl": "https://github.com/SAP/open-ux-tools/blob",
+      "pathPattern": "/{file}",
+      "anchorStyle": "github"
+    },
+    {
+      "id": "fiori-tools-suite",
+      "type": "generated",
+      "lang": "en",
+      "boost": 0.08,
+      "tags": ["fiori-tools", "commands", "vscode", "bas"],
+      "description": "Generated SAP Fiori Tools command matrix from Open UX",
+      "libraryId": "/fiori-tools-suite",
+      "sourcePath": "openux-generated/fiori-tools-suite",
+      "baseUrl": "https://github.com/SAP/open-ux-tools/blob",
+      "pathPattern": "/{file}",
+      "anchorStyle": "github"
+    },
+    {
+      "id": "fiori-opa5-docu",
+      "type": "generated",
+      "lang": "en",
+      "boost": 0.1,
+      "tags": ["opa5", "integration-tests", "fiori-elements", "sap.fe.test"],
+      "description": "Curated OPA5 guidance for SAP Fiori elements applications from Open UX",
+      "libraryId": "/fiori-opa5-docu",
+      "sourcePath": "openux-generated/fiori-opa5-docu",
+      "baseUrl": "https://github.com/SAP/open-ux-tools/blob",
+      "pathPattern": "/{file}",
+      "anchorStyle": "github"
+    },
+    {
+      "id": "fiori-extension-instructions",
+      "type": "generated",
+      "lang": "en",
+      "boost": 0.1,
+      "tags": ["fiori-elements", "extensions", "controller-extension", "fragments"],
+      "description": "Curated SAP Fiori elements extension implementation instructions from Open UX",
+      "libraryId": "/fiori-extension-instructions",
+      "sourcePath": "openux-generated/fiori-extension-instructions",
+      "baseUrl": "https://github.com/SAP/open-ux-tools/blob",
+      "pathPattern": "/{file}",
+      "anchorStyle": "github"
+    },
+    {
+      "id": "ux-ui5-tooling",
+      "type": "generated",
+      "lang": "en",
+      "boost": 0.1,
+      "tags": ["fiori-tools", "ui5-tooling", "middleware", "tasks", "cli"],
+      "description": "SAP Fiori Tools UI5 Tooling README materialized from Open UX",
+      "libraryId": "/ux-ui5-tooling",
+      "sourcePath": "openux-generated/ux-ui5-tooling",
+      "baseUrl": "https://github.com/SAP/open-ux-tools/blob",
+      "pathPattern": "/{file}",
+      "anchorStyle": "github"
+    },
+    {
+      "id": "ui5-tooling",
+      "type": "documentation",
+      "lang": "en",
+      "boost": 0.0,
+      "tags": ["tooling", "build", "cli"],
+      "description": "UI5 Tooling documentation",
+      "libraryId": "/ui5-tooling",
+      "sourcePath": "ui5-tooling/docs",
+      "baseUrl": "https://ui5.github.io/cli/v4",
+      "pathPattern": "/pages/{file}",
+      "anchorStyle": "github"
+    },
+    {
+      "id": "cloud-mta-build-tool", 
+      "type": "documentation",
+      "lang": "en",
+      "boost": 0.0,
+      "tags": ["mta", "build", "deployment"],
+      "description": "Cloud MTA Build Tool",
+      "libraryId": "/cloud-mta-build-tool",
+      "sourcePath": "cloud-mta-build-tool/docs/docs",
+      "baseUrl": "https://sap.github.io/cloud-mta-build-tool",
+      "pathPattern": "/{file}",
+      "anchorStyle": "github"
+    },
+    {
+      "id": "ui5-webcomponents",
+      "type": "documentation", 
+      "lang": "en",
+      "boost": 0.0,
+      "tags": ["webcomponents", "ui5"],
+      "description": "UI5 Web Components",
+      "libraryId": "/ui5-webcomponents",
+      "sourcePath": "ui5-webcomponents/docs",
+      "baseUrl": "https://ui5.github.io/webcomponents",
+      "pathPattern": "/docs/{file}/",
+      "anchorStyle": "github"
+    },
+    {
+      "id": "cloud-sdk-js",
+      "type": "documentation",
+      "lang": "en", 
+      "boost": 0.05,
+      "tags": ["sdk", "javascript", "cloud"],
+      "description": "SAP Cloud SDK for JavaScript",
+      "libraryId": "/cloud-sdk-js",
+      "sourcePath": "cloud-sdk/docs-js",
+      "baseUrl": "https://sap.github.io/cloud-sdk/docs/js",
+      "pathPattern": "/{file}",
+      "anchorStyle": "github"
+    },
+    {
+      "id": "cloud-sdk-java",
+      "type": "documentation",
+      "lang": "en",
+      "boost": 0.05,
+      "tags": ["sdk", "java", "cloud"],
+      "description": "SAP Cloud SDK for Java",
+      "libraryId": "/cloud-sdk-java",
+      "sourcePath": "cloud-sdk/docs-java",
+      "baseUrl": "https://sap.github.io/cloud-sdk/docs/java",
+      "pathPattern": "/{file}",
+      "anchorStyle": "github"
+    },
+    {
+      "id": "cloud-sdk-ai-js",
+      "type": "documentation",
+      "lang": "en",
+      "boost": 0.05, 
+      "tags": ["ai", "sdk", "javascript"],
+      "description": "SAP Cloud SDK AI for JavaScript",
+      "libraryId": "/cloud-sdk-ai-js",
+      "sourcePath": "cloud-sdk-ai/docs-js",
+      "baseUrl": "https://sap.github.io/ai-sdk/docs/js",
+      "pathPattern": "/{file}",
+      "anchorStyle": "github"
+    },
+    {
+      "id": "cloud-sdk-ai-java",
+      "type": "documentation",
+      "lang": "en",
+      "boost": 0.05,
+      "tags": ["ai", "sdk", "java"],
+      "description": "SAP Cloud SDK AI for Java",
+      "libraryId": "/cloud-sdk-ai-java",
+      "sourcePath": "cloud-sdk-ai/docs-java",
+      "baseUrl": "https://sap.github.io/ai-sdk/docs/java",
+      "pathPattern": "/{file}",
+      "anchorStyle": "github"
+    },
+    {
+      "id": "ui5-typescript",
+      "type": "documentation",
+      "lang": "en",
+      "boost": 0.1,
+      "tags": ["ui5", "typescript", "types", "frontend"],
+      "description": "UI5 TypeScript",
+      "libraryId": "/ui5-typescript",
+      "sourcePath": "ui5-typescript",
+      "baseUrl": "https://ui5.github.io/typescript",
+      "pathPattern": "/{file}.html",
+      "anchorStyle": "github"
+    },
+    {
+      "id": "ui5-cc-spreadsheetimporter",
+      "type": "documentation", 
+      "lang": "en",
+      "boost": 0.05,
+      "tags": ["ui5", "spreadsheet", "importer", "custom-control"],
+      "description": "UI5 CC Spreadsheet Importer",
+      "libraryId": "/ui5-cc-spreadsheetimporter",
+      "sourcePath": "ui5-cc-spreadsheetimporter/docs",
+      "baseUrl": "https://docs.spreadsheet-importer.com",
+      "pathPattern": "/pages/{file}/",
+      "anchorStyle": "github"
+    },
+    {
+      "id": "abap-cheat-sheets",
+      "type": "documentation",
+      "lang": "en", 
+      "boost": 0.05,
+      "tags": ["abap", "syntax", "cheat-sheets", "examples", "backend"],
+      "description": "ABAP Cheat Sheets",
+      "libraryId": "/abap-cheat-sheets",
+      "sourcePath": "abap-cheat-sheets",
+      "baseUrl": "https://github.com/SAP-samples/abap-cheat-sheets/blob/main",
+      "pathPattern": "/{file}",
+      "anchorStyle": "github"
+    },
+    {
+      "id": "sap-styleguides",
+      "type": "documentation",
+      "lang": "en",
+      "boost": 0.06,
+      "tags": ["abap", "clean-code", "style-guide", "best-practices", "code-review"],
+      "description": "SAP Style Guides",
+      "libraryId": "/sap-styleguides", 
+      "sourcePath": "sap-styleguides",
+      "baseUrl": "https://github.com/SAP/styleguides/blob/main",
+      "pathPattern": "/{file}",
+      "anchorStyle": "github"
+    },
+    {
+      "id": "dsag-abap-leitfaden",
+      "type": "documentation",
+      "lang": "en",
+      "boost": 0.5,
+      "tags": ["abap", "leitfaden", "best-practices", "english", "dsag", "clean-core"],
+      "description": "DSAG ABAP Guide (English)",
+      "libraryId": "/dsag-abap-leitfaden",
+      "sourcePath": "dsag-abap-leitfaden/docs",
+      "baseUrl": "https://marianfoo.github.io/DSAG-ABAP-Guide",
+      "pathPattern": "/{file}/",
+      "anchorStyle": "github"
+    },
+    {
+      "id": "abap-fiori-showcase",
+      "type": "documentation",
+      "lang": "en",
+      "boost": 0.08,
+      "tags": ["fiori-elements", "abap", "rap", "annotations", "odata-v4", "showcase"],
+      "description": "ABAP Platform Fiori Feature Showcase",
+      "libraryId": "/abap-fiori-showcase",
+      "sourcePath": "abap-fiori-showcase",
+      "baseUrl": "https://github.com/SAP-samples/abap-platform-fiori-feature-showcase/blob/main",
+      "pathPattern": "/{file}",
+      "anchorStyle": "github"
+    },
+    {
+      "id": "cap-fiori-showcase",
+      "type": "documentation",
+      "lang": "en",
+      "boost": 0.08,
+      "tags": ["fiori-elements", "cap", "annotations", "odata-v4", "showcase", "nodejs"],
+      "description": "CAP Fiori Elements Feature Showcase",
+      "libraryId": "/cap-fiori-showcase",
+      "sourcePath": "cap-fiori-showcase",
+      "baseUrl": "https://github.com/SAP-samples/fiori-elements-feature-showcase/blob/main",
+      "pathPattern": "/{file}",
+      "anchorStyle": "github"
+    },
+    {
+      "id": "abap-platform-rap-opensap",
+      "type": "samples",
+      "lang": "en",
+      "boost": 0.07,
+      "tags": ["rap", "abap", "samples", "opensap", "course", "tutorial"],
+      "description": "RAP openSAP Course Samples - Building Apps with ABAP RESTful Application Programming",
+      "libraryId": "/abap-platform-rap-opensap",
+      "sourcePath": "abap-platform-rap-opensap",
+      "baseUrl": "https://github.com/SAP-samples/abap-platform-rap-opensap/blob/main",
+      "pathPattern": "/{file}",
+      "anchorStyle": "github"
+    },
+    {
+      "id": "cloud-abap-rap",
+      "type": "samples",
+      "lang": "en",
+      "boost": 0.07,
+      "tags": ["rap", "abap", "cloud", "btp", "samples", "examples"],
+      "description": "ABAP Cloud + RAP Examples - RAP development in ABAP Cloud environment",
+      "libraryId": "/cloud-abap-rap",
+      "sourcePath": "cloud-abap-rap",
+      "baseUrl": "https://github.com/SAP-samples/cloud-abap-rap/blob/main",
+      "pathPattern": "/{file}",
+      "anchorStyle": "github"
+    },
+    {
+      "id": "abap-platform-reuse-services",
+      "type": "samples",
+      "lang": "en",
+      "boost": 0.06,
+      "tags": ["rap", "abap", "reuse", "services", "number-range", "change-documents"],
+      "description": "RAP Reuse Services - Number Ranges, Change Documents, Mail, Adobe Forms",
+      "libraryId": "/abap-platform-reuse-services",
+      "sourcePath": "abap-platform-reuse-services",
+      "baseUrl": "https://github.com/SAP-samples/abap-platform-reuse-services/blob/main",
+      "pathPattern": "/{file}",
+      "anchorStyle": "github"
+    },
+    {
+      "id": "abap-docs-standard",
+      "type": "documentation",
+      "lang": "en",
+      "boost": 1.0,
+      "tags": ["abap", "keyword-documentation", "language-reference", "syntax", "programming", "standard", "on-premise"],
+      "description": "Official ABAP Keyword Documentation (Standard ABAP - On-Premise)",
+      "libraryId": "/abap-docs-standard",
+      "sourcePath": "abap-docs/docs/standard/md",
+      "baseUrl": "https://help.sap.com/doc/abapdocu_latest_index_htm/latest/en-US",
+      "pathPattern": "/{file}",
+      "anchorStyle": "sap-help"
+    },
+    {
+      "id": "abap-docs-cloud",
+      "type": "documentation",
+      "lang": "en",
+      "boost": 0.8,
+      "tags": ["abap", "keyword-documentation", "language-reference", "syntax", "programming", "cloud", "btp", "restricted"],
+      "description": "Official ABAP Keyword Documentation (ABAP Cloud - BTP, Restricted Syntax)",
+      "libraryId": "/abap-docs-cloud",
+      "sourcePath": "abap-docs/docs/cloud/md",
+      "baseUrl": "https://help.sap.com/doc/abapdocu_cp_index_htm/CLOUD/en-US",
+      "pathPattern": "/{file}",
+      "anchorStyle": "sap-help"
+    },
+    {
+      "id": "btp-cloud-platform",
+      "type": "documentation",
+      "lang": "en",
+      "boost": 0.1,
+      "tags": ["btp", "cloud", "platform", "sap", "development", "administration", "security"],
+      "description": "SAP Business Technology Platform documentation",
+      "libraryId": "/btp-cloud-platform",
+      "sourcePath": "btp-cloud-platform/docs",
+      "baseUrl": "https://help.sap.com/docs/BTP/65de2977205c403bbc107264b8eccf4b",
+      "pathPattern": "/{file}.html",
+      "anchorStyle": "sap-help"
+    },
+    {
+      "id": "sap-artificial-intelligence",
+      "type": "documentation",
+      "lang": "en",
+      "boost": 0.1,
+      "tags": ["ai", "sap-ai-core", "sap-ai-launchpad", "machine-learning", "ml-ops"],
+      "description": "SAP AI Core and SAP AI Launchpad documentation",
+      "libraryId": "/sap-artificial-intelligence",
+      "sourcePath": "sap-artificial-intelligence/docs",
+      "baseUrl": "https://help.sap.com/docs",
+      "pathPattern": "/{file}.html",
+      "anchorStyle": "sap-help"
+    },
+    {
+      "id": "terraform-provider-btp",
+      "type": "documentation",
+      "lang": "en",
+      "boost": 0.1,
+      "tags": ["terraform", "btp", "infrastructure-as-code", "provider"],
+      "description": "Terraform provider documentation for SAP BTP",
+      "libraryId": "/terraform-provider-btp",
+      "sourcePath": "terraform-provider-btp",
+      "baseUrl": "https://registry.terraform.io/providers/SAP/btp/latest/docs",
+      "pathPattern": "/{file}",
+      "anchorStyle": "custom"
+    },
+    {
+      "id": "architecture-center",
+      "type": "documentation",
+      "lang": "en",
+      "boost": 0.1,
+      "tags": ["architecture", "reference-architecture", "enterprise-architecture", "btp", "integration", "solution-design"],
+      "description": "SAP Architecture Center - Reference architectures for SAP solutions",
+      "libraryId": "/architecture-center",
+      "sourcePath": "architecture-center/docs/ref-arch",
+      "baseUrl": "https://architecture.learning.sap.com/docs",
+      "pathPattern": "{file}",
+      "anchorStyle": "github"
+    },
+    {
+      "id": "teched2025-dt260",
+      "type": "samples",
+      "lang": "en",
+      "boost": 0.08,
+      "tags": ["abap", "clean-core", "atc", "modernization", "cloud-readiness", "s4hana", "teched", "workshop"],
+      "description": "TechEd 2025 DT260 – Modernizing ABAP extensions with clean core and ATC",
+      "libraryId": "/teched2025-dt260",
+      "sourcePath": "teched2025-dt260",
+      "baseUrl": "https://github.com/SAP-samples/teched2025-DT260/blob/main",
+      "pathPattern": "/{file}",
+      "anchorStyle": "github"
+    }
+  ],
+  
+  "synonyms": [
+    { "from": "ui5", "to": ["sapui5", "openui5"] },
+    { "from": "button", "to": ["btn", "sap.m.Button"] },
+    { "from": "table", "to": ["sap.m.Table", "sap.ui.table.Table"] },
+    { "from": "wizard", "to": ["sap.m.Wizard"] },
+    { "from": "testing", "to": ["wdi5", "e2e", "automation"] },
+    { "from": "cds", "to": ["cap", "cloud application programming"] },
+    { "from": "odata", "to": ["rest", "api", "service"] },
+    { "from": "typescript", "to": ["ts", "types", "type definitions"] },
+    { "from": "spreadsheet", "to": ["excel", "csv", "import", "upload"] },
+    { "from": "abap", "to": ["advanced business application programming", "sap programming"] },
+    { "from": "abap cloud", "to": ["abap btp", "cloud abap", "restricted abap", "abap steampunk"] },
+    { "from": "standard abap", "to": ["on-premise abap", "full abap", "classic abap"] },
+    { "from": "clean-code", "to": ["clean code", "best practices", "style guide"] },
+    { "from": "style-guide", "to": ["styleguide", "coding standards", "best practices"] },
+    { "from": "leitfaden", "to": ["guidelines", "guide", "best practices"] },
+    { "from": "clean-core", "to": ["clean core", "extensibility", "cloud development", "atc", "modernization"] },
+    { "from": "atc", "to": ["abap test cockpit", "code analysis", "cloud readiness", "clean core check"] },
+    { "from": "fiori-elements", "to": ["fiori elements", "annotations", "odata"] },
+    { "from": "rap", "to": ["restful application programming", "abap restful"] },
+    { "from": "annotations", "to": ["ui5 annotations", "odata annotations", "fiori annotations"] },
+    { "from": "reference architecture", "to": ["architecture center", "solution architecture", "enterprise architecture"] },
+    { "from": "architecture", "to": ["reference architecture", "solution design", "architecture center"] }
+  ],
+  
+  "acronyms": {
+    "CAP": ["Cloud Application Programming", "cds"],
+    "CDS": ["Core Data Services", "cap"],
+    "UI5": ["sapui5", "openui5"],
+    "BTP": ["Business Technology Platform", "cloud"],
+    "MTA": ["Multi-Target Application"],
+    "CQL": ["CDS Query Language", "query"],
+    "OData": ["Open Data Protocol", "rest", "api"],
+    "TS": ["TypeScript", "types"],
+    "ABAP": ["Advanced Business Application Programming", "sap programming"],
+    "DSAG": ["Deutschsprachige SAP-Anwendergruppe", "german sap user group", "DSAG ABAP guidelines"],
+    "RAP": ["RESTful Application Programming", "abap restful", "business object"]
+  },
+
+  "contextBoosts": {
+    "SAP Cloud SDK": {
+      "/cloud-sdk-ai-js": 1.0,
+      "/cloud-sdk-ai-java": 1.0,
+      "/cloud-sdk-js": 0.8,
+      "/cloud-sdk-java": 0.8,
+      "/cap": 0.2
+    },
+    "UI5": {
+      "/sapui5": 0.9,
+      "/openui5-api": 0.9,
+      "/openui5-samples": 0.9,
+      "/ui5-typescript": 0.8
+    },
+    "wdi5": {
+      "/wdi5": 1.0,
+      "/openui5-api": 0.4,
+      "/openui5-samples": 0.4,
+      "/sapui5": 0.4
+    },
+    "UI5 Web Components": {
+      "/ui5-webcomponents": 1.0
+    },
+    "UI5 Tooling": {
+      "/ui5-tooling": 1.0,
+      "/btp-fiori-tools": 0.9,
+      "/fiori-tools-samples": 0.8,
+      "/ux-ui5-tooling": 0.9,
+      "/sap-ux-create": 0.7,
+      "/fiori-tools-opa-guide": 0.6,
+      "/fiori-tools-suite": 0.6
+    },
+    "Cloud MTA Build Tool": {
+      "/cloud-mta-build-tool": 1.0
+    },
+    "CAP": {
+      "/cap": 1.0,
+      "/cap-fiori-showcase": 0.9,
+      "/sapui5": 0.2
+    },
+    "TypeScript": {
+      "/ui5-typescript": 1.0,
+      "/sapui5": 0.4,
+      "/openui5-api": 0.4
+    },
+    "UI5 CC Spreadsheet Importer": {
+      "/ui5-cc-spreadsheetimporter": 1.0,
+      "/sapui5": 0.3,
+      "/openui5-api": 0.3
+    },
+    "ABAP": {
+      "/abap-docs-standard": 1.0,
+      "/abap-docs-cloud": 0.8,
+      "/abap-cheat-sheets": 0.8,
+      "/sap-styleguides": 0.7,
+      "/dsag-abap-leitfaden": 0.6,
+      "/teched2025-dt260": 0.4,
+      "/cap": 0.2
+    },
+    "ABAP Cloud": {
+      "/abap-docs-cloud": 1.5,
+      "/abap-docs-standard": 0.3,
+      "/abap-cheat-sheets": 0.6,
+      "/cap": 0.4
+    },
+    "Standard ABAP": {
+      "/abap-docs-standard": 1.5,
+      "/abap-docs-cloud": 0.2,
+      "/abap-cheat-sheets": 0.6,
+      "/dsag-abap-leitfaden": 0.5
+    },
+    "Clean Core": {
+      "/teched2025-dt260": 1.5,
+      "/dsag-abap-leitfaden": 0.8,
+      "/abap-docs-cloud": 0.6,
+      "/abap-cheat-sheets": 0.4
+    },
+    "ATC": {
+      "/teched2025-dt260": 1.5,
+      "/abap-docs-cloud": 0.5,
+      "/abap-docs-standard": 0.5
+    },
+    "Clean Code": {
+      "/sap-styleguides": 1.0,
+      "/dsag-abap-leitfaden": 0.8,
+      "/abap-cheat-sheets": 0.4
+    },
+    "DSAG": {
+      "/dsag-abap-leitfaden": 1.0,
+      "/abap-cheat-sheets": 0.5,
+      "/sap-styleguides": 0.3
+    },
+    "Fiori Elements": {
+      "/abap-fiori-showcase": 1.0,
+      "/cap-fiori-showcase": 1.0,
+      "/sapui5": 0.6,
+      "/cap": 0.5
+    },
+    "RAP": {
+      "/abap-fiori-showcase": 1.0,
+      "/abap-cheat-sheets": 0.6,
+      "/cap": 0.3
+    },
+    "cloud": {
+      "/abap-docs-cloud": 2.0,
+      "/abap-docs-standard": 0.2
+    },
+    "btp": {
+      "/btp-cloud-platform": 1.5,
+      "/abap-docs-cloud": 1.5,
+      "/cap": 0.8
+    },
+    "on-premise": {
+      "/abap-docs-standard": 1.5,
+      "/abap-docs-cloud": 0.1
+    },
+    "SAP BTP": {
+      "/btp-cloud-platform": 1.0,
+      "/cap": 0.6,
+      "/abap-docs-cloud": 0.5
+    },
+    "SAP AI": {
+      "/sap-artificial-intelligence": 1.0,
+      "/cloud-sdk-ai-js": 0.5,
+      "/cloud-sdk-ai-java": 0.5
+    },
+    "Terraform BTP": {
+      "/terraform-provider-btp": 0.5
+    },
+    "Architecture": {
+      "/architecture-center": 1.0,
+      "/btp-cloud-platform": 0.4
+    },
+    "Reference Architecture": {
+      "/architecture-center": 1.5,
+      "/btp-cloud-platform": 0.3
+    }
+  },
+
+  "libraryMappings": {
+    "sapui5": "sapui5",
+    "cap": "cap",
+    "cloud-sdk-js": "cloud-sdk-js",
+    "cloud-sdk-ai-js": "cloud-sdk-ai-js",
+    "openui5-api": "sapui5",
+    "openui5-samples": "sapui5",
+    "wdi5": "wdi5",
+    "ui5-tooling": "ui5-tooling",
+    "cloud-mta-build-tool": "cloud-mta-build-tool",
+    "ui5-webcomponents": "ui5-webcomponents",
+    "cloud-sdk-java": "cloud-sdk-java",
+    "cloud-sdk-ai-java": "cloud-sdk-ai-java",
+    "ui5-typescript": "ui5-typescript",
+    "ui5-cc-spreadsheetimporter": "ui5-cc-spreadsheetimporter",
+    "abap-cheat-sheets": "abap-cheat-sheets",
+    "sap-styleguides": "sap-styleguides",
+    "dsag-abap-leitfaden": "dsag-abap-leitfaden",
+    "abap-fiori-showcase": "abap-fiori-showcase",
+    "cap-fiori-showcase": "cap-fiori-showcase",
+    "abap-platform-rap-opensap": "abap-platform-rap-opensap",
+    "cloud-abap-rap": "cloud-abap-rap",
+    "abap-platform-reuse-services": "abap-platform-reuse-services",
+    "teched2025-dt260": "teched2025-dt260",
+    "abap-docs-standard": "abap-docs",
+    "abap-docs-cloud": "abap-docs",
+    "btp-cloud-platform": "btp-cloud-platform",
+    "sap-artificial-intelligence": "sap-artificial-intelligence",
+    "terraform-provider-btp": "terraform-provider-btp",
+    "architecture-center": "architecture-center"
+  },
+
+  "contextEmojis": {
+    "CAP": "🏗️",
+    "wdi5": "🧪", 
+    "UI5": "🎨",
+    "UI5 Web Components": "🕹️",
+    "SAP Cloud SDK": "🌐",
+    "UI5 Tooling": "🔧",
+    "Cloud MTA Build Tool": "🚢",
+    "TypeScript": "📝",
+    "UI5 CC Spreadsheet Importer": "📊",
+    "ABAP": "💻",
+    "Clean Code": "✨",
+    "DSAG": "🇩🇪",
+    "Fiori Elements": "📱",
+    "RAP": "⚡",
+    "Clean Core": "🧹",
+    "ATC": "🔍",
+    "MIXED": "🔀",
+    "SAP BTP": "☁️",
+    "SAP AI": "🤖",
+    "Terraform BTP": "🏗️",
+    "Architecture": "🏛️",
+    "Reference Architecture": "🏛️"
+  }
+}

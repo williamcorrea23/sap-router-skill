@@ -1,0 +1,40 @@
+{
+    "VCAP_SERVICES": {
+        "xsuaa": [
+            {
+                "name": "mcp-uaa",
+                "label": "xsuaa",
+                "tags": [
+                    "xsuaa"
+                ],
+                "credentials": {
+                    <for running in BAS add credentials>
+                }
+            }
+        ],
+        "destination": [
+            {
+                "name": "mcp-dest",
+                "label": "destination",
+                "tags": [
+                    "destination"
+                ],
+                "credentials": {
+                    <for running in BAS add credentials>
+                }
+            }
+        ],
+        "connectivity": [
+            {
+                "name": "mcp-conn",
+                "label": "connectivity",
+                "tags": [
+                    "connectivity"
+                ],
+                "credentials": {
+                    <for running in BAS add credentials>
+                }
+            }
+        ]
+    }
+}

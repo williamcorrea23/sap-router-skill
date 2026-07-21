@@ -1,0 +1,31 @@
+{
+    "name": "abap-skills",
+    "owner": {
+        "name": "Lik Wei Tan",
+        "email": "likweitan@gmail.com"
+    },
+    "metadata": {
+        "description": "ABAP development skills including Fiori URL generation and Clean ABAP code analysis",
+        "version": "1.1.0"
+    },
+    "plugins": [
+        {
+            "name": "sap-fiori-url-generator",
+            "description": "Generate SAP Fiori Launchpad URLs from app names",
+            "source": "./",
+            "strict": false,
+            "skills": [
+                "./skills/sap-fiori-apps-reference"
+            ]
+        },
+        {
+            "name": "clean-abap",
+            "description": "Check ABAP code for compliance with Clean ABAP principles",
+            "source": "./",
+            "strict": false,
+            "skills": [
+                "./skills/clean-abap"
+            ]
+        }
+    ]
+}

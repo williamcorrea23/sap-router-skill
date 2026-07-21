@@ -1,0 +1,34 @@
+meta {
+  name: MCP Tool - books-by-author
+  type: http
+  seq: 8
+}
+
+post {
+  url: http://localhost:4004/mcp
+  body: json
+  auth: inherit
+}
+
+headers {
+  mcp-session-id: {{SESSION_ID}}
+  Accept: application/json,text/event-stream
+}
+
+body:json {
+  {
+    "jsonrpc": "2.0",
+    "id": 2,
+    "method": "tools/call",
+    "params": {
+      "name": "books-by-author",
+      "arguments": {
+        "authorName": "Steph"
+      }
+    }
+  }
+}
+
+vars:pre-request {
+  SESSION_ID: 	a473f65d-6aca-47e7-899e-514ceed55d0d
+}

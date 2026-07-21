@@ -1,0 +1,91 @@
+{
+  "name": "mcp-sap-docs",
+  "version": "0.3.51",
+  "type": "module",
+  "main": "dist/server.js",
+  "scripts": {
+    "build:tsc": "tsc",
+    "build:index": "npm run build:tsc && node dist/scripts/build-index.js",
+    "build:fts": "npm run build:tsc && node dist/scripts/build-fts.js",
+    "build:fts-only": "npm run build:tsc && node dist/scripts/build-index.js && node dist/scripts/build-fts.js",
+    "build": "npm run build:tsc && node dist/scripts/build-index.js && node dist/scripts/build-fts.js && node dist/scripts/build-embeddings.js",
+    "build:embeddings": "npm run build:tsc && node dist/scripts/build-embeddings.js",
+    "btp:build-image": "bash scripts/btp/build-ghcr-image.sh",
+    "btp:build-image:push": "bash scripts/btp/build-ghcr-image.sh --push",
+    "btp:deploy:mta": "node scripts/btp/deploy-cf-mta.mjs",
+    "start": "node dist/src/server.js",
+    "start:http": "node dist/src/http-server.js",
+    "start:streamable": "node dist/src/streamable-http-server.js",
+    "inspect": "npx @modelcontextprotocol/inspector",
+    "test": "npm run test:url-generation && npm run test:discovery-center && npm run test:integration",
+    "test:sparse-checkout": "npm run build:tsc && npx vitest run test/sparse-checkout.test.ts",
+    "test:url-generation": "npm run build:tsc && npx vitest run test/comprehensive-url-generation.test.ts test/source-url-matrix.test.ts test/source-url-preference.test.ts test/openux-materializer.test.ts test/search-response-schema.test.ts test/prompts.test.ts test/software-heroes-afm.test.ts test/ui5-version-diff.test.ts test/sap-help-id.test.ts",
+    "test:url-generation:debug": "npm run build:tsc && DEBUG_TESTS=true npx vitest run test/comprehensive-url-generation.test.ts",
+    "test:mcp-urls": "npm run build:tsc && npx vitest run test/mcp-search-url-verification.test.ts",
+    "test:integration": "npm run build && node test/tools/run-tests.js",
+    "test:integration:run": "node test/tools/run-tests.js",
+    "test:integration:urls": "npm run build && node test/tools/run-tests.js --spec search-url-verification.js",
+    "test:integration:urls:run": "node test/tools/run-tests.js --spec search-url-verification.js",
+    "test:smoke": "node test/tools/search.smoke.js",
+    "test:community": "npm run build:tsc && node test/community-search.ts",
+    "test:community-tool": "npm run build:tsc && node test/tools/community-search-tool.mjs",
+    "test:urls:status": "npm run build:tsc && npx tsx test/url-status.ts",
+    "test:prod": "node scripts/test-live-prod.mjs",
+    "check-version": "node scripts/check-version.js",
+    "download:ui5-lib-diff": "node scripts/download-ui5-lib-diff.mjs",
+    "setup": "bash setup.sh",
+    "setup:submodules": "git submodule sync --recursive && git submodule update --init --recursive --depth 1 && git submodule status --recursive",
+    "test:software-heroes": "npm run build:tsc && npx vitest run test/software-heroes-core.test.ts test/software-heroes-afm.test.ts test/software-heroes-content-search.test.ts",
+    "test:discovery-center": "npm run build:tsc && npx vitest run test/discovery-center.test.ts",
+    "test:discovery-center:live": "npm run build:tsc && node test/discovery-center-live.mjs",
+    "test:fetch-sap-help": "npm run build:tsc && npx vitest run test/fetch-sap-help.test.ts",
+    "test:sap-objects": "npm run build:tsc && npx vitest run test/sap-released-objects.test.ts",
+    "test:embeddings": "npm run build:tsc && npx vitest run test/embeddings.test.ts",
+    "test:ui5-version-diff": "npm run build:tsc && npx vitest run test/ui5-version-diff.test.ts",
+    "eval": "npm run build:tsc && node test/eval/run-eval.js",
+    "eval:update": "npm run build:tsc && node test/eval/run-eval.js --update",
+    "test:version-filter": "npm run build:tsc && npx vitest run test/version-filter-sap-help.test.ts",
+    "test:product-filter": "npm run build:tsc && npx vitest run test/product-filter-sap-help.test.ts",
+    "test:fallback-ladder": "npm run build:tsc && npx vitest run test/help-fallback-ladder.test.ts",
+    "test:citations": "npm run build:tsc && npx vitest run test/citations-sap-help.test.ts",
+    "test:html-to-md": "npm run build:tsc && npx vitest run test/html-to-md.test.ts"
+  },
+  "ts-node": {
+    "esm": true
+  },
+  "dependencies": {
+    "@abaplint/core": "^2.115.0",
+    "@huggingface/transformers": "^3.8.1",
+    "@modelcontextprotocol/sdk": "^1.25.3",
+    "better-sqlite3": "^12.2.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "fast-glob": "^3.3.2",
+    "gray-matter": "^4.0.3",
+    "turndown": "^7.2.4",
+    "turndown-plugin-gfm": "^1.0.2",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^4.17.23",
+    "@types/node": "^20.11.19",
+    "@types/turndown": "^5.0.6",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.4",
+    "vitest": "^2.1.5"
+  },
+  "description": "Offline SAP documentation MCP server with unified local + online search",
+  "homepage": "https://github.com/marianfoo/mcp-sap-docs#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marianfoo/mcp-sap-docs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/marianfoo/mcp-sap-docs/issues"
+  },
+  "bin": {
+    "mcp-sap-docs": "dist/src/server.js"
+  }
+}

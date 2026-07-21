@@ -1,0 +1,22 @@
+# Build outputs
+dist/
+node_modules/
+
+# Configuration files
+*.json
+*.yaml
+*.yml
+
+# Archives
+mta_archives/
+
+# Environment files
+.env*
+
+# Documentation
+docs/
+*.md
+
+# IDE and system files
+.vscode/
+.git/

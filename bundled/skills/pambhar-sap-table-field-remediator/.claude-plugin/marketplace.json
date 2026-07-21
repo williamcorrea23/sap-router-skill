@@ -1,0 +1,14 @@
+{
+  "name": "sap-remediator",
+  "description": "S/4HANA brownfield remediation tooling for custom ABAP — detect, tier, and fix table/field breaks, with a page-cited Simplification-List knowledge base over MCP.",
+  "owner": {
+    "name": "TUM x Deloitte - AI Coding Skill 3"
+  },
+  "plugins": [
+    {
+      "name": "sap-table-field-remediator",
+      "source": ".",
+      "description": "Detect custom ABAP that breaks in an S/4HANA brownfield conversion, tier each fix by how much human judgment it needs, and emit a machine-readable remediation report. Bundles a page-cited Simplification-List knowledge base served over MCP."
+    }
+  ]
+}

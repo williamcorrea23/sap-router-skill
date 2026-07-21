@@ -1,0 +1,20 @@
+{
+  "name": "sapstack",
+  "version": "2.4.0",
+  "description": "SAP Enterprise Operations Platform — 20 plugins, 16 agents, 18 commands, 328+ T-codes, 6 languages, MCP server, VS Code Extension, country/industry/bridge/exceptions/hooks frameworks",
+  "license": "MIT",
+  "author": "BoxLogoDev",
+  "keywords": [
+    "sap", "abap", "s4hana", "claude-code", "skills", "agents", "plugins", "mcp",
+    "fi", "co", "tr", "mm", "sd", "pp", "hcm", "successfactors", "btp", "basis",
+    "pm", "qm", "wm", "ewm", "gts", "cloud-pe"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BoxLogoDev/sapstack"
+  },
+  "bugs": {
+    "url": "https://github.com/BoxLogoDev/sapstack/issues"
+  },
+  "homepage": "https://github.com/BoxLogoDev/sapstack#readme"
+}

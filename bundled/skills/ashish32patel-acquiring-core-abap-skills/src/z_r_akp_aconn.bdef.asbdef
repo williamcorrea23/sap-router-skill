@@ -1,0 +1,61 @@
+managed implementation in class ZBP_CL_R_AKP_ACONN unique;
+strict ( 2 );
+with draft;
+define behavior for Z_R_AKP_ACONN alias Connection
+persistent table zakp_aconn
+draft table zakp_aconn_d
+etag master LocalLastChangedAt
+lock master total etag LastChangedAt
+authorization master ( global )
+
+{
+  field ( readonly )
+  UUID,
+  LocalCreatedAt,
+  LocalCreatedBy,
+  LastChangedAt,
+  LocalLastChangedAt,
+  LocalLastChangedBy;
+
+  field ( numbering : managed )
+  UUID;
+
+
+  create;
+  update;
+  delete;
+
+  draft action Edit;
+  draft action Activate optimized;
+  draft action Discard;
+  draft action Resume;
+  draft determine action Prepare;
+
+  mapping for zakp_aconn
+    {
+      UUID               = uuid;
+      CarrierID          = carrier_id;
+      ConnectionID       = connection_id;
+      AirportFromID      = airport_from_id;
+      CityFrom           = city_from;
+      CountryFrom        = country_from;
+      AirportToID        = airport_to_id;
+      CityTo             = city_to;
+      CountryTo          = country_to;
+      LocalCreatedBy     = local_created_by;
+      LocalCreatedAt     = local_created_at;
+      LocalLastChangedBy = local_last_changed_by;
+      LocalLastChangedAt = local_last_changed_at;
+      LastChangedAt      = last_changed_at;
+    }
+
+  validation CheckSemanticKey on save { create; update; }
+  validation CheckCarrierID on save { create; field CarrierID; }
+  validation CheckOriginDestination on save { create; field AirportFromID, AirportToID; }
+  determination GetCities on save { field airportFromID, AirportToID; }
+
+  field( readonly ) CityFrom , CountryFrom, CityTo, CountryTo;
+
+
+
+}

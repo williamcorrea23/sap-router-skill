@@ -1,0 +1,90 @@
+# SAP CLI Skill - Git 忽略配置
+
+# ==================== 敏感信息 ====================
+# 环境变量文件（包含 SAP 连接密码等敏感信息）
+.env
+.env.sapcli
+.env.*.local
+.env.erp-*
+.env.erp-dev
+.env.erp-test
+.env.crm-*
+.env.srm-*
+
+# 会话记录文件（包含用户路径和配置信息）
+session_*.json
+
+# 个人配置文件
+.sapcli-persona.json
+
+# 初始化对话记录
+sapcli_init_dialog_*.md
+
+# ==================== 测试与工作空间 ====================
+# 测试工作空间（本地测试输出）
+sapcli-skill-workspace/
+*-workspace/
+
+# 测试输出
+test-output/
+coverage/
+.pytest_cache/
+
+# ==================== 大型二进制文件 ====================
+# SAP NW RFC SDK（需单独下载，约 100MB+）
+tools/sapSdk/
+
+# PyRFC 编译文件
+*.pyd
+
+# ==================== Python ====================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# ==================== 日志文件 ====================
+*.log
+dev_rfc.log
+
+# ==================== IDE 配置 ====================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ==================== 操作系统文件 ====================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ==================== 临时文件 ====================
+tmp/
+temp/
+*.tmp
+*.bak
+
+# ==================== 本地配置 ====================
+.env.local
+.env.*.local
+
+# ==================== 其他 ====================
+# .iflow 目录（iFlow 平台特定配置）
+.iflow/

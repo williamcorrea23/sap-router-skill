@@ -1,0 +1,98 @@
+"""gCTS Error wrappers"""
+
+import json
+import re
+from sap.errors import SAPCliError
+
+
+class GCTSRequestError(SAPCliError):
+    """Base gCTS error type"""
+
+    def __init__(self, messages):
+        super().__init__()
+
+        self.messages = messages
+
+    def __repr__(self):
+        return json.dumps(self.messages, indent=2)
+
+    def __str__(self):
+        return f'gCTS exception: {self.messages["exception"]}'
+
+
+class GCTSRepoAlreadyExistsError(GCTSRequestError):
+    """A repository already exists"""
+
+    # pylint: disable=unnecessary-pass
+    pass
+
+
+class GCTSRepoNotExistsError(GCTSRequestError):
+    """A repository does not exist"""
+
+    def __init__(self, messages):
+        super().__init__(messages)
+        self.messages['exception'] = 'Repository does not exist'
+
+
+class GCTSRepoCloneError(GCTSRequestError):
+    """A repository clone error"""
+
+    def __init__(self, messages):
+        super().__init__(messages)
+        self.messages['exception'] = 'Repository unable to clone. Already cloned or in use'
+
+
+class GCTSRepoCloneTaskDeleteError(GCTSRequestError):
+    """A repository clone task delete error"""
+
+    def __init__(self, messages):
+        super().__init__(messages)
+        self.messages['exception'] = 'Task unable to delete. Already performed clone operation.'
+
+
+class GCTSProcessError(SAPCliError):
+    """Process error raised by a code watching gCTS background tasks"""
+
+    def __init__(self, process_messages, *, process_name=None, process_id=None):
+        if process_name:
+            message = f'gCTS process {process_name} failed (log id: {process_id})'
+        else:
+            message = 'gCTS process failed'
+
+        super().__init__(message)
+
+        self.process_name = process_name
+        self.process_id = process_id
+        self.process_messages = process_messages
+
+
+def exception_from_http_error(http_error):
+    """Converts HTTPRequestError to proper instance"""
+
+    if 'application/json' not in http_error.response.headers.get('Content-Type', ''):
+        return http_error
+
+    messages = http_error.response.json()
+
+    log = messages.get('log', None)
+    if log:
+        first_entry = log[0].get('message', '')
+
+        repo_already_exists_suffixes = (
+            'Error action CLONE_REPOSITORY Repository already cloned or in use',
+            'Error action CREATE_REPOSITORY Repository already exists',
+            'Error action Repository already exists',
+        )
+
+        if any(first_entry.endswith(suffix) for suffix in repo_already_exists_suffixes):
+            return GCTSRepoAlreadyExistsError(messages)
+
+        if re.match(r'Repository .* was already created by user .*', first_entry):
+            return GCTSRepoAlreadyExistsError(messages)
+
+    exception = messages.get('exception', None)
+    if exception == 'No relation between system and repository':
+        return GCTSRepoNotExistsError(messages)
+
+    return GCTSRequestError(messages)

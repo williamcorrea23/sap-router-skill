@@ -1,0 +1,55 @@
+{
+  "skill_name": "sap-s4hana-fico-implementation",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I'm learning SAP FICO. How do I configure a Chart of Accounts in S/4HANA?",
+      "expected_output": "Step-by-step teaching mode guide covering: (1) What is Chart of Accounts and business purpose, (2) SPRO path, (3) Transaction OB13, (4) Table SKA1, (5) Field-by-field guidance with examples, (6) Account numbering best practices, (7) Testing steps, (8) Next steps (assign to company code). Response should be teaching-focused with business context.",
+      "files": [],
+      "assertions": [
+        "Response detects fresher persona (teaching mode)",
+        "Mentions transaction OB13",
+        "Mentions table SKA1",
+        "Provides SPRO path",
+        "Explains business purpose of Chart of Accounts",
+        "Provides example account numbering structure",
+        "Includes testing steps",
+        "Mentions next step: OB62 (assign to company code)",
+        "Uses encouraging tone appropriate for learner"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I need to configure parallel accounting with IFRS and Local GAAP ledgers in S/4HANA, with different depreciation keys for each ledger in Asset Accounting. What's the best approach?",
+      "expected_output": "Professional mode response with: (1) Direct solution approaches (2-3 options), (2) Transaction FINSC_LEDGER for ledger config, (3) Asset Accounting parallel valuation setup, (4) Trade-offs and performance considerations, (5) Maintenance implications, (6) Testing approach. Should be concise and technical.",
+      "files": [],
+      "assertions": [
+        "Response detects professional persona (expert mode)",
+        "Mentions transaction FINSC_LEDGER",
+        "Discusses parallel ledgers (0L leading, 2L/3L non-leading)",
+        "Addresses Asset Accounting parallel valuation",
+        "Provides multiple solution approaches with trade-offs",
+        "Mentions performance or maintenance considerations",
+        "Uses technical SAP terminology confidently",
+        "Response is direct and efficient (not overly explanatory)"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "How do I configure TDS (Tax Deducted at Source) for India?",
+      "expected_output": "Country-specific localization guidance reading from india-localization.md reference file. Should cover: (1) TDS tax procedure, (2) TDS sections and rates, (3) Withholding tax configuration, (4) Vendor master TDS fields, (5) Automatic payment program for TDS, (6) Form 26AS reporting, (7) Test scenario. Should reference India-specific transactions and config.",
+      "files": [],
+      "assertions": [
+        "References india-localization.md or provides India TDS framework",
+        "Mentions TDS sections (e.g., 194C, 194J)",
+        "Discusses withholding tax configuration",
+        "Mentions extended withholding tax (EWT)",
+        "Provides vendor master TDS field guidance",
+        "Discusses F110 (automatic payment) TDS handling",
+        "Mentions Form 26AS or TDS reporting",
+        "Provides test scenario for TDS",
+        "Uses India-specific terminology"
+      ]
+    }
+  ]
+}

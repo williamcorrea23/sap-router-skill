@@ -1,0 +1,507 @@
+"""Python decorators for conversions of Python objects to ADT XML fragments
+
+# Attributes:
+#
+# <NAME attr_one="something" attr_two="success"/>
+
+class SampleObject(metaclass=OrderedClassMembers):
+
+    read_write_attr = XmlNodeAttributeProperty('attr_two')
+
+    def __init__(self):
+        self._void = None
+
+    @xml_attribute("attr_one")
+    def read_only_attr(self) -> str:
+        return 'something'
+
+
+so = SampleObject()
+so.read_write_attr = 'success'
+
+# Elements:
+#
+# <?xml version="1.0" encoding="UTF-8"?>
+# <root_element>
+#    <child_element attr_one="something" attr_two="test_two"/>
+# </root_element>
+
+class RootObject(metaclass=OrderedClassMembers):
+
+    config = XmlNodeProperty('child_element', factory=SampleObject)
+
+    def __init__(self):
+        self.config = None
+
+ro = RootObject()
+ro.config.read_write_attr = 'test_two'
+
+# Lists:
+#
+# <parent>
+#   <item foo="bar"/>
+# </parent>
+
+class SampleItem(metaclass=OrderedClassMembers):
+
+    prop_foo = XmlNodeAttributeProperty('foo')
+
+    def __init__(self, foo):
+        self.prop_foo = foo
+
+
+class SampleList(metaclass=OrderedClassMembers):
+
+    items = XmlListNodeProperty('item')
+
+sl = SampleList()
+sl.items.apped(SampleItem("bar"))
+
+# Text element:
+# <parent>
+#   <child>text data</child>
+# </parent>
+
+class SampleTextElement(metaclass=OrderedClassMembers):
+
+    child = xml_text_node_property('child')
+
+    def __init__(self, text):
+        self.child = text
+
+sample = SampleTextElement('text data')
+
+# Text and attributes:
+# <parent>
+#   <child demo="value">text data</child>
+# </parent>
+
+class SampleTextWithAttrElement(metaclass=OrderedClassMembers):
+
+    demo = XmlNodeAttributeProperty('demo')
+
+    def __init__(self, text):
+        self.demo = 'value'
+        self._text = text
+
+    @xml_text()
+    def text(self):
+        return self._text
+
+    @text.setter
+    def text(self, value):
+        self._text = value
+
+sample = SampleTextWithAttrElement('text data')
+"""
+
+from enum import Enum
+import collections
+
+
+def _make_attr_name_for_version(element_name, version):
+    """Makes the given name unique for the given version parameter
+       which can be:
+       - None : version is irrelevant
+       - str : single version
+       - list|set : name appears in several versions
+    """
+
+    def format_name(version, suffix):
+        return f'{version}_{suffix}'
+
+    name = f'_{element_name}'.replace(':', '_')
+
+    if version is None:
+        # No suffix needed
+        return name
+
+    if isinstance(version, str):
+        # Single version
+        return format_name(name, version)
+
+    if isinstance(version, (list, set)):
+        # Multiple versions
+        return format_name(name, '_'.join(version))
+
+    raise TypeError(f'Version cannot be of the type {type(version).__name__}')
+
+
+class OrderedClassMembers(type):
+    """MetaClass to preserve get order of member declarations
+       to serialize the XML elements in the expected order.
+    """
+
+    @classmethod
+    # pylint: disable=unused-argument
+    def __prepare__(mcs, name, bases):
+        return collections.OrderedDict()
+
+    def __new__(mcs, name, bases, classdict):
+        members = []
+
+        if bases:
+            parent = bases[-1]
+            if hasattr(parent, '__ordered__'):
+                members.extend(parent.__ordered__)
+
+        child_keys = [key for key in classdict.keys()
+                      if key not in ('__module__', '__qualname__')]
+
+        # Remove parent members that the child class redefines
+        # so that the child's declaration order takes precedence.
+        redefined = set(child_keys) & set(members)
+        if redefined:
+            members = [m for m in members if m not in redefined]
+
+        members.extend(child_keys)
+
+        classdict['__ordered__'] = members
+
+        return type.__new__(mcs, name, bases, classdict)
+
+
+class XmlElementKind(Enum):
+    """XML element kinds"""
+
+    OBJECT = 1  # Represents XML tag: <tag attribute=foo><child>...</child></tag>
+    TEXT = 2  # Represents text data of an XML tag: <tag>text data</tag>
+
+
+# pylint: disable=too-few-public-methods
+class XmlAttributeProperty(property):
+    """XML Annotation"""
+
+    def __init__(self, name, fget, fset=None, deserialize=True, version=None):
+        super().__init__(fget, fset)
+
+        self.name = name
+        self.deserialize = deserialize
+        self.version = version
+
+    def setter(self, fset):
+        return type(self)(self.name, self.fget, fset, deserialize=self.deserialize)
+
+
+# pylint: disable=too-few-public-methods
+class XmlTextProperty(property):
+    """XML Annotation marking the property as a text node of an XML element. A
+    class can have only 1 such property.
+    """
+
+    def __init__(self, fget, fset=None, deserialize=True, version=None):
+        super().__init__(fget, fset)
+
+        # Used by marshaller in debug logs
+        self.name = '#text'
+        self.deserialize = deserialize
+        self.version = version
+
+    def setter(self, fset):
+        return type(self)(self.fget, fset, deserialize=self.deserialize, version=self.version)
+
+
+# pylint: disable=too-few-public-methods,too-many-arguments
+class XmlElementProperty(property):
+    """XML Annotation
+
+       Arguments:
+        - name: XML element name
+        - fget: getter function for the annotated property
+        - fset: setter function for the annotated property (default: None)
+        - deserialize: whether the property should be deserialized when parsing
+          XML, use False if you need a property that appears only in
+          serialization (default: True)
+        - factory: a callable to create an instance of the property type when deserializing (default: None)
+        - kind: the kind of XML element OBJECT or TEXT (default: OBJECT)
+        - version: an optional version or list of versions to make the property name unique across versions (default: None)
+        - ignore_empty: set to True if you do not want to serialize empty XML tags for None values (default: False)
+    """
+
+    NAME_FROM_OBJECT = None
+
+    def __init__(self, name, fget, fset=None, deserialize=True, factory=None, kind=XmlElementKind.OBJECT,
+                 version=None, ignore_empty=False):
+        super().__init__(fget, fset)
+
+        self.name = name
+        self.deserialize = deserialize
+        self.factory = factory
+        self.kind = kind
+        self.version = version
+        self.ignore_empty = ignore_empty
+
+    def setter(self, fset):
+        return type(self)(self.name, self.fget, fset, deserialize=self.deserialize, factory=self.factory,
+                          kind=self.kind, ignore_empty=self.ignore_empty)
+
+
+class XmlPropertyImpl:
+    """XML Property implementation which enriches the given object with a new
+       attribute whose name is built from the corresponding XML name.
+    """
+
+    def __init__(self, name, default_value=None, version=None):
+
+        self.attr = _make_attr_name_for_version(name, version)
+
+        self.default_value = default_value
+
+    def get(self, obj):
+        """Getter"""
+
+        try:
+            return getattr(obj, self.attr)
+        except AttributeError:
+            return self.default_value
+
+    def set(self, obj, value):
+        """Setter"""
+
+        obj.__dict__[self.attr] = value
+
+
+class XmlNodeProperty(XmlElementProperty, XmlPropertyImpl):
+    """A descriptor class to avoid the need to define 2 useless functions
+       get/set when absolutely not necessary.
+
+       Arguments:
+         - name: XML element name
+         - value: default value to return if the property is not set on the object
+         - deserialize: whether the property should be deserialized when
+           parsing XML, use False if you need a property that appears only in
+           serialization (default: True)
+         - factory: a callable to create an instance of the property type when deserializing (default: None)
+         - kind: the kind of XML element (default: OBJECT)
+         - version: an optional version or list of versions to make the property name unique across versions (default: None)
+         - ignore_empty: set to True if you do not want to serialize empty XML tags for None values (default: False)
+    """
+
+    def __init__(self, name, value=None, deserialize=True, factory=None, kind=XmlElementKind.OBJECT, version=None,
+                 ignore_empty=False):
+        super().__init__(name, self.get, fset=self.set, deserialize=deserialize, factory=factory,
+                         kind=kind, version=version, ignore_empty=ignore_empty)
+        XmlPropertyImpl.__init__(self, name, default_value=value, version=version)
+
+    def setter(self, fset):
+        """Turned off setter decorator which is not necessary and confusing"""
+
+        # TODO: reorder inheritance - this is stupid!
+        raise NotImplementedError()
+
+
+class XmlNodeAttributeProperty(XmlAttributeProperty, XmlPropertyImpl):
+    """A descriptor class to avoid the need to define 2 useless functions
+       get/set when absolutely not necessary.
+    """
+
+    def __init__(self, name, value=None, deserialize=True, version=None):
+        super().__init__(name, self.get, fset=self.set, deserialize=deserialize,
+                         version=version)
+        XmlPropertyImpl.__init__(self, name, default_value=value, version=version)
+
+    def setter(self, fset):
+        """Turned off setter decorator which is not necessary and confusing"""
+
+        # TODO: reorder inheritance - this is stupid!
+        raise NotImplementedError()
+
+
+class XmlListNodeProperty(XmlElementProperty):
+    """Many repetitions of the same tag:
+
+        <the-name-arg value=foo/>
+        <the-name-arg value=bar/>
+        <the-name-arg value=grc/>
+
+        The property member has a magic side effect: the setter is the method append
+        and it does not set the list but appends the given value to the list of items.
+
+        class SampleList(metaclass=OrderedClassMembers):
+            items = XmlListNodeProperty('item')
+
+        sl = SampleList()
+
+        # To append to an empty list, you can either assign the value to the property:
+        sl.items = SampleItem("bar")
+
+        # Or define the list with a default value and then append to it:
+        class SampleList(metaclass=OrderedClassMembers):
+            items = XmlListNodeProperty('item', value=[])
+
+        # and then append to the list:
+        sl.items.append(SampleItem("bar"))
+
+        The reason behind the appending setter is to keep the marshaller simple.
+
+        The serialization of the list is straightforward: each item is
+        serialized as a child XML element of the same name. The marshaller
+        does not generated anything if the list is empty or None - because
+        during deserialization, the marshaller does not need to remember
+        whether the element is a list item or a single object - the marshaller
+        just deserializes the element an sets the property to the deserialized value,
+        and the setter takes care of appending the value to the list if needed.
+
+        Some ADT objects simply mixes single and multiple occurrences of elements
+        instead of wrapping lists in a container element.
+
+        <adt-object>
+            <some-other-data/>
+            <the-name-arg value=foo/>
+            <the-name-arg value=bar/>
+            <the-name-arg value=grc/>
+            <yet-another-object/>
+        </adt-object>
+    """
+
+    def __init__(self, name, value=None, deserialize=True, factory=None, kind=XmlElementKind.OBJECT, version=None):
+        super().__init__(name, self.get, fset=self.append, deserialize=deserialize,
+                         factory=factory, kind=kind, version=version)
+
+        if value is not None and not isinstance(value, list):
+            raise RuntimeError()
+
+        self.attr = _make_attr_name_for_version(name, version)
+
+        self.default_value = value
+
+    def _get_list(self, obj):
+        items = obj.__dict__.get(self.attr, None)
+        if items is None:
+            if self.default_value is not None:
+                items = list(self.default_value)
+                obj.__dict__[self.attr] = items
+
+        return items
+
+    def get(self, obj):
+        """Getter"""
+
+        try:
+            return getattr(obj, self.attr)
+        except AttributeError:
+            return self._get_list(obj)
+
+    def append(self, obj, value):
+        """Setter"""
+
+        items = self._get_list(obj)
+        if items is None:
+            items = []
+            obj.__dict__[self.attr] = items
+
+        items.append(value)
+
+
+class XmlContainerMeta(OrderedClassMembers):
+    """A MetaClass adding the class-method 'define' which returns
+       a class representing ADT XML container - i.e a wrapping node
+       with many children of the same tag.
+    """
+
+    def define(cls, item_element_name, item_factory, version=None):
+        """Defines a new class with the property items which will be
+           annotated as XmlElement.
+
+           The annotated property is named 'items' and can be publicly used.
+        """
+
+        items_property = XmlListNodeProperty(item_element_name, deserialize=True, factory=item_factory,
+                                             value=[], kind=XmlElementKind.OBJECT, version=version)
+
+        return type(f'XMLContainer_{item_factory.__name__}', (cls,), {'items': items_property})
+
+
+class XmlContainer(metaclass=XmlContainerMeta):
+    """A template class with the property items which is annotated as XmlElement.
+    The resulting class provides a list-like interface to the items:
+        - append(value) to append an item to the list
+        - __iter__() to iterate over the items
+        - __getitem__(index) to get an item by index
+        - __len__() to get the number of items
+
+    Usage:
+        If you need to parse something like this:
+
+        <adt-object>
+            <the-xml-container-name>
+                <the-item-element-name value=foo/>
+                <the-item-element-name value=bar/>
+                <the-item-element-name value=grc/>
+            </the-xml-container-name>
+        </adt-object>
+
+        # Then you can define a class for the container like this:
+
+        class TheItem:
+            xml_attr = XmlNodeAttributeProperty('value')
+
+        MyItemsContainer = XmlContainer.define('the-item-element-name', TheItem)
+
+        # and then use it in the ADT object class:
+
+        class MyAdtObject(ADTObject):
+            items = XmlNodeProperty('the-xml-container-name', factory=MyItemsContainer)
+    """
+
+    def append(self, value):
+        """Appends the give value to the XML container"""
+
+        # pylint: disable=no-member
+        self.items.append(value)
+
+    def __iter__(self):
+        # pylint: disable=no-member
+        return self.items.__iter__()
+
+    def __getitem__(self, index):
+        # pylint: disable=no-member
+        return self.items.__getitem__(index)
+
+    def __len__(self):
+        # pylint: disable=no-member
+        return self.items.__len__()
+
+
+def xml_text_node_property(name, value=None, deserialize=True, version=None, ignore_empty=False):
+    """A factory method returning a descriptor property XML Element without attributes and holding
+       the value in a text node.
+    """
+
+    return XmlNodeProperty(name, value=value, deserialize=deserialize, factory=None, kind=XmlElementKind.TEXT,
+                           version=version, ignore_empty=ignore_empty)
+
+
+def xml_text(deserialize=True, version=None):
+    """A factory method returning a descriptor property marking the text node.
+    """
+
+    def decorator(meth):
+        """Creates a property object"""
+
+        return XmlTextProperty(meth, deserialize=deserialize, version=version)
+
+    return decorator
+
+
+def xml_attribute(name, deserialize=True, version=None):
+    """Mark the given property as a XML element attribute of the given name"""
+
+    def decorator(meth):
+        """Creates a property object"""
+
+        return XmlAttributeProperty(name, meth, deserialize=deserialize, version=version)
+
+    return decorator
+
+
+def xml_element(name, deserialize=True, factory=None, kind=XmlElementKind.OBJECT, version=None, ignore_empty=False):
+    """Mark the given property as a XML element of the given name"""
+
+    def decorator(meth):
+        """Creates a property object"""
+
+        return XmlElementProperty(name, meth, deserialize=deserialize, factory=factory, kind=kind, version=version,
+                                  ignore_empty=ignore_empty)
+
+    return decorator

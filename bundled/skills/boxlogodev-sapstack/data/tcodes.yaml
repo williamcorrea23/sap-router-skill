@@ -1,0 +1,1915 @@
+# sapstack — 확정된 SAP T-code 리스트 (모듈별)
+#
+# 목적: scripts/check-tcodes.sh가 SKILL.md의 T-code를 이 리스트와 대조하여
+# 오탈자·존재하지 않는 T-code를 탐지합니다.
+#
+# 엔트리 형식:
+#   <T-CODE>:
+#     name: 한 줄 설명
+#     modules: [FI, CO, MM, ...]   # 해당 T-code가 속한 모듈
+#     release: both | ecc_only | s4_only | s4_2021+
+#     note: 선택적 부가 정보 (예: deprecated, replaced_by)
+#
+# 업데이트 원칙:
+#   - ECC vs S/4HANA에서 동작이 달라진 경우 release 필드로 명시
+#   - 확실하지 않은 T-code는 등록 금지 (과소 등록이 과잉 등록보다 낫다)
+#   - 한국 특화 T-code는 modules에 BC 또는 KR 태그 추가
+
+# ──────────────────────────────────────────────────────────────
+# BASIS / BC (System Administration)
+# ──────────────────────────────────────────────────────────────
+SM50:
+  name: Work Process Overview (local)
+  modules: [BASIS, BC]
+  release: both
+SM51:
+  name: Work Process Overview (all servers)
+  modules: [BASIS, BC]
+  release: both
+SM66:
+  name: Global Work Process Overview
+  modules: [BASIS, BC]
+  release: both
+SM12:
+  name: Lock Entries
+  modules: [BASIS, BC]
+  release: both
+SM13:
+  name: Update Requests
+  modules: [BASIS, BC]
+  release: both
+SM21:
+  name: System Log
+  modules: [BASIS, BC]
+  release: both
+SM36:
+  name: Define Background Job
+  modules: [BASIS, BC]
+  release: both
+SM37:
+  name: Background Job Overview
+  modules: [BASIS, BC]
+  release: both
+SM59:
+  name: RFC Destinations
+  modules: [BASIS, BC]
+  release: both
+SM30:
+  name: Call View Maintenance
+  modules: [BASIS, BC]
+  release: both
+SM31:
+  name: Table Maintenance
+  modules: [BASIS, BC]
+  release: both
+SMICM:
+  name: ICM Monitor
+  modules: [BASIS, BC]
+  release: both
+SMGW:
+  name: Gateway Monitor
+  modules: [BASIS, BC]
+  release: both
+ST22:
+  name: ABAP Runtime Error (Dump) Analysis
+  modules: [BASIS, BC, ABAP]
+  release: both
+ST05:
+  name: SQL Trace
+  modules: [BASIS, BC, ABAP]
+  release: both
+ST06:
+  name: OS Monitor
+  modules: [BASIS, BC]
+  release: both
+ST02:
+  name: Memory Buffers
+  modules: [BASIS, BC]
+  release: both
+STMS:
+  name: Transport Management System
+  modules: [BASIS, BC]
+  release: both
+SCC4:
+  name: Client Administration
+  modules: [BASIS, BC]
+  release: both
+SCC1:
+  name: Client Copy from Transport
+  modules: [BASIS, BC]
+  release: both
+STRUST:
+  name: Trust Manager (SSL Certificates)
+  modules: [BASIS, BC]
+  release: both
+SE09:
+  name: Transport Organizer
+  modules: [BASIS, BC, ABAP]
+  release: both
+SE10:
+  name: Transport Organizer (Extended)
+  modules: [BASIS, BC, ABAP]
+  release: both
+SU01:
+  name: User Maintenance
+  modules: [BASIS, BC]
+  release: both
+SU10:
+  name: Mass User Maintenance
+  modules: [BASIS, BC]
+  release: both
+PFCG:
+  name: Role Maintenance
+  modules: [BASIS, BC]
+  release: both
+SUIM:
+  name: User Information System
+  modules: [BASIS, BC]
+  release: both
+SU53:
+  name: Evaluate Authorization Check
+  modules: [BASIS, BC]
+  release: both
+BD54:
+  name: Logical Systems
+  modules: [BASIS, BC]
+  release: both
+SPAM:
+  name: Support Package Manager
+  modules: [BASIS, BC]
+  release: both
+SAINT:
+  name: Add-On Installation Tool
+  modules: [BASIS, BC]
+  release: both
+SNOTE:
+  name: Note Assistant
+  modules: [BASIS, BC, ABAP]
+  release: both
+RZ20:
+  name: CCMS Monitoring
+  modules: [BASIS, BC]
+  release: both
+SAT:
+  name: Runtime Analysis
+  modules: [BASIS, BC, ABAP]
+  release: both
+
+# ──────────────────────────────────────────────────────────────
+# ABAP
+# ──────────────────────────────────────────────────────────────
+SE38:
+  name: ABAP Editor
+  modules: [ABAP]
+  release: both
+SE24:
+  name: Class Builder
+  modules: [ABAP]
+  release: both
+SE11:
+  name: Data Dictionary
+  modules: [ABAP]
+  release: both
+SE16:
+  name: Data Browser
+  modules: [ABAP]
+  release: both
+SE16N:
+  name: General Table Display
+  modules: [ABAP]
+  release: both
+  note: 운영 환경에서 데이터 직접 편집 금지
+SE80:
+  name: Object Navigator
+  modules: [ABAP]
+  release: both
+SE37:
+  name: Function Builder
+  modules: [ABAP]
+  release: both
+SE93:
+  name: Maintain Transaction Codes
+  modules: [ABAP]
+  release: both
+
+# ──────────────────────────────────────────────────────────────
+# FI (Financial Accounting)
+# ──────────────────────────────────────────────────────────────
+FB01:
+  name: Post Document
+  modules: [FI]
+  release: both
+FB02:
+  name: Change Document
+  modules: [FI]
+  release: both
+FB03:
+  name: Display Document
+  modules: [FI]
+  release: both
+FB50:
+  name: G/L Account Posting (Enjoy)
+  modules: [FI]
+  release: both
+FB60:
+  name: Enter Vendor Invoice
+  modules: [FI]
+  release: both
+FB70:
+  name: Enter Customer Invoice
+  modules: [FI]
+  release: both
+F-02:
+  name: Enter G/L Account Posting
+  modules: [FI]
+  release: both
+F-05:
+  name: Post Foreign Currency Valuation (ECC)
+  modules: [FI]
+  release: ecc_only
+F-29:
+  name: Post Customer Down Payment
+  modules: [FI]
+  release: both
+F-37:
+  name: Request Down Payment
+  modules: [FI]
+  release: both
+F-39:
+  name: Clear Down Payment
+  modules: [FI]
+  release: both
+F-44:
+  name: Clear Vendor
+  modules: [FI]
+  release: both
+F-47:
+  name: Post Vendor Down Payment Request
+  modules: [FI]
+  release: both
+F-48:
+  name: Post Vendor Down Payment
+  modules: [FI]
+  release: both
+F.01:
+  name: Balance Sheet
+  modules: [FI]
+  release: both
+F.08:
+  name: G/L Balance (per company code)
+  modules: [FI]
+  release: both
+F.13:
+  name: Automatic Clearing
+  modules: [FI]
+  release: both
+  note: Test Run 필수
+F.16:
+  name: Balance Carry Forward (GL)
+  modules: [FI]
+  release: ecc_only
+F110:
+  name: Automatic Payment Transactions
+  modules: [FI, TR]
+  release: both
+F150:
+  name: Dunning Run
+  modules: [FI]
+  release: both
+FAGL_FC_VAL:
+  name: Foreign Currency Valuation
+  modules: [FI]
+  release: both
+  note: Test Run 필수
+FAGLGVTR:
+  name: Balance Carry Forward (New G/L)
+  modules: [FI]
+  release: both
+FAGLB03:
+  name: Display G/L Balance
+  modules: [FI]
+  release: both
+FBL1N:
+  name: Vendor Line Items
+  modules: [FI]
+  release: both
+FBL5N:
+  name: Customer Line Items
+  modules: [FI]
+  release: both
+FD32:
+  name: Credit Management (ECC)
+  modules: [FI, SD]
+  release: ecc_only
+  note: S/4HANA FSCM에서는 UKM_BP
+FD33:
+  name: Display Credit Master
+  modules: [FI, SD]
+  release: ecc_only
+FBZP:
+  name: Payment Program Configuration
+  modules: [FI, TR]
+  release: both
+FBMP:
+  name: Dunning Procedures
+  modules: [FI]
+  release: both
+FI12:
+  name: Maintain House Banks (ECC)
+  modules: [FI, TR]
+  release: ecc_only
+FKMT:
+  name: Account Assignment Model
+  modules: [FI]
+  release: both
+FS00:
+  name: G/L Account Master
+  modules: [FI]
+  release: both
+FTXP:
+  name: Tax Code Maintenance
+  modules: [FI]
+  release: both
+OB52:
+  name: Open and Close Posting Periods
+  modules: [FI]
+  release: both
+OBC4:
+  name: Field Status Variants
+  modules: [FI]
+  release: both
+OB14:
+  name: Posting Key Field Status
+  modules: [FI]
+  release: both
+OMR6:
+  name: Tolerance Limits for Invoice Verification
+  modules: [FI, MM]
+  release: both
+OBYC:
+  name: Account Determination for Material Management
+  modules: [FI, MM]
+  release: both
+OBA1:
+  name: Exchange Rate Difference Accounts
+  modules: [FI]
+  release: both
+AFAB:
+  name: Post Depreciation
+  modules: [FI, AA]
+  release: both
+  note: Test Run 필수
+ABAVN:
+  name: Asset Retirement
+  modules: [FI, AA]
+  release: both
+AJAB:
+  name: Year-End Close for Asset Accounting
+  modules: [FI, AA]
+  release: both
+UDM_DISPUTE:
+  name: Dispute Management (S/4 FSCM)
+  modules: [FI]
+  release: s4_only
+UKM_BP:
+  name: Credit Master Data (S/4 FSCM)
+  modules: [FI, SD]
+  release: s4_only
+VKM1:
+  name: Released SD Documents — Orders
+  modules: [SD]
+  release: both
+VKM3:
+  name: Released SD Documents — Deliveries
+  modules: [SD]
+  release: both
+
+# ──────────────────────────────────────────────────────────────
+# CO (Controlling)
+# ──────────────────────────────────────────────────────────────
+KS01:
+  name: Create Cost Center
+  modules: [CO]
+  release: both
+KS02:
+  name: Change Cost Center
+  modules: [CO]
+  release: both
+KE30:
+  name: CO-PA Report Execution
+  modules: [CO]
+  release: both
+KE51:
+  name: Create Profit Center
+  modules: [CO]
+  release: both
+KE5Z:
+  name: PCA Line Item Report
+  modules: [CO]
+  release: both
+KO01:
+  name: Create Internal Order
+  modules: [CO]
+  release: both
+KO88:
+  name: Internal Order Settlement
+  modules: [CO]
+  release: both
+KP06:
+  name: Cost Center Planning (by element)
+  modules: [CO]
+  release: both
+KP26:
+  name: Activity Type Price Planning
+  modules: [CO]
+  release: both
+KSU5:
+  name: Assessment Cycle Execution
+  modules: [CO]
+  release: both
+KSV5:
+  name: Distribution Cycle Execution
+  modules: [CO]
+  release: both
+CK11N:
+  name: Create Cost Estimate
+  modules: [CO]
+  release: both
+CK24:
+  name: Price Update
+  modules: [CO]
+  release: both
+CKMLCP:
+  name: Actual Costing Run
+  modules: [CO]
+  release: both
+KKS1:
+  name: Variance Calculation (individual)
+  modules: [CO]
+  release: both
+KKS2:
+  name: Variance Calculation (selection)
+  modules: [CO]
+  release: both
+
+# ──────────────────────────────────────────────────────────────
+# TR (Treasury)
+# ──────────────────────────────────────────────────────────────
+FF7A:
+  name: Cash Position / Liquidity Forecast
+  modules: [TR]
+  release: both
+FF7B:
+  name: Liquidity Forecast (per currency)
+  modules: [TR]
+  release: both
+FF_5:
+  name: Import Electronic Bank Statement
+  modules: [TR]
+  release: both
+FEBAN:
+  name: Post-Process Bank Statements
+  modules: [TR]
+  release: both
+FTR_CREATE:
+  name: Create Financial Transaction
+  modules: [TR]
+  release: both
+
+# ──────────────────────────────────────────────────────────────
+# MM (Materials Management)
+# ──────────────────────────────────────────────────────────────
+MIGO:
+  name: Goods Movement
+  modules: [MM]
+  release: both
+MIRO:
+  name: Invoice Verification
+  modules: [MM, FI]
+  release: both
+MB51:
+  name: Material Document List
+  modules: [MM]
+  release: both
+MB52:
+  name: Warehouse Stock
+  modules: [MM]
+  release: both
+MB5B:
+  name: Stock on Posting Date
+  modules: [MM]
+  release: both
+MBEW:
+  name: Material Valuation Data
+  modules: [MM]
+  release: both
+MMBE:
+  name: Stock Overview
+  modules: [MM]
+  release: both
+ME21N:
+  name: Create Purchase Order
+  modules: [MM]
+  release: both
+ME22N:
+  name: Change Purchase Order
+  modules: [MM]
+  release: both
+ME23N:
+  name: Display Purchase Order
+  modules: [MM]
+  release: both
+MEK1:
+  name: Create Condition (Purchasing)
+  modules: [MM]
+  release: both
+MEK3:
+  name: Display Condition (Purchasing)
+  modules: [MM]
+  release: both
+MMPV:
+  name: Close Period for Material Master
+  modules: [MM]
+  release: both
+MR11:
+  name: GR/IR Account Maintenance
+  modules: [MM]
+  release: both
+  note: Test Run 필수
+MRBR:
+  name: Release Blocked Invoices
+  modules: [MM]
+  release: both
+OMSY:
+  name: MM Periods
+  modules: [MM]
+  release: both
+OMJ1:
+  name: Negative Stock Settings
+  modules: [MM]
+  release: both
+OMJJ:
+  name: Movement Type Configuration
+  modules: [MM]
+  release: both
+OMWB:
+  name: Account Determination (MM)
+  modules: [MM, FI]
+  release: both
+COGI:
+  name: Automatic Goods Movement Errors
+  modules: [MM, PP]
+  release: both
+
+# ──────────────────────────────────────────────────────────────
+# SD (Sales & Distribution)
+# ──────────────────────────────────────────────────────────────
+VA01:
+  name: Create Sales Order
+  modules: [SD]
+  release: both
+VA02:
+  name: Change Sales Order
+  modules: [SD]
+  release: both
+VA05:
+  name: List of Sales Orders
+  modules: [SD]
+  release: both
+VA11:
+  name: Create Inquiry
+  modules: [SD]
+  release: both
+VA21:
+  name: Create Quotation
+  modules: [SD]
+  release: both
+VL01N:
+  name: Create Outbound Delivery
+  modules: [SD]
+  release: both
+VF01:
+  name: Create Billing Document
+  modules: [SD]
+  release: both
+VF03:
+  name: Display Billing Document
+  modules: [SD]
+  release: both
+VF04:
+  name: Process Billing Due List
+  modules: [SD]
+  release: both
+VF11:
+  name: Cancel Billing Document
+  modules: [SD]
+  release: both
+VK11:
+  name: Create Condition Record
+  modules: [SD]
+  release: both
+VK12:
+  name: Change Condition Record
+  modules: [SD]
+  release: both
+VOFM:
+  name: Maintain Formulas and Routines
+  modules: [SD]
+  release: both
+VTFA:
+  name: Copy Control — Order to Billing
+  modules: [SD]
+  release: both
+VTFL:
+  name: Copy Control — Delivery to Billing
+  modules: [SD]
+  release: both
+
+# ──────────────────────────────────────────────────────────────
+# PP (Production Planning)
+# ──────────────────────────────────────────────────────────────
+CS01:
+  name: Create BOM
+  modules: [PP]
+  release: both
+CS02:
+  name: Change BOM
+  modules: [PP]
+  release: both
+CA01:
+  name: Create Routing
+  modules: [PP]
+  release: both
+CA02:
+  name: Change Routing
+  modules: [PP]
+  release: both
+CR01:
+  name: Create Work Center
+  modules: [PP]
+  release: both
+CR02:
+  name: Change Work Center
+  modules: [PP]
+  release: both
+CO01:
+  name: Create Production Order
+  modules: [PP]
+  release: both
+CO02:
+  name: Change Production Order
+  modules: [PP]
+  release: both
+CO11N:
+  name: Production Order Confirmation
+  modules: [PP]
+  release: both
+CO15:
+  name: Cancel Confirmation
+  modules: [PP]
+  release: both
+MD01:
+  name: MRP Run (total planning)
+  modules: [PP]
+  release: both
+MD02:
+  name: MRP Run (single item, multi-level)
+  modules: [PP]
+  release: both
+MD03:
+  name: MRP Run (single item, single-level)
+  modules: [PP]
+  release: both
+MD04:
+  name: Stock/Requirements List
+  modules: [PP]
+  release: both
+MD41:
+  name: Single Item Planning
+  modules: [PP]
+  release: both
+MD43:
+  name: Single Item Multi-Level Planning
+  modules: [PP]
+  release: both
+MF50:
+  name: Planning Table (REM)
+  modules: [PP]
+  release: both
+MFBF:
+  name: Backflush (REM)
+  modules: [PP]
+  release: both
+OMIW:
+  name: Low Level Code Determination
+  modules: [PP]
+  release: both
+
+# ──────────────────────────────────────────────────────────────
+# HCM
+# ──────────────────────────────────────────────────────────────
+PA30:
+  name: Maintain HR Master Data
+  modules: [HCM]
+  release: both
+PA40:
+  name: Personnel Actions
+  modules: [HCM]
+  release: both
+PT60:
+  name: Time Evaluation
+  modules: [HCM]
+  release: both
+PT01:
+  name: Create Work Schedule
+  modules: [HCM]
+  release: both
+PT50:
+  name: Quota Overview (Time Management)
+  modules: [HCM]
+  release: both
+CAT2:
+  name: Time Sheet Data Entry
+  modules: [HCM]
+  release: both
+PE01:
+  name: Maintain Payroll Schemas
+  modules: [HCM]
+  release: both
+PE02:
+  name: Maintain Payroll PCRs
+  modules: [HCM]
+  release: both
+PE03:
+  name: Maintain Features (HR)
+  modules: [HCM]
+  release: both
+PP01:
+  name: Maintain Organization Plan (OM)
+  modules: [HCM]
+  release: both
+PO13:
+  name: Maintain Position
+  modules: [HCM]
+  release: both
+PPOCE:
+  name: Create Org Structure (Enjoy)
+  modules: [HCM]
+  release: both
+PPOME:
+  name: Change Org Structure (Enjoy)
+  modules: [HCM]
+  release: both
+
+# ──────────────────────────────────────────────────────────────
+# FI Extended (v1.3.0)
+# ──────────────────────────────────────────────────────────────
+F-33:
+  name: Post Bill of Exchange Usage (Customer)
+  modules: [FI]
+  release: both
+F-36:
+  name: Bill of Exchange Payment (Vendor)
+  modules: [FI]
+  release: both
+F-49:
+  name: Customer Noted Item
+  modules: [FI]
+  release: both
+F-54:
+  name: Clear Vendor Down Payment
+  modules: [FI]
+  release: both
+F-55:
+  name: Post Vendor Noted Item (Guarantee)
+  modules: [FI]
+  release: both
+F.81:
+  name: Reverse Accrual/Deferral
+  modules: [FI]
+  release: both
+FBS1:
+  name: Post Accrual/Deferral Document
+  modules: [FI]
+  release: both
+FCH5:
+  name: Create Check
+  modules: [FI]
+  release: both
+FCH6:
+  name: Change Check Information
+  modules: [FI]
+  release: both
+FD02:
+  name: Change Customer (Accounting)
+  modules: [FI, SD]
+  release: both
+FBCJ:
+  name: Cash Journal Posting
+  modules: [FI]
+  release: both
+OKB9:
+  name: Default Account Assignment (CO)
+  modules: [CO, FI]
+  release: both
+UKM_MY_LIMIT:
+  name: Credit Limit (S/4 FSCM)
+  modules: [FI, SD]
+  release: s4_only
+S_ALR_87012085:
+  name: AP Aging Report
+  modules: [FI]
+  release: both
+S_ALR_87012078:
+  name: AR Aging Report
+  modules: [FI]
+  release: both
+S_ALR_87011963:
+  name: Asset Balance Report
+  modules: [FI, AA]
+  release: both
+FAGL_FC_TRANS:
+  name: Foreign Currency Translation (S/4)
+  modules: [FI]
+  release: s4_only
+
+# ──────────────────────────────────────────────────────────────
+# MM Extended (v1.3.0)
+# ──────────────────────────────────────────────────────────────
+MM01:
+  name: Create Material Master
+  modules: [MM]
+  release: both
+MM02:
+  name: Change Material Master
+  modules: [MM]
+  release: both
+MM03:
+  name: Display Material Master
+  modules: [MM]
+  release: both
+XK01:
+  name: Create Vendor (Central)
+  modules: [MM, FI]
+  release: ecc_only
+  note: S/4에서는 BP로 통합
+XK02:
+  name: Change Vendor (Central)
+  modules: [MM, FI]
+  release: ecc_only
+XK03:
+  name: Display Vendor (Central)
+  modules: [MM, FI]
+  release: ecc_only
+MK01:
+  name: Create Vendor (Purchasing)
+  modules: [MM]
+  release: ecc_only
+ME11:
+  name: Create Info Record
+  modules: [MM]
+  release: both
+ME51N:
+  name: Create Purchase Requisition
+  modules: [MM]
+  release: both
+ME52N:
+  name: Change Purchase Requisition
+  modules: [MM]
+  release: both
+ME53N:
+  name: Display Purchase Requisition
+  modules: [MM]
+  release: both
+ME58:
+  name: Ordering Purchase Requisitions
+  modules: [MM]
+  release: both
+MB5S:
+  name: GR/IR Balance Analysis
+  modules: [MM]
+  release: ecc_only
+  note: S/4HANA에서는 GRIR Fiori 앱
+MB53:
+  name: Display Plant Stock Availability
+  modules: [MM]
+  release: both
+MI01:
+  name: Create Physical Inventory Document
+  modules: [MM]
+  release: both
+MI04:
+  name: Enter Inventory Count
+  modules: [MM]
+  release: both
+MI07:
+  name: Post Physical Inventory
+  modules: [MM]
+  release: both
+MI09:
+  name: Enter Count without Document
+  modules: [MM]
+  release: both
+MI20:
+  name: Physical Inventory Differences
+  modules: [MM]
+  release: both
+ME2O:
+  name: Subcontracting Stock Monitor
+  modules: [MM]
+  release: both
+LT0A:
+  name: Create Transfer Order (WM)
+  modules: [MM, WM]
+  release: both
+MSC1N:
+  name: Create Batch
+  modules: [MM]
+  release: both
+MSC3N:
+  name: Display Batch
+  modules: [MM]
+  release: both
+MRBR:
+  name: Release Blocked Invoices (Invoice Verification)
+  modules: [MM]
+  release: both
+MIR4:
+  name: Display Invoice Document
+  modules: [MM, FI]
+  release: both
+MIR6:
+  name: Invoice Overview
+  modules: [MM, FI]
+  release: both
+MR8M:
+  name: Cancel Invoice Document
+  modules: [MM, FI]
+  release: both
+
+# ──────────────────────────────────────────────────────────────
+# SD Extended (v1.3.0)
+# ──────────────────────────────────────────────────────────────
+XD01:
+  name: Create Customer (Central)
+  modules: [SD, FI]
+  release: ecc_only
+XD02:
+  name: Change Customer (Central)
+  modules: [SD, FI]
+  release: ecc_only
+XD03:
+  name: Display Customer (Central)
+  modules: [SD, FI]
+  release: ecc_only
+VD01:
+  name: Create Customer (Sales)
+  modules: [SD]
+  release: ecc_only
+VOV8:
+  name: Define Sales Order Type
+  modules: [SD]
+  release: both
+VL02N:
+  name: Change Outbound Delivery
+  modules: [SD]
+  release: both
+VL09:
+  name: Cancel Goods Issue for Delivery
+  modules: [SD]
+  release: both
+VL10A:
+  name: Delivery Due List (Sales Orders)
+  modules: [SD]
+  release: both
+VL10B:
+  name: Delivery Due List (Purchase Orders)
+  modules: [SD]
+  release: both
+VB01:
+  name: Create Rebate Agreement
+  modules: [SD]
+  release: both
+VB02:
+  name: Change Rebate Agreement
+  modules: [SD]
+  release: both
+VB07:
+  name: Settle Rebate
+  modules: [SD]
+  release: both
+VCH1:
+  name: Create Output Condition Record
+  modules: [SD]
+  release: both
+PR00:
+  name: Price Conditions (SD)
+  modules: [SD]
+  release: both
+
+# ──────────────────────────────────────────────────────────────
+# PP Extended (v1.3.0)
+# ──────────────────────────────────────────────────────────────
+CS03:
+  name: Display BOM
+  modules: [PP]
+  release: both
+CA03:
+  name: Display Routing
+  modules: [PP]
+  release: both
+CA11:
+  name: Create Reference Operation Set
+  modules: [PP]
+  release: both
+CR11:
+  name: Display Capacity
+  modules: [PP]
+  release: both
+COR1:
+  name: Create Process Order
+  modules: [PP]
+  release: both
+COR2:
+  name: Change Process Order
+  modules: [PP]
+  release: both
+COR6N:
+  name: Process Order Confirmation
+  modules: [PP]
+  release: both
+MD01N:
+  name: MRP Run (S/4 Compact)
+  modules: [PP]
+  release: s4_only
+MD61:
+  name: Create Planned Independent Requirements
+  modules: [PP]
+  release: both
+MD62:
+  name: Change Planned Independent Requirements
+  modules: [PP]
+  release: both
+
+# ──────────────────────────────────────────────────────────────
+# TR Extended (v1.3.0)
+# ──────────────────────────────────────────────────────────────
+FF67:
+  name: Manual Bank Statement
+  modules: [TR]
+  release: both
+
+# ──────────────────────────────────────────────────────────────
+# BASIS / BC Extended (v1.3.0)
+# ──────────────────────────────────────────────────────────────
+DB02:
+  name: Database Monitor
+  modules: [BASIS, BC]
+  release: both
+ST01:
+  name: System Trace (Authorization)
+  modules: [BASIS, BC]
+  release: both
+ST12:
+  name: Single Transaction Analysis
+  modules: [BASIS, BC]
+  release: both
+STMS_IMPORT:
+  name: Transport Import Queue
+  modules: [BASIS, BC]
+  release: both
+SE06:
+  name: Set Up Transport Organizer
+  modules: [BASIS, BC]
+  release: both
+SCC3:
+  name: Client Copy Log
+  modules: [BASIS, BC]
+  release: both
+SCC7:
+  name: Post-Client Import Processing
+  modules: [BASIS, BC]
+  release: both
+SCC8:
+  name: Client Export
+  modules: [BASIS, BC]
+  release: both
+SCCL:
+  name: Local Client Copy
+  modules: [BASIS, BC]
+  release: both
+SU24:
+  name: Maintain Authorization Defaults
+  modules: [BASIS, BC]
+  release: both
+SFW5:
+  name: Switch Framework Customizing (Business Function)
+  modules: [BASIS, BC]
+  release: both
+RZ10:
+  name: Edit Profile (Parameters)
+  modules: [BASIS, BC]
+  release: both
+RZ11:
+  name: Maintain Profile Parameters
+  modules: [BASIS, BC]
+  release: both
+SE91:
+  name: Message Maintenance
+  modules: [BASIS, BC, ABAP]
+  release: both
+SLICENSE:
+  name: System License Administration
+  modules: [BASIS, BC]
+  release: both
+SLG1:
+  name: Application Log
+  modules: [BASIS, BC]
+  release: both
+SICK:
+  name: Installation Check
+  modules: [BASIS, BC]
+  release: both
+RSUSR002:
+  name: Users by Complex Selection Criteria
+  modules: [BASIS, BC]
+  release: both
+
+# ──────────────────────────────────────────────────────────────
+# ABAP Extended (v1.3.0)
+# ──────────────────────────────────────────────────────────────
+SE01:
+  name: Transport Organizer (Extended)
+  modules: [ABAP]
+  release: both
+SE78:
+  name: Graphics Management (SmartForm)
+  modules: [ABAP]
+  release: both
+SO10:
+  name: Standard Text Maintenance
+  modules: [ABAP]
+  release: both
+SMARTFORMS:
+  name: SAP Smart Forms
+  modules: [ABAP]
+  release: both
+SFP:
+  name: Adobe Form Builder
+  modules: [ABAP]
+  release: both
+WE02:
+  name: IDoc Display
+  modules: [ABAP, BC]
+  release: both
+WE05:
+  name: IDoc Lists
+  modules: [ABAP, BC]
+  release: both
+WE19:
+  name: IDoc Test Tool
+  modules: [ABAP, BC]
+  release: both
+WE60:
+  name: IDoc Documentation
+  modules: [ABAP, BC]
+  release: both
+BD87:
+  name: Process IDoc Status
+  modules: [ABAP, BC]
+  release: both
+SXMB_MONI:
+  name: Integration Engine Monitor (PI/PO)
+  modules: [ABAP, BC]
+  release: both
+
+# ──────────────────────────────────────────────────────────────
+# GTS — Global Trade Services (v1.4.0)
+# ──────────────────────────────────────────────────────────────
+# GTS는 /SAPSLL/ 네임스페이스 사용 — check-tcodes.sh가 base name만
+# 추출하므로 namespace 포함·제외 두 형태 모두 등록
+MENU_LEGALR3:
+  name: GTS Main Menu (/SAPSLL/ namespace)
+  modules: [GTS]
+  release: both
+COMPLR3:
+  name: GTS Compliance Workbench (/SAPSLL/ namespace)
+  modules: [GTS]
+  release: both
+CUS_CUHD_R3:
+  name: GTS Customs Document (/SAPSLL/ namespace)
+  modules: [GTS]
+  release: both
+PREF_CUST:
+  name: GTS Preference Determination (/SAPSLL/ namespace)
+  modules: [GTS]
+  release: both
+SPL_AUDIT:
+  name: GTS SPL Audit Log (/SAPSLL/ namespace)
+  modules: [GTS]
+  release: both
+MENU_LEGALSPL:
+  name: GTS SPL Configuration (/SAPSLL/ namespace)
+  modules: [GTS]
+  release: both
+
+# Namespace-full 형태 (문서 참조용, 스크립트는 위의 base name 사용)
+"/SAPSLL/MENU_LEGALR3":
+  name: GTS Main Menu
+  modules: [GTS]
+  release: both
+"/SAPSLL/COMPLR3":
+  name: Compliance Workbench
+  modules: [GTS]
+  release: both
+"/SAPSLL/CUS_CUHD_R3":
+  name: Customs Document
+  modules: [GTS]
+  release: both
+"/SAPSLL/LCLOG":
+  name: License Log
+  modules: [GTS]
+  release: both
+"/SAPSLL/PREF_CUST":
+  name: Preference Determination
+  modules: [GTS]
+  release: both
+"/SAPSLL/PRODUCT_R3":
+  name: Product Master (GTS)
+  modules: [GTS]
+  release: both
+"/SAPSLL/SPL_AUDIT":
+  name: SPL Audit Log
+  modules: [GTS]
+  release: both
+"/SAPSLL/CTSSPLAUD":
+  name: SPL Screening Monitor
+  modules: [GTS]
+  release: both
+"/SAPSLL/MENU_LEGALSPL":
+  name: SPL Configuration
+  modules: [GTS]
+  release: both
+"/SAPSLL/CTSCUST_R3":
+  name: Customs Document Display
+  modules: [GTS]
+  release: both
+
+# ──────────────────────────────────────────────────────────────
+# PM (Plant Maintenance)
+# ──────────────────────────────────────────────────────────────
+IE01:
+  name: Create Equipment
+  modules: [PM]
+  release: both
+IE02:
+  name: Change Equipment
+  modules: [PM]
+  release: both
+IE03:
+  name: Display Equipment
+  modules: [PM]
+  release: both
+IL01:
+  name: Create Functional Location
+  modules: [PM]
+  release: both
+IL02:
+  name: Change Functional Location
+  modules: [PM]
+  release: both
+IL03:
+  name: Display Functional Location
+  modules: [PM]
+  release: both
+IW21:
+  name: Create PM Notification
+  modules: [PM]
+  release: both
+IW22:
+  name: Change PM Notification
+  modules: [PM]
+  release: both
+IW23:
+  name: Display PM Notification
+  modules: [PM]
+  release: both
+IW28:
+  name: PM Notification List (Change)
+  modules: [PM]
+  release: both
+IW29:
+  name: PM Notification List (Display)
+  modules: [PM]
+  release: both
+IW31:
+  name: Create Maintenance Order
+  modules: [PM]
+  release: both
+IW32:
+  name: Change Maintenance Order
+  modules: [PM]
+  release: both
+IW33:
+  name: Display Maintenance Order
+  modules: [PM]
+  release: both
+IW38:
+  name: Maintenance Order List (Change)
+  modules: [PM]
+  release: both
+IW39:
+  name: Maintenance Order List (Display)
+  modules: [PM]
+  release: both
+IW65:
+  name: Measurement Document List
+  modules: [PM]
+  release: both
+IP01:
+  name: Create Maintenance Plan
+  modules: [PM]
+  release: both
+IP02:
+  name: Change Maintenance Plan
+  modules: [PM]
+  release: both
+IP03:
+  name: Display Maintenance Plan
+  modules: [PM]
+  release: both
+IP10:
+  name: Schedule Maintenance Plan
+  modules: [PM]
+  release: both
+IP11:
+  name: Maintenance Strategy (Display/Change)
+  modules: [PM]
+  release: both
+IP30:
+  name: Deadline Monitoring
+  modules: [PM]
+  release: both
+IA01:
+  name: Create General Task List
+  modules: [PM]
+  release: both
+IA05:
+  name: Task List for Functional Location
+  modules: [PM]
+  release: both
+CR01:
+  name: Create Work Center
+  modules: [PM, PP]
+  release: both
+CR02:
+  name: Change Work Center
+  modules: [PM, PP]
+  release: both
+CR03:
+  name: Display Work Center
+  modules: [PM, PP]
+  release: both
+
+# ──────────────────────────────────────────────────────────────
+# QM (Quality Management)
+# ──────────────────────────────────────────────────────────────
+QA01:
+  name: Create Inspection Lot (Manual)
+  modules: [QM]
+  release: both
+QA02:
+  name: Change Inspection Lot
+  modules: [QM]
+  release: both
+QA03:
+  name: Display Inspection Lot
+  modules: [QM]
+  release: both
+QA11:
+  name: Record Usage Decision
+  modules: [QM]
+  release: both
+QA12:
+  name: Change Usage Decision
+  modules: [QM]
+  release: both
+QA13:
+  name: Display Usage Decision
+  modules: [QM]
+  release: both
+QA32:
+  name: Usage Decision (Mass Processing)
+  modules: [QM]
+  release: both
+QE01:
+  name: Results Recording (Single)
+  modules: [QM]
+  release: both
+QE51N:
+  name: Results Recording (Multiple)
+  modules: [QM]
+  release: both
+QM01:
+  name: Create Quality Notification
+  modules: [QM]
+  release: both
+QM02:
+  name: Change Quality Notification
+  modules: [QM]
+  release: both
+QM03:
+  name: Display Quality Notification
+  modules: [QM]
+  release: both
+QP01:
+  name: Create Inspection Plan
+  modules: [QM]
+  release: both
+QP02:
+  name: Change Inspection Plan
+  modules: [QM]
+  release: both
+QP03:
+  name: Display Inspection Plan
+  modules: [QM]
+  release: both
+QS21:
+  name: Master Inspection Characteristic (Create)
+  modules: [QM]
+  release: both
+QS31:
+  name: Inspection Method (Create)
+  modules: [QM]
+  release: both
+QDV1:
+  name: Sampling Procedure (Create)
+  modules: [QM]
+  release: both
+QDR1:
+  name: Dynamic Modification Rule (Create)
+  modules: [QM]
+  release: both
+QC01:
+  name: Certificate Profile (Create)
+  modules: [QM]
+  release: both
+QC21:
+  name: Create Quality Certificate
+  modules: [QM]
+  release: both
+QI01:
+  name: Quality Info Record (Create)
+  modules: [QM, MM]
+  release: both
+QI02:
+  name: Quality Info Record (Change)
+  modules: [QM, MM]
+  release: both
+QI03:
+  name: Quality Info Record (Display)
+  modules: [QM, MM]
+  release: both
+
+# ──────────────────────────────────────────────────────────────
+# WM (Warehouse Management — ECC Legacy)
+# ──────────────────────────────────────────────────────────────
+LS01N:
+  name: Create Storage Bin
+  modules: [WM]
+  release: ecc_only
+  note: Deprecated in S/4HANA — use EWM
+LS02N:
+  name: Change Storage Bin
+  modules: [WM]
+  release: ecc_only
+LS03N:
+  name: Display Storage Bin
+  modules: [WM]
+  release: ecc_only
+LT01:
+  name: Create Transfer Order (Manually)
+  modules: [WM]
+  release: ecc_only
+LT03:
+  name: Display Transfer Order
+  modules: [WM]
+  release: ecc_only
+LT06:
+  name: Confirm Transfer Order
+  modules: [WM]
+  release: ecc_only
+LT0E:
+  name: Create TO for Material Document
+  modules: [WM]
+  release: ecc_only
+LT0G:
+  name: Create TO for Delivery
+  modules: [WM]
+  release: ecc_only
+LB01:
+  name: Create Transfer Requirement
+  modules: [WM]
+  release: ecc_only
+LB10:
+  name: Transfer Requirement List
+  modules: [WM]
+  release: ecc_only
+LI01N:
+  name: Create WM Physical Inventory Document
+  modules: [WM]
+  release: ecc_only
+LI02N:
+  name: Change WM PI Document
+  modules: [WM]
+  release: ecc_only
+LI03N:
+  name: Display WM PI Document
+  modules: [WM]
+  release: ecc_only
+LS24:
+  name: Quants per Storage Bin
+  modules: [WM]
+  release: ecc_only
+
+# ──────────────────────────────────────────────────────────────
+# EWM (Extended Warehouse Management)
+# ──────────────────────────────────────────────────────────────
+"/SCWM/MON":
+  name: Warehouse Monitor
+  modules: [EWM]
+  release: both
+"/SCWM/WAVE":
+  name: Wave Management
+  modules: [EWM]
+  release: both
+"/SCWM/PACK":
+  name: Packing
+  modules: [EWM]
+  release: both
+"/SCWM/RFUI":
+  name: RF Framework UI
+  modules: [EWM]
+  release: both
+"/SCWM/PI":
+  name: Physical Inventory (EWM)
+  modules: [EWM]
+  release: both
+"/SCWM/PRDO":
+  name: Production Supply
+  modules: [EWM]
+  release: both
+"/SCWM/ADGI":
+  name: Post Goods Receipt (EWM)
+  modules: [EWM]
+  release: both
+"/SCWM/ADGO":
+  name: Post Goods Issue (EWM)
+  modules: [EWM]
+  release: both
+"/SCWM/LS01":
+  name: Create Storage Bin (EWM)
+  modules: [EWM]
+  release: both
+"/SCWM/LS03":
+  name: Display Storage Bin (EWM)
+  modules: [EWM]
+  release: both
+"/SCWM/RSRC":
+  name: Resource Management
+  modules: [EWM]
+  release: both
+"/SCWM/YM":
+  name: Yard Management
+  modules: [EWM]
+  release: both
+"/SCWM/MFS":
+  name: Material Flow System
+  modules: [EWM]
+  release: both
+
+# ──────────────────────────────────────────────────────────────
+# v2.2.0 Phase 0 backfill — pre-existing 미등록 T-code 정리
+# (SKILL.md 인용은 있었으나 yaml 등록 누락)
+# 후속 phase에서 더 풍부한 도메인 검증 후 적절한 모듈 섹션으로 재배치 예정
+# ──────────────────────────────────────────────────────────────
+CO24:
+  name: Missing Parts Info System
+  modules: [PP, PM]
+  release: both
+IP10N:
+  name: Schedule Maintenance Plans (Mass Processing)
+  modules: [PM]
+  release: both
+MM41:
+  name: Create Article (Retail)
+  modules: [MM]
+  release: both
+  note: Retail-specific (Article Master)
+ME61:
+  name: "Vendor Evaluation: Maintain"
+  modules: [MM]
+  release: both
+QE05N:
+  name: Recording Results for Inspection Points
+  modules: [QM]
+  release: both
+VL0N:
+  name: Outbound Delivery Monitor
+  modules: [SD, LE-SHP]
+  release: both
+SE39:
+  name: Split Screen Editor (deprecated)
+  modules: [ABAP]
+  release: ecc_only
+  note: deprecated in S/4HANA — use SE80/ADT instead
+
+# v2.2.0 Phase 1 backfill — SKILL.md 인용 확인 후 등록 (의심 → 실존 확정)
+LT04:
+  name: Generate Transfer Order from Material Document
+  modules: [WM]
+  release: ecc_only
+  note: deprecated in S/4HANA — use EWM /SCWM/PRDI/PRDO
+LS16:
+  name: Stock per Storage Bin
+  modules: [WM]
+  release: ecc_only
+LS20:
+  name: Display Stock Account Movements per Storage Bin
+  modules: [WM]
+  release: ecc_only
+OB8C:
+  name: Define Field Selection Variants for Special G/L Indicator
+  modules: [FI]
+  release: both
+  note: SPRO config T-code (IMG path under FI Special G/L)
+QPR1:
+  name: Sample Drawing — Create
+  modules: [QM]
+  release: both
+QPR2:
+  name: Sample Drawing — Change
+  modules: [QM]
+  release: both
+
+# ──────────────────────────────────────────────────────────────
+# v2.2.0 Phase 1 — 부족 모듈 보강 (TR/HCM/EWM/CO/PP)
+# 분포 분석으로 TR=9, HCM=13, EWM=13, CO=18을 최우선 보강 대상으로 식별
+# 추가된 T-code는 모두 SAP 보편 표준 (도메인 검증 보수적)
+# ──────────────────────────────────────────────────────────────
+
+# TR (Treasury) 보강
+TBB1:
+  name: Treasury Posting Run
+  modules: [TR]
+  release: both
+TPM10:
+  name: Position Display
+  modules: [TR]
+  release: both
+FF63:
+  name: Memo Record for Cash Position
+  modules: [TR]
+  release: both
+F-58:
+  name: Outgoing Payment with Printout
+  modules: [FI, TR]
+  release: both
+
+# HCM 보강
+PA10:
+  name: Personnel File
+  modules: [HCM]
+  release: both
+PA20:
+  name: Display HR Master Data
+  modules: [HCM]
+  release: both
+PE51:
+  name: HR Form Editor
+  modules: [HCM]
+  release: both
+
+# EWM 보강 (/SCWM/ prefix)
+"/SCWM/PRDI":
+  name: Process Inbound Delivery Notification
+  modules: [EWM]
+  release: both
+"/SCWM/CWM_PHYINV":
+  name: Physical Inventory Document (Catch Weight)
+  modules: [EWM]
+  release: both
+"/SCWM/PI_PREP":
+  name: Physical Inventory Preparation
+  modules: [EWM]
+  release: both
+
+# PP (Production Planning) 보강 — Process Order 시리즈
+CO40:
+  name: Convert Planned Order to Production Order
+  modules: [PP]
+  release: both
+COR1:
+  name: Create Process Order
+  modules: [PP]
+  release: both
+COR2:
+  name: Change Process Order
+  modules: [PP]
+  release: both
+COR3:
+  name: Display Process Order
+  modules: [PP]
+  release: both
+
+# CO (Controlling) 보강
+KOH1:
+  name: Create Order Group
+  modules: [CO]
+  release: both
+KOH2:
+  name: Change Order Group
+  modules: [CO]
+  release: both
+KEKO:
+  name: Display Costing Run
+  modules: [CO]
+  release: both
+KEKD:
+  name: Display Cost Estimate
+  modules: [CO]
+  release: both
+
+# FI 보강 — 누락된 빈출 T-code
+F-43:
+  name: Vendor Invoice (Direct Entry)
+  modules: [FI]
+  release: both
+F-44:
+  name: Vendor Open Item Clearing
+  modules: [FI]
+  release: both
+
+# ─────────────────────────────────────────────────────────
+# v2.3 B3 — 신규 4 클라우드 모듈 연동 T-code
+# IBP/SAC/Ariba/Integration Cloud 는 BTP SaaS 라 자체 SAP GUI
+# T-code 가 없음. 아래는 S/4·ECC 측에서 해당 클라우드와 연동할 때
+# 실제로 사용하는 검증된 통합 T-code (추측 식별자 미포함).
+# ─────────────────────────────────────────────────────────
+
+# Integration Cloud — Web Service / SOA (CPI ↔ S/4 SOAP)
+SOAMANAGER:
+  name: Web Service Configuration (SOA Management)
+  modules: [IC, BC]
+  release: both
+SRT_MONI:
+  name: Web Service Message Monitor
+  modules: [IC, BC]
+  release: both
+SRT_UTIL:
+  name: SOAP Runtime Utility / Trace
+  modules: [IC, BC]
+  release: both
+
+# Integration Cloud — IDoc / EDI (CPI IDoc adapter ↔ S/4)
+WE20:
+  name: Partner Profiles (IDoc)
+  modules: [IC, BC]
+  release: both
+WE21:
+  name: Port Definition (IDoc)
+  modules: [IC, BC]
+  release: both
+IDX1:
+  name: IDoc Adapter Port Maintenance
+  modules: [IC, BC]
+  release: both
+IDX2:
+  name: IDoc Adapter Metadata
+  modules: [IC, BC]
+  release: both
+
+# Integration Cloud — OData / Gateway (Datasphere·SAC consumption)
+SEGW:
+  name: Gateway Service Builder (OData)
+  modules: [IC, BC]
+  release: both
+SICF:
+  name: HTTP Service Hierarchy Maintenance (ICF)
+  modules: [IC, BC]
+  release: both
+SAML2:
+  name: SAML 2.0 Configuration (cloud SSO)
+  modules: [IC, BC]
+  release: both
+
+# Integration Cloud — SLT / Delta Queue (Datasphere replication)
+LTRC:
+  name: SLT Replication Configuration
+  modules: [IC]
+  release: both
+LTRS:
+  name: SLT Advanced Replication Settings
+  modules: [IC]
+  release: both
+ODQMON:
+  name: Operational Delta Queue Monitor
+  modules: [IC, SAC]
+  release: both
+
+# SAC / Datasphere — BW extraction source (Live / Import connection)
+RSA1:
+  name: Data Warehouse Workbench
+  modules: [SAC, IC]
+  release: both
+RSO2:
+  name: Maintain Generic DataSource
+  modules: [SAC, IC]
+  release: both
+RSA5:
+  name: Install Business Content DataSource
+  modules: [SAC, IC]
+  release: both
+RSA6:
+  name: Maintain DataSource (post-install)
+  modules: [SAC, IC]
+  release: both
+RSRT:
+  name: BW Query Monitor (SAC import test)
+  modules: [SAC]
+  release: both
+
+# IBP — S/4 PP integration (PIR / MRP after IBP plan release)
+MD05:
+  name: MRP List — Individual Display
+  modules: [IBP, PP]
+  release: both
+MD63:
+  name: Display Planned Independent Requirements (PIR)
+  modules: [IBP, PP]
+  release: both
+MDBT:
+  name: MRP Run in Background (parallel)
+  modules: [IBP, PP]
+  release: both
+CO41:
+  name: Conversion of Planned Orders (collective)
+  modules: [IBP, PP]
+  release: both
+VFX3:
+  name: Release Billing Documents for Accounting
+  modules: [IBP, SD]
+  release: both
+
+# Ariba — S/4 MM procurement integration (PR-to-PO flow)
+ME2N:
+  name: Purchase Orders by PO Number
+  modules: [Ariba, MM]
+  release: both
+ME59N:
+  name: Automatic Creation of PO from Requisitions
+  modules: [Ariba, MM]
+  release: both
+
+# ──────────────────────────────────────────────────────────────
+# eval gold-set 참조 보강 (v2.4) — symptom-index가 참조하나 미등록이던 실존 T-code
+# ──────────────────────────────────────────────────────────────
+OB08:
+  name: Maintain Exchange Rates (currency translation)
+  modules: [FI, TR]
+  release: both
+"V/08":
+  name: Maintain Pricing Procedure (Conditions Pricing Procedure)
+  modules: [SD]
+  release: both
+KA01:
+  name: Create Cost Element (Primary)
+  modules: [CO]
+  release: ecc_only
+  note: "S/4: cost element = G/L account, maintain via FS00"
+PC00_M99:
+  name: Payroll Driver (International / generic)
+  modules: [HCM]
+  release: both
+EDOC_COCKPIT:
+  name: eDocument Cockpit (electronic document / e-invoice monitor)
+  modules: [FI]
+  release: both
+
+# eval gold-set 확장 (v2.4, 21→32건) — symptom-index 참조하나 미등록이던 실존 T-code
+KEPM:
+  name: CO-PA Planning (Profitability Analysis planning framework)
+  modules: [CO]
+  release: both
+NACE:
+  name: Output Condition Records / Message Determination (output management)
+  modules: [SD, MM]
+  release: both
+CO09:
+  name: Availability Overview (ATP check)
+  modules: [SD, PP]
+  release: both
+CM25:
+  name: Capacity Planning Table (graphical)
+  modules: [PP]
+  release: both

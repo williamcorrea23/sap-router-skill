@@ -1,13 +1,13 @@
 # SAP Router Skill — Multi-IDE Agent Instructions
 
-> **87 skills mirrored across 4 IDEs — same SKILL.md content in each.**
+> **89 skills mirrored across 4 IDEs — same SKILL.md content in each.**
 >
 > | IDE | Skill Directory | Entry Point |
 > |---|---|---|
-> | **Claude Code** | `.claude/skills/` (87 skills) | `.claude/skills/run-sap-router-skill/SKILL.md` |
-> | **Antigravity (Gemini)** | `.gemini/skills/` (87 skills) | `.gemini/skills/run-sap-router-skill/SKILL.md` |
-> | **Codex / OpenAI** | `.codex/skills/` (87 skills) | `.codex/AGENTS.md` |
-> | **Cursor** | `.cursor/skills/` (87 skills) | `.cursor/skills/run-sap-router-skill/SKILL.md` |
+> | **Claude Code** | `.claude/skills/` (89 skills) | `.claude/skills/run-sap-router-skill/SKILL.md` |
+> | **Antigravity (Gemini)** | `.gemini/skills/` (89 skills) | `.gemini/skills/run-sap-router-skill/SKILL.md` |
+> | **Codex / OpenAI** | `.codex/skills/` (89 skills) | `.codex/AGENTS.md` |
+> | **Cursor** | `.cursor/skills/` (89 skills) | `.cursor/skills/run-sap-router-skill/SKILL.md` |
 >
 > All skills auto-trigger by file context and keyword. See SKILL.md for master dispatch.
 > **New (2026-07-13):** `rtk-token-optimizer` (60-90% token savings via CLI proxy) + `context-mode` (98% tool output reduction via MCP sandbox).
@@ -45,7 +45,7 @@ python scripts/approval_broker.py plan --capability sap.apim.proxy.deploy --targ
 
 ## What this project is
 
-15 standalone Python 3 CLIs + one Node.js review gate — no live SAP system required
+40 Python operational scripts plus Node.js review gates — no live SAP system required
 credentials required. Everything runs offline:
 
 | Script | Purpose |
@@ -186,3 +186,5 @@ python scripts/abap_serializer.py list-formats
 - `route` is a classifier, not a validator — unknown actions fall to SAP GUI scripting. Functional writes are gated on --functional. ZROUTER is opt-in, never the default.
 - **`template_repo.py` works offline** — resolves placeholders via Python string substitution. ABAP runtime eval uses `GENERATE SUBROUTINE POOL` (see ZROUTER_DISPATCH v2).
 - **`abap_serializer.py` `_class_to_type`** auto-detects from name prefix: `ZCL_`→CLAS, `ZIF_`→INTF, `ZCX_`→CLAS, other `Z*`→PROG. Use explicit `--type` to override.
+
+@RTK.md

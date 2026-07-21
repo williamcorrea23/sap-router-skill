@@ -30,6 +30,10 @@
     {"id": "sap.fiori.app.modify", "effect": "mutating", "domain": "fiori"},
     {"id": "sap.ui5.project.validate", "effect": "read", "domain": "ui5"},
     {"id": "sap.cap.model.search", "effect": "read", "domain": "cap"},
-    {"id": "sap.cap.project.build", "effect": "mutating", "domain": "cap"}
+    {"id": "sap.cap.project.build", "effect": "mutating", "domain": "cap"},
+    {"id": "agent.context.execute", "effect": "read", "domain": "agent-runtime"},
+    {"id": "agent.context.fetch", "effect": "read", "domain": "agent-runtime"},
+    {"id": "agent.context.memory", "effect": "read", "domain": "agent-runtime"},
+    {"id": "agent.output.optimize", "effect": "read", "domain": "agent-runtime"}
   ]
 }

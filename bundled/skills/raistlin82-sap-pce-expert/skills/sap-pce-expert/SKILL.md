@@ -1,0 +1,207 @@
+---
+name: sap-pce-expert
+description: |
+  Comprehensive knowledge of SAP Private Cloud ERP (RISE with SAP) for architects, basis consultants, developers, and project managers. Use when working with RISE with SAP implementations, S/4HANA Cloud Private Edition (including 2025 FPS01 release with Agentic AI), PCE migrations (brownfield/greenfield/bluefield/selective data transition), SAP-managed infrastructure on hyperscalers (AWS, Azure, GCP, Alibaba), clean core strategy, ABAP Cloud extensibility, SAP Integration Suite, SAP Signavio, SAP Business Network, or RISE licensing and contracts.
+
+  Keywords: RISE with SAP, SAP Private Cloud ERP, S/4HANA Cloud Private Edition, PCE, 2025 FPS01, Agentic AI, Joule, brownfield, greenfield, bluefield, selective data transition, SUM, DMLT, HUoM, SAPS, SAP-managed operations, clean core, ABAP Cloud, key user extensibility, developer extensibility, BTP extensions, hyperscaler, Alibaba Cloud, RISE contract, SLA, patching cadence, backup restore, ISO 27001, SOC 2, GDPR, Foundational Success Plan
+license: GPL-3.0
+metadata:
+  version: "1.6.1"
+  last_verified: "2026-07-03"
+---
+
+# SAP Private Cloud ERP Expert (RISE with SAP)
+
+## Related Skills
+
+- **sap-btp-best-practices**: Use for SAP BTP platform architecture, account hierarchy, CI/CD, and governance
+- **sap-btp-developer-guide**: Use for CAP application development on BTP
+- **sap-abap**: Use for ABAP development syntax, internal tables, and ABAP-specific patterns
+- **sap-btp-integration-suite**: Use for SAP Integration Suite iFlow design and configuration
+- **sap-btp-cloud-platform**: Use for BTP runtime environments and CLI commands
+
+---
+
+## Retrieval Protocol
+
+Follow this BEFORE composing an answer. It keeps context small and covers content that spans
+multiple files.
+
+1. **Expand the query into English SAP terminology.** The reference content is English; the
+   user may ask in any language (often Italian). List the key concepts plus SAP synonyms and
+   transaction codes. Use the Keyword Index below to help.
+   - "come gestisco i backup?" → backup, restore, retention, RPO, RTO, HSR
+   - "autenticazione SSO" → authentication, SSO, SAML, IAS, IPS, SNC, SPNEGO
+2. **Grep the reference files (Stage 1 — locate).** Search this skill's `references/`
+   directory (the folder next to this SKILL.md), case-insensitive, with context, for the
+   expanded terms. Search ALL files — do not pre-limit to one topic.
+3. **Read only the matching rows/sections.** Do not load whole files. When a match is in a
+   SAP Notes table (`| Note ID | Title | Relevance |`), read the whole row (all three
+   columns — the explanation is in Relevance). Collect matches across files: a topic often
+   spans files (e.g. backup touches operations, security, and infrastructure). You now have
+   the pinpointed topic and SAP Note IDs.
+4. **Augment with live content (Stage 2 — optional, graceful).** If the `sap-docs` MCP is
+   available, use the pinpointed terms/topic to fetch current SAP Help/Community content and
+   enrich the answer. If `sap-docs` is not configured or errors, skip this step silently and
+   answer from the curated rows. **SAP Note text always comes from the curated `.md`** — do
+   not attempt live note-by-ID fetch here. Indicate when content is curated vs. live.
+5. **Fallback.** If grep (step 2) yields nothing useful, use the Content Routing Guide below
+   to open the owning file — the prior behavior.
+6. **Answer, citing the SAP Note IDs** you used.
+
+Prefer specific terms first; widen only if needed. Stage 2 is a bonus layer — the skill must
+answer fully from the curated content when no live MCP is present.
+
+---
+
+## Content Routing Guide
+
+When source documentation spans multiple topics, route content using this table:
+
+| Topic | Primary File | Cross-Cutting File |
+|-------|-------------|-------------------|
+| RISE bundle components, S/4HANA overview | `architecture-and-components.md` | — |
+| Hyperscalers, data centers, network topology | `infrastructure-and-deployment.md` | `cross-cutting/hyperscaler-contracts.md` |
+| Migration approaches, tools, timelines | `migration-and-adoption.md` | `cross-cutting/clean-core-strategy.md` |
+| SAP-managed ops, patching, backup, SLAs | `operations-and-sla.md` | — |
+| Certifications, compliance, shared responsibility | `security-and-compliance.md` | `cross-cutting/identity-and-access.md` |
+| ABAP Cloud, BTP extensions, extensibility | `extensibility-and-development.md` | `cross-cutting/clean-core-strategy.md` |
+| Integration Suite, APIs, hybrid patterns | `integration.md` | — |
+| Licensing model, HUoM, SAPS, contracts | `licensing-and-sizing.md` | `cross-cutting/hyperscaler-contracts.md` |
+| Clean core (spans migration + extensibility + ops) | — | `cross-cutting/clean-core-strategy.md` |
+| IAM (spans security + BTP + ops) | — | `cross-cutting/identity-and-access.md` |
+| Hyperscaler agreements (spans licensing + infra + security) | — | `cross-cutting/hyperscaler-contracts.md` |
+
+---
+
+## Keyword Index
+
+Use this to form Grep queries (expand the user's question into these English SAP terms) and to
+know the fallback file. One row per topic area; not an exhaustive tcode list.
+
+| Area | Terms / tcodes to grep | File |
+|---|---|---|
+| RISE bundle / S/4HANA overview | RISE, bundle, S/4HANA, Signavio, Business Network, SAPUI5, SOAMANAGER | architecture-and-components.md |
+| Hyperscaler / network / data center | hyperscaler, AWS, Azure, GCP, Alibaba, VPC, VNET, Direct Connect, ExpressRoute, data center | infrastructure-and-deployment.md |
+| Disaster Recovery infrastructure | DR, disaster recovery, RPO, RTO, replication | infrastructure-and-deployment.md |
+| Migration / conversion tools | migration, brownfield, greenfield, bluefield, SUM, DMLT, Readiness Check, selective data transition | migration-and-adoption.md |
+| Operations / SLA / patching | SLA, patching, SPS, SP, EWA, SGEN, service request, ECS, number range | operations-and-sla.md |
+| Backup / restore | backup, restore, retention, HSR, 3572444 | operations-and-sla.md |
+| bgRFC / async processing | bgRFC, SBGRFCMON, SRT_MONI, qRFC | operations-and-sla.md |
+| Security / compliance | ISO 27001, SOC, GDPR, encryption, penetration test, vulnerability, RSBDCOS0, HTTP_WHITELIST, UCON | security-and-compliance.md |
+| Extensibility / ABAP Cloud / BTP | ABAP Cloud, clean core, key user, RAP, BAdI, SICF, Web Dynpro, ATO, S_ATO_SETUP | extensibility-and-development.md |
+| Integration | Integration Suite, Cloud Connector, iFlow, API, SDI, DP Agent, RFC, IDoc | integration.md |
+| Licensing / sizing | licensing, FUE, HUoM, SAPS, subscription, contract, Global Account | licensing-and-sizing.md |
+| Clean core strategy | clean core, maturity model, tiers, KPIs | cross-cutting/clean-core-strategy.md |
+| Identity / SSO / access | SSO, SAML, IAS, IPS, SNC, SPNEGO, XSUAA, STRUST | cross-cutting/identity-and-access.md |
+| Hyperscaler contracts | hyperscaler agreement, BYOL, contract, region | cross-cutting/hyperscaler-contracts.md |
+
+---
+
+## Overview
+
+RISE with SAP is SAP's bundled offering that combines S/4HANA Cloud Private Edition with SAP Business Technology Platform, SAP Signavio, SAP Business Network, and SAP-managed infrastructure on a hyperscaler of choice.
+
+**Quick Links**:
+- **SAP Help Portal**: [https://help.sap.com/docs/rise-with-sap](https://help.sap.com/docs/rise-with-sap)
+- **SAP RISE Overview**: [https://www.sap.com/products/erp/rise.html](https://www.sap.com/products/erp/rise.html)
+
+---
+
+## Table of Contents
+
+1. [Architecture and Components](#architecture-and-components)
+2. [Infrastructure and Deployment](#infrastructure-and-deployment)
+3. [Migration and Adoption](#migration-and-adoption)
+4. [Operations and SLA](#operations-and-sla)
+5. [Security and Compliance](#security-and-compliance)
+6. [Extensibility and Development](#extensibility-and-development)
+7. [Integration](#integration)
+8. [Licensing and Sizing](#licensing-and-sizing)
+
+---
+
+## Architecture and Components
+
+See `references/architecture-and-components.md` for complete detail.
+
+> RISE with SAP bundles: S/4HANA Cloud Private Edition + SAP BTP + SAP Signavio + SAP Business Network + SAP-managed infrastructure.
+
+---
+
+## Infrastructure and Deployment
+
+See `references/infrastructure-and-deployment.md` for complete detail.
+
+> Hyperscaler options: AWS, Microsoft Azure, Google Cloud, Alibaba Cloud. SAP manages the infrastructure; customers choose the hyperscaler and region.
+
+---
+
+## Migration and Adoption
+
+See `references/migration-and-adoption.md` and `references/cross-cutting/clean-core-strategy.md`.
+
+> Four adoption paths: Greenfield (new implementation), Brownfield (system conversion), Bluefield (selective), Selective Data Transition.
+
+---
+
+## Operations and SLA
+
+See `references/operations-and-sla.md` for complete detail.
+
+> SAP manages: infrastructure, OS, HANA DB, S/4HANA patching. Customer manages: business configuration, extensions, integrations.
+
+---
+
+## Security and Compliance
+
+See `references/security-and-compliance.md` and `references/cross-cutting/identity-and-access.md`.
+
+> Certifications include ISO 27001, SOC 1/2, GDPR. Shared responsibility model clearly defines SAP vs. customer scope.
+
+---
+
+## Extensibility and Development
+
+See `references/extensibility-and-development.md` and `references/cross-cutting/clean-core-strategy.md`.
+
+> Clean core principle: keep S/4HANA standard, extend via ABAP Cloud (in-app) or SAP BTP (side-by-side).
+
+---
+
+## Integration
+
+See `references/integration.md` for complete detail.
+
+> Integration hub: SAP Integration Suite on BTP. Supports cloud-to-cloud, cloud-to-on-premise, and hybrid scenarios.
+
+---
+
+## Licensing and Sizing
+
+See `references/licensing-and-sizing.md` and `references/cross-cutting/hyperscaler-contracts.md`.
+
+> RISE is subscription-based. Sizing uses HUoM (HANA Units of Memory) and SAPS (SAP Application Performance Standard).
+
+---
+
+## Bundled References
+
+| File | Content |
+|------|---------|
+| `references/architecture-and-components.md` | RISE bundle overview, component details |
+| `references/infrastructure-and-deployment.md` | Hyperscalers, network, regions, SAP-managed infra |
+| `references/migration-and-adoption.md` | Migration paths, tools (SUM, DMLT), timelines |
+| `references/operations-and-sla.md` | Managed ops model, patching, backup, SLAs, support |
+| `references/security-and-compliance.md` | Certifications, shared responsibility, security controls |
+| `references/extensibility-and-development.md` | ABAP Cloud, BTP extensions, clean core guidance |
+| `references/integration.md` | SAP Integration Suite, APIs, hybrid patterns |
+| `references/licensing-and-sizing.md` | Licensing model, HUoM, SAPS, contract structure |
+| `references/cross-cutting/clean-core-strategy.md` | Clean core spanning migration + extensibility + ops |
+| `references/cross-cutting/identity-and-access.md` | IAM spanning security + BTP + operations |
+| `references/cross-cutting/hyperscaler-contracts.md` | Hyperscaler agreements spanning licensing + infra + security |
+
+---
+
+**Last Updated**: 2026-07-03
+**Next Review**: 2026-10-03 (quarterly)

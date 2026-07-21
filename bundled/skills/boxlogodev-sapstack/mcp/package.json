@@ -1,0 +1,59 @@
+{
+  "name": "@boxlogodev/sapstack-mcp",
+  "version": "2.4.0",
+  "description": "sapstack MCP server — SAP knowledge base + Evidence Loop session management",
+  "type": "module",
+  "main": "dist/server.js",
+  "bin": {
+    "sapstack-mcp": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "cli": "node dist/cli.js",
+    "dev": "tsx server.ts",
+    "test": "tsx tests/write-path.test.ts",
+    "clean": "rimraf dist"
+  },
+  "keywords": [
+    "sap",
+    "mcp",
+    "model-context-protocol",
+    "evidence-loop",
+    "sapstack"
+  ],
+  "author": "BoxLogoDev",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BoxLogoDev/sapstack",
+    "directory": "mcp"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "ajv": "^8.17.0",
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.0.0",
+    "rimraf": "^5.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.4.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "sapstack-server.json"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "sapstack": {
+    "stage": "implementation",
+    "runtime_status": "v1.6.0 — write-path tools fully implemented (start_session, add_evidence, next_turn, validate_session_file)"
+  }
+}

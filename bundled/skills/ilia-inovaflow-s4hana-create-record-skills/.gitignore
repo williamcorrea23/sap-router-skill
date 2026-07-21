@@ -1,0 +1,32 @@
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
+
+# Secrets — never commit these
+.env
+.env.*
+!.env.example
+!.env.template
+*.pem
+*.key
+secrets/
+
+# Local notes / scratch
+scratch/
+*.tmp
+*.log
+.tmp/
+
+# Node
+node_modules/
+package-lock.json
+yarn.lock
+
+# Test outputs
+create-log.jsonl
+results.json
+po-candidates.json
+verify-sample.json

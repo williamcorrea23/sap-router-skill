@@ -1,0 +1,735 @@
+#!/bin/python
+
+import unittest
+from types import SimpleNamespace
+
+from sap.errors import SAPCliError
+import sap.adt
+import sap.adt.objects
+import sap.adt.wb
+
+from fixtures_adt import (DummyADTObject, LOCK_RESPONSE_OK, EMPTY_RESPONSE_OK, GET_DUMMY_OBJECT_ADT_XML,
+                          GET_DUMMY_OBJECT_INACTIVE_ADT_XML,
+                          DELETION_RESPONSE_FAILED_PACKAGE, DELETION_RESPONSE_FAILED_INTERFACE,
+                          DELETION_RESPONSE_OK_INTERFACE, DELETION_RESPONSE_OK_PACKAGE)
+from sap.adt.errors import ExceptionDeletionFailure
+
+from mock import Response, Connection
+
+
+ACTIVATE_RESPONSE_FAILED='''<?xml version="1.0" encoding="utf-8"?>
+  <chkl:messages xmlns:chkl="http://www.sap.com/abapxml/checklist">
+    <msg objDescr="Program ZABAPGIT" type="E" line="1" href="/sap/bc/adt/programs/programs/zabapgit/source/main#start=41593,4" forceSupported="true">
+      <shortText>
+        <txt>The exception CX_WDY_MD_EXCEPTION is not caught or declared in the RAISING clause of "RECOVER_DEFINITION". "RECOVER_DEFINITION".</txt>
+      </shortText>
+      <atom:link href="art.syntax:G-Q" rel="http://www.sap.com/adt/categories/quickfixes" xmlns:atom="http://www.w3.org/2005/Atom"/>
+    </msg>
+  </chkl:messages>
+'''
+
+
+class TestADTCoreReference(unittest.TestCase):
+
+    def test_name_none(self):
+        ref = sap.adt.objects.ADTCoreData.Reference(name=None)
+        self.assertIsNone(ref.name)
+
+        ref.name = None
+        self.assertIsNone(ref.name)
+
+    def test_name_upper(self):
+        ref = sap.adt.objects.ADTCoreData.Reference(name='package')
+        self.assertEqual(ref.name, 'PACKAGE')
+
+        ref.name = 'child'
+        self.assertEqual(ref.name, 'CHILD')
+
+
+class TestADTObject(unittest.TestCase):
+
+    def test_uri(self):
+        victory = DummyADTObject()
+
+        self.assertEqual(victory.uri, 'awesome/success/noobject')
+
+    def test_str(self):
+        victory = DummyADTObject(name='objname')
+
+        self.assertEqual(str(victory), 'DUMMY/S objname')
+
+    def test_lock_modify_ok(self):
+        connection = Connection([LOCK_RESPONSE_OK, LOCK_RESPONSE_OK])
+
+        victory = DummyADTObject(connection=connection)
+        handle = victory.lock()
+        self.assertEqual(handle, 'win')
+
+        self.assertEqual([(e.method, e.adt_uri) for e in connection.execs], [('POST', '/sap/bc/adt/awesome/success/noobject')])
+
+        lock_request = connection.execs[0]
+        self.assertEqual(sorted(lock_request.params.keys()), ['_action', 'accessMode'])
+        self.assertEqual(lock_request.params['_action'], 'LOCK')
+        self.assertEqual(lock_request.params['accessMode'], 'MODIFY')
+
+        self.assertEqual(sorted(lock_request.headers.keys()), ['Accept', 'X-sap-adt-sessiontype'])
+        self.assertEqual(lock_request.headers['X-sap-adt-sessiontype'], 'stateful')
+        self.assertEqual(lock_request.headers['Accept'], 'application/vnd.sap.as+xml;charset=UTF-8;dataname=com.sap.adt.lock.result;q=0.8, application/vnd.sap.as+xml;charset=UTF-8;dataname=com.sap.adt.lock.result2;q=0.9')
+
+        handle = victory.lock()
+        self.assertEqual(handle, 'win')
+
+    def test_lock_modify_invalid(self):
+        response = Response(text='invalid',
+                            status_code=200,
+                            headers={'Content-Type': 'text/plain'})
+
+        connection = Connection([response, response])
+
+        victory = DummyADTObject(connection=connection)
+
+        try:
+            victory.lock()
+            self.assertFail('Exception was expected')
+        except SAPCliError as ex:
+            self.assertEqual(str(ex), f'Object {victory.uri}: lock response does not have lock result\ninvalid')
+
+        try:
+            victory.lock()
+            self.assertFail('Exception was expected')
+        except SAPCliError as ex:
+            self.assertEqual(str(ex), f'Object {victory.uri}: lock response does not have lock result\ninvalid')
+
+    def test_unlock_ok(self):
+        connection = Connection([LOCK_RESPONSE_OK, None])
+
+        victory = DummyADTObject(connection=connection)
+        handle = victory.lock()
+        victory.unlock(handle)
+
+        self.assertEqual(
+            [(e.method, e.adt_uri) for e in connection.execs],
+            2 * [('POST', '/sap/bc/adt/awesome/success/noobject')])
+
+        unlock_request = connection.execs[1]
+        self.assertEqual(sorted(unlock_request.params.keys()), ['_action', 'lockHandle'])
+        self.assertEqual(unlock_request.params['_action'], 'UNLOCK')
+        self.assertEqual(unlock_request.params['lockHandle'], 'win')
+
+        self.assertEqual(sorted(unlock_request.headers.keys()), ['X-sap-adt-sessiontype'])
+        self.assertEqual(unlock_request.headers['X-sap-adt-sessiontype'], 'stateful')
+
+    def test_unlock_not_locked(self):
+        connection = Connection([LOCK_RESPONSE_OK, None])
+
+        victory = DummyADTObject(connection=connection)
+
+        try:
+            victory.unlock('NOTLOCKED')
+        except SAPCliError as ex:
+            self.assertEqual(str(ex), f'Object {victory.uri}: not locked')
+
+        self.assertEqual(
+            [(e.method, e.adt_uri) for e in connection.execs],
+            [('POST', '/sap/bc/adt/awesome/success/noobject')])
+
+        unlock_request = connection.execs[0]
+        self.assertEqual(sorted(unlock_request.params.keys()), ['_action', 'lockHandle'])
+        self.assertEqual(unlock_request.params['_action'], 'UNLOCK')
+        self.assertEqual(unlock_request.params['lockHandle'], 'NOTLOCKED')
+
+    def test_activate(self):
+        connection = Connection([
+                EMPTY_RESPONSE_OK,
+                Response(text=GET_DUMMY_OBJECT_ADT_XML, status_code=200, headers={})
+        ])
+
+        victory = DummyADTObject(connection=connection, name='SOFTWARE_ENGINEER')
+
+        sap.adt.wb.activate(victory)
+
+        self.assertEqual(len(connection.execs), 2)
+        self.assertEqual(connection.execs[0].method, 'POST')
+        self.assertEqual(connection.execs[0].adt_uri, '/sap/bc/adt/activation')
+
+        self.assertEqual(connection.execs[0].headers['Accept'], 'application/xml' )
+        self.assertEqual(connection.execs[0].headers['Content-Type'], 'application/xml')
+        self.assertEqual(sorted(connection.execs[0].headers.keys()), ['Accept', 'Content-Type'])
+
+        self.assertEqual(connection.execs[0].params['method'], 'activate' )
+        self.assertEqual(connection.execs[0].params['preauditRequested'], 'true')
+        self.assertEqual(sorted(connection.execs[0].params.keys()), ['method', 'preauditRequested'])
+
+        self.maxDiff = None
+        self.assertEqual(connection.execs[0].body, '''<?xml version="1.0" encoding="UTF-8"?>
+<adtcore:objectReferences xmlns:adtcore="http://www.sap.com/adt/core">
+<adtcore:objectReference adtcore:uri="/sap/bc/adt/awesome/success/software_engineer" adtcore:name="SOFTWARE_ENGINEER"/>
+</adtcore:objectReferences>''' )
+
+    def test_activate_fails(self):
+        connection = Connection([
+                Response(ACTIVATE_RESPONSE_FAILED, 200, {}),
+                Response(text=GET_DUMMY_OBJECT_INACTIVE_ADT_XML, status_code=200, headers={})
+        ])
+
+        victory = DummyADTObject(connection=connection, name='SOFTWARE_ENGINEER')
+
+        with self.assertRaises(SAPCliError) as cm:
+            sap.adt.wb.activate(victory)
+
+        self.maxDiff = None
+        self.assertEqual(str(cm.exception), f'Could not activate: {ACTIVATE_RESPONSE_FAILED}')
+
+    def test_create_ok_wihout_corrnr(self):
+        connection = Connection([EMPTY_RESPONSE_OK])
+        victory = DummyADTObject(connection=connection, name='creator')
+
+        victory.create()
+
+        self.assertEqual(len(connection.execs), 1)
+        self.assertEqual(connection.execs[0].method, 'POST')
+        self.assertEqual(connection.execs[0].adt_uri, '/sap/bc/adt/awesome/success')
+
+        self.assertEqual(connection.execs[0].headers['Content-Type'], 'application/vnd.sap.super.cool.txt+xml; charset=utf-8')
+        self.assertEqual(sorted(connection.execs[0].headers.keys()), ['Content-Type'])
+
+        self.assertIsNone(connection.execs[0].params)
+
+        self.maxDiff = None
+        self.assertEqual(connection.execs[0].body.decode('utf-8'), '''<?xml version="1.0" encoding="UTF-8"?>
+<win:dummies xmlns:win="http://www.example.com/never/lose" xmlns:adtcore="http://www.sap.com/adt/core" adtcore:type="DUMMY/S" adtcore:description="adt fixtures dummy object" adtcore:name="creator">
+<adtcore:packageRef/>
+</win:dummies>''' )
+
+    def test_create_ok_wih_corrnr(self):
+        connection = Connection([EMPTY_RESPONSE_OK])
+        victory = DummyADTObject(connection=connection, name='creator')
+
+        victory.create(corrnr='NPL000008')
+
+        self.assertEqual(connection.execs[0].params['corrNr'], 'NPL000008')
+        self.assertEqual(sorted(connection.execs[0].params.keys()), ['corrNr'])
+
+    def test_create_v2(self):
+        conn = Connection(collections={'/sap/bc/adt/awesome/success': ['application/vnd.sap.super.cool.txt.v2+xml']})
+        victory = DummyADTObject(connection=conn)
+        victory.create()
+
+        self.assertEqual(conn.execs[0][2], {'Content-Type': 'application/vnd.sap.super.cool.txt.v2+xml; charset=utf-8'})
+
+        self.maxDiff = None
+        self.assertEqual(conn.execs[0].body.decode('utf-8'), '''<?xml version="1.0" encoding="UTF-8"?>
+<win:dummies xmlns:win="http://www.example.com/never/lose" xmlns:adtcore="http://www.sap.com/adt/core" adtcore:type="DUMMY/S" adtcore:description="adt fixtures dummy object" adtcore:name="noobject">
+<adtcore:packageRef/>
+<elemv2>version2</elemv2>
+</win:dummies>''' )
+
+    def test_create_v0_priority(self):
+        conn = Connection(collections={'/sap/bc/adt/awesome/success': ['application/vnd.sap.super.cool.txt+xml',
+                                                                       'application/vnd.sap.super.cool.txt.v2+xml']})
+        victory = DummyADTObject(connection=conn)
+        victory.create()
+
+        self.assertEqual(conn.execs[0][2], {'Content-Type': 'application/vnd.sap.super.cool.txt+xml; charset=utf-8'})
+
+    def test_create_mime_not_found(self):
+        conn = Connection(collections={'/sap/bc/adt/awesome/success': ['application/something.else+xml']})
+        victory = DummyADTObject(connection=conn)
+
+        with self.assertRaises(sap.errors.SAPCliError) as caught:
+            victory.create()
+
+        self.assertEqual(str(caught.exception),
+            'Not supported mimes for awesome/success: "application/something.else+xml" not in "application/vnd.sap.super.cool.txt+xml;application/vnd.sap.super.cool.txt.v2+xml"')
+
+    def test_delete(self):
+        conn = Connection([EMPTY_RESPONSE_OK])
+        DummyADTObject(connection=conn, name='dummy').delete()
+
+        self.assertEqual(conn.execs[0].method, 'POST')
+        self.assertEqual(conn.execs[0].adt_uri, '/sap/bc/adt/deletion/delete')
+        self.assertEqual(conn.execs[0].body, b'''<?xml version="1.0" encoding="UTF-8"?>
+<del:deletionRequest xmlns:adtcore="http://www.sap.com/adt/core" xmlns:del="http://www.sap.com/adt/deletion">
+  <del:object adtcore:uri="/sap/bc/adt/awesome/success/dummy">
+    <del:transportNumber></del:transportNumber>
+  </del:object>
+</del:deletionRequest>''')
+
+    def test_delete_with_corrnr(self):
+        conn = Connection([EMPTY_RESPONSE_OK])
+        DummyADTObject(connection=conn, name='dummy').delete(corrnr='NPLK900000')
+
+        self.assertEqual(conn.execs[0].method, 'POST')
+        self.assertEqual(conn.execs[0].adt_uri, '/sap/bc/adt/deletion/delete')
+        self.assertEqual(conn.execs[0].body, b'''<?xml version="1.0" encoding="UTF-8"?>
+<del:deletionRequest xmlns:adtcore="http://www.sap.com/adt/core" xmlns:del="http://www.sap.com/adt/deletion">
+  <del:object adtcore:uri="/sap/bc/adt/awesome/success/dummy">
+    <del:transportNumber>NPLK900000</del:transportNumber>
+  </del:object>
+</del:deletionRequest>''')
+
+    def test_module_create_delete_body(self):
+        body = sap.adt.objects.create_delete_body('/sap/bc/adt/programs/programs/zhello')
+
+        self.assertEqual(body, '''<?xml version="1.0" encoding="UTF-8"?>
+<del:deletionRequest xmlns:adtcore="http://www.sap.com/adt/core" xmlns:del="http://www.sap.com/adt/deletion">
+  <del:object adtcore:uri="/sap/bc/adt/programs/programs/zhello">
+    <del:transportNumber></del:transportNumber>
+  </del:object>
+</del:deletionRequest>''')
+
+    def test_module_create_delete_body_with_corrnr(self):
+        body = sap.adt.objects.create_delete_body('/sap/bc/adt/programs/programs/zhello', corrnr='NPLK900000')
+
+        self.assertEqual(body, '''<?xml version="1.0" encoding="UTF-8"?>
+<del:deletionRequest xmlns:adtcore="http://www.sap.com/adt/core" xmlns:del="http://www.sap.com/adt/deletion">
+  <del:object adtcore:uri="/sap/bc/adt/programs/programs/zhello">
+    <del:transportNumber>NPLK900000</del:transportNumber>
+  </del:object>
+</del:deletionRequest>''')
+
+    def test_module_adt_object_delete(self):
+        conn = Connection([EMPTY_RESPONSE_OK])
+        sap.adt.objects.adt_object_delete(conn, '/sap/bc/adt/programs/programs/zhello')
+
+        self.assertEqual(conn.execs[0].method, 'POST')
+        self.assertEqual(conn.execs[0].adt_uri, '/sap/bc/adt/deletion/delete')
+        self.assertEqual(conn.execs[0].body, b'''<?xml version="1.0" encoding="UTF-8"?>
+<del:deletionRequest xmlns:adtcore="http://www.sap.com/adt/core" xmlns:del="http://www.sap.com/adt/deletion">
+  <del:object adtcore:uri="/sap/bc/adt/programs/programs/zhello">
+    <del:transportNumber></del:transportNumber>
+  </del:object>
+</del:deletionRequest>''')
+
+    def test_module_adt_object_delete_with_corrnr(self):
+        conn = Connection([EMPTY_RESPONSE_OK])
+        sap.adt.objects.adt_object_delete(conn, '/sap/bc/adt/programs/programs/zhello', corrnr='NPLK900000')
+
+        self.assertEqual(conn.execs[0].body, b'''<?xml version="1.0" encoding="UTF-8"?>
+<del:deletionRequest xmlns:adtcore="http://www.sap.com/adt/core" xmlns:del="http://www.sap.com/adt/deletion">
+  <del:object adtcore:uri="/sap/bc/adt/programs/programs/zhello">
+    <del:transportNumber>NPLK900000</del:transportNumber>
+  </del:object>
+</del:deletionRequest>''')
+
+    def test_module_adt_object_delete_success_interface(self):
+        conn = Connection([Response(text=DELETION_RESPONSE_OK_INTERFACE, status_code=200, headers={})])
+        sap.adt.objects.adt_object_delete(conn, '/sap/bc/adt/oo/interfaces/zif_abapgit_xml_output')
+
+    def test_module_adt_object_delete_success_package(self):
+        conn = Connection([Response(text=DELETION_RESPONSE_OK_PACKAGE, status_code=200, headers={})])
+        sap.adt.objects.adt_object_delete(conn, '/sap/bc/adt/packages/%24abapgit_xml')
+
+    def test_module_adt_object_delete_failed_package(self):
+        conn = Connection([Response(text=DELETION_RESPONSE_FAILED_PACKAGE, status_code=200, headers={})])
+
+        with self.assertRaises(ExceptionDeletionFailure) as cm:
+            sap.adt.objects.adt_object_delete(conn, '/sap/bc/adt/packages/%24abapgit_xml')
+
+        self.assertIn('Package contains 6 objects', str(cm.exception))
+
+    def test_module_adt_object_delete_failed_interface(self):
+        conn = Connection([Response(text=DELETION_RESPONSE_FAILED_INTERFACE, status_code=200, headers={})])
+
+        with self.assertRaises(ExceptionDeletionFailure) as cm:
+            sap.adt.objects.adt_object_delete(conn, '/sap/bc/adt/oo/interfaces/zif_abapgit_xml_output')
+
+        self.assertIn('No URI-Mapping defined for URI', str(cm.exception))
+
+    def test_properties(self):
+        victory = DummyADTObject()
+
+        with self.assertRaises(SAPCliError) as cm:
+            victory.name = 'somethingelse'
+
+        self.assertEqual(str(cm.exception), 'Deserializing wrong object: noobject != somethingelse')
+
+    def test_fetch(self):
+        connection = Connection([Response(text=GET_DUMMY_OBJECT_ADT_XML, status_code=200, headers={})])
+        victory = DummyADTObject(connection=connection, name='SOFTWARE_ENGINEER')
+        victory.fetch()
+
+        self.assertEqual(connection.mock_methods(), [('GET', '/sap/bc/adt/awesome/success/software_engineer')])
+
+        self.assertEqual(victory.description, 'You cannot stop me!')
+        self.assertEqual(victory.language, 'CZ')
+        self.assertEqual(victory.name, 'SOFTWARE_ENGINEER')
+        self.assertEqual(victory.master_language, 'EN')
+        self.assertEqual(victory.master_system, 'NPL')
+        self.assertEqual(victory.responsible, 'DEVELOPER')
+        self.assertEqual(victory.active, 'active')
+        self.assertEqual(victory.reference.name, 'UNIVERSE')
+
+    def test_open_editor_default(self):
+        connection = Connection([LOCK_RESPONSE_OK, EMPTY_RESPONSE_OK])
+        victory = DummyADTObject(connection=connection, name='editor_test')
+
+        with victory.open_editor() as editor:
+            self.assertEqual(editor.uri, 'awesome/success/editor_test')
+            self.assertEqual(editor.mimetype, 'application/vnd.sap.super.cool.txt+xml')
+            self.assertEqual(editor.connection, connection)
+            self.assertEqual(editor.lock_handle, 'win')
+            self.assertIsNone(editor.corrnr)
+
+    def test_open_editor_with_lock_and_corrnr(self):
+        connection = Connection([EMPTY_RESPONSE_OK])
+        victory = DummyADTObject(connection=connection, name='editor_no_lock')
+
+        with victory.open_editor(corrnr='123456', lock_handle='clock') as editor:
+            self.assertEqual(editor.lock_handle, 'clock')
+            self.assertEqual(editor.corrnr, '123456')
+
+    def test_push(self):
+        connection = Connection([LOCK_RESPONSE_OK, EMPTY_RESPONSE_OK, EMPTY_RESPONSE_OK])
+        victory = DummyADTObject(connection=connection, name='SOFTWARE_ENGINEER')
+
+        with victory.open_editor() as editor:
+            editor.push()
+
+        self.assertEqual(connection.mock_methods(), [('POST', '/sap/bc/adt/awesome/success/software_engineer'),
+                                                     ('PUT', '/sap/bc/adt/awesome/success/software_engineer'),
+                                                     ('POST', '/sap/bc/adt/awesome/success/software_engineer')])
+
+        request = connection.execs[1]
+
+        self.assertEqual(sorted(request.headers.keys()), ['Content-Type'])
+        self.assertEqual(request.headers['Content-Type'], 'application/vnd.sap.super.cool.txt+xml; charset=utf-8')
+
+        self.assertEqual(sorted(request.params.keys()), ['lockHandle'])
+        self.assertEqual(request.params['lockHandle'], 'win')
+
+        self.maxDiff = None
+        self.assertEqual(request.body.decode('utf-8'), '''<?xml version="1.0" encoding="UTF-8"?>
+<win:dummies xmlns:win="http://www.example.com/never/lose" xmlns:adtcore="http://www.sap.com/adt/core" adtcore:type="DUMMY/S" adtcore:description="adt fixtures dummy object" adtcore:name="SOFTWARE_ENGINEER">
+<adtcore:packageRef/>
+</win:dummies>''')
+
+    def test_text_single_line(self):
+        connection = Connection([Response(status_code=200, text='content')])
+        victory = DummyADTObject(connection=connection, name='SOFTWARE_ENGINEER')
+        self.assertEqual(victory.text, 'content')
+
+    def test_text_mixed_endings(self):
+        connection = Connection([Response(status_code=200,
+                                          text='first\nsecond\r\nthird\r\n')
+        ])
+
+        victory = DummyADTObject(connection=connection, name='SOFTWARE_ENGINEER')
+        self.assertEqual(victory.text, 'first\nsecond\nthird\n')
+
+
+class TestADTObjectType(unittest.TestCase):
+
+    def setUp(self):
+        self.adt_object = sap.adt.objects.ADTObjectType(
+            'code',
+            'basepath',
+            sap.adt.objects.XMLNamespace(name='xmlnsname', uri='uri'),
+            'mimetype',
+            {'text/plain': '/text'},
+            'xmlelementname')
+
+    def test_adt_object_type_basepath(self):
+        self.assertEqual(self.adt_object.basepath, 'basepath')
+
+        self.adt_object.basepath = 'newpath'
+        self.assertEqual(self.adt_object.basepath, 'newpath')
+
+    def test_adt_object_type_xmlelement(self):
+        self.assertEqual(self.adt_object.xmlelement, 'xmlnsname:xmlelementname')
+
+    def test_adt_object_type_mime_string(self):
+        self.assertEqual(self.adt_object.mimetype, 'mimetype')
+        self.assertEqual(self.adt_object.all_mimetypes, ['mimetype'])
+
+    def test_adt_object_type_mime_list(self):
+        self.adt_object._mimetype = ['mimetype2', 'mimetype1']
+        self.assertEqual(self.adt_object.mimetype, 'mimetype2')
+        self.assertEqual(self.adt_object.all_mimetypes, ['mimetype2','mimetype1'])
+
+
+    def test_adt_object_type_source_mimetype_default(self):
+        self.assertEqual(self.adt_object.source_mimetype, 'text/plain')
+
+    def test_adt_object_type_source_mimetype_custom(self):
+        adt_object = sap.adt.objects.ADTObjectType(
+            'code',
+            'basepath',
+            sap.adt.objects.XMLNamespace(name='xmlnsname', uri='uri'),
+            'mimetype',
+            {'application/json': '/source'},
+            'xmlelementname',
+            source_mimetype='application/json')
+
+        self.assertEqual(adt_object.source_mimetype, 'application/json')
+
+
+class TestADTObjectTextWithCustomSourceMimetype(unittest.TestCase):
+
+    def test_text_uses_source_mimetype_for_accept_header(self):
+        connection = Connection([Response(status_code=200, text='{"key":"value"}')])
+
+        json_objtype = sap.adt.ADTObjectType(
+            'DUMMY/J',
+            'awesome/json',
+            sap.adt.objects.xmlns_adtcore_ancestor('win', 'http://www.example.com/never/lose'),
+            'application/vnd.sap.json+xml',
+            {'application/json': 'source/main'},
+            'dummies',
+            source_mimetype='application/json',
+        )
+
+        class JsonDummy(sap.adt.ADTObject):
+            OBJTYPE = json_objtype
+
+            def __init__(self, conn, name):
+                super().__init__(conn, name, metadata=sap.adt.ADTCoreData(description='test'))
+
+        obj = JsonDummy(connection, 'TEST_OBJ')
+        result = obj.text
+
+        self.assertEqual(result, '{"key":"value"}')
+
+        request = connection.execs[0]
+        self.assertEqual(request.headers['Accept'], 'application/json')
+        self.assertIn('source/main', request.adt_uri)
+
+
+class TestMIMEVersion(unittest.TestCase):
+
+    def test_parse_out_versin_from_mime(self):
+        known_mime_variants = [
+            ('application/vnd.sap.ap.adt.bopf.businessobjects.v2+xml', '2'),
+            ('text/plain', None),
+            ('application/vnd.sap.adt.quickfixes.evaluation+xml;version=1.0.0', '1.0.0'),
+            ('application/vnd.sap.adt.wdy.view+xml', '0'),
+            ('application/vnd.sap.adt.wdy.view.v1+xml', '1')
+        ]
+
+        for mime, exp_version in known_mime_variants:
+            act_version = sap.adt.objects.mimetype_to_version(mime)
+            self.assertEqual(act_version, exp_version, mime)
+
+
+class TestADTObjectSets(unittest.TestCase):
+
+    def setUp(self):
+        self.sets = sap.adt.objects.ADTObjectSets()
+
+        self.sample_object = SimpleNamespace(
+            full_adt_uri='full/adt/uri',
+            name='Included_Name'
+        )
+
+    def assertSetsContents(self):
+        self.assertEqual(len(self.sets.inclusive.references.references), 1)
+
+        act_ref = self.sets.inclusive.references.references[0]
+        self.assertEqual(act_ref.uri, self.sample_object.full_adt_uri)
+        self.assertEqual(act_ref.name, self.sample_object.name.upper())
+
+    def test_include_object(self):
+        self.sets.include_object(self.sample_object)
+        self.assertSetsContents()
+
+    def test_include_single_object(self):
+        self.sets.include(self.sample_object)
+        self.assertSetsContents()
+
+    def test_include_list(self):
+        self.sets.include([self.sample_object])
+        self.assertSetsContents()
+
+
+class TestADTPropertyEditor(unittest.TestCase):
+
+    def test_no_exception_write(self):
+        obj = 'mock object'
+        lock_handle = None
+        editor = sap.adt.objects.ADTObjectPropertyEditor(obj, lock_handle)
+
+        # This is it - if the method raises, this test fails
+        editor.write('ignored')
+
+
+class TestAdtObjectLockFunction(unittest.TestCase):
+
+    def test_lock_ok(self):
+        connection = Connection([LOCK_RESPONSE_OK])
+
+        params = sap.adt.objects.lock_params(sap.adt.objects.LOCK_ACCESS_MODE_MODIFY)
+        handle = sap.adt.objects.adt_object_lock(connection, 'programs/programs/ztest', parameters=params)
+
+        self.assertEqual(handle, 'win')
+
+        request = connection.execs[0]
+        self.assertEqual(request.method, 'POST')
+        self.assertEqual(request.adt_uri, '/sap/bc/adt/programs/programs/ztest')
+        self.assertEqual(request.params['_action'], 'LOCK')
+        self.assertEqual(request.params['accessMode'], 'MODIFY')
+        self.assertEqual(request.headers['X-sap-adt-sessiontype'], 'stateful')
+        self.assertIn('dataname=com.sap.adt.lock.result', request.headers['Accept'])
+
+    def test_lock_invalid_response(self):
+        response = Response(text='invalid', status_code=200, headers={'Content-Type': 'text/plain'})
+        connection = Connection([response])
+
+        params = sap.adt.objects.lock_params(sap.adt.objects.LOCK_ACCESS_MODE_MODIFY)
+
+        with self.assertRaises(SAPCliError) as cm:
+            sap.adt.objects.adt_object_lock(connection, 'programs/programs/ztest', parameters=params)
+
+        self.assertIn('lock response does not have lock result', str(cm.exception))
+
+    def test_lock_msg_action(self):
+        connection = Connection([LOCK_RESPONSE_OK])
+
+        params = sap.adt.objects.lock_params(sap.adt.objects.LOCK_ACCESS_MODE_MODIFY, action='LOCK_MSG')
+        handle = sap.adt.objects.adt_object_lock(
+            connection, 'programs/programs/ztest', parameters=params, body=b'message')
+
+        self.assertEqual(handle, 'win')
+
+        request = connection.execs[0]
+        self.assertEqual(request.params['_action'], 'LOCK_MSG')
+        self.assertEqual(request.headers['Content-Type'], 'text/plain')
+        self.assertIn('dataname=com.sap.adt.StatusMessage', request.headers['Accept'])
+        self.assertEqual(request.body, b'message')
+
+
+class TestAdtObjectUnlockFunction(unittest.TestCase):
+
+    def test_unlock_ok(self):
+        connection = Connection([None])
+
+        params = sap.adt.objects.unlock_params('my_handle')
+        sap.adt.objects.adt_object_unlock(connection, 'programs/programs/ztest', parameters=params)
+
+        request = connection.execs[0]
+        self.assertEqual(request.method, 'POST')
+        self.assertEqual(request.adt_uri, '/sap/bc/adt/programs/programs/ztest')
+        self.assertEqual(request.params['_action'], 'UNLOCK')
+        self.assertEqual(request.params['lockHandle'], 'my_handle')
+        self.assertEqual(request.headers['X-sap-adt-sessiontype'], 'stateful')
+        self.assertNotIn('Content-Type', request.headers)
+
+    def test_unlock_with_content_type_and_body(self):
+        connection = Connection([None])
+
+        params = sap.adt.objects.unlock_params(None, action=sap.adt.objects.UNLOCK_ACTION_UNLOCK_ALL)
+        sap.adt.objects.adt_object_unlock(
+            connection, 'programs/programs/ztest', parameters=params,
+            content_type='text/plain', body=b'payload')
+
+        request = connection.execs[0]
+        self.assertEqual(request.params['_action'], 'UNLOCK_ALL')
+        self.assertNotIn('lockHandle', request.params)
+        self.assertEqual(request.headers['Content-Type'], 'text/plain')
+        self.assertEqual(request.body, b'payload')
+
+    def test_unlock_all_params(self):
+        params = sap.adt.objects.unlock_params(None, action=sap.adt.objects.UNLOCK_ACTION_UNLOCK_ALL)
+        self.assertEqual(params, {'_action': 'UNLOCK_ALL'})
+
+    def test_unlock_params(self):
+        params = sap.adt.objects.unlock_params('handle123')
+        self.assertEqual(params, {'_action': 'UNLOCK', 'lockHandle': 'handle123'})
+
+
+class TestLockUnlockParams(unittest.TestCase):
+
+    def test_lock_params_default_action(self):
+        params = sap.adt.objects.lock_params('MODIFY')
+        self.assertEqual(params, {'_action': 'LOCK', 'accessMode': 'MODIFY'})
+
+    def test_lock_params_custom_action(self):
+        params = sap.adt.objects.lock_params('MODIFY', action='LOCK_MSG')
+        self.assertEqual(params, {'_action': 'LOCK_MSG', 'accessMode': 'MODIFY'})
+
+    def test_lock_params_custom_access_mode(self):
+        params = sap.adt.objects.lock_params('READ')
+        self.assertEqual(params, {'_action': 'LOCK', 'accessMode': 'READ'})
+
+    def test_unlock_params_default_action(self):
+        params = sap.adt.objects.unlock_params('handle123')
+        self.assertEqual(params, {'_action': 'UNLOCK', 'lockHandle': 'handle123'})
+
+    def test_unlock_params_unlock_all_omits_lock_handle(self):
+        params = sap.adt.objects.unlock_params(None, action=sap.adt.objects.UNLOCK_ACTION_UNLOCK_ALL)
+        self.assertEqual(params, {'_action': 'UNLOCK_ALL'})
+        self.assertNotIn('lockHandle', params)
+
+    def test_unlock_params_with_explicit_unlock_action(self):
+        params = sap.adt.objects.unlock_params('abc', action=sap.adt.objects.UNLOCK_ACTION_UNLOCK)
+        self.assertEqual(params, {'_action': 'UNLOCK', 'lockHandle': 'abc'})
+
+
+class TestADTObjectSourceEditorFactoryMethods(unittest.TestCase):
+
+    def test_plain_text_factory_returns_source_editor(self):
+        connection = Connection([LOCK_RESPONSE_OK, EMPTY_RESPONSE_OK, EMPTY_RESPONSE_OK])
+        obj = DummyADTObject(connection=connection, name='test_obj')
+
+        with obj.open_editor() as editor:
+            self.assertIsInstance(editor, sap.adt.objects.ADTObjectSourceEditor)
+            self.assertEqual(editor._content_type, 'text/plain')
+
+    def test_plain_text_factory_headers(self):
+        connection = Connection([LOCK_RESPONSE_OK, EMPTY_RESPONSE_OK, EMPTY_RESPONSE_OK])
+        obj = DummyADTObject(connection=connection, name='test_obj')
+
+        with obj.open_editor() as editor:
+            self.assertEqual(editor.get_headers(), {'Content-Type': 'text/plain; charset=utf-8'})
+
+    def test_plain_text_factory_strips_trailing_newline(self):
+        connection = Connection([LOCK_RESPONSE_OK, EMPTY_RESPONSE_OK, EMPTY_RESPONSE_OK])
+        obj = DummyADTObject(connection=connection, name='test_obj')
+
+        with obj.open_editor() as editor:
+            editor.write('line1\nline2\n')
+
+        put_request = connection.execs[1]
+        self.assertEqual(put_request.body, b'line1\nline2')
+
+    def test_json_factory_returns_source_editor(self):
+        editor = sap.adt.objects.ADTObjectSourceEditor.json(
+            SimpleNamespace(connection=None, uri='test', objtype=None),
+            lock_handle='handle',
+            corrnr='123'
+        )
+
+        self.assertIsInstance(editor, sap.adt.objects.ADTObjectSourceEditor)
+        self.assertEqual(editor._content_type, 'application/json')
+
+    def test_json_factory_headers(self):
+        editor = sap.adt.objects.ADTObjectSourceEditor.json(
+            SimpleNamespace(connection=None, uri='test', objtype=None),
+        )
+
+        self.assertEqual(editor.get_headers(), {'Content-Type': 'application/json; charset=utf-8'})
+
+    def test_json_factory_strips_trailing_newline(self):
+        connection = Connection([EMPTY_RESPONSE_OK])
+        obj = SimpleNamespace(
+            connection=connection,
+            uri='awesome/success/test_obj',
+            objtype=SimpleNamespace(get_uri_for_type=lambda t: '/source/main'),
+            unlock=lambda h: None,
+        )
+
+        editor = sap.adt.objects.ADTObjectSourceEditor.json(obj, lock_handle='handle')
+        editor.write('{"key": "value"}\n')
+
+        put_request = connection.execs[0]
+        self.assertEqual(put_request.body, b'{"key": "value"}')
+
+    def test_default_content_type_is_plain_text(self):
+        editor = sap.adt.objects.ADTObjectSourceEditor(
+            SimpleNamespace(connection=None, uri='test', objtype=None),
+        )
+
+        self.assertEqual(editor._content_type, 'text/plain')
+
+
+if __name__ == '__main__':
+    unittest.main()

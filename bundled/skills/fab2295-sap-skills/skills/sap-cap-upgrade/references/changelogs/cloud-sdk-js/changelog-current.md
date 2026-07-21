@@ -1,0 +1,223 @@
+<!-- mirror: https://sap.github.io/cloud-sdk/docs/js/release-notes -->
+<!-- fetched: 2026-05-09T02:26:56.875Z -->
+<!-- generator: cap-upgrade/scripts/refresh-references.js -->
+[](https://github.com/SAP/cloud-sdk-js)
+[](https://opensource.org/licenses/Apache-2.0)
+
+## 4.6.0 [Core Modules] - April 13, 2026​
+
+### Compatibility Notes​
+
+- [util] Deprecate `unixEOL` and `webEOL`. Use '\n' or '\r\n' respectively. (a6c8ff6)
+
+### Fixed Issues​
+
+- [connectivity] Destinations with authentication type "SAMLAssertion" are no longer cached, even if caching is enabled. (see https://github.com/SAP/cloud-sdk-js/issues/6396) (0800e7a)
+
+- [connectivity] Support `TrustStoreLocation` for `OAuth2ClientCredentials` destinations. (8637346)
+
+- [connectivity] Extend `isDestinationFetchOptions` to check `service` property. (259d8ad)
+
+- [http-client] Improve handling of missing `zlib`-module in the `compress()` middleware and lazy-load it only when needed.
+To compress requests in the browser, ensure that a suitable polyfill is provided. (7ea34ce)
+
+## 4.5.1 [Core Modules] - February 27, 2026​
+
+### Fixed Issues​
+
+- [eslint-config] Correct formatting in ESLint flat-config (330230c)
+
+## 4.5.0 [Core Modules] - February 27, 2026​
+
+### Compatibility Notes​
+
+- [connectivity] Update `@sap/xssec` to version 4.12.2 with changed XSUAA URL behavior.
+When fetching XSUAA tokens with zone ID (multi-tenant scenarios), xssec now uses the base domain without a tenant subdomain prefix. (02d1302)
+
+### New Features​
+
+- [openapi, openapi-generator] Support request bodies with content type "multipart/form-data". (3b95c42)
+
+- [openapi-generator] Allow OpenAPI version 3.1. style "type": "null" schemas. OpenAPI version 3.1. support is limited. (007541a)
+
+### Improvements​
+
+- [connectivity] Allow passing a `service` binding directly through `DestinationFromServiceBindingOptions` instead of looking it up by name. (962cdcb)
+
+- [http-client] Add `signal` property to `CustomRequestConfig` and `HttpRequestConfigBase` type definition to document `AbortSignal` support for cancelling HTTP requests. (cbed72f)
+
+- [http-client] Add request compression middleware.
+Use the `compress()` middleware to compress HTTP request payloads using gzip, brotli, deflate, or zstd algorithms.
+Supports multiple compression modes: auto (size-based), passthrough (pre-compressed), or forced compression. (f5715de)
+
+## 4.4.0 [Core Modules] - January 29, 2026​
+
+### New Features​
+
+- [connectivity] Support IAS (App-to-App) authentication. Use `transformServiceBindingToDestination()` function or `getDestinationFromServiceBinding()` function to create a destination targeting an IAS application. (d444438)
+
+## 4.3.1 [Core Modules] - January 05, 2026​
+
+### Improvements​
+
+- [eslint-config] Open the peer dependency range of the `eslint` module to include version 8 and 9. Version 9 can now be used without the potentially unsafe npm flag `--legacy-peer-deps`. (6431463)
+
+## 4.3.0 [Core Modules] - January 02, 2026​
+
+### New Features​
+
+- [connectivity] Support certificates in JKS format for `ClientCertificateAuthentication`. (ab96aff)
+
+## 4.2.0 [Core Modules] - November 27, 2025​
+
+### New Features​
+
+- [generator, generator-common] Introduce option `generateESM` in OData generator to generate ESM compatible code. (c73c7fa)
+
+### Fixed Issues​
+
+- [openapi] Fix missing `type: module` in generated `package.json` when `--generateESM` option is enabled. (e09754a)
+
+- [openapi-generator] Improve the handling of arrays of enums (f17ca59)
+
+## 4.1.2 [Core Modules] - September 18, 2025​
+
+### Fixed Issues​
+
+- [connectivity, http-client, openapi, resilience, util] Update `axios` to `1.12.2` to fix vulnerability to DoS attack. Refer here for more details. (011b841)
+
+## 4.1.1 [Core Modules] - July 31, 2025​
+
+### Fixed Issues​
+
+- [connectivity, http-client, openapi, resilience, util] Update `axios` to `1.11.0` to use non-vulnerable version of `form-data`. (b502b40)
+
+## 4.1.0 [Core Modules] - July 21, 2025​
+
+### Compatibility Notes​
+
+- [connectivity] The `getDestinationFromDestinationService()` function no longer verifies the incoming XSUAA JWT against the application's bound XSUAA instance. Consequently, the `cacheVerificationKeys` option is now deprecated and has no effect. (3c19ffa)
+
+### Improvements​
+
+- [connectivity] Remove dependency on XSUAA service binding while retrieving destinations using `getDestinationFromDestinationService()` and `getAllDestinationsFromDestinationService()` functions. (3c19ffa)
+
+## 4.0.2 [Core Modules] - March 18, 2025​
+
+### Fixed Issues​
+
+- [connectivity] Remove destination cache in `getDestinationFromServiceBinding()` function to let cached destinations retrieved in `getDestinationFromDestinationService()` function be added with the `proxyConfiguration` property.
+
+@sap-cloud-sdk/resilience@4.0.2
+
+- @sap-cloud-sdk/util@4.0.2 (4a187d6)
+
+## 4.0.1 [Core Modules] - March 05, 2025​
+
+## Fixed Issues​
+
+- [eslint-config] Downgrade `@stylistic/eslint-plugin` to v3 as v4 is EMS-only. (97ad0ad)
+
+## 4.0.0 [Core Modules] - March 04, 2025​
+
+### Improvements​
+
+- [connectivity] Enable destination caching by default when retrieving destinations via the destination service. Change affects behavior of `getDestination()` method, `getAllDestinationsFromDestinationService()` method, generated client's `execute()` method and generic HTTP requests execution using `executeHttpRequest()`. (d69325a)
+
+- [generator, odata-common, odata-v4] Support precision handling during serialization of `Edm.DateTimeOffset` fields in OData v4. (ab6ca60)
+
+### Compatibility Notes​
+
+- [connectivity] Disable `iasToXsuaaTokenExchange` by default if not defined. (25c9dd8)
+
+- [connectivity] The following deprecated content has been removed from the package:
+
+The behaviour of `getAgentConfig()` function is changed to be asynchronous. The temporary asynchronous function `getAgentConfigAsync()` has been removed.
+
+- The `destinationForServiceBinding()` function has been removed. Use `getDestinationFromServiceBinding()` instead.
+
+- The `PartialDestinationFetchOptions` type has been removed. Use either `ServiceBindingTransformOptions` or `getDestinationFromServiceBinding()` function.
+
+- The `serviceToken()` function no longer takes `xsuaaCredentials` as part of the `options` parameter.
+
+- The `parseDestination()` function is no longer a public API.
+
+- The `DestinationForServiceBindingOptions` interface has been renamed to `DestinationFromServiceBindingOptions`. (7d92a1b)
+
+- [odata-common] The following deprecated content has been removed from the package:
+
+The `FunctionImportParameters` type has been removed. Use `OperationParameters` instead.
+
+- The `ODataFunctionImportRequestConfig` constant has been removed. Use `ODataFunctionRequestConfig` instead.
+
+- The `FunctionImportParameter` constant has been removed. Use `OperationParameter` instead.
+
+- The `ActionFunctionImportRequestBuilderBase` constant has been removed. Use `OperationRequestBuilderBase` instead. (7d92a1b)
+
+- [odata-v2] The following deprecated content has been removed from the package:
+
+The `ODataFunctionImportRequestConfig` constant has been removed. Use `ODataFunctionRequestConfig` instead.
+
+- The `FunctionImportRequestBuilder` constant has been removed. Use `OperationRequestBuilder` instead. (7d92a1b)
+
+- [odata-v4] The following deprecated content has been removed from the package:
+
+The `ODataFunctionImportRequestConfig` constant has been removed. Use `ODataFunctionRequestConfig` instead.
+
+- The `ActionImportParameter` class has been removed. Use `OperationParameter` instead.
+
+- The `ActionImportParameters` type has been removed. Use `OperationParameters` instead.
+
+- The `FunctionImportRequestBuilder` class has been removed. Use `OperationRequestBuilder` instead.
+
+- The `BoundFunctionImportRequestBuilder` class has been removed. Use `OperationRequestBuilder` instead.
+
+- The `BoundActionImportRequestBuilder` class has been removed. Use `OperationRequestBuilder` instead.
+
+- The `ODataActionImportRequestConfig` constant has been removed. Use `ODataActionRequestConfig` instead.
+
+- The `ODataBoundActionImportRequestConfig` class has been removed. Use `ODataBoundActionRequestConfig` instead.
+
+- The `OdataBoundFunctionImportRequestConfig` constant has been removed. Use `ODataBoundFunctionRequestConfig` instead.
+
+- The `ActionImportRequestBuilder` class has been removed. Use `OperationRequestBuilder` instead. (7d92a1b)
+
+- [resilience] The following deprecated content has been removed from the package:
+
+The `circuitBreakerHttp` constant has been removed. Use `circuitBreaker` instead. (7d92a1b)
+
+- [util] The following deprecated content has been removed from the package:
+
+The `assoc` constant has been removed. There is no replacement. (7d92a1b)
+
+- 4.6.0 [Core Modules] - April 13, 2026Compatibility Notes
+- Fixed Issues
+
+- 4.5.1 [Core Modules] - February 27, 2026Fixed Issues
+
+- 4.5.0 [Core Modules] - February 27, 2026Compatibility Notes
+- New Features
+- Improvements
+
+- 4.4.0 [Core Modules] - January 29, 2026New Features
+
+- 4.3.1 [Core Modules] - January 05, 2026Improvements
+
+- 4.3.0 [Core Modules] - January 02, 2026New Features
+
+- 4.2.0 [Core Modules] - November 27, 2025New Features
+- Fixed Issues
+
+- 4.1.2 [Core Modules] - September 18, 2025Fixed Issues
+
+- 4.1.1 [Core Modules] - July 31, 2025Fixed Issues
+
+- 4.1.0 [Core Modules] - July 21, 2025Compatibility Notes
+- Improvements
+
+- 4.0.2 [Core Modules] - March 18, 2025Fixed Issues
+
+- 4.0.1 [Core Modules] - March 05, 2025
+- Fixed Issues
+- 4.0.0 [Core Modules] - March 04, 2025Improvements
+- Compatibility Notes

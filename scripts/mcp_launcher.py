@@ -81,6 +81,27 @@ def probe(server_id: str) -> dict:
 
 
 def run_server(server_id: str) -> int:
+    canonical_registry = ROOT / ".agents" / "registries" / "mcps.json"
+    if canonical_registry.exists():
+        sys.path.insert(0, str(ROOT / "python"))
+        from sap_router_core.registry import load_servers
+        server = load_servers().get(server_id)
+        if not server:
+            print(json.dumps({"error": "fallback-candidate-not-promoted", "server": server_id,
+                              "reason": "Review and promote the candidate in .agents/registries/mcps.json first."}), file=sys.stderr)
+            return 2
+        runtime = server.get("runtime", {})
+        command = runtime.get("command")
+        if not command:
+            print(json.dumps({"error": "missing-runtime", "server": server_id}), file=sys.stderr)
+            return 2
+        missing = [name for name in server.get("auth", {}).get("env_refs", []) if not os.environ.get(name)]
+        if missing:
+            print(json.dumps({"error": "server-not-ready", "server": server_id, "reason": "missing-env:" + ",".join(missing)}), file=sys.stderr)
+            return 2
+        env = os.environ.copy()
+        env.update({key: str(value) for key, value in runtime.get("env", {}).items()})
+        return subprocess.call([command] + runtime.get("args", []), cwd=ROOT, env=env)
     config = load_json(MCP_CONFIG)
     ok, reason = server_ready(server_id, config)
     if not ok:
@@ -109,6 +130,10 @@ def main() -> int:
     probe_p.add_argument("--execute", action="store_true")
     run_p = sub.add_parser("run")
     run_p.add_argument("--server", required=True)
+    search_p = sub.add_parser("search", help="Rank reviewed and bundled MCPs for a task")
+    search_p.add_argument("--query", required=True)
+    search_p.add_argument("--capability")
+    search_p.add_argument("--limit", type=int, default=10)
     args = parser.parse_args()
 
     if args.command == "list":
@@ -116,7 +141,7 @@ def main() -> int:
             sys.path.insert(0, str(ROOT / "python"))
             from sap_router_core.registry import load_servers, resolve_servers_for_capability
             servers = resolve_servers_for_capability(args.capability) if args.capability else list(load_servers().values())
-            result = [{"id": s["id"], "status": s["status"], "capabilities": s["capabilities"], "owner": s.get("owner")} for s in servers]
+            result = [{"id": s["id"], "status": s["status"], "readiness": "probe-required", "capabilities": s["capabilities"], "owner": s.get("owner")} for s in servers]
             if args.json:
                 print(json.dumps(result, indent=2))
             else:
@@ -142,6 +167,10 @@ def main() -> int:
         return 0 if result["ready"] else 1
     if args.command == "run":
         return run_server(args.server)
+    if args.command == "search":
+        sys.path.insert(0, str(ROOT / "scripts"))
+        from source_catalog import search
+        return search(args.query, "mcp", args.capability, args.limit)
     return 1
 
 

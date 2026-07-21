@@ -1,0 +1,34 @@
+meta {
+  name: MCP Prompts - give-me-book-abstract
+  type: http
+  seq: 10
+}
+
+post {
+  url: http://localhost:4004/mcp
+  body: json
+  auth: inherit
+}
+
+headers {
+  mcp-session-id: {{SESSION_ID}}
+  Accept: application/json,text/event-stream
+}
+
+body:json {
+  {
+    "jsonrpc": "2.0",
+    "id": 2,
+    "method": "prompts/get",
+    "params": {
+      "name": "give-me-book-abstract",
+      "arguments": {
+        "book-id": "1"
+      }
+    }
+  }
+}
+
+vars:pre-request {
+  SESSION_ID: 9d5444ca-c8b8-4f4f-a253-606cdfaf802c
+}

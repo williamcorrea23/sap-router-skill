@@ -1,0 +1,8 @@
+#!/usr/bin/env python3
+"""SAP Command Line tool"""
+
+import sys
+from sap.cli._entry import main
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv))

@@ -1,0 +1,48 @@
+WE02 — IDoc List
+
+Selection: Direction = Inbound, Date = 2026-04-19 to 2026-04-20, Status = 56
+
+IDoc Number       Direction  Status  Basic Type   Message Type  Partner No.    Partner Type  Port            Created On   Created At
+0000000098712341  Inbound    56      ORDERS05     ORDERS        VEND_ACME      LI            A000000042      2026-04-19   22:14:03
+0000000098712342  Inbound    56      ORDERS05     ORDERS        VEND_ACME      LI            A000000042      2026-04-19   22:14:05
+0000000098712343  Inbound    56      ORDERS05     ORDERS        VEND_ACME      LI            A000000042      2026-04-19   22:14:07
+0000000098712344  Inbound    56      DELVRY07     DESADV        SUPP_BRAVO     LI            A000000042      2026-04-19   23:01:44
+0000000098712345  Inbound    56      DELVRY07     DESADV        SUPP_BRAVO     LI            A000000042      2026-04-19   23:01:46
+0000000098712346  Inbound    56      ORDERS05     ORDERS        VEND_CHARLIE   LI            A000000042      2026-04-20   04:22:18
+
+Status record detail (status 56) — double-click output:
+
+IDoc 0000000098712341
+  Status: 56  IDoc with errors added
+  Message: EDI: Partner profile, inbound parameters missing
+  Message-ID: E0 397
+  Application: EDI_DC40
+  Function: Partner profile not maintained for partner VEND_ACME / LI / ORDERS / ORDERS05
+
+IDoc 0000000098712342
+  Status: 56  IDoc with errors added
+  Message: EDI: Partner profile, inbound parameters missing
+  Message-ID: E0 397
+  Function: Partner profile not maintained for partner VEND_ACME / LI / ORDERS / ORDERS05
+
+IDoc 0000000098712343
+  Status: 56  IDoc with errors added
+  Message: EDI: Partner profile, inbound parameters missing
+  Function: Partner profile not maintained for partner VEND_ACME / LI / ORDERS / ORDERS05
+
+IDoc 0000000098712344
+  Status: 56  IDoc with errors added
+  Message: No inbound process code found for message type DESADV, partner SUPP_BRAVO
+  Message-ID: E0 372
+  Function: Process code missing in WE20 inbound parameters
+
+IDoc 0000000098712345
+  Status: 56  IDoc with errors added
+  Message: No inbound process code found for message type DESADV, partner SUPP_BRAVO
+  Function: Process code missing in WE20 inbound parameters
+
+IDoc 0000000098712346
+  Status: 56  IDoc with errors added
+  Message: Partner VEND_CHARLIE is not defined
+  Message-ID: B1 212
+  Function: Partner number not found in KNA1/LFA1 or WE20 table EDPP1

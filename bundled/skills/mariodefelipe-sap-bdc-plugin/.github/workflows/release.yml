@@ -1,0 +1,65 @@
+name: Build & release plugin
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Derive version from tag
+        id: ver
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Build .plugin archive
+        run: |
+          VERSION="${{ steps.ver.outputs.version }}"
+          OUT="sap-bdc-${VERSION}.plugin"
+          # Zip repo contents, excluding .git, dotfile junk we don't ship, build outputs, caches.
+          # Keep .claude-plugin/ and .mcp.json (those ARE the plugin manifest).
+          zip -r "${OUT}" . \
+            -x '.git/*' \
+            -x '.github/*' \
+            -x '*.plugin' \
+            -x '**/__pycache__/*' \
+            -x '**/.pytest_cache/*' \
+            -x '**/node_modules/*' \
+            -x '**/.DS_Store' \
+            -x 'dist/*' \
+            -x 'build/*'
+          ls -lh "${OUT}"
+
+      - name: Extract changelog section for this version
+        id: notes
+        run: |
+          VERSION="${{ steps.ver.outputs.version }}"
+          # Pull the "**<version> (...)**" block from README.md (## Changelog section)
+          awk -v ver="${VERSION}" '
+            /^## Changelog/ {inCh=1; next}
+            inCh && $0 ~ "^\\*\\*" ver {cap=1; print; next}
+            cap && /^\*\*[0-9]/ {exit}
+            cap {print}
+          ' README.md > release-notes.md
+          if [ ! -s release-notes.md ]; then
+            echo "No changelog entry found for ${VERSION} — falling back to tag name" >&2
+            echo "Release ${VERSION}" > release-notes.md
+          fi
+          cat release-notes.md
+
+      - name: Create GitHub release and upload asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          body_path: release-notes.md
+          files: sap-bdc-${{ steps.ver.outputs.version }}.plugin

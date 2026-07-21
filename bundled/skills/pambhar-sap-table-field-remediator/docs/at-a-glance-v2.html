@@ -1,0 +1,520 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SAP Table &amp; Field Remediator — At a glance (v2)</title>
+  <meta name="description" content="One-picture overview of the SAP Table & Field Remediator skill: it finds what breaks in an S/4HANA conversion and never changes anything risky on its own — deterministic where safe, Claude only on the hard residue, a human gating anything risky.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+  /* ---- tokens (brand palette, trimmed to 4 roles + neutral + tier ramp) --- */
+  :root {
+    --ink:      #0f172a;
+    --ink-soft: #334155;
+    --muted:    #64748b;
+    --line:     #e2e8f0;
+    --line-2:   #cbd5e1;
+    --bg:       #f8fafc;
+    --bg-tint:  #f1f5f9;
+    --card:     #ffffff;
+
+    /* four semantic roles */
+    --know:  #4f46e5;  --know-bg: #eef2ff;   /* knowledge  — indigo */
+    --det:   #0f766e;  --det-bg:  #ccfbf1;   /* code       — teal   */
+    --llm:   #7c3aed;  --llm-bg:  #ede9fe;   /* Claude     — violet */
+    --human: #b91c1c;  --human-bg:#fee2e2;   /* human      — red    */
+    --neutral: #64748b; --neutral-bg: #f1f5f9; /* in / out  — gray  */
+
+    /* one severity ramp: cool -> warm = more human judgment */
+    --t1: #059669;  --t1-bg: #d1fae5;
+    --t2: #d97706;  --t2-bg: #fef3c7;
+    --t3: #e11d48;  --t3-bg: #ffe4e6;
+
+    --good:    #047857; --good-bg: #d1fae5; --good-line: #6ee7b7;
+
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    --display: "Space Grotesk", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+    --shadow-sm: 0 1px 2px rgba(15,23,42,.05), 0 1px 3px rgba(15,23,42,.06);
+    --shadow-md: 0 4px 12px rgba(15,23,42,.06), 0 12px 28px rgba(15,23,42,.07);
+    --radius: 16px; --radius-sm: 10px;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink-soft);
+    font-family: var(--sans); font-size: 16px; line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    padding: clamp(1.4rem, 4vw, 3rem) 0;
+  }
+  .wrap { width: min(1180px, 94vw); margin: 0 auto; }
+  h1, h2, h3, .display { font-family: var(--display); color: var(--ink); letter-spacing: -.02em; line-height: 1.08; margin: 0; }
+  strong { color: var(--ink); }
+  code { font-family: var(--mono); font-size: .82em; background: var(--know-bg); color: var(--know); padding: .08em .38em; border-radius: 6px; }
+
+  /* ---- shared uppercase treatments: ONLY (1) band eyebrow, (2) step keys --- */
+  .eyebrow { font: 700 .72rem/1 var(--sans); letter-spacing: .13em; text-transform: uppercase; color: var(--know); display: inline-flex; align-items: center; gap: .5rem; }
+  .eyebrow::before { content: ""; width: 20px; height: 2px; background: currentColor; border-radius: 2px; }
+  .key { font: 700 .62rem var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+
+  /* ================= HERO ================= */
+  .hero { text-align: center; max-width: 60ch; margin: 0 auto clamp(1.8rem, 3.6vw, 2.6rem); }
+  .hero .eyebrow { justify-content: center; margin-bottom: 1rem; }
+  .hero h1 { font-size: clamp(1.7rem, 3.9vw, 2.9rem); font-weight: 700; }
+  .hero h1 .warn { color: var(--human); }
+  .guarantee {
+    display: inline-flex; align-items: center; gap: .7rem; margin: 1.3rem auto .9rem;
+    background: var(--good-bg); border: 1.5px solid var(--good-line);
+    border-radius: 999px; padding: .55rem 1.2rem .55rem .7rem;
+    box-shadow: var(--shadow-sm);
+  }
+  .guarantee .zero { font: 700 1.9rem var(--display); color: var(--good); line-height: 1; letter-spacing: -.03em; }
+  .guarantee .txt { text-align: left; font-size: .92rem; color: var(--ink); font-weight: 600; }
+  .guarantee .txt small { display: block; font-weight: 500; color: var(--good); font-size: .8rem; }
+  .subtitle { font-family: var(--display); font-weight: 500; color: var(--muted); font-size: clamp(1rem, 1.6vw, 1.15rem); letter-spacing: -.01em; }
+
+  /* ================= LEGEND ================= */
+  .legend {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+    gap: .6rem 1.3rem; margin: 0 auto clamp(1.4rem, 3vw, 2rem); padding: .9rem 1.1rem;
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    box-shadow: var(--shadow-sm); font-size: .84rem; max-width: 1000px;
+  }
+  .legend .li { display: inline-flex; align-items: center; gap: .45rem; color: var(--ink-soft); white-space: nowrap; }
+  .legend .sw { width: 13px; height: 13px; border-radius: 4px; flex: 0 0 auto; }
+  .legend .ramp { width: 46px; height: 13px; border-radius: 4px; background: linear-gradient(90deg, var(--t1), var(--t2), var(--t3)); }
+  .legend .planned-sw { width: 15px; height: 13px; border: 1.5px dashed var(--line-2); border-radius: 4px; background: repeating-linear-gradient(45deg, #fff, #fff 3px, var(--bg-tint) 3px, var(--bg-tint) 6px); }
+  .legend .sep { width: 1px; height: 20px; background: var(--line); }
+
+  /* ================= BAND scaffold ================= */
+  .band { border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); box-shadow: var(--shadow-sm); padding: 1.15rem 1.25rem 1.3rem; }
+  .band + .connect { text-align: center; }
+  .band-head { display: flex; align-items: baseline; gap: .6rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .band-head h3 { font: 600 1.05rem var(--sans); color: var(--ink); }
+  .band-head .hint { font-size: .82rem; color: var(--muted); }
+
+  .connect { display: flex; justify-content: center; align-items: center; gap: .5rem; padding: .35rem 0; color: var(--muted); font: 600 .74rem var(--sans); text-transform: uppercase; letter-spacing: .1em; }
+  .connect .down { font-size: 1.1rem; line-height: 1; }
+
+  /* secondary bands read quieter than the hero pipeline */
+  .band.secondary { background: var(--bg-tint); }
+
+  /* ---- planned marker (single consistent convention) ---- */
+  .planned { position: relative; }
+  .planned-tag { display: inline-flex; align-items: center; font: 700 .6rem var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); background: var(--card); border: 1px solid var(--line-2); border-radius: 999px; padding: .1rem .45rem; }
+  .built-tag { display: inline-flex; align-items: center; font: 700 .6rem var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--good); background: var(--good-bg); border: 1px solid var(--good-line); border-radius: 999px; padding: .1rem .45rem; }
+
+  /* ================= KNOWLEDGE band ================= */
+  /* two kinds of source: a ranked mapping lookup (left) + evidence Claude reads (right) */
+  .know-split { display: grid; grid-template-columns: minmax(0, 1fr) 1px minmax(0, .78fr); gap: 0 1.15rem; align-items: stretch; }
+  .kdiv { background: var(--line); border-radius: 1px; }
+
+  .kgroup { display: flex; flex-direction: column; }
+  .kgroup-head { display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap; margin-bottom: .6rem; }
+  .kgroup-label { font: 700 .6rem var(--mono); letter-spacing: .09em; text-transform: uppercase; color: var(--know); background: var(--know-bg); border-radius: 6px; padding: .2rem .45rem; }
+  .kgroup-note { font-size: .78rem; color: var(--muted); }
+  .kgroup.kevidence .kgroup-label { color: var(--muted); background: var(--neutral-bg); }
+
+  .kcard { display: flex; flex-direction: column; border: 1px solid var(--line); border-left: 4px solid var(--know); border-radius: var(--radius-sm); background: var(--card); padding: .7rem .8rem; }
+  .kcard .kh { display: flex; align-items: center; justify-content: space-between; gap: .4rem; }
+  .kcard .ktitle { display: flex; align-items: center; gap: .45rem; min-width: 0; }
+  .kcard h4 { font: 600 .9rem var(--sans); color: var(--ink); margin: 0; }
+  .kcard .krole { font: 600 .68rem var(--sans); color: var(--muted); margin: .2rem 0 .05rem; }
+  .kcard p { margin: .18rem 0 0; font-size: .8rem; color: var(--ink-soft); line-height: 1.34; }
+
+  /* ranked precedence: ① wins, ② is the base — first match wins */
+  .rank { flex: 0 0 auto; width: 20px; height: 20px; border-radius: 999px; display: grid; place-items: center; font: 700 .72rem var(--display); color: #fff; background: var(--know); }
+  .kcard.rank-1 { background: var(--know-bg); border-left-width: 5px; }
+  .kcard.rank-2 .rank, .kcard.rank-3 .rank { background: var(--know); opacity: .5; }
+
+  .klookup { display: flex; flex-wrap: wrap; align-items: stretch; gap: .5rem; }
+  .klookup > .kcard { flex: 1 1 150px; min-width: 150px; }
+  .kstep { flex: 1 1 190px; min-width: 174px; display: flex; align-items: stretch; gap: .5rem; }  /* else + card wrap together, so the connector stays attached to card ③ */
+  .kstep > .kcard { flex: 1 1 auto; min-width: 0; }
+  .kelse { flex: 0 0 auto; align-self: center; display: flex; flex-direction: column; align-items: center; gap: .12rem; }
+  .kelse-arr { font-size: 1.2rem; font-weight: 700; line-height: 1; color: var(--line-2); }
+  .kelse-t { font: 700 .56rem var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+
+  .klookup-cap { margin-top: auto; padding-top: .6rem; font-size: .8rem; color: var(--ink-soft); }
+  .klookup-cap strong { color: var(--ink); }
+
+  .kevidence .kcard.evidence { border-left-color: var(--know); background: var(--card); }
+  /* target verifier: a check on the fix target — teal, distinct from the indigo evidence card, and NOT in the decision precedence */
+  .kevidence .kcard.support { border-left-color: var(--det); }
+  .kevidence .kcard.support .krole { color: var(--det); }
+  .kevidence .kcard + .kcard { margin-top: .55rem; }
+  .kevidence .kread { margin-top: .5rem; font-size: .78rem; color: var(--muted); }
+  .kevidence .kread strong { color: var(--ink-soft); }
+
+  .kcard.is-planned { border-style: dashed; border-left-style: solid; border-color: var(--line-2); border-left-color: var(--line-2); background: repeating-linear-gradient(45deg, #fff, #fff 8px, #fbfcfe 8px, #fbfcfe 16px); }
+  .kcard.is-planned h4 { color: var(--ink-soft); }
+
+  /* ================= PIPELINE band (HERO) ================= */
+  .band.hero-band { border: 2px solid var(--line-2); box-shadow: var(--shadow-md); }
+  .pipe { display: flex; align-items: stretch; justify-content: center; gap: .3rem; }
+  .parr { align-self: center; color: var(--line-2); font-size: 1.3rem; font-weight: 700; flex: 0 0 auto; }
+
+  .pnode { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; justify-content: center;
+    border: 1px solid var(--line); border-top: 4px solid var(--c, var(--neutral));
+    border-radius: var(--radius-sm); background: var(--card); padding: .8rem .85rem; box-shadow: var(--shadow-sm); }
+  .pnode .key { color: var(--c, var(--muted)); margin-bottom: .3rem; }
+  .pnode h4 { font: 600 .96rem var(--sans); color: var(--ink); margin: 0 0 .15rem; }
+  .pnode p { margin: 0; font-size: .82rem; color: var(--ink-soft); line-height: 1.35; }
+  .pnode.io { --c: var(--neutral); background: var(--neutral-bg); }
+  .pnode.llm { --c: var(--llm); }
+  .pnode.human { --c: var(--human); }
+
+  /* deterministic core: framed group of three compact steps */
+  .core { flex: 1.15 1 0; min-width: 0; border: 2px solid var(--det); border-radius: var(--radius); background: var(--det-bg); padding: .55rem .55rem .6rem; display: flex; flex-direction: column; }
+  .core > .key { color: var(--det); margin: .05rem 0 .45rem .15rem; }
+  .core .steps { display: flex; flex-direction: column; gap: .4rem; flex: 1; }
+  .cstep { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--det); border-radius: 8px; padding: .45rem .55rem; }
+  .cstep h5 { font: 600 .86rem var(--sans); color: var(--ink); margin: 0; display: flex; align-items: baseline; gap: .4rem; }
+  .cstep h5 .key { color: var(--det); }
+  .cstep p { margin: .05rem 0 0; font-size: .78rem; color: var(--ink-soft); line-height: 1.3; }
+  .cstep.guard { border-left-color: var(--good); background: var(--good-bg); }
+  .cstep.guard h5, .cstep.guard h5 .key { color: var(--good); }
+  .cstep.guard p { color: #065f46; }
+
+  /* the planned ADT tail sits inside the human node */
+  .adt { margin-top: .45rem; display: inline-flex; align-items: center; gap: .4rem; font-size: .76rem; color: var(--muted); }
+
+  /* ---- routing strip (tiers = one severity ramp) ---- */
+  .routing { margin-top: 1.05rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+  .routing .rlabel { font-size: .82rem; color: var(--muted); margin-bottom: .55rem; }
+  .routing .rlabel strong { color: var(--ink); }
+  .tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; }
+  .tier { display: flex; align-items: flex-start; gap: .55rem; border: 1px solid var(--line); border-left: 4px solid var(--tc); border-radius: var(--radius-sm); background: var(--card); padding: .6rem .7rem; }
+  .tier .tk { flex: 0 0 auto; width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; font: 700 .8rem var(--display); color: #fff; background: var(--tc); }
+  .tier h4 { font: 600 .88rem var(--sans); color: var(--ink); margin: 0 0 .1rem; }
+  .tier h4 code { background: transparent; color: var(--tc); padding: 0; font-size: .82em; }
+  .tier p { margin: 0; font-size: .78rem; color: var(--ink-soft); line-height: 1.3; }
+  .tier.t1 { --tc: var(--t1); } .tier.t2 { --tc: var(--t2); } .tier.t3 { --tc: var(--t3); }
+  .ramp-caption { margin-top: .6rem; display: flex; align-items: center; gap: .6rem; font-size: .78rem; color: var(--muted); }
+  .ramp-caption .bar { flex: 1; height: 6px; border-radius: 999px; background: linear-gradient(90deg, var(--t1), var(--t2) 52%, var(--t3)); }
+
+  /* ================= CYCLE: Knowledge + run + return = one closed loop ===== */
+  /* the whole lower half is wrapped so a return rail can run from retro back
+     up into the Knowledge band, closing the loop */
+  .cycle { display: grid; grid-template-columns: 58px minmax(0, 1fr); position: relative; }
+  .cycle-body { grid-column: 2; min-width: 0; }
+
+  /* left return rail: carries the flow from retro back UP into Knowledge */
+  .rail { grid-column: 1; position: relative; }
+  .rail-line { position: absolute; right: 17px; top: 66px; bottom: 22px; width: 3px;
+    background: linear-gradient(180deg, var(--know), #818cf8); border-radius: 2px; }
+  .rail-up { position: absolute; right: 11px; top: 50%; transform: translateY(-50%);
+    width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent;
+    border-bottom: 11px solid var(--know); }
+  .rail-cap { position: absolute; right: 1px; top: 50%; transform: translateY(-50%);
+    writing-mode: vertical-rl; transform: translateY(-50%) rotate(180deg);
+    font: 700 .57rem var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--know); }
+
+  /* top elbow: the rail turns right and points INTO the Knowledge band */
+  .loop-in { position: absolute; left: 41px; top: 60px; display: flex; align-items: center; z-index: 3; }
+  .loop-in .seg { width: 15px; height: 3px; background: var(--know); }
+  .loop-in .head { width: 0; height: 0; border-top: 6px solid transparent; border-bottom: 6px solid transparent; border-left: 9px solid var(--know); }
+
+  /* bottom return bar: retro learns -> feeds Knowledge, flowing LEFT into the rail */
+  .return { position: relative; display: flex; align-items: center; gap: .7rem;
+    margin-top: .55rem; padding: .6rem 1rem; border: 1.5px solid #c7d2fe;
+    border-radius: 999px; background: var(--know-bg); }
+  .return::before { content: ""; position: absolute; left: -20px; top: 50%; transform: translateY(-50%);
+    width: 21px; height: 3px; background: var(--know); }  /* bridge to the rail */
+  .return .rhead { flex: 0 0 auto; width: 0; height: 0; margin-right: .05rem;
+    border-top: 7px solid transparent; border-bottom: 7px solid transparent; border-right: 10px solid var(--know); }
+  .return .rtxt { flex: 1; font-size: .82rem; color: var(--ink-soft); line-height: 1.4; }
+  .return .rtxt strong { color: var(--ink); }
+  .return .rfrom { flex: 0 0 auto; font: 700 .6rem var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+
+  /* small anchor in the Knowledge head naming where the loop closes */
+  .loop-anchor { margin-left: auto; display: inline-flex; align-items: center; gap: .3rem;
+    font: 700 .6rem var(--mono); letter-spacing: .08em; text-transform: uppercase;
+    color: var(--know); background: var(--know-bg); padding: .22rem .55rem; border-radius: 999px; }
+
+  /* two honest halves, legible inside the one run band */
+  .half-label { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem;
+    margin: 1.15rem 0 .65rem; font-size: .82rem; color: var(--muted); }
+  .half-k { font: 700 .62rem var(--sans); letter-spacing: .09em; text-transform: uppercase;
+    color: #fff; background: var(--hc, var(--muted)); border-radius: 6px; padding: .18rem .5rem; }
+
+  /* hand-off hinge: the report is done -> a human takes it over */
+  .handoff { display: flex; align-items: center; gap: .7rem; justify-content: center;
+    margin: .85rem auto .1rem; padding: .55rem 1rem; max-width: 760px;
+    border: 1.5px dashed var(--human); border-radius: var(--radius); background: var(--human-bg); }
+  .handoff .ha { font-size: 1.25rem; line-height: 1; color: var(--human); flex: 0 0 auto; }
+  .handoff p { margin: 0; font-size: .83rem; color: var(--ink-soft); }
+  .handoff p strong { color: var(--human); }
+
+  /* human-half nodes reuse the pipeline node motif — it's the same flow, continued */
+  .pnode.h-know { --c: var(--know); }
+  .pnode .adt { margin-top: .45rem; }
+
+  .cycle-note { margin: .85rem 0 .1rem; font-size: .78rem; color: var(--muted); line-height: 1.45; }
+  .cycle-note strong { color: var(--ink); }
+
+  /* ================= RESPONSIVE ================= */
+  /* pipeline + tiers stack cleanly below desktop width — never scrolls sideways */
+  @media (max-width: 1040px) {
+    .pipe { flex-direction: column; align-items: stretch; }
+    .pipe .parr { align-self: center; transform: rotate(90deg); }
+    .core .steps { flex-direction: row; }
+    .cstep { flex: 1; }
+  }
+  @media (max-width: 820px) {
+    .know-split { grid-template-columns: 1fr; }
+    .kdiv { height: 1px; margin: 1rem 0; }
+    .tiers { grid-template-columns: 1fr; }
+    .core .steps { flex-direction: column; }
+  }
+  @media (max-width: 560px) {
+    .klookup { flex-direction: column; }
+    .kstep { flex-direction: column; }
+    .kelse { flex-direction: row; padding: .1rem 0; }
+    .kelse-arr { transform: rotate(90deg); }
+    .return { flex-wrap: wrap; }
+  }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+
+    <!-- ===================== HERO ===================== -->
+    <div class="hero">
+      <span class="eyebrow">The whole skill in one picture</span>
+      <h1>Finds what breaks in S/4HANA — and <span class="warn">never changes anything risky</span> on its own.</h1>
+      <div class="guarantee">
+        <span class="zero">0</span>
+        <span class="txt">unsafe fixes<small>by construction, not by prompt</small></span>
+      </div>
+      <div class="subtitle">Knowledge in, trust out.</div>
+    </div>
+
+    <!-- ===================== LEGEND ===================== -->
+    <div class="legend" aria-label="Legend">
+      <span class="li"><span class="sw" style="background:var(--neutral)"></span> In / out</span>
+      <span class="li"><span class="sw" style="background:var(--know)"></span> Knowledge</span>
+      <span class="li"><span class="sw" style="background:var(--det)"></span> Deterministic code</span>
+      <span class="li"><span class="sw" style="background:var(--llm)"></span> Claude (judgment)</span>
+      <span class="li"><span class="sw" style="background:var(--human)"></span> Human sign-off</span>
+      <span class="sep" aria-hidden="true"></span>
+      <span class="li"><span class="ramp"></span> Tiers: cool&nbsp;→&nbsp;warm = more human judgment</span>
+      <span class="li"><span class="planned-sw"></span> Dashed = planned, not built</span>
+    </div>
+
+    <!-- ===================== THE CYCLE (Knowledge + run + return) ========= -->
+    <!-- one closed loop: Knowledge feeds a run; the run's human half learns and
+         feeds back up the left rail into Knowledge -->
+    <div class="cycle">
+
+      <!-- left return rail (drawn); connects the bottom return bar up to Knowledge -->
+      <div class="rail" aria-hidden="true">
+        <div class="rail-line"></div>
+        <div class="rail-up"></div>
+        <span class="rail-cap">Return</span>
+      </div>
+      <div class="loop-in" aria-hidden="true"><span class="seg"></span><span class="head"></span></div>
+
+      <div class="cycle-body">
+
+    <!-- ---------- KNOWLEDGE band (source + return target) ---------- -->
+    <div class="band secondary">
+      <div class="band-head">
+        <span class="eyebrow" style="color:var(--know)">Knowledge in</span>
+        <h3>What each fix draws on</h3>
+        <span class="hint">the catalog decides via a 2-step lookup; supporting sources check the target and inform the fix</span>
+        <span class="loop-anchor">↩ the loop closes here</span>
+      </div>
+      <div class="know-split">
+
+        <!-- ranked mapping lookup: object → status · tier · target, first match wins -->
+        <div class="kgroup klookup-group">
+          <div class="kgroup-head">
+            <span class="kgroup-label">Mapping lookup</span>
+            <span class="kgroup-note">object&nbsp;→&nbsp;status&nbsp;·&nbsp;tier&nbsp;·&nbsp;target</span>
+          </div>
+
+          <div class="klookup">
+            <div class="kcard rank-1">
+              <div class="kh"><div class="ktitle"><span class="rank">1</span><h4>Custom overrides</h4></div></div>
+              <span class="krole">client · wins when present</span>
+              <p>The client's own mappings in <code>custom-overrides.yaml</code>. Usually empty; any entry beats the standard catalog.</p>
+            </div>
+
+            <span class="kelse" aria-hidden="true"><span class="kelse-arr">→</span><span class="kelse-t">else</span></span>
+
+            <div class="kcard rank-2">
+              <div class="kh"><div class="ktitle"><span class="rank">2</span><h4>Remediation Catalog</h4></div></div>
+              <span class="krole">Deloitte-curated · the base · sets world &amp; tier</span>
+              <p>Curated known fixes, keyed by object. The authoritative base — it sets the decision.</p>
+            </div>
+          </div>
+
+          <div class="klookup-cap"><strong>First match wins</strong> — your overrides beat the standard catalog.</div>
+        </div>
+
+        <div class="kdiv" aria-hidden="true"></div>
+
+        <!-- supporting sources: NOT in the decision precedence — one verifies the target, one is read for the fix -->
+        <div class="kgroup kevidence">
+          <div class="kgroup-head">
+            <span class="kgroup-label">Supporting sources</span>
+            <span class="kgroup-note">not the decision — they don't set world or tier</span>
+          </div>
+          <div class="kcard support">
+            <div class="kh"><div class="ktitle"><h4>Cloudification Repo</h4></div><span class="built-tag">Built</span></div>
+            <span class="krole">verifies / fills the fix target · hints on catalog misses</span>
+            <p>SAP's official object→successor map. Confirms or flags the catalog's target, fills a gap, and suggests a target on a catalog miss. Tables only (262); never sets tier.</p>
+          </div>
+          <div class="kcard evidence">
+            <div class="kh"><div class="ktitle"><h4>Simplification-List KB</h4></div></div>
+            <span class="krole">evidence Claude reads</span>
+            <p>SAP's change list, made searchable. Claude reads the narrative to derive the variant-correct fix per statement.</p>
+          </div>
+          <p class="kread">Neither competes for <strong>the mapping</strong> — the catalog decides; these check the target and inform the fix.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="connect"><span class="down">↓</span> feeds</div>
+
+    <!-- ===================== THE RUN (one flow, two honest halves) ========= -->
+    <div class="band hero-band run-band">
+      <div class="band-head">
+        <span class="eyebrow" style="color:var(--det)">A single run</span>
+        <h3>The machine runs to a report; then a human works it — and the run teaches the catalog</h3>
+      </div>
+
+      <!-- ---- MACHINE HALF: deterministic + Claude, stops at a report ---- -->
+      <div class="half-label"><span class="half-k" style="--hc:var(--det)">Machine half</span> deterministic where it's safe · Claude only on the hard residue · runs with no human, stops at a report</div>
+      <div class="pipe">
+        <div class="pnode io">
+          <span class="key">in</span>
+          <h4>Custom ABAP</h4>
+          <p>Programs, function modules, classes.</p>
+        </div>
+        <span class="parr" aria-hidden="true">→</span>
+
+        <div class="core">
+          <span class="key">Deterministic core · runs with no human</span>
+          <div class="steps">
+            <div class="cstep">
+              <h5><span class="key">detect</span> Detect</h5>
+              <p>Finds risky table &amp; field access.</p>
+            </div>
+            <div class="cstep">
+              <h5><span class="key">classify</span> Classify</h5>
+              <p>Assigns a tier and an action.</p>
+            </div>
+            <div class="cstep guard">
+              <h5><span class="key">guard</span> Guard</h5>
+              <p>Blocks unsafe auto-applies — 0 by construction.</p>
+            </div>
+          </div>
+        </div>
+        <span class="parr" aria-hidden="true">→</span>
+
+        <div class="pnode llm">
+          <span class="key">T3 · escalations</span>
+          <h4>Claude</h4>
+          <p>Only the ambiguous cases — reads the knowledge, drafts the correct fix.</p>
+        </div>
+        <span class="parr" aria-hidden="true">→</span>
+
+        <div class="pnode io">
+          <span class="key">out</span>
+          <h4>Remediation report</h4>
+          <p>Proposed fixes, not applied.</p>
+        </div>
+      </div>
+
+      <!-- ---- HINGE: report done -> a human takes it over (the tier gates who acts) ---- -->
+      <div class="handoff">
+        <span class="ha" aria-hidden="true">↓</span>
+        <p><strong>Hand-off — not the end.</strong> The report is done; a human takes it over. The tier says how much judgment each finding needs.</p>
+      </div>
+
+      <!-- routing: tiers as one severity ramp — the hand-off gradient -->
+      <div class="routing">
+        <div class="rlabel"><strong>Routed by how much human judgment each fix needs</strong> — the tier sets the action.</div>
+        <div class="tiers">
+          <div class="tier t1">
+            <span class="tk">T1</span>
+            <div>
+              <h4>Mechanical · <code>auto_apply</code></h4>
+              <p>Safe 1:1 swap. Deterministic, no human.</p>
+            </div>
+          </div>
+          <div class="tier t2">
+            <span class="tk">T2</span>
+            <div>
+              <h4>Bounded · <code>propose</code></h4>
+              <p>Deterministic drafts it; human signs off.</p>
+            </div>
+          </div>
+          <div class="tier t3">
+            <span class="tk">T3</span>
+            <div>
+              <h4>Intent · <code>escalate</code></h4>
+              <p>Claude proposes; the human decides.</p>
+            </div>
+          </div>
+        </div>
+        <div class="ramp-caption"><span>less human judgment</span><span class="bar"></span><span>more human judgment</span></div>
+      </div>
+
+      <!-- ---- HUMAN-WORKED HALF: works the report, signs off, learns ---- -->
+      <div class="half-label"><span class="half-k" style="--hc:var(--human)">Human-worked half</span> works the report · signs off · the run teaches the catalog</div>
+      <div class="pipe humanflow">
+        <div class="pnode h-know">
+          <span class="key">worklist</span>
+          <h4>Work the findings</h4>
+          <p>Triage the report, finding by finding.</p>
+        </div>
+        <span class="parr" aria-hidden="true">→</span>
+
+        <div class="pnode human">
+          <span class="key">sign-off</span>
+          <h4>Sign off</h4>
+          <p>Approve each fix — who &amp; when, on record.</p>
+          <span class="adt"><span class="planned-tag">Planned</span> apply in ADT</span>
+        </div>
+        <span class="parr" aria-hidden="true">→</span>
+
+        <div class="pnode h-know">
+          <span class="key">after-action</span>
+          <h4>After-action report</h4>
+          <p>What was applied, changed, deferred.</p>
+        </div>
+        <span class="parr" aria-hidden="true">→</span>
+
+        <div class="pnode h-know">
+          <span class="key">retro</span>
+          <h4>Retro spots a gap</h4>
+          <p>A missed case the catalog should have known.</p>
+        </div>
+      </div>
+
+      <p class="cycle-note"><strong>Built (demo-grade):</strong> worklist · sign-off · after-action · retro, from one worked example. Roadmap: apply the fix in ADT · a review surface outside the session · a general learning engine.</p>
+    </div>
+
+    <!-- ---------- RETURN: retro learns -> back up the rail into Knowledge ---------- -->
+    <div class="return">
+      <span class="rhead" aria-hidden="true"></span>
+      <div class="rtxt"><strong>Retro learns → back into Knowledge.</strong> A fixed gap becomes a locked regression test the catalog keeps — closing the loop.</div>
+      <span class="planned-tag">Planned: general engine</span>
+      <span class="rfrom">↑ from retro</span>
+    </div>
+
+      </div><!-- /cycle-body -->
+    </div><!-- /cycle -->
+
+  </main>
+</body>
+</html>

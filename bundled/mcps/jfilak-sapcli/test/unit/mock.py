@@ -1,0 +1,596 @@
+import copy
+import json
+import types
+from typing import Dict, NamedTuple, Optional
+from io import StringIO
+from argparse import ArgumentParser
+from contextlib import AbstractContextManager, contextmanager
+
+import unittest
+from unittest.mock import patch, MagicMock, Mock
+
+import sap.adt
+import sap.http
+import sap.http.token_cache
+import sap.rest
+import sap.cli.core
+
+
+class Response:
+
+    def __init__(self, text=None, status_code=None, headers=None, content_type=None, json=None):
+        self.text = text
+        self.status_code = status_code if status_code is not None else 200
+        self.headers = headers or {}
+        self._json = json
+
+        if content_type is not None:
+            if self.headers is None:
+                self.headers = {}
+
+            self.headers['Content-Type'] = content_type
+            self.headers['content-type'] = content_type
+
+    def json(self):
+        if self._json is None:
+            raise ValueError()
+
+        return self._json
+
+    @staticmethod
+    def with_json(json=None, status_code=None, headers=None):
+        return Response(json=json, content_type='application/json', headers=headers, status_code=status_code)
+
+    @staticmethod
+    def ok():
+        return Response(status_code=200)
+
+
+class Request(NamedTuple):
+
+    method: str
+    adt_uri: str
+    headers: Dict
+    body: str
+    params: Dict
+
+    @property
+    def url(self):
+        return self.adt_uri
+
+    def to_short_str(self):
+        return f'{self.method} {self.adt_uri}'
+
+    def __str__(self):
+        str_request = self.to_short_str()
+
+        if self.params:
+            str_request += '?' + '&'.join((f'{key}={value}' for (key, value) in self.params.items()))
+
+        if self.headers:
+            str_request += '\n' + '\n'.join((f'{key}: {value}' for (key, value) in self.headers.items()))
+
+        if self.body:
+            str_request += '\n' + self.body
+
+    def assertEqual(self, other, asserter, json_body=False):
+        asserter.assertEqual(self.to_short_str(), other.to_short_str())
+
+        if json_body:
+            asserter.assertEqual(json.loads(self.body), json.loads(other.body), f'Not matching JSON bodies for {self.to_short_str()}')
+        else:
+            asserter.assertEqual(self.body, other.body, f'Not matching bodies for {self.to_short_str()}')
+
+        asserter.assertEqual(self.params, other.params, f'Not matching parameters for {self.to_short_str()}')
+        asserter.assertEqual(self.headers, other.headers, f'Not matching parameters for {self.to_short_str()}')
+
+    @staticmethod
+    def get(adt_uri=None, headers=None, params=None, accept=None):
+        if accept:
+            headers = dict(headers or {})
+            headers['Accept'] = accept
+
+        return Request(method='GET', adt_uri=adt_uri, headers=headers, body=None, params=params)
+
+    @staticmethod
+    def get_json(uri=None, headers=None, params=None):
+        return Request.get(adt_uri=uri, headers=headers, params=params, accept='application/json')
+
+    @staticmethod
+    def post(uri=None, headers=None, body=None, params=None, accept=None, content_type=None):
+        if accept:
+            headers = headers or {}
+            headers['Accept'] = accept
+
+        if content_type:
+            headers = headers or {}
+            headers['Content-Type'] = content_type
+
+        return Request(method='POST', adt_uri=uri, headers=headers, body=body, params=params)
+
+    @staticmethod
+    def post_xml(uri=None, headers=None, body=None, params=None, accept=None):
+        return Request.post(
+                uri=uri,
+                headers=headers,
+                params=params,
+                accept=accept,
+                content_type='application/xml',
+                body=body
+            )
+
+
+    @staticmethod
+    def post_json(uri=None, headers=None, body=None, params=None, accept=None, content_type=None):
+        headers = headers or {}
+        headers.update({'Content-Type': content_type or 'application/json'})
+        if accept:
+            headers['Accept'] = accept
+
+        json_body = json.dumps(body)
+        return Request(method='POST', adt_uri=uri, headers=headers, body=json_body, params=params)
+
+
+    @staticmethod
+    def post_text(uri=None, headers=None, body=None, params=None, accept=None):
+        headers = headers or {}
+        headers.update({'Content-Type': 'text/plain'})
+        if accept:
+            headers['Accept'] = accept
+
+        return Request(method='POST', adt_uri=uri, headers=headers, body=body, params=params)
+
+    @staticmethod
+    def delete(uri=None, headers=None, body=None, params=None):
+        return Request(method='DELETE', adt_uri=uri, headers=headers, body=body, params=params)
+
+    @staticmethod
+    def put(uri=None, headers=None, body=None, params=None):
+        return Request(method='PUT', adt_uri=uri, headers=headers, body=body, params=params)
+
+    def clone_with_uri(self, uri):
+        return Request(
+            method=self.method,
+            adt_uri=uri,
+            headers=self.headers,
+            body=self.body,
+            params=self.params)
+
+def ok_responses():
+
+    while True:
+        yield Response(text='', status_code=200, headers={})
+
+
+class SimpleAsserter:
+
+    def assertEqual(self, lhs, rhs, message=None):
+        assert lhs == rhs, message
+
+
+class MockHTTPClient(sap.http.HTTPClient):
+    """HTTPClient that records requests and returns predefined responses.
+
+    Used by mock connections (e.g. RESTConnection) to intercept HTTP calls
+    without hitting the network. Subclassing HTTPClient keeps the real
+    execute_with_session/error-handler logic intact; only retrieve() is
+    replaced.
+    """
+
+    def __init__(self, responses=None, asserter=None, url_builder=None, user='ANZEIGER'):
+        super().__init__(host='mockhost', client='100', user=user, password='mockpass')
+
+        self.execs = list()
+        self.asserter = asserter if asserter is not None else SimpleAsserter()
+        self._url_builder = url_builder
+        self.set_responses_iter(ok_responses() if responses is None else iter(responses))
+
+    def set_responses(self, *responses):
+        if responses and isinstance(responses[0], list):
+            responses = responses[0]
+
+        self.set_responses_iter(iter(responses))
+
+    def set_responses_iter(self, responses_iter):
+        self._resp_iter = responses_iter
+
+    def retrieve(self, session, method, path, params=None, headers=None, body=None):
+        req = Request(method, path, headers, body, params)
+        self.execs.append(req)
+
+        res = next(self._resp_iter)
+        if res is None:
+            res = next(ok_responses())
+
+        if isinstance(res, tuple):
+            exp_request = res[1]
+            res = res[0]
+
+            if self._url_builder is not None:
+                full_uri = self._url_builder(exp_request.adt_uri)
+                exp_request = exp_request.clone_with_uri(full_uri)
+
+            exp_request.assertEqual(req, self.asserter)
+
+        return (req, res)
+
+
+class RESTConnection(sap.rest.Connection):
+
+    def __init__(self, responses=None, user='ANZEIGER', asserter=None):
+        """
+        Args:
+            response: A list of Response instances or tuples (Response, Request)
+                      if you want to automatically check the request. Ins such
+                      case, you should also pass the argument asserter.
+        """
+        super().__init__('/icf/path', 'login/url', 'host', '100', user, 'mockpass')
+
+        self.asserter = asserter if asserter is not None else SimpleAsserter()
+
+        self._http_client = MockHTTPClient(
+            responses=responses,
+            asserter=self.asserter,
+            url_builder=self._build_url,
+            user=user,
+        )
+
+    @property
+    def execs(self):
+        return self._http_client.execs
+
+    def set_responses(self, *responses):
+        self._http_client.set_responses(*responses)
+
+    def set_responses_iter(self, responses_iter):
+        self._http_client.set_responses_iter(responses_iter)
+
+    def _get_session(self):
+        return 'bogus session'
+
+    def _build_url(self, uri_path):
+        return uri_path
+
+    def mock_methods(self):
+        return [(e.method, e.adt_uri) for e in self.execs]
+
+
+class Connection(sap.adt.Connection):
+
+    def __init__(self, responses=None, user='ANZEIGER', collections=None, asserter=None):
+        """
+        Args:
+            response: A list of Response instances or tuples (Response, Request)
+                      if you want to automatically check the request. Ins such
+                      case, you should also pass the argument asserter.
+        """
+        super(Connection, self).__init__('mockhost', 'mockclient', user, 'mockpass')
+
+        self.collections = collections
+        self.execs = list()
+        self.asserter = asserter if asserter is not None else SimpleAsserter()
+        self.set_responses_iter(ok_responses() if responses is None else iter(responses))
+
+        # Rewire _http_client.retrieve to use our mock _retrieve
+        self._http_client.retrieve = self._retrieve
+
+    def set_responses(self, *responses):
+        if responses and isinstance(responses[0], list):
+            responses = responses[0]
+
+        self.set_responses_iter(iter(responses))
+
+    def set_responses_iter(self, responses_iter):
+        self._resp_iter = responses_iter
+
+    def _get_session(self):
+        return 'bogus session'
+
+    def _build_adt_url(self, adt_uri):
+        return f'/{self.uri}/{adt_uri}'
+
+    def _retrieve(self, session, method, url, params=None, headers=None, body=None):
+        req = Request(method, url, headers, body, params)
+        self.execs.append(req)
+
+        res = next(self._resp_iter)
+        if res is None:
+            res = next(ok_responses())
+
+        if isinstance(res, tuple):
+            exp_request = res[1]
+            res = res[0]
+
+            full_uri = self._build_adt_url(exp_request.adt_uri)
+            exp_request = exp_request.clone_with_uri(full_uri)
+
+            exp_request.assertEqual(req, self.asserter)
+
+        return (req, res)
+
+    def mock_methods(self):
+        return  [(e.method, e.adt_uri) for e in self.execs]
+
+    def get_collection_types(self, basepath, default_mimetype):
+
+        if self.collections is None:
+            return [default_mimetype]
+
+        return self.collections[f'/{self.uri}/{basepath}']
+
+
+def empty_rfc_responses():
+
+    while True:
+        yield {}
+
+
+class RFCConnection:
+
+    def __init__(self, responses=None):
+        self.responses = iter(responses) if responses else empty_rfc_responses()
+        self.execs = []
+
+    def call(self, remote_function, **kwargs):
+        self.execs.append((remote_function, kwargs))
+
+        return next(self.responses)
+
+    def set_responses(self, responses):
+        self.responses = iter(responses)
+
+
+class BufferConsole(sap.cli.core.PrintConsole):
+
+    def __init__(self):
+        self.tag = None
+        self.std_output = StringIO()
+        self.err_output = StringIO()
+
+        super(BufferConsole, self).__init__(out_file=self.std_output, err_file=self.err_output)
+
+    @property
+    def capout(self):
+        return self.std_output.getvalue()
+
+    @property
+    def caperr(self):
+        return self.err_output.getvalue()
+
+    def reset(self):
+        self.std_output.truncate(0)
+        self.std_output.seek(0)
+        self.err_output.truncate(0)
+        self.err_output.seek(0)
+
+
+@contextmanager
+def patch_get_print_console_with_buffer():
+    """Capture output printed out by sapcli.
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            sap.cli.core.printout('Test!')
+            sap.cli.core.printout('Yet another Test!')
+            sap.cli.core.printerr('This is error!')
+
+        self.assertEqual(fake_console.capout, 'Test!\nYet another Test!\n')
+        self.assertEqual(fake_console.caperr, 'This is error!\n')
+    """
+
+    buffer = BufferConsole()
+    buffer.tag = 'function patch'
+    backup = sap.cli.core.set_console(buffer)
+    try:
+        yield buffer
+    finally:
+        double_check = sap.cli.core.set_console(backup)
+        if double_check.tag != 'function patch':
+            raise Exception('nightmare')
+
+
+class GroupArgumentParser:
+
+    def __init__(self, group_class):
+        self._group = group_class()
+        self._parser = ArgumentParser()
+        self._group.install_parser(self._parser)
+
+    def parse(self, *argv):
+        return self._parser.parse_args(argv)
+
+
+class PatcherTestCase:
+
+    def __init__(self, *args, **kwargs):
+        super(PatcherTestCase, self).__init__()
+
+        self._patchers = {}
+        self._console_backup = None
+
+    def patch(self, spec, **kwargs):
+        if spec in self._patchers:
+            raise RuntimeError('Cannot patch patched %s' % (spec))
+
+        print('Patching', spec)
+        patcher = patch(spec, **kwargs)
+        self._patchers[spec] = patcher
+        return patcher.start()
+
+    def patch_console(self, console=None):
+        if console is None:
+            console = BufferConsole()
+
+        console.tag = self
+
+
+        # Remember only the first one - that's the real original and that's how patch works!
+        if self._console_backup is not None:
+            raise Exception('double patch')
+
+        self._console_backup = sap.cli.core.set_console(console)
+        return Mock(return_value=console)
+
+    def unpatch_all(self):
+        if self._console_backup is not None:
+            double_check = sap.cli.core.set_console(self._console_backup)
+            if double_check.tag is not self:
+                raise Exception('revert something else')
+            self._console_backup = None
+
+        for spec, patcher in self._patchers.items():
+            print('Unpatching:', spec)
+            patcher.stop()
+
+
+class ConsoleOutputTestCase(unittest.TestCase):
+
+    def __init__(self, *args, **kwargs):
+        super(ConsoleOutputTestCase, self).__init__(*args, **kwargs)
+
+    def tearDown(self):
+         super().tearDown()
+
+    def setUp(self):
+        super().setUp()
+        self.console = BufferConsole()
+
+    def assertEmptyConsole(self, console,):
+        self.assertEqual(console.capout, '')
+        self.assertEqual(console.caperr, '')
+
+    def assertConsoleContents(self, console, stdout='', stderr=''):
+        self.assertEqual(console.capout, stdout)
+        self.assertEqual(console.caperr, stderr)
+
+
+class GCTSLogMessages:
+
+    def __init__(self, *messages):
+        self.data = messages
+
+
+class GCTSLogProtocol:
+
+    def __init__(self, typ, protocol):
+        self.data = {
+            'type': typ,
+            'protocol': protocol.data
+        }
+
+
+def make_gcts_log_entry(severity, message, time=None, user=None, section=None, action=None, code=None, protocol=None):
+    entry = {'severity': severity, 'message': message}
+
+    if time is not None:
+        entry['time'] = time
+
+    if user is not None:
+        entry['user'] = user
+
+    if section is not None:
+        entry['section'] = section
+
+    if action is not None:
+        entry['action'] = action
+
+    if code is not None:
+        entry['code'] = code
+
+    if protocol is not None:
+        entry['protocol'] = protocol.data
+
+    return entry
+
+
+def make_gcts_log_error(message, time=None, user=None, section=None, action=None, code=None, protocol=None):
+    return make_gcts_log_entry(
+        'ERROR',
+        message,
+        time=time,
+        user=user,
+        section=section,
+        action=action,
+        code=code,
+        protocol=protocol
+    )
+
+
+class GCTSLogBuilder:
+
+    def __init__(self, errorLog=None, log=None, exception=None):
+        self.errorLog = errorLog or list()
+        self.log = log or list()
+        self.exception = exception
+
+    def get_contents(self):
+        contents = {}
+        contents['errorLog'] = self.errorLog or list()
+        contents['log'] = self.log or list()
+        contents['exception'] = self.exception or 'Server Side Exception'
+
+        return contents
+
+    def log_error(self, entry):
+        self.log.append(entry)
+        self.errorLog.append(entry)
+        return self
+
+    def log_exception(self, message, code):
+        self.exception = message
+        self.errorLog.append(make_gcts_log_error(message=message, code=code))
+        return self
+
+
+class TestRFCLibError(Exception):
+
+    def __init__(self, message):
+        super().__init__(message)
+
+
+mod_exception = types.SimpleNamespace(RFCLibError=TestRFCLibError)
+mod_pyrfc = types.SimpleNamespace(_exception=mod_exception)
+
+
+class RetainedStringIO(StringIO):
+    """Because the parent StringIO raises an error if you call
+       getvalue() after the call to close().
+    """
+
+    def __init__(self):
+        self.finalvalue = None
+        super().__init__()
+
+    def close(self):
+        self.finalvalue = self.getvalue()
+        super().close()
+
+
+class StringIOFile(StringIO, AbstractContextManager):
+
+    def __init__(self, buf):
+        StringIO.__init__(self, buf)
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        return False
+
+
+class InMemoryTokenStore(sap.http.token_cache.TokenStore):
+
+    def __init__(self, content: dict = None):
+        self.content = content or {}
+
+    def get(self, key: str) -> Optional[sap.http.token_cache.Token]:
+        """Return the stored token for `key`, or None if absent."""
+
+        return self.content.get(key)
+
+    def set(self, key: str, token: sap.http.token_cache.Token) -> None:
+        """Store `token` under `key`, overwriting any existing entry."""
+
+        self.content[key] = token
+
+    def delete(self, key: str) -> None:
+        """Remove the entry for `key`. No-op if it doesn't exist."""
+
+        if key in self.content:
+            del self.content[key]

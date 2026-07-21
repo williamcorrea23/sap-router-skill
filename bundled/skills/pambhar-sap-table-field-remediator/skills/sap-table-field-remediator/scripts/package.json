@@ -1,0 +1,9 @@
+{
+  "name": "sap-table-field-remediator-scripts",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Deterministic detector for the SAP Table & Field Remediator skill (abaplint AST backbone).",
+  "dependencies": {
+    "@abaplint/core": "^2"
+  }
+}

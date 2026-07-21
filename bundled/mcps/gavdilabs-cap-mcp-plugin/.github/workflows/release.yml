@@ -1,0 +1,59 @@
+name: Release & Publish to NPM
+on:
+  workflow_dispatch:
+    inputs:
+      version-bump:
+        type: choice
+        description: Release type
+        options:
+          - patch
+          - minor
+          - major
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      deployments: write
+      attestations: write
+      id-token: write
+    steps:
+      - name: Checkout with SSH key
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          registry-url: 'https://registry.npmjs.org'
+
+      # OIDC requires npm v11.5.1 or later
+      # Node.js v20 comes with v10.8, so we need to update it:
+      - name: Update NPM CLI for OIDC 
+        run: npm install -g npm@latest
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Initialize Git user
+        run: |
+          git config --global user.email "svl@gavdilabs.com"
+          git config --global user.name "Release Workflow"
+          git remote set-url origin git@github.com:${{ github.repository }}.git
+
+      # Migrated to use trusted publisher instead
+      #- name: Initialize NPM config
+        #run: npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
+        #env:
+          #NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Release
+        run: npx release-it ${{ github.event.inputs.version-bump }} --ci
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          #NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: End
+        run: echo "New version released!"

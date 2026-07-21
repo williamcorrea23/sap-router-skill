@@ -4,10 +4,10 @@
       "type": "stdio",
       "command": "node",
       "args": [
-        "c:/Users/William Correa/Downloads/sap-router-orchestrator-files/sap-router-skill/references/context-mode/start.mjs"
+        "c:/Users/William Correa/Downloads/sap-router-orchestrator-files/sap-router-skill/bundled/tools/context-mode/start.mjs"
       ],
       "env": {
-        "CONTEXT_MODE_PLATFORM": "antigravity"
+        "CONTEXT_MODE_PLATFORM": "codex"
       },
       "description": "context-mode MCP server — saves 98% of your context window. Sandboxed code execution, FTS5 knowledge base, and session continuity."
     },

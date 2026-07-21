@@ -1,0 +1,22 @@
+tools:
+  - name: check_ownership
+    description: |
+      Check if a company code is present in the defined scope and fiscal period.
+
+      Queries the database for records matching:
+      - The given fiscal period (FISCPER)
+      - The given company code (ZCOMPCODE)
+      - Scope conditions: (ZSCOPE IN S_LEGAL, S_LEGAL_DKK, S_LEGAL_SPECIAL AND ZVERSION 001)
+        OR (ZSCOPE = S_LEGAL AND ZVERSION = 021)
+
+      Returns True if any matching rows are found, False otherwise.
+    parameters:
+      - name: param_fiscper
+        type: string
+        required: true
+        description: Fiscal period to check (e.g. '2024001')
+      - name: param_cocd
+        type: string
+        required: true
+        description: Company code to check (e.g. '1000')
+    implementation: app.skills.ownership_check.tools:check_ownership

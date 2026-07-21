@@ -1,0 +1,36 @@
+tools:
+  - name: check_data_availability
+    description: |
+      Check if data exists in a Datasphere table for given filter criteria.
+
+      Executes a SQL query against the configured Datasphere table,
+      grouping by standard investigation dimensions (company code,
+      version, period, scope) and applying the specified filters.
+
+      Returns:
+      - Whether any data was found (non-zero aggregates)
+      - Grouped results showing which dimension combinations have data
+      - Aggregated key figures (e.g. SUM of CS_TRN_LC, CS_TRN_GC) per group,
+        or ROW_COUNT if no measures are configured for the table
+
+      Use this to verify data presence before branching investigation logic.
+    parameters:
+      - name: table
+        type: string
+        required: true
+        description: >
+          Datasphere table name to check (e.g. 'CV_ZBC_AA61').
+          Refer to the investigation playbook for the correct table.
+      - name: filters
+        type: object
+        required: false
+        description: >
+          Filter conditions as column:value pairs. Use actual Datasphere
+          column names (e.g. {"ZCOMPCODE": "1110", "FISCPER": "2024012"}).
+      - name: group_by
+        type: array
+        required: false
+        description: >
+          Columns to group results by. Defaults to standard investigation
+          dimensions from the config for the given table.
+    implementation: app.skills.data_availability.tools:check_data_availability

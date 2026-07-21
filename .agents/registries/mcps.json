@@ -12,10 +12,7 @@
       },
       "runtime": {
         "command": "npx",
-        "args": [
-          "arc-1",
-          "--help"
-        ],
+        "args": ["arc-1"],
         "transport": "stdio",
         "platforms": [
           "windows",
@@ -63,9 +60,7 @@
       },
       "runtime": {
         "command": "aibap.mcp",
-        "args": [
-          "--help"
-        ],
+        "args": [],
         "transport": "stdio",
         "platforms": [
           "windows",
@@ -316,8 +311,7 @@
         "command": "npx",
         "args": [
           "-y",
-          "@ui5/mcp-server@0.2.14",
-          "--help"
+          "@ui5/mcp-server@0.2.14"
         ],
         "transport": "stdio",
         "platforms": [
@@ -362,8 +356,7 @@
         "command": "npx",
         "args": [
           "-y",
-          "@sap-ux/fiori-mcp-server@1.8.1",
-          "--help"
+          "@sap-ux/fiori-mcp-server@1.8.1"
         ],
         "transport": "stdio",
         "platforms": [
@@ -409,8 +402,7 @@
         "command": "npx",
         "args": [
           "-y",
-          "@cap-js/mcp-server@0.0.5",
-          "--help"
+          "@cap-js/mcp-server@0.0.5"
         ],
         "transport": "stdio",
         "platforms": [
@@ -441,6 +433,42 @@
         "fallback_group": "cap"
       },
       "owner": "sap-cap-developer"
+    },
+    {
+      "id": "context-mode",
+      "display_name": "Context Mode MCP",
+      "status": "enabled",
+      "source": {
+        "repository": "bundled/tools/context-mode",
+        "license": "Elastic-2.0",
+        "version": "1.0.169",
+        "revision": "d31941ec6b31c5c4f1ad45de32f76d67c2225209"
+      },
+      "runtime": {
+        "command": "node",
+        "args": ["bundled/tools/context-mode/start.mjs"],
+        "env": {"CONTEXT_MODE_PLATFORM": "codex"},
+        "transport": "stdio",
+        "platforms": ["windows", "linux", "macos"]
+      },
+      "auth": {"mode": "none", "env_refs": []},
+      "capabilities": [
+        "agent.context.execute",
+        "agent.context.fetch",
+        "agent.context.memory"
+      ],
+      "safety": {
+        "default_mode": "sandboxed",
+        "mutations": "project_permissions",
+        "telemetry": "none"
+      },
+      "probes": {
+        "initialize": true,
+        "tools_list": true,
+        "domain_probe": "jsonrpc_tools"
+      },
+      "routing": {"priority": 5, "fallback_group": "agent-context"},
+      "owner": "sap-tutor"
     },
     {
       "id": "apim-ui-mcp",

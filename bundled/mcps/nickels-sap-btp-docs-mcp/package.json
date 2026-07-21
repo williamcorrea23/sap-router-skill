@@ -1,0 +1,49 @@
+{
+  "name": "sap-btp-documentation-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for SAP BTP documentation with semantic search capabilities",
+  "type": "module",
+  "bin": {
+    "sap-btp-mcp": "./build/index.js"
+  },
+  "files": [
+    "build"
+  ],
+  "scripts": {
+    "build": "tsc && chmod +x build/index.js",
+    "watch": "tsc --watch",
+    "prepare": "npm run build",
+    "start": "node build/index.js",
+    "dev": "tsc && node build/index.js",
+    "index-docs": "node build/scripts/index-docs.js"
+  },
+  "keywords": [
+    "mcp",
+    "sap",
+    "btp",
+    "documentation",
+    "ai",
+    "semantic-search"
+  ],
+  "author": "delaware Netherlands",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "glob": "^11.0.0",
+    "gray-matter": "^4.0.3",
+    "unified": "^11.0.5",
+    "remark-parse": "^11.0.0",
+    "remark-stringify": "^11.0.0",
+    "remark-frontmatter": "^5.0.0",
+    "remark-gfm": "^4.0.0",
+    "unist-util-visit": "^5.0.0",
+    "fuse.js": "^7.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

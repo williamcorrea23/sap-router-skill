@@ -27,8 +27,7 @@ triggers:
 
 ## Local Reference
 ```
-C:\Users\William Correa\tools\context-mode\
-sap-router-skill\references\context-mode\
+sap-router-skill\bundled\tools\context-mode\
 ```
 
 ## Core Capabilities
@@ -43,8 +42,8 @@ sap-router-skill\references\context-mode\
 ## Installation
 
 ```bash
-# Clone (already done)
-cd C:\Users\William Correa\tools\context-mode
+# Repository-owned snapshot (already bundled)
+cd bundled/tools/context-mode
 npm install
 
 # Initialize for your agent (from project directory):
@@ -198,8 +197,8 @@ ctx doctor         # Diagnose storage and env config
 ```
 
 ## References
-- Repository: `references/context-mode/`
-- Contributing: `references/context-mode/CONTRIBUTING.md`
+- Repository: `bundled/tools/context-mode/`
+- Contributing: `bundled/tools/context-mode/CONTRIBUTING.md`
 - Issues tracker: https://github.com/mksglu/context-mode/issues
-- Security: `references/context-mode/SECURITY.md` (if present)
+- Security: `bundled/tools/context-mode/SECURITY.md` (if present)
 - License: Elastic License 2.0 (source-available, no SaaS repackaging)

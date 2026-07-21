@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+.env
+*.xlsx
+*.xls
+MB5B_*.txt
+MB5B_diagnostics_*/
+MB5B_ui_inspection_*/
+.artifacts/
+output/
+design-qa.md
+site/node_modules/
+site/dist/
+site/.astro/
+site/.npm-cache/
+.playwright-cli/
+/skills/Common/sap-windowsgui-logon/assets/config.json

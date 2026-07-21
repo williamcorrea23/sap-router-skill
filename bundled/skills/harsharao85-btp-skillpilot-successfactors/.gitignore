@@ -1,0 +1,25 @@
+# Environment variables — never commit secrets
+.env
+
+# Node
+node_modules/
+npm-debug.log*
+
+# CAP build artifacts
+gen/
+dist/
+
+# SQLite database (dev only)
+*.db
+*.sqlite
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/settings.json
+*.swp
+
+# Test coverage
+coverage/

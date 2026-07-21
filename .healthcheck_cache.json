@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-17T01:16:35",
+  "timestamp": "2026-07-21T03:05:29",
   "overall_status": "DEGRADED",
   "mcp_checks": {
     "arc-1": {
@@ -8,9 +8,8 @@
         "details": "All 4 vars set"
       },
       "binary": {
-        "status": "AVAILABLE",
-        "exit_code": 0,
-        "stderr": ""
+        "status": "TIMEOUT",
+        "reason": "Probe timed out"
       },
       "criticality": "HIGH",
       "description": "arc-1 (adt): read_source, write_source, syntax_check, activate"
@@ -915,9 +914,8 @@
   "missing_optional": [],
   "recommendations": [],
   "soap_rfc_check": {
-    "status": "UNEXPECTED",
-    "http_status": 401,
-    "url": "https://10.57.203.136:44300/sap/bc/soap/rfc"
+    "status": "UNREACHABLE",
+    "error": "timed out"
   },
   "readiness_v6": {
     "status": "PASS",
@@ -1006,6 +1004,15 @@
         "MUTATION_READY": false,
         "missing_env": []
       },
+      "context-mode": {
+        "DECLARED": true,
+        "INSTALLED": true,
+        "CONFIGURED": true,
+        "INITIALIZED": "NOT_EXECUTED",
+        "DOMAIN_READY": false,
+        "MUTATION_READY": false,
+        "missing_env": []
+      },
       "apim-ui-mcp": {
         "DECLARED": true,
         "INSTALLED": true,
@@ -1019,6 +1026,6 @@
       }
     }
   },
-  "high_mcp_ok": "8/12",
+  "high_mcp_ok": "7/12",
   "strict": false
 }

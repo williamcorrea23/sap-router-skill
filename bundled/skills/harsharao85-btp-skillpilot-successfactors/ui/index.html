@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkillPilot — AI Learning Assistant</title>
+  <style>
+    /* ------------------------------------------------------------------ */
+    /* Reset & base                                                         */
+    /* ------------------------------------------------------------------ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --sap-blue:        #0070F2;
+      --sap-blue-dark:   #0057C2;
+      --sap-blue-light:  #E8F3FF;
+      --sap-blue-chip:   #D1E8FF;
+      --gray-bg:         #F5F6F7;
+      --gray-border:     #D9D9D9;
+      --gray-mid:        #8C8C8C;
+      --gray-dark:       #32363A;
+      --white:           #FFFFFF;
+      --error-bg:        #FFF1F1;
+      --error-border:    #E0504A;
+      --error-text:      #AA0808;
+      --radius-bubble:   12px;
+      --radius-chip:     16px;
+      --font:            'Helvetica Neue', Arial, sans-serif;
+      --shadow-header:   0 1px 4px rgba(0,0,0,0.10);
+      --shadow-input:    0 -1px 4px rgba(0,0,0,0.06);
+    }
+
+    html, body {
+      height: 100%;
+      font-family: var(--font);
+      background: var(--gray-bg);
+      color: var(--gray-dark);
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Layout shell                                                         */
+    /* ------------------------------------------------------------------ */
+    .shell {
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+      max-width: 860px;
+      margin: 0 auto;
+      background: var(--white);
+      box-shadow: 0 0 24px rgba(0,0,0,0.08);
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Header                                                              */
+    /* ------------------------------------------------------------------ */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      height: 56px;
+      background: var(--white);
+      box-shadow: var(--shadow-header);
+      flex-shrink: 0;
+      z-index: 10;
+    }
+
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-logo svg {
+      flex-shrink: 0;
+    }
+
+    .logo-wordmark {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--sap-blue);
+      letter-spacing: -0.3px;
+    }
+
+    .header-subtitle {
+      font-size: 12px;
+      color: var(--gray-mid);
+      font-weight: 400;
+      letter-spacing: 0.1px;
+    }
+
+    .header-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: var(--sap-blue-light);
+      border-radius: 20px;
+      font-size: 11px;
+      color: var(--sap-blue-dark);
+      font-weight: 500;
+    }
+
+    .header-badge::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      background: #30C030;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Chat window                                                          */
+    /* ------------------------------------------------------------------ */
+    .chat-window {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 20px 16px;
+      scroll-behavior: smooth;
+    }
+
+    /* Empty state */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 40px;
+      gap: 20px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .empty-icon {
+      width: 64px;
+      height: 64px;
+      background: var(--sap-blue-light);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .empty-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--gray-dark);
+      text-align: center;
+    }
+
+    .empty-subtitle {
+      font-size: 14px;
+      color: var(--gray-mid);
+      text-align: center;
+      max-width: 380px;
+      line-height: 1.5;
+    }
+
+    .sample-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      max-width: 580px;
+    }
+
+    .sample-chip {
+      padding: 8px 14px;
+      border: 1.5px solid var(--sap-blue);
+      border-radius: var(--radius-chip);
+      font-size: 13px;
+      color: var(--sap-blue);
+      background: var(--white);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      line-height: 1.3;
+      text-align: center;
+    }
+
+    .sample-chip:hover {
+      background: var(--sap-blue);
+      color: var(--white);
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Messages                                                             */
+    /* ------------------------------------------------------------------ */
+    .messages { display: flex; flex-direction: column; gap: 16px; }
+
+    .message-row {
+      display: flex;
+      gap: 10px;
+      animation: slideUp 0.2s ease;
+    }
+
+    .message-row.user  { justify-content: flex-end; }
+    .message-row.assistant { justify-content: flex-start; }
+
+    /* Avatar */
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .avatar.assistant {
+      background: var(--sap-blue);
+      color: var(--white);
+    }
+
+    .message-col { display: flex; flex-direction: column; gap: 6px; max-width: 75%; }
+    .message-row.user .message-col { align-items: flex-end; }
+
+    /* Bubble */
+    .bubble {
+      padding: 10px 14px;
+      border-radius: var(--radius-bubble);
+      font-size: 14px;
+      line-height: 1.55;
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+
+    .bubble.user {
+      background: var(--sap-blue);
+      color: var(--white);
+      border-bottom-right-radius: 4px;
+    }
+
+    .bubble.assistant {
+      background: var(--gray-bg);
+      color: var(--gray-dark);
+      border-bottom-left-radius: 4px;
+      border: 1px solid var(--gray-border);
+    }
+
+    .bubble.assistant h3 {
+      font-size: 14px;
+      font-weight: 700;
+      margin: 6px 0 4px;
+      color: var(--gray-dark);
+    }
+
+    .bubble.assistant h3:first-child { margin-top: 0; }
+
+    .bubble.assistant ul {
+      margin: 4px 0 4px 18px;
+      padding: 0;
+    }
+
+    .bubble.assistant li { margin-bottom: 2px; }
+
+    .bubble.error {
+      background: var(--error-bg);
+      color: var(--error-text);
+      border: 1px solid var(--error-border);
+    }
+
+    /* Source citations */
+    .sources {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .source-chip {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      background: var(--sap-blue-chip);
+      border-radius: var(--radius-chip);
+      font-size: 11px;
+      color: var(--sap-blue-dark);
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    .source-chip .source-type {
+      opacity: 0.7;
+      font-weight: 400;
+    }
+
+    .source-chip .source-score {
+      font-size: 10px;
+      opacity: 0.65;
+      font-weight: 400;
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Typing indicator                                                     */
+    /* ------------------------------------------------------------------ */
+    .typing-bubble {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 12px 16px;
+      background: var(--gray-bg);
+      border: 1px solid var(--gray-border);
+      border-radius: var(--radius-bubble);
+      border-bottom-left-radius: 4px;
+      width: fit-content;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      background: var(--gray-mid);
+      border-radius: 50%;
+      animation: bounce 1.2s infinite ease-in-out;
+    }
+
+    .dot:nth-child(1) { animation-delay: 0s; }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+      40%            { transform: translateY(-6px); opacity: 1; }
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Input bar                                                            */
+    /* ------------------------------------------------------------------ */
+    .input-bar {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      padding: 12px 16px;
+      background: var(--white);
+      box-shadow: var(--shadow-input);
+      flex-shrink: 0;
+    }
+
+    .input-wrap {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      border: 1.5px solid var(--gray-border);
+      border-radius: 24px;
+      padding: 8px 14px;
+      transition: border-color 0.15s;
+      background: var(--white);
+    }
+
+    .input-wrap:focus-within { border-color: var(--sap-blue); }
+
+    textarea {
+      flex: 1;
+      border: none;
+      outline: none;
+      resize: none;
+      font-family: var(--font);
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--gray-dark);
+      background: transparent;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+
+    textarea::placeholder { color: var(--gray-mid); }
+
+    .send-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: var(--sap-blue);
+      color: var(--white);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .send-btn:hover:not(:disabled) { background: var(--sap-blue-dark); }
+    .send-btn:active:not(:disabled) { transform: scale(0.93); }
+    .send-btn:disabled { background: var(--gray-border); cursor: not-allowed; }
+
+    /* ------------------------------------------------------------------ */
+    /* Animations                                                           */
+    /* ------------------------------------------------------------------ */
+    @keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ------------------------------------------------------------------ */
+    /* Responsive                                                           */
+    /* ------------------------------------------------------------------ */
+    @media (max-width: 600px) {
+      header { padding: 0 16px; }
+      .header-subtitle { display: none; }
+      .chat-window { padding: 16px 12px 12px; }
+      .message-col { max-width: 88%; }
+      .input-bar { padding: 10px 12px; }
+    }
+  </style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- Header -->
+  <header>
+    <div class="header-logo">
+      <!-- Compass icon -->
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="14" cy="14" r="13" fill="#E8F3FF" stroke="#0070F2" stroke-width="1.5"/>
+        <circle cx="14" cy="14" r="3" fill="#0070F2"/>
+        <polygon points="14,4 16.5,13 14,12 11.5,13" fill="#0070F2"/>
+        <polygon points="14,24 11.5,15 14,16 16.5,15" fill="#8C8C8C"/>
+        <polygon points="4,14 13,11.5 12,14 13,16.5" fill="#8C8C8C"/>
+        <polygon points="24,14 15,16.5 16,14 15,11.5" fill="#8C8C8C"/>
+      </svg>
+      <div>
+        <div class="logo-wordmark">SkillPilot</div>
+        <div class="header-subtitle">AI Learning Assistant · SAP SuccessFactors</div>
+      </div>
+    </div>
+    <div class="header-badge">Live on BTP</div>
+  </header>
+
+  <!-- Chat window -->
+  <div class="chat-window" id="chatWindow">
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">
+        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <path d="M16 3C8.82 3 3 8.82 3 16s5.82 13 13 13 13-5.82 13-13S23.18 3 16 3zm1 19h-2v-8h2v8zm0-10h-2v-2h2v2z" fill="#0070F2"/>
+        </svg>
+      </div>
+      <div class="empty-title">What would you like to learn today?</div>
+      <div class="empty-subtitle">Ask me about SAP courses, learning paths, certifications, or how to prepare for your next S/4HANA project.</div>
+      <div class="sample-chips" id="sampleChips">
+        <button class="sample-chip" onclick="sendSample(this)">What learning path for S/4HANA migration?</button>
+        <button class="sample-chip" onclick="sendSample(this)">What certifications are available for BTP architects?</button>
+        <button class="sample-chip" onclick="sendSample(this)">How do I prepare for a SuccessFactors rollout?</button>
+        <button class="sample-chip" onclick="sendSample(this)">What skills do I need for SAP BTP development?</button>
+      </div>
+    </div>
+    <div class="messages" id="messages"></div>
+  </div>
+
+  <!-- Input bar -->
+  <div class="input-bar">
+    <div class="input-wrap">
+      <textarea
+        id="questionInput"
+        rows="1"
+        placeholder="Ask about SAP courses, certifications, learning paths…"
+        onkeydown="handleKey(event)"
+        oninput="autoGrow(this)"
+      ></textarea>
+    </div>
+    <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Send" disabled>
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <path d="M2 16L16 9 2 2v5.5l9 1.5-9 1.5V16z" fill="white"/>
+      </svg>
+    </button>
+  </div>
+
+</div>
+
+<script>
+  const API_URL = 'https://skillpilot-hr.cfapps.us10-001.hana.ondemand.com/api/chat';
+
+  const chatWindow  = document.getElementById('chatWindow');
+  const messagesEl  = document.getElementById('messages');
+  const emptyState  = document.getElementById('emptyState');
+  const input       = document.getElementById('questionInput');
+  const sendBtn     = document.getElementById('sendBtn');
+
+  let isLoading = false;
+
+  // ── Enable/disable send button based on input ──────────────────────────
+  input.addEventListener('input', () => {
+    sendBtn.disabled = input.value.trim().length === 0 || isLoading;
+  });
+
+  // ── Auto-grow textarea ─────────────────────────────────────────────────
+  function autoGrow(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  }
+
+  // ── Enter to send (Shift+Enter for newline) ────────────────────────────
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (!sendBtn.disabled) sendMessage();
+    }
+  }
+
+  // ── Sample chip click ──────────────────────────────────────────────────
+  function sendSample(btn) {
+    input.value = btn.textContent;
+    autoGrow(input);
+    sendMessage();
+  }
+
+  // ── Hide empty state once first message is sent ────────────────────────
+  function hideEmptyState() {
+    if (emptyState.style.display !== 'none') {
+      emptyState.style.display = 'none';
+    }
+  }
+
+  // ── Scroll to bottom ───────────────────────────────────────────────────
+  function scrollBottom() {
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }
+
+  // ── Append a user bubble ───────────────────────────────────────────────
+  function appendUserMessage(text) {
+    const row = document.createElement('div');
+    row.className = 'message-row user';
+    row.innerHTML = `
+      <div class="message-col">
+        <div class="bubble user">${escapeHtml(text)}</div>
+      </div>`;
+    messagesEl.appendChild(row);
+    scrollBottom();
+  }
+
+  // ── Append typing indicator, return the row element ───────────────────
+  function appendTyping() {
+    const row = document.createElement('div');
+    row.className = 'message-row assistant';
+    row.innerHTML = `
+      <div class="avatar assistant">SP</div>
+      <div class="message-col">
+        <div class="typing-bubble">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+      </div>`;
+    messagesEl.appendChild(row);
+    scrollBottom();
+    return row;
+  }
+
+  // ── Replace typing indicator with assistant response ───────────────────
+  function replaceTypingWithResponse(typingRow, answer, sources) {
+    const sourcesHtml = buildSourcesHtml(sources);
+    typingRow.innerHTML = `
+      <div class="avatar assistant">SP</div>
+      <div class="message-col">
+        <div class="bubble assistant">${renderMarkdown(answer)}</div>
+        ${sourcesHtml}
+      </div>`;
+    scrollBottom();
+  }
+
+  // ── Replace typing indicator with error ───────────────────────────────
+  function replaceTypingWithError(typingRow, message) {
+    typingRow.innerHTML = `
+      <div class="avatar assistant">SP</div>
+      <div class="message-col">
+        <div class="bubble error">${escapeHtml(message)}</div>
+      </div>`;
+    scrollBottom();
+  }
+
+  // ── Build source citation chips ────────────────────────────────────────
+  function buildSourcesHtml(sources) {
+    if (!sources || sources.length === 0) return '';
+    const chips = sources.map(s => {
+      const score = s.relevanceScore != null
+        ? ` <span class="source-score">${(s.relevanceScore * 100).toFixed(0)}%</span>`
+        : '';
+      return `<div class="source-chip">
+        <span class="source-type">${escapeHtml(s.type)}</span>
+        · ${escapeHtml(s.title)}${score}
+      </div>`;
+    }).join('');
+    return `<div class="sources">${chips}</div>`;
+  }
+
+  // ── XSS-safe text ─────────────────────────────────────────────────────
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  // ── Simple markdown renderer (no external libraries) ───────────────────
+  function renderMarkdown(text) {
+    const lines = escapeHtml(text).split('\n');
+    const html = [];
+    let inList = false;
+
+    for (const raw of lines) {
+      const line = raw.trimEnd();
+
+      // ## Heading → <h3>
+      if (/^##\s+/.test(line)) {
+        if (inList) { html.push('</ul>'); inList = false; }
+        html.push(`<h3>${line.replace(/^##\s+/, '')}</h3>`);
+        continue;
+      }
+
+      // - Bullet → <li>
+      if (/^[-*]\s+/.test(line)) {
+        if (!inList) { html.push('<ul>'); inList = true; }
+        html.push(`<li>${applyInline(line.replace(/^[-*]\s+/, ''))}</li>`);
+        continue;
+      }
+
+      // Close list if open
+      if (inList) { html.push('</ul>'); inList = false; }
+
+      // Blank line → spacer
+      if (line.trim() === '') {
+        html.push('<br>');
+        continue;
+      }
+
+      // Normal paragraph line
+      html.push(`<span>${applyInline(line)}</span><br>`);
+    }
+
+    if (inList) html.push('</ul>');
+    return html.join('');
+  }
+
+  // Apply inline rules: **bold**
+  function applyInline(text) {
+    return text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  }
+
+  // ── Main send handler ──────────────────────────────────────────────────
+  async function sendMessage() {
+    const question = input.value.trim();
+    if (!question || isLoading) return;
+
+    isLoading = true;
+    sendBtn.disabled = true;
+    input.value = '';
+    input.style.height = 'auto';
+
+    hideEmptyState();
+    appendUserMessage(question);
+    const typingRow = appendTyping();
+
+    try {
+      const res = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question }),
+      });
+
+      if (!res.ok) {
+        let detail = `HTTP ${res.status}`;
+        try {
+          const body = await res.json();
+          detail = body.error || detail;
+        } catch (_) {}
+        throw new Error(detail);
+      }
+
+      const data = await res.json();
+      replaceTypingWithResponse(typingRow, data.answer || '(no response)', data.sources);
+    } catch (err) {
+      const msg = err.message.includes('Failed to fetch')
+        ? 'Could not reach SkillPilot. Check your connection or the BTP service status.'
+        : `Error: ${err.message}`;
+      replaceTypingWithError(typingRow, msg);
+    } finally {
+      isLoading = false;
+      sendBtn.disabled = input.value.trim().length === 0;
+      input.focus();
+    }
+  }
+</script>
+</body>
+</html>

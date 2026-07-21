@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "sap-gui": {
+      "type": "stdio",
+      "command": "uv",
+      "args": ["run", "python", "-m", "mcp_sap_gui.server"],
+      "cwd": "${workspaceFolder}"
+    }
+  }
+}

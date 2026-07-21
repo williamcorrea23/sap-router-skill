@@ -1,0 +1,622 @@
+"""User management over RFC"""
+
+import os
+import datetime
+
+from typing import Dict, Optional, Union, List
+
+from sap import get_logger
+from sap.errors import SAPCliError
+from sap.rfc.core import RFCParams
+from sap.rfc.bapi import (
+    BAPIError,
+    BAPIReturn
+)
+
+
+UserId = str
+UserAddress = Dict[str, str]
+
+
+def add_to_dict_if_not_none(target_dict, target_key, value):
+    """Adds the given value to the give dict as the given key
+       only if the given value is not None.
+    """
+
+    if value is None:
+        return False
+
+    target_dict[target_key] = value
+    return True
+
+
+def add_to_dict_if_not_present(target_dict, target_key, value):
+    """Adds the given value to the give dict as the given key
+       only if the given key is not in the given dict yet.
+    """
+
+    if target_key in target_dict:
+        return False
+
+    target_dict[target_key] = value
+    return True
+
+
+def copy_dict_or_new(original: dict) -> dict:
+    """Makes a copy of the original dict if not None;
+       otherwise returns an empty dict.
+    """
+
+    if original is None:
+        return {}
+
+    return dict(original)
+
+
+def sap_date_from(the_date: datetime.date) -> str:
+    """Converts Python date to string"""
+
+    return the_date.strftime('%Y%m%d')
+
+
+def today_sap_date() -> str:
+    """Returns SAP date string for today"""
+
+    return sap_date_from(datetime.date.today())
+
+
+def mod_log():
+    """rfc.core module logger"""
+
+    return get_logger()
+
+
+class UserPasswordManager:
+    """An utility class for handling productive password"""
+
+    def __init__(self):
+        self._use_productive_password = None
+        self._password = None
+        self._user_type = None
+
+    def get_use_productive_password(self) -> bool:
+        """Get if new password should be productive or not"""
+
+        return self._use_productive_password
+
+    def get_password(self) -> str:
+        """Get user's new password"""
+
+        return self._password
+
+    def get_user_type(self) -> str:
+        """Get user type"""
+
+        return self._user_type
+
+    def get_dummy_password(self) -> str:
+        """Get dummy password"""
+
+        return os.environ.get('SAPCLI_ABAP_USER_DUMMY_PASSWORD', 'DummyPwd123!')
+
+    def set_use_productive_password(self, use_productive_password: bool):
+        """Set if new password should be productive or not"""
+
+        self._use_productive_password = use_productive_password
+        return self._use_productive_password
+
+    def set_password(self, password):
+        """Set user's new password"""
+
+        self._password = password
+        return self._password
+
+    def set_user_type(self, user_type: str):
+        """Set user type"""
+
+        self._user_type = user_type
+        return self._user_type
+
+    def is_productive_password_needed(self) -> bool:
+        """Is it requested to use a productive password for Dialog or Communications Data user"""
+
+        return all([
+            self.get_use_productive_password(),
+            self.get_password(),
+            self.get_user_type() in ['A', 'C']])     # A = Dialog, C = Communications Data
+
+
+# pylint: disable=too-many-instance-attributes, too-many-public-methods
+class UserBuilder:
+    """An utility class for building SAP user parameters"""
+
+    def __init__(self):
+        self._username = None
+        self._address = None
+        self._logondata = None
+        self._logondatax = None
+        self._snc = None
+        self._sncx = None
+        self._ref_user = None
+        self._ref_userx = None
+        self._company = None
+        self._companyx = None
+        self._sapuser_uuid = None
+        self._sapuser_uuidx = None
+        self._password = None
+        self._alias = None
+        self._userPasswordManager = UserPasswordManager()
+
+    @property
+    def _address_data(self) -> UserAddress:
+        if self._address is None:
+            self._address = {}
+
+        return self._address
+
+    @property
+    def _password_data(self) -> Dict[str, str]:
+        if self._password is None:
+            self._password = {}
+
+        return self._password
+
+    @property
+    def _alias_data(self) -> Dict[str, str]:
+        if self._alias is None:
+            self._alias = {}
+
+        return self._alias
+
+    @property
+    def _logondata_data(self) -> Dict[str, str]:
+        if self._logondata is None:
+            self._logondata = {}
+
+        return self._logondata
+
+    @property
+    def _snc_data(self) -> Dict[str, str]:
+        if self._snc is None:
+            self._snc = {}
+            self._sncx = {}
+
+        return self._snc
+
+    @property
+    def _logondatax_data(self) -> Dict[str, str]:
+        if self._logondatax is None:
+            self._logondatax = {}
+
+        return self._logondatax
+
+    @property
+    def _ref_user_data(self) -> Dict[str, str]:
+        if self._ref_user is None:
+            self._ref_user = {}
+            self._ref_userx = {}
+
+        return self._ref_user
+
+    @property
+    def _company_data(self) -> Dict[str, str]:
+        if self._company is None:
+            self._company = {}
+            self._companyx = {}
+
+        return self._company
+
+    @property
+    def _sapuser_uuid_data(self) -> Dict[str, str]:
+        if self._sapuser_uuid is None:
+            self._sapuser_uuid = {}
+            self._sapuser_uuidx = {}
+
+        return self._sapuser_uuid
+
+    def set_username(self, username: str):
+        """Sets user name for logon"""
+
+        self._username = username
+        return self
+
+    def set_first_name(self, first_name: str):
+        """Sets user's first name"""
+
+        self._address_data['FIRSTNAME'] = first_name
+        return self
+
+    def set_last_name(self, last_name: str):
+        """Sets user's last name"""
+
+        self._address_data['LASTNAME'] = last_name
+        return self
+
+    def set_email_address(self, email_address: str):
+        """Sets user's email address"""
+
+        self._address_data['E_MAIL'] = email_address
+        return self
+
+    def set_password(self, password: str, productive_password=False):
+        """Sets user's password - works only for the user type Service"""
+
+        self._password_data['BAPIPWD'] = password
+        self._userPasswordManager.set_password(password)
+        self._userPasswordManager.set_use_productive_password(productive_password)
+        return self
+
+    def set_alias(self, alias: str):
+        """Sets user's alias for HTTP authentication"""
+
+        self._alias_data['USERALIAS'] = alias
+        return self
+
+    def set_type(self, typ: str):
+        """Sets user's type"""
+
+        self._logondata_data['USTYP'] = typ
+        self._userPasswordManager.set_user_type(typ)
+        return self
+
+    def set_group(self, group: str):
+        """Sets user group"""
+
+        self._logondata_data['CLASS'] = group
+        return self
+
+    def set_valid_from(self, start_date: Union[str]):
+        """Sets user's start validity date"""
+
+        if isinstance(start_date, str):
+            self._logondata_data['GLTGV'] = start_date
+        else:
+            raise ValueError()
+
+        return self
+
+    def set_valid_to(self, end_date: Union[str]):
+        """Sets user's end validity date"""
+
+        if isinstance(end_date, str):
+            self._logondata_data['GLTGB'] = end_date
+        else:
+            raise ValueError()
+
+        return self
+
+    def set_snc_name(self, snc_name: str) -> 'UserBuilder':
+        """Sets user's SNC name"""
+
+        self._snc_data['PNAME'] = snc_name
+        self._sncx['PNAME'] = 'X'
+
+        return self
+
+    def set_snc_permit_password(self, flag: bool) -> 'UserBuilder':
+        """Sets user's SNC SAPGUI password permit flag - if true, users are
+           allowed to use SAPGUI password instead of SNC authentication.
+        """
+
+        self._snc_data['GUIFLAG'] = 'X' if flag else ''
+        self._sncx['GUIFLAG'] = 'X'
+
+        return self
+
+    def set_reference_user(self, ref_user: str) -> 'UserBuilder':
+        """Sets user's reference user for authorizations"""
+
+        self._ref_user_data['REF_USER'] = ref_user
+        self._ref_userx['REF_USER'] = 'X'
+
+        return self
+
+    def set_security_policy(self, security_policy: str) -> 'UserBuilder':
+        """Sets user's security policy"""
+
+        self._logondata_data['SECURITY_POLICY'] = security_policy
+        self._logondatax_data['SECURITY_POLICY'] = 'X'
+
+        return self
+
+    def set_company(self, company: str) -> 'UserBuilder':
+        """Sets user's company (address)"""
+
+        self._company_data['COMPANY'] = company
+        self._companyx['COMPANY'] = 'X'
+
+        return self
+
+    def set_company_template_orgtype(self, flag: bool) -> 'UserBuilder':
+        """Sets the flag marking user's company address as a template.
+
+           Note: BAPI_USER_CHANGE cannot modify this flag on its own (the X
+           structure BAPIUSCOMX has no marker for it), so it is only effective
+           when creating a user.
+        """
+
+        self._company_data['TEMPLATE_ORGTYPE'] = 'X' if flag else ''
+
+        return self
+
+    def set_sapuser_uuid(self, sap_uid: str) -> 'UserBuilder':
+        """Sets user's SAP user UUID (SAP_UID)"""
+
+        self._sapuser_uuid_data['SAP_UID'] = sap_uid
+        self._sapuser_uuidx['SAP_UID'] = 'X'
+
+        return self
+
+    def get_username(self) -> str:
+        """Get user's name"""
+
+        return self._username
+
+    def get_user_password_manager(self) -> UserPasswordManager:
+        """Set user's password status"""
+
+        return self._userPasswordManager
+
+    def _rfc_params_add_username(self, params):
+        add_to_dict_if_not_none(params, 'USERNAME', self._username)
+
+    def _rfc_params_add_password(self, params):
+        if self._userPasswordManager.is_productive_password_needed():
+            if self._userPasswordManager.get_dummy_password() == self._userPasswordManager.get_password():
+                raise SAPCliError('Dummy password matches the new productive password')
+
+            password = copy_dict_or_new({'BAPIPWD': self._userPasswordManager.get_dummy_password()})
+        else:
+            password = copy_dict_or_new(self._password)
+
+        add_to_dict_if_not_present(password, 'BAPIPWD', '')
+        params['PASSWORD'] = password
+
+    def _rfc_params_add_alias(self, params):
+        alias = copy_dict_or_new(self._alias)
+        add_to_dict_if_not_present(alias, 'USERALIAS', '')
+        params['ALIAS'] = alias
+
+    def _rfc_params_add_snc(self, params):
+        snc = copy_dict_or_new(self._snc)
+        params['SNC'] = snc
+
+    @staticmethod
+    def _rfc_params_add_change_structure(params, name, data, datax):
+        """Adds the given structure together with its change-marker (X)
+           structure to the RFC params, but only if the structure holds data.
+        """
+
+        if not data:
+            return
+
+        params[name] = copy_dict_or_new(data)
+        params[name + 'X'] = copy_dict_or_new(datax)
+
+    def build_rfc_params(self) -> RFCParams:
+        """Creates RFC parameters for Creating users"""
+
+        params: RFCParams = {}
+
+        self._rfc_params_add_username(params)
+
+        address = copy_dict_or_new(self._address)
+        add_to_dict_if_not_present(address, 'FIRSTNAME', '')
+        add_to_dict_if_not_present(address, 'LASTNAME', '')
+        add_to_dict_if_not_present(address, 'E_MAIL', '')
+        params['ADDRESS'] = address
+
+        self._rfc_params_add_password(params)
+
+        self._rfc_params_add_alias(params)
+
+        self._rfc_params_add_snc(params)
+
+        if self._ref_user:
+            params['REF_USER'] = copy_dict_or_new(self._ref_user)
+
+        if self._company:
+            params['COMPANY'] = copy_dict_or_new(self._company)
+
+        if self._sapuser_uuid:
+            params['SAPUSER_UUID'] = copy_dict_or_new(self._sapuser_uuid)
+
+        logondata = copy_dict_or_new(self._logondata_data)
+        add_to_dict_if_not_present(logondata, 'GLTGV', today_sap_date())
+        add_to_dict_if_not_present(logondata, 'GLTGB', '20991231')
+        params['LOGONDATA'] = logondata
+
+        return params
+
+    def build_change_rfc_params(self) -> RFCParams:
+        """Create RFC parameters fro Updating user"""
+
+        params: RFCParams = {}
+        self._rfc_params_add_username(params)
+
+        if self._password:
+            self._rfc_params_add_password(params)
+            params['PASSWORDX'] = {'BAPIPWD': 'X'}
+
+        if self._alias:
+            self._rfc_params_add_alias(params)
+            params['ALIASX'] = {'BAPIALIAS': 'X'}
+
+        if self._snc:
+            self._rfc_params_add_snc(params)
+            params['SNCX'] = copy_dict_or_new(self._sncx)
+
+        if self._logondatax:
+            # Transmit only the explicitly modified LOGONDATA fields so that
+            # unrelated fields (validity dates, user type, ...) are not reset.
+            params['LOGONDATA'] = {key: self._logondata_data[key] for key in self._logondatax}
+            params['LOGONDATAX'] = copy_dict_or_new(self._logondatax)
+
+        self._rfc_params_add_change_structure(params, 'REF_USER', self._ref_user, self._ref_userx)
+        self._rfc_params_add_change_structure(params, 'COMPANY', self._company, self._companyx)
+        self._rfc_params_add_change_structure(params, 'SAPUSER_UUID', self._sapuser_uuid, self._sapuser_uuidx)
+
+        return params
+
+
+class UserRoleAssignmentBuilder:
+    """An utility class for building SAP user roles assignment parameters"""
+
+    def __init__(self, user):
+        self._user = user
+        self._roles = []
+
+    def add_roles(self, role_names: List[str]):
+        """Set assigned roles name"""
+
+        self._roles = role_names
+        return self
+
+    def build_rfc_params(self) -> Optional[RFCParams]:
+        """Creates RFC parameters"""
+
+        if not self._roles:
+            return None
+
+        rfc_table = []
+
+        for role_name in self._roles:
+            table_row = {'AGR_NAME': role_name}
+
+            add_to_dict_if_not_present(table_row, 'FROM_DAT', today_sap_date())
+            add_to_dict_if_not_present(table_row, 'TO_DAT', '20991231')
+
+            rfc_table.append(table_row)
+
+        return {
+            'USERNAME': self._user,
+            'ACTIVITYGROUPS': rfc_table
+        }
+
+
+class UserProfileAssignmentBuilder:
+    """An utility class for building SAP user profiles assignment parameters"""
+
+    def __init__(self, user):
+        self._user = user
+        self._profiles = []
+
+    def add_profiles(self, profile_names: List[str]):
+        """Set assigned profiles name"""
+
+        self._profiles = profile_names
+        return self
+
+    def build_rfc_params(self) -> Optional[RFCParams]:
+        """Creates RFC parameters"""
+
+        if not self._profiles:
+            return None
+
+        rfc_table = []
+
+        for profile_name in self._profiles:
+            table_row = {'BAPIPROF': profile_name}
+            rfc_table.append(table_row)
+
+        return {
+            'USERNAME': self._user,
+            'PROFILES': rfc_table
+        }
+
+
+class UserManager:
+    """Proxy to SAP API managing Users"""
+
+    def _call_bapi_method(self, connection, method_name, kwargs):
+        resp = connection.call(method_name, **kwargs)
+        BAPIError.raise_for_error(resp['RETURN'], resp)
+        return resp
+
+    def _call_user_change_password(self, connection, params):
+        return self._call_bapi_method(connection, 'SUSR_USER_CHANGE_PASSWORD_RFC', params)
+
+    def _fetch_user_type(self, connection, username: UserId) -> str:
+        bapi_return = self.fetch_user_details(connection, username)
+
+        if not bapi_return.get('LOGONDATA'):
+            mod_log().debug('No values found for key LOGONDATA.')
+        if not bapi_return.get('LOGONDATA', {}).get('USTYP'):
+            mod_log().debug('No values found for key USTYP.')
+
+        return bapi_return.get('LOGONDATA', {}).get('USTYP', '')
+
+    def _change_user_password(self, connection, user_builder: UserBuilder) -> Optional[dict]:
+        user_pass_mgr = user_builder.get_user_password_manager()
+
+        if not user_pass_mgr.is_productive_password_needed():
+            return None
+
+        change_password_param = {
+            'BNAME': user_builder.get_username(),
+            'PASSWORD': user_pass_mgr.get_dummy_password(),
+            'NEW_PASSWORD': user_pass_mgr.get_password(),
+            'USE_BAPI_RETURN': 1
+        }
+        rfc_bapi_ret = self._call_user_change_password(connection, change_password_param)
+        return rfc_bapi_ret['RETURN']
+
+    def user_builder(self) -> UserBuilder:
+        """Returns instance of User Parameters builder"""
+
+        return UserBuilder()
+
+    def fetch_user_details(self, connection, username: UserId) -> dict:
+        """Creates a new user for the given user data"""
+
+        return self._call_bapi_method(connection,
+                                      'BAPI_USER_GET_DETAIL',
+                                      {'USERNAME': username})
+
+    def create_user(self, connection, user_builder: UserBuilder) -> BAPIReturn:
+        """Creates a new user for the given user data"""
+
+        rfc_ret = self._call_bapi_method(connection, 'BAPI_USER_CREATE1', user_builder.build_rfc_params())
+        bapi_messages = rfc_ret['RETURN']
+
+        rfc_password_change_ret = self._change_user_password(connection, user_builder)
+        if rfc_password_change_ret:
+            bapi_messages.append(rfc_password_change_ret)
+
+        return BAPIReturn(bapi_messages)
+
+    def change_user(self, connection, user_builder: UserBuilder) -> BAPIReturn:
+        """Updates user with the given user data"""
+
+        rfc_user_type = self._fetch_user_type(connection, user_builder.get_username())
+        user_pass_mgr = user_builder.get_user_password_manager()
+        user_pass_mgr.set_user_type(rfc_user_type)
+
+        rfc_ret = self._call_bapi_method(connection, 'BAPI_USER_CHANGE', user_builder.build_change_rfc_params())
+        bapi_messages = rfc_ret['RETURN']
+
+        rfc_password_change_ret = self._change_user_password(connection, user_builder)
+        if rfc_password_change_ret:
+            bapi_messages.append(rfc_password_change_ret)
+
+        return BAPIReturn(bapi_messages)
+
+    def user_role_assignment_builder(self, username: str) -> UserRoleAssignmentBuilder:
+        """Returns instance of User Role Assignment builder"""
+
+        return UserRoleAssignmentBuilder(username)
+
+    def assign_roles(self, connection, roles_builder: UserRoleAssignmentBuilder) -> None:
+        """Assigns roles"""
+
+        self._call_bapi_method(connection, 'BAPI_USER_ACTGROUPS_ASSIGN', roles_builder.build_rfc_params())
+
+    def user_profile_assignment_builder(self, username: str) -> UserProfileAssignmentBuilder:
+        """Returns instance of User Profile Assignment builder"""
+
+        return UserProfileAssignmentBuilder(username)
+
+    def assign_profiles(self, connection, profiles_builder: UserProfileAssignmentBuilder) -> None:
+        """Assigns profiles"""
+
+        self._call_bapi_method(connection, 'BAPI_USER_PROFILES_ASSIGN', profiles_builder.build_rfc_params())

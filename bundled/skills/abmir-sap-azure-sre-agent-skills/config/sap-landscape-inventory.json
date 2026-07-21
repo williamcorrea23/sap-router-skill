@@ -1,0 +1,35 @@
+{
+  "_note": "EXAMPLE filled inventory (Abbas AB1 lab). SAMPLE — replace the systems below with your own, or delete this file. Blank template: sap-landscape-inventory.template.json. Environment-level values (subscription ID, AMS workspace ID, storage account, AMS query notes) live in Team Onboarding, which is always in the agent's context — they are NOT duplicated here. This file holds ONLY the per-system inventory.",
+  "environment": "SAP-Lab",
+  "systems": [
+    {
+      "sid": "AB1",
+      "db_sid": "DB1",
+      "architecture": "scale-up",
+      "deployment": "standalone",
+      "type": "scaleup-standalone",
+      "criticality": "dev",
+      "os_type": "SLES_SAP",
+      "storage_type": "Premium_LRS",
+      "region": "centralus",
+      "ha": { "enabled": false },
+      "dr": { "enabled": false },
+      "resource_group": "RG_SAP_CUS_AB1",
+      "managed_rg": "mrg-AB1-48f3f2",
+      "ams_providers": {
+        "hana": "sap-hana-pr-AB1",
+        "os": "os-linux-pr-AB1vm"
+      },
+      "vms": [
+        {
+          "name": "AB1vm",
+          "roles": ["db", "ascs", "pas"],
+          "ha_role": "none",
+          "hana_instance": "00",
+          "ascs_instance": "01",
+          "app_instance": "00"
+        }
+      ]
+    }
+  ]
+}

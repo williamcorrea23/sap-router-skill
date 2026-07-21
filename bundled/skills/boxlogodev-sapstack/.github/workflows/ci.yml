@@ -1,0 +1,72 @@
+name: sapstack CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  quality-gates:
+    name: Quality Gates
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Make scripts executable
+        run: chmod +x scripts/*.sh
+
+      - name: Lint SKILL.md / agent frontmatter
+        run: ./scripts/lint-frontmatter.sh
+
+      - name: Check marketplace.json integrity
+        run: ./scripts/check-marketplace.sh
+
+      - name: Check hardcoding (strict)
+        run: ./scripts/check-hardcoding.sh --strict
+
+      - name: Check T-code registry (strict)
+        run: ./scripts/check-tcodes.sh --strict
+
+      - name: Check Korean references (strict)
+        run: ./scripts/check-ko-references.sh --strict
+
+      - name: Check internal markdown links (strict)
+        run: ./scripts/check-links.sh --strict
+
+      - name: Check ECC vs S/4HANA split (strict)
+        run: ./scripts/check-ecc-s4-split.sh --strict
+
+      - name: Build multi-AI compatibility layer (check-only)
+        run: ./scripts/build-multi-ai.sh --check
+
+      - name: Check IMG references
+        run: ./scripts/check-img-references.sh
+
+      - name: Check Best Practice structure
+        run: ./scripts/check-best-practices.sh
+
+      - name: Check Industry references
+        run: ./scripts/check-industry-refs.sh
+
+      - name: Validate config schema
+        run: ./scripts/validate-config.sh || true
+
+      - name: Smoke test — resolve-note
+        run: |
+          ./scripts/resolve-note.sh korea | head -5
+          ./scripts/resolve-note.sh migration | head -5
+
+      - name: Check version sync across packages
+        run: ./scripts/bump-version.sh --check
+
+      - name: Check translation parity (multilingual SKILL)
+        run: ./scripts/check-translation-parity.sh --strict
+
+      - name: Check eval gold-set integrity (strict, API-free)
+        run: ./scripts/check-eval-goldset.sh --strict

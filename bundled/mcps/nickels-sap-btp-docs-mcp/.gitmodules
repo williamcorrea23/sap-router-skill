@@ -1,0 +1,3 @@
+[submodule "docs/sap-btp-docs"]
+	path = docs/sap-btp-docs
+	url = https://github.com/SAP-docs/btp-cloud-platform.git

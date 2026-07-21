@@ -1,0 +1,51 @@
+WE02 + BD87 combined output — Outbound IDocs stuck and one ack-negative case
+
+Context from user: "We sent ORDERS to three carriers this morning. Two are sitting at status 03 since 08:12, one came back with a negative ack at 09:40. Also seeing DELVRY outbound stuck at 30 for one customer."
+
+Outbound IDocs:
+
+IDoc Number       Direction  Status  Basic Type   Message Type  Partner No.    Partner Type  Port             Created
+0000000100223344  Outbound   03      ORDERS05     ORDERS        CARRIER_GAMMA  LI            EDI_CARRIERS     2026-04-20 08:12
+0000000100223345  Outbound   03      ORDERS05     ORDERS        CARRIER_HOTEL  LI            EDI_CARRIERS     2026-04-20 08:12
+0000000100223346  Outbound   17      ORDERS05     ORDERS        CARRIER_INDIA  LI            EDI_CARRIERS     2026-04-20 08:12
+0000000100223401  Outbound   30      DELVRY07     DESADV        CUST_JULIET    KU            LS_EDI_OUT       2026-04-20 07:55
+0000000100223402  Outbound   30      DELVRY07     DESADV        CUST_JULIET    KU            LS_EDI_OUT       2026-04-20 07:55
+0000000100223403  Outbound   30      DELVRY07     DESADV        CUST_JULIET    KU            LS_EDI_OUT       2026-04-20 08:02
+
+Status record detail:
+
+IDoc 0000000100223344
+  Status: 03  Data passed to port OK
+  No subsequent status record (expected 12 or 16). Last status timestamp: 2026-04-20 08:12
+  Elapsed since status 03: 6h 48min
+  Message: —
+
+IDoc 0000000100223345
+  Status: 03  Data passed to port OK
+  No subsequent status record. Last status timestamp: 2026-04-20 08:12
+  Elapsed since status 03: 6h 48min
+
+IDoc 0000000100223346
+  Status: 17  Functional ack negative from partner
+  Received ack IDoc: 0000000100223999 (ALEAUD)
+  Message text (from partner ack): "Rejected — unknown article number KLR-0042-TNT-XL; please resend with valid EAN."
+  Message-ID: E0 411
+
+IDoc 0000000100223401
+  Status: 30  IDoc ready for dispatch (ALE service)
+  Message: —
+  ALE service: waiting for RSEOUT00 processing
+
+IDoc 0000000100223402
+  Status: 30  IDoc ready for dispatch (ALE service)
+
+IDoc 0000000100223403
+  Status: 30  IDoc ready for dispatch (ALE service)
+
+Port definitions (WE21 extract):
+  EDI_CARRIERS — tRFC destination EDI_CARRIERS_DEST (SM59: tested OK 2026-04-15)
+  LS_EDI_OUT   — File port, dir /sap/out/edi/, last file written 2026-04-19 23:58
+
+Background jobs (SM37 extract):
+  RSEOUT00     last run 2026-04-19 23:58 (scheduled daily 23:58 only)
+  RBDMOIND     last run 2026-04-20 09:00 (scheduled hourly)

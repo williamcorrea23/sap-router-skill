@@ -1,0 +1,3304 @@
+{
+  "format": "crv-successors/1",
+  "source": "SAP/abap-atc-cr-cv-s4hc (Apache-2.0), objectReleaseInfo PCE",
+  "generated_from": "objectReleaseInfo_PCELatest.json",
+  "note": "Target dictionary ONLY. CRV state is clean-core API readiness, NOT brownfield breakage; do not derive world/tier from it.",
+  "types": [
+    "TABL"
+  ],
+  "count": 262,
+  "successors": {
+    "ACDOCA": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_GLACCOUNTLINEITEM",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_GLACCOUNTLINEITEM"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_GLACCOUNTLINEITEMRAWDATA"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_JOURNALENTRYITEM"
+        }
+      ]
+    },
+    "AFKO": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_MANUFACTURINGORDER",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_MANUFACTURINGORDER"
+        }
+      ]
+    },
+    "AFPO": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_MANUFACTURINGORDERITEM",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_MANUFACTURINGORDERITEM"
+        }
+      ]
+    },
+    "AFRU": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_MFGORDERCONFIRMATION",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_MFGORDERCONFIRMATION"
+        }
+      ]
+    },
+    "AFVC": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_MANUFACTURINGORDEROPERATION",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_MANUFACTURINGORDEROPERATION"
+        }
+      ]
+    },
+    "AFVU": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_MANUFACTURINGORDEROPERATION",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_MANUFACTURINGORDEROPERATION"
+        }
+      ]
+    },
+    "AFVV": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_MANUFACTURINGORDEROPERATION",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_MANUFACTURINGORDEROPERATION"
+        }
+      ]
+    },
+    "AUFK": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_ORDER",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_ORDER"
+        }
+      ]
+    },
+    "BKPF": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_JOURNALENTRY",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_JOURNALENTRY"
+        }
+      ]
+    },
+    "BNKA": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_BANK_2",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_BANK_2"
+        }
+      ]
+    },
+    "BSEC": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_ONETIMEACCOUNTCUSTOMER",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_ONETIMEACCOUNTCUSTOMER"
+        }
+      ]
+    },
+    "BSED": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_BILLOFEXCHANGE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_BILLOFEXCHANGE"
+        }
+      ]
+    },
+    "BSEG": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_OPERATIONALACCTGDOCITEM",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_OPERATIONALACCTGDOCITEM"
+        }
+      ]
+    },
+    "BSEG_ADD": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_ADDLLEDGEROPLACCTGDOCITEM",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_ADDLLEDGEROPLACCTGDOCITEM"
+        }
+      ]
+    },
+    "BUT000": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_BUSINESSPARTNER",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_BUSINESSPARTNER"
+        }
+      ]
+    },
+    "CDHDR": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "CL_CHDO_READ_TOOLS",
+      "preferred_type": "CLAS",
+      "all": [
+        {
+          "type": "CLAS",
+          "key": "CL_CHDO_READ_TOOLS"
+        },
+        {
+          "type": "CLAS",
+          "key": "CL_CHDO_WRITE_TOOLS"
+        }
+      ]
+    },
+    "CDPOS": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "CL_CHDO_READ_TOOLS",
+      "preferred_type": "CLAS",
+      "all": [
+        {
+          "type": "CLAS",
+          "key": "CL_CHDO_READ_TOOLS"
+        },
+        {
+          "type": "CLAS",
+          "key": "CL_CHDO_WRITE_TOOLS"
+        }
+      ]
+    },
+    "CEPC": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PROFITCENTER",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PROFITCENTER"
+        }
+      ]
+    },
+    "CEPCT": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PROFITCENTERTEXT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PROFITCENTERTEXT"
+        }
+      ]
+    },
+    "CRHD": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_WORKCENTER",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_WORKCENTER"
+        }
+      ]
+    },
+    "CRTX": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_WORKCENTERTEXT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_WORKCENTERTEXT"
+        }
+      ]
+    },
+    "CSKA": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_GLACCOUNT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_GLACCOUNT"
+        }
+      ]
+    },
+    "CSKB": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_GLACCOUNTINCOMPANYCODE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_GLACCOUNTINCOMPANYCODE"
+        }
+      ]
+    },
+    "CSKS": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_COSTCENTER",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_COSTCENTER"
+        }
+      ]
+    },
+    "CSKT": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_COSTCENTERTEXT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_COSTCENTERTEXT"
+        }
+      ]
+    },
+    "CSKU": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_GLACCOUNTTEXT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_GLACCOUNTTEXT"
+        }
+      ]
+    },
+    "CSLA": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_COSTCENTERACTIVITYTYPE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_COSTCENTERACTIVITYTYPE"
+        }
+      ]
+    },
+    "CSLT": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_COSTCENTERACTIVITYTYPETEXT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_COSTCENTERACTIVITYTYPETEXT"
+        }
+      ]
+    },
+    "DD04T": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "XCO Library (I18N APIs)",
+      "preferred_type": "concept",
+      "all": [
+        {
+          "type": "concept",
+          "key": "XCO Library (I18N APIs)"
+        }
+      ]
+    },
+    "DD07L": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "DDCDS_CUSTOMER_DOMAIN_VALUE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "DDCDS_CUSTOMER_DOMAIN_VALUE"
+        }
+      ]
+    },
+    "DD07T": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "DDCDS_CUSTOMER_DOMAIN_VALUE_T",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "DDCDS_CUSTOMER_DOMAIN_VALUE_T"
+        }
+      ]
+    },
+    "DFKKKO": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CADOCUMENTHEADER",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CADOCUMENTHEADER"
+        }
+      ]
+    },
+    "DFKKOP": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CADOCUMENTBPITEMPHYSICAL",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CADOCUMENTBPITEMPHYSICAL"
+        }
+      ]
+    },
+    "DFKKOPK": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CADOCUMENTGLITEM",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CADOCUMENTGLITEM"
+        }
+      ]
+    },
+    "EBAN": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PURCHASEREQUISITIONITEMAPI01",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PURCHASEREQUISITIONITEMAPI01"
+        }
+      ]
+    },
+    "EBKN": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PURREQNACCTASSGMTAPI01",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PURREQNACCTASSGMTAPI01"
+        }
+      ]
+    },
+    "EHEWAD_WA_TRRQLA": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_WASTETRANSFERREQUESTHISTORY",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_WASTETRANSFERREQUESTHISTORY"
+        }
+      ]
+    },
+    "EINA": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PURCHASINGINFORECORDAPI01",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PURCHASINGINFORECORDAPI01"
+        }
+      ]
+    },
+    "EINE": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PURCHASINGINFORECORDAPI01",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PURCHASINGINFORECORDAPI01"
+        }
+      ]
+    },
+    "EKBE": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PURCHASEORDERHISTORYAPI01",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PURCHASEORDERHISTORYAPI01"
+        }
+      ]
+    },
+    "EKES": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_POSUPPLIERCONFIRMATIONAPI01",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_POSUPPLIERCONFIRMATIONAPI01"
+        }
+      ]
+    },
+    "EKET": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PURORDSCHEDULELINEAPI01",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PURORDSCHEDULELINEAPI01"
+        }
+      ]
+    },
+    "EKKN": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PURORDACCOUNTASSIGNMENTAPI01",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PURORDACCOUNTASSIGNMENTAPI01"
+        }
+      ]
+    },
+    "EKKO": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PURCHASEORDERAPI01",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PURCHASEORDERAPI01"
+        }
+      ]
+    },
+    "EKPA": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PURCHASEORDERPARTNERAPI01",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PURCHASEORDERPARTNERAPI01"
+        }
+      ]
+    },
+    "EKPO": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PURCHASEORDERITEMAPI01",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PURCHASEORDERITEMAPI01"
+        }
+      ]
+    },
+    "EORD": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_MPPURCHASINGSOURCEITEM",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_MPPURCHASINGSOURCEITEM"
+        }
+      ]
+    },
+    "EQUK": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PURGQUOTAARRGMTAPI01",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PURGQUOTAARRGMTAPI01"
+        }
+      ]
+    },
+    "EQUP": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PURGQUOTAARRGMTITEMAPI01",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PURGQUOTAARRGMTITEMAPI01"
+        }
+      ]
+    },
+    "FKKVK": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CONTRACTACCOUNTHEADER",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CONTRACTACCOUNTHEADER"
+        }
+      ]
+    },
+    "FKKVKP": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CONTRACTACCOUNTPARTNER",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CONTRACTACCOUNTPARTNER"
+        }
+      ]
+    },
+    "KBED": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CAPACITYREQUIREMENTITEM",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CAPACITYREQUIREMENTITEM"
+        }
+      ]
+    },
+    "KBLK": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_EARMARKEDFUNDSDOCUMENT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_EARMARKEDFUNDSDOCUMENT"
+        }
+      ]
+    },
+    "KBLP": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_EARMARKEDFUNDSDOCUMENTITEM",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_EARMARKEDFUNDSDOCUMENTITEM"
+        }
+      ]
+    },
+    "KNA1": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CUSTOMER",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CUSTOMER"
+        }
+      ]
+    },
+    "KNB1": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CUSTOMERCOMPANY",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CUSTOMERCOMPANY"
+        }
+      ]
+    },
+    "KNB5": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CUSTOMERDUNNING",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CUSTOMERDUNNING"
+        }
+      ]
+    },
+    "KNBK": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_BUSINESSPARTNERBANK",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_BUSINESSPARTNERBANK"
+        }
+      ]
+    },
+    "KNVI": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CUSTSALESAREATAX",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CUSTSALESAREATAX"
+        }
+      ]
+    },
+    "KNVK": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CONTACTPERSON",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CONTACTPERSON"
+        }
+      ]
+    },
+    "KNVP": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CUSTSALESPARTNERFUNC",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CUSTSALESPARTNERFUNC"
+        }
+      ]
+    },
+    "KNVV": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CUSTOMERSALESAREA",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CUSTOMERSALESAREA"
+        }
+      ]
+    },
+    "KONH": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SLSPRCGCONDITIONRECORD",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SLSPRCGCONDITIONRECORD"
+        }
+      ]
+    },
+    "KONM": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SLSPRCGCNDNRECORDSCALE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SLSPRCGCNDNRECORDSCALE"
+        }
+      ]
+    },
+    "KONP": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SLSPRCGCONDITIONRECORD",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SLSPRCGCONDITIONRECORD"
+        }
+      ]
+    },
+    "KONV": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SLSPRCGCONDITIONRECORD",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SLSPRCGCONDITIONRECORD"
+        }
+      ]
+    },
+    "LFA1": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SUPPLIER",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SUPPLIER"
+        }
+      ]
+    },
+    "LFAS": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_BUSINESSPARTNERTAXNUMBER",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_BUSINESSPARTNERTAXNUMBER"
+        }
+      ]
+    },
+    "LFB1": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SUPPLIERCOMPANY",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SUPPLIERCOMPANY"
+        }
+      ]
+    },
+    "LFBK": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_BUSINESSPARTNERBANK",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_BUSINESSPARTNERBANK"
+        }
+      ]
+    },
+    "LFM1": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SUPPLIERPURCHASINGORG",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SUPPLIERPURCHASINGORG"
+        }
+      ]
+    },
+    "LIKP": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_DELIVERYDOCUMENT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_DELIVERYDOCUMENT"
+        }
+      ]
+    },
+    "LIPS": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_DELIVERYDOCUMENTITEM",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_DELIVERYDOCUMENTITEM"
+        }
+      ]
+    },
+    "MARA": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PRODUCT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PRODUCT"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_PRODUCTPROCUREMENT"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_PRODUCTQM"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_PRODUCTSALES"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_PRODUCTSTORAGE_2"
+        }
+      ]
+    },
+    "MARC": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PRODUCTPLANTBASIC",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PRODUCTPLANTBASIC"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_PRODUCTPLANTCOSTING"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_PRODUCTPLANTFORECAST"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_PRODUCTPLANTINTLTRD"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_PRODUCTPLANTPROCUREMENT"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_PRODUCTPLANTQTMANAGEMENT"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_PRODUCTPLANTSALES"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_PRODUCTSUPPLYPLANNING"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_PRODUCTWORKSCHEDULING"
+        }
+      ]
+    },
+    "MARD": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PRODUCTSTORAGELOCATIONBASIC",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PRODUCTSTORAGELOCATIONBASIC"
+        }
+      ]
+    },
+    "MARM": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PRODUCTUNITSOFMEASURE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PRODUCTUNITSOFMEASURE"
+        }
+      ]
+    },
+    "MATDOC": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_MATERIALDOCUMENTHEADER_2",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_MATERIALDOCUMENTHEADER_2"
+        }
+      ]
+    },
+    "MCH1": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_BATCH",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_BATCH"
+        }
+      ]
+    },
+    "MCHA": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_BATCH",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_BATCH"
+        }
+      ]
+    },
+    "MKAL": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PRODUCTIONVERSION",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PRODUCTIONVERSION"
+        }
+      ]
+    },
+    "MKPF": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_MATERIALDOCUMENTHEADER_2",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_MATERIALDOCUMENTHEADER_2"
+        }
+      ]
+    },
+    "MSEG": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_MATERIALDOCUMENTITEM_2",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_MATERIALDOCUMENTITEM_2"
+        }
+      ]
+    },
+    "MSKA": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_MATERIALSTOCK",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_MATERIALSTOCK"
+        }
+      ]
+    },
+    "MSKU": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_MATERIALSTOCK",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_MATERIALSTOCK"
+        }
+      ]
+    },
+    "MSLB": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_MATERIALSTOCK",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_MATERIALSTOCK"
+        }
+      ]
+    },
+    "MSLBH": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_MATERIALSTOCK",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_MATERIALSTOCK"
+        }
+      ]
+    },
+    "MSPR": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_MATERIALSTOCK",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_MATERIALSTOCK"
+        }
+      ]
+    },
+    "PACKKP": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PACKINGINSTRUCTIONHEADER",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PACKINGINSTRUCTIONHEADER"
+        }
+      ]
+    },
+    "PACKPO": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PACKINGINSTRUCTIONCOMPONENT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PACKINGINSTRUCTIONCOMPONENT"
+        }
+      ]
+    },
+    "PKHD": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_KANBANCONTROLCYCLE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_KANBANCONTROLCYCLE"
+        }
+      ]
+    },
+    "PLFH": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_MFGBOOOPPRODNRSCETOOLCHGST",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_MFGBOOOPPRODNRSCETOOLCHGST"
+        }
+      ]
+    },
+    "PLKO": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_BILLOFOPERATIONSGROUP",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_BILLOFOPERATIONSGROUP"
+        }
+      ]
+    },
+    "PLPO": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_MFGBILLOFOPERATIONSOPERATION",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_MFGBILLOFOPERATIONSOPERATION"
+        }
+      ]
+    },
+    "PRCD_ELEMENTS": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SLSPRCGCONDITIONRECORD",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SLSPRCGCONDITIONRECORD"
+        }
+      ]
+    },
+    "QALS": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_INSPECTIONLOT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_INSPECTIONLOT"
+        }
+      ]
+    },
+    "QPCT": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CHARCATTRIBUTECODETEXT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CHARCATTRIBUTECODETEXT"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_DEFECTCODETEXT"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_USAGEDECISIONCODETEXT"
+        }
+      ]
+    },
+    "QPMK": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_INSPSPECIFICATIONVERSION",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_INSPSPECIFICATIONVERSION"
+        }
+      ]
+    },
+    "RBCO": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SUPLRINVOICEITEMGLACCTAPI01",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SUPLRINVOICEITEMGLACCTAPI01"
+        }
+      ]
+    },
+    "RBKP": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SUPPLIERINVOICEAPI01",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SUPPLIERINVOICEAPI01"
+        }
+      ]
+    },
+    "RBSELBEST": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SUPLRINVCSELDPURGDOCAPI01",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SUPLRINVCSELDPURGDOCAPI01"
+        }
+      ]
+    },
+    "RESB": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_RESERVATIONDOCUMENTITEM",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_RESERVATIONDOCUMENTITEM"
+        }
+      ]
+    },
+    "RKWA": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SUPCSGNMTPPLINEWTHDRWLAPI01",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SUPCSGNMTPPLINEWTHDRWLAPI01"
+        }
+      ]
+    },
+    "RSEG": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SUPLRINVCITEMPURORDREFAPI01",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SUPLRINVCITEMPURORDREFAPI01"
+        }
+      ]
+    },
+    "SETHEADER": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_COSTCENTERHIERARCHY",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_COSTCENTERHIERARCHY"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_COSTCTRACTIVITYTYPEHIERARCHY"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_FUNCTIONALAREAHIERARCHY"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_PROFITCENTERHIERARCHY"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_STSTCLKEYFIGUREHIERARCHY"
+        }
+      ]
+    },
+    "SETHEADERT": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_COSTCENTERHIERARCHY",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_COSTCENTERHIERARCHY"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_COSTCTRACTIVITYTYPEHIERARCHY"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_FUNCTIONALAREAHIERARCHY"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_PROFITCENTERHIERARCHY"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_STSTCLKEYFIGUREHIERARCHY"
+        }
+      ]
+    },
+    "SETLEAF": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_COSTCENTERHIERARCHYNODE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_COSTCENTERHIERARCHYNODE"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_COSTCTRACTIVITYTYPEHIERNODE"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_FUNCTIONALAREAHIERNODE"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_PROFITCENTERHIERARCHYNODE"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_STSTCLKEYFIGUREHIERNODE"
+        }
+      ]
+    },
+    "SETNODE": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_COSTCENTERHIERARCHYNODE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_COSTCENTERHIERARCHYNODE"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_COSTCTRACTIVITYTYPEHIERNODE"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_FUNCTIONALAREAHIERNODE"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_PROFITCENTERHIERARCHYNODE"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_STSTCLKEYFIGUREHIERNODE"
+        }
+      ]
+    },
+    "SKA1": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_GLACCOUNTINCHARTOFACCOUNTS",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_GLACCOUNTINCHARTOFACCOUNTS"
+        }
+      ]
+    },
+    "SKAT": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_GLACCOUNTTEXT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_GLACCOUNTTEXT"
+        }
+      ]
+    },
+    "SKB1": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_GLACCOUNTINCOMPANYCODE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_GLACCOUNTINCOMPANYCODE"
+        }
+      ]
+    },
+    "T001": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_COMPANYCODE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_COMPANYCODE"
+        }
+      ]
+    },
+    "T002": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_LANGUAGE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_LANGUAGE"
+        }
+      ]
+    },
+    "T002T": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_LANGUAGETEXT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_LANGUAGETEXT"
+        }
+      ]
+    },
+    "T003": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_ACCOUNTINGDOCUMENTTYPE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_ACCOUNTINGDOCUMENTTYPE"
+        }
+      ]
+    },
+    "T004": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CHARTOFACCOUNTS",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CHARTOFACCOUNTS"
+        }
+      ]
+    },
+    "T005": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_COUNTRY",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_COUNTRY"
+        }
+      ]
+    },
+    "T005T": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_COUNTRYTEXT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_COUNTRYTEXT"
+        }
+      ]
+    },
+    "T006": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_UNITOFMEASURE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_UNITOFMEASURE"
+        }
+      ]
+    },
+    "T006A": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_UNITOFMEASURETEXT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_UNITOFMEASURETEXT"
+        }
+      ]
+    },
+    "T006B": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_UNITOFMEASURECOMMERCIALNAME",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_UNITOFMEASURECOMMERCIALNAME"
+        }
+      ]
+    },
+    "T006C": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_UNITOFMEASURETECHNICALNAME",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_UNITOFMEASURETECHNICALNAME"
+        }
+      ]
+    },
+    "T006D": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_UNITOFMEASUREDIMENSION",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_UNITOFMEASUREDIMENSION"
+        }
+      ]
+    },
+    "T006I": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_UNITOFMEASUREISOCODE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_UNITOFMEASUREISOCODE"
+        }
+      ]
+    },
+    "T006J": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_UNITOFMEASUREISOCODETEXT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_UNITOFMEASUREISOCODETEXT"
+        }
+      ]
+    },
+    "T006T": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_UNITOFMEASUREDIMENSIONTEXT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_UNITOFMEASUREDIMENSIONTEXT"
+        }
+      ]
+    },
+    "T008": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PAYMENTBLOCKINGREASON",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PAYMENTBLOCKINGREASON"
+        }
+      ]
+    },
+    "T008T": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PAYMENTBLOCKINGREASON",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PAYMENTBLOCKINGREASON"
+        }
+      ]
+    },
+    "T011": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_FINANCIALSTATEMENTHIER",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_FINANCIALSTATEMENTHIER"
+        }
+      ]
+    },
+    "T011T": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_FINANCIALSTATEMENTHIERT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_FINANCIALSTATEMENTHIERT"
+        }
+      ]
+    },
+    "T014": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CREDITCONTROLAREA",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CREDITCONTROLAREA"
+        }
+      ]
+    },
+    "T014T": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CREDITCONTROLAREATEXT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CREDITCONTROLAREATEXT"
+        }
+      ]
+    },
+    "T024": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PURCHASINGGROUP",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PURCHASINGGROUP"
+        }
+      ]
+    },
+    "T024D": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_MRPCONTROLLER",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_MRPCONTROLLER"
+        }
+      ]
+    },
+    "T024E": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PURCHASINGORGANIZATION",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PURCHASINGORGANIZATION"
+        }
+      ]
+    },
+    "T027A": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SHIPPINGINSTRUCTION",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SHIPPINGINSTRUCTION"
+        }
+      ]
+    },
+    "T027B": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SHIPPINGINSTRUCTIONTEXT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SHIPPINGINSTRUCTIONTEXT"
+        }
+      ]
+    },
+    "T040S": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_DUNNINGBLOCKINGREASONCODE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_DUNNINGBLOCKINGREASONCODE"
+        }
+      ]
+    },
+    "T048": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CORRESPONDENCETYPE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CORRESPONDENCETYPE"
+        }
+      ]
+    },
+    "T074T": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SPECIALGLCODETEXT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SPECIALGLCODETEXT"
+        }
+      ]
+    },
+    "T074U": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SPECIALGLCODE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SPECIALGLCODE"
+        }
+      ]
+    },
+    "T077X": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CUSTOMERACCOUNTGROUPTEXT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CUSTOMERACCOUNTGROUPTEXT"
+        }
+      ]
+    },
+    "T151": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CUSTOMERGROUP",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CUSTOMERGROUP"
+        }
+      ]
+    },
+    "T151T": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CUSTOMERGROUP",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CUSTOMERGROUP"
+        }
+      ]
+    },
+    "T156": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_GOODSMOVEMENTTYPE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_GOODSMOVEMENTTYPE"
+        }
+      ]
+    },
+    "T161": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PURCHASINGDOCUMENTTYPE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PURCHASINGDOCUMENTTYPE"
+        }
+      ]
+    },
+    "T161T": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PURCHASINGDOCUMENTTYPETEXT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PURCHASINGDOCUMENTTYPETEXT"
+        }
+      ]
+    },
+    "T163D": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SUPLRCONFCATINTERNALASSGMT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SUPLRCONFCATINTERNALASSGMT"
+        }
+      ]
+    },
+    "T163I": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_ACCTASSIGNMENTCATEGORYTEXT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_ACCTASSIGNMENTCATEGORYTEXT"
+        }
+      ]
+    },
+    "T163K": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_ACCOUNTASSIGNMENTCATEGORY",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_ACCOUNTASSIGNMENTCATEGORY"
+        }
+      ]
+    },
+    "T166C": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PURGDOCOUTPUTRELEVANTCHANGE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PURGDOCOUTPUTRELEVANTCHANGE"
+        }
+      ]
+    },
+    "T166K": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PURGOBJTEXTOBJECTOUTPRLVNCE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PURGOBJTEXTOBJECTOUTPRLVNCE"
+        }
+      ]
+    },
+    "T166P": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PURGOBJITEMTXTOBJOUTPRLVNCE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PURGOBJITEMTXTOBJOUTPRLVNCE"
+        }
+      ]
+    },
+    "T166T": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PURGDOCOUTPUTCHANGETEXT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PURGDOCOUTPUTCHANGETEXT"
+        }
+      ]
+    },
+    "T171T": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SALESDISTRICT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SALESDISTRICT"
+        }
+      ]
+    },
+    "T178": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_MATERIALPRICINGGROUP",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_MATERIALPRICINGGROUP"
+        }
+      ]
+    },
+    "T188": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CUSTOMERPRICEGROUP",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CUSTOMERPRICEGROUP"
+        }
+      ]
+    },
+    "T189": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PRICELISTTYPE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PRICELISTTYPE"
+        }
+      ]
+    },
+    "T459A": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PLNDINDEPRQMTTYPE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PLNDINDEPRQMTTYPE"
+        }
+      ]
+    },
+    "T683": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SLSPRICINGPROCEDURE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SLSPRICINGPROCEDURE"
+        }
+      ]
+    },
+    "T683S": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SLSPRICINGPROCEDUREITEM",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SLSPRICINGPROCEDUREITEM"
+        }
+      ]
+    },
+    "T683T": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SLSPRICINGPROCEDUREITEM",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SLSPRICINGPROCEDUREITEM"
+        }
+      ]
+    },
+    "T685": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CONDITIONTYPE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CONDITIONTYPE"
+        }
+      ]
+    },
+    "T685A": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PRICINGCONDITIONTYPE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PRICINGCONDITIONTYPE"
+        }
+      ]
+    },
+    "T685T": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CONDITIONTYPE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CONDITIONTYPE"
+        }
+      ]
+    },
+    "TADIR": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CUSTABAPOBJDIRECTORYENTRY",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CUSTABAPOBJDIRECTORYENTRY"
+        }
+      ]
+    },
+    "TBSL": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_POSTINGKEY",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_POSTINGKEY"
+        }
+      ]
+    },
+    "TCURC": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CURRENCY",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CURRENCY"
+        }
+      ]
+    },
+    "TCURF": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_EXCHANGERATEFACTORSRAWDATA",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_EXCHANGERATEFACTORSRAWDATA"
+        }
+      ]
+    },
+    "TCURN": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_EXCHRATEQTANTYPERAWDATA",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_EXCHRATEQTANTYPERAWDATA"
+        }
+      ]
+    },
+    "TCURR": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_EXCHANGERATERAWDATA",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_EXCHANGERATERAWDATA"
+        }
+      ]
+    },
+    "TCURT": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CURRENCYTEXT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CURRENCYTEXT"
+        }
+      ]
+    },
+    "TCURV": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_EXCHANGERATETYPE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_EXCHANGERATETYPE"
+        }
+      ]
+    },
+    "TCURX": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CURRENCY",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CURRENCY"
+        }
+      ]
+    },
+    "TDEVC": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CUSTABAPPACKAGE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CUSTABAPPACKAGE"
+        }
+      ]
+    },
+    "TINC": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_INCOTERMSCLASSIFICATION",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_INCOTERMSCLASSIFICATION"
+        }
+      ]
+    },
+    "TINCT": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_INCOTERMSCLASSIFICATION",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_INCOTERMSCLASSIFICATION"
+        }
+      ]
+    },
+    "TKA01": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CONTROLLINGAREA",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CONTROLLINGAREA"
+        }
+      ]
+    },
+    "TKA02": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_COMPANYCODE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_COMPANYCODE"
+        }
+      ]
+    },
+    "TPAR": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_INCOTERMSCLASSIFICATION",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_INCOTERMSCLASSIFICATION"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_PARTNERFUNCTION"
+        }
+      ]
+    },
+    "TPART": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PARTNERFUNCTIONTEXT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PARTNERFUNCTIONTEXT"
+        }
+      ]
+    },
+    "TPRIO": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_DELIVERYPRIORITY",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_DELIVERYPRIORITY"
+        }
+      ]
+    },
+    "TSKD": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CUSTOMERTAXCLASSIFICATION",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CUSTOMERTAXCLASSIFICATION"
+        }
+      ]
+    },
+    "TSKDT": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CUSTOMERTAXCLASSIFICATION",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CUSTOMERTAXCLASSIFICATION"
+        }
+      ]
+    },
+    "TSPA": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_DIVISION",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_DIVISION"
+        }
+      ]
+    },
+    "TSPAT": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_DIVISION",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_DIVISION"
+        }
+      ]
+    },
+    "TSTL": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_PRODUCTSALESTAX",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_PRODUCTSALESTAX"
+        }
+      ]
+    },
+    "TTYPT": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_REFERENCEDOCUMENTTYPETEXT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_REFERENCEDOCUMENTTYPETEXT"
+        }
+      ]
+    },
+    "TVAG": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SALESDOCUMENTRJCNREASON",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SALESDOCUMENTRJCNREASON"
+        }
+      ]
+    },
+    "TVAGT": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SALESDOCUMENTRJCNREASON",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SALESDOCUMENTRJCNREASON"
+        }
+      ]
+    },
+    "TVAK": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SALESDOCUMENTTYPE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SALESDOCUMENTTYPE"
+        }
+      ]
+    },
+    "TVAKT": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SALESDOCUMENTTYPE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SALESDOCUMENTTYPE"
+        }
+      ]
+    },
+    "TVAP": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SALESDOCUMENTITEMCATEGORY",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SALESDOCUMENTITEMCATEGORY"
+        }
+      ]
+    },
+    "TVAPT": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SALESDOCUMENTITEMCATEGORY",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SALESDOCUMENTITEMCATEGORY"
+        }
+      ]
+    },
+    "TVAU": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SDDOCUMENTREASON",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SDDOCUMENTREASON"
+        }
+      ]
+    },
+    "TVAUT": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SDDOCUMENTREASONTEXT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SDDOCUMENTREASONTEXT"
+        }
+      ]
+    },
+    "TVBUR": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SALESOFFICE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SALESOFFICE"
+        }
+      ]
+    },
+    "TVBVK": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SALESOFFICESALESGROUP",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SALESOFFICESALESGROUP"
+        }
+      ]
+    },
+    "TVCIN": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SDDOCUMENTPAYMENTCARDTYPE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SDDOCUMENTPAYMENTCARDTYPE"
+        }
+      ]
+    },
+    "TVCINT": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SDDOCUMENTPAYMENTCARDTYPE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SDDOCUMENTPAYMENTCARDTYPE"
+        }
+      ]
+    },
+    "TVEPT": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SCHEDULELINECATEGORY",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SCHEDULELINECATEGORY"
+        }
+      ]
+    },
+    "TVFK": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_BILLINGDOCUMENTTYPE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_BILLINGDOCUMENTTYPE"
+        }
+      ]
+    },
+    "TVFKT": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_BILLINGDOCUMENTTYPE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_BILLINGDOCUMENTTYPE"
+        }
+      ]
+    },
+    "TVFS": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_BILLINGBLOCKREASON",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_BILLINGBLOCKREASON"
+        }
+      ]
+    },
+    "TVFST": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_BILLINGBLOCKREASON",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_BILLINGBLOCKREASON"
+        }
+      ]
+    },
+    "TVGRT": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SALESGROUP",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SALESGROUP"
+        }
+      ]
+    },
+    "TVKBT": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SALESOFFICE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SALESOFFICE"
+        }
+      ]
+    },
+    "TVKBZ": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SALESAREASALESOFFICE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SALESAREASALESOFFICE"
+        }
+      ]
+    },
+    "TVKGG": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CUSTOMERCONDITIONGROUPVH",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CUSTOMERCONDITIONGROUPVH"
+        }
+      ]
+    },
+    "TVKGGT": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CUSTCNDNGROUPVALUEHELPTEXT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CUSTCNDNGROUPVALUEHELPTEXT"
+        }
+      ]
+    },
+    "TVKGR": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SALESGROUP",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SALESGROUP"
+        }
+      ]
+    },
+    "TVKO": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SALESORGANIZATION",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SALESORGANIZATION"
+        }
+      ]
+    },
+    "TVKOT": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SALESORGANIZATION",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SALESORGANIZATION"
+        }
+      ]
+    },
+    "TVKOV": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SLSORGANIZATIONDISTRCHNL",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SLSORGANIZATIONDISTRCHNL"
+        }
+      ]
+    },
+    "TVKT": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CUSTOMERACCOUNTASSGMTGROUP",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CUSTOMERACCOUNTASSGMTGROUP"
+        }
+      ]
+    },
+    "TVKWZ": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CUSTSALESAREATAX",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CUSTSALESAREATAX"
+        }
+      ]
+    },
+    "TVLK": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_DELIVERYDOCUMENTTYPE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_DELIVERYDOCUMENTTYPE"
+        }
+      ]
+    },
+    "TVLKT": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_DELIVERYDOCUMENTTYPETEXT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_DELIVERYDOCUMENTTYPETEXT"
+        }
+      ]
+    },
+    "TVLS": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_DELIVERYBLOCKREASON",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_DELIVERYBLOCKREASON"
+        }
+      ]
+    },
+    "TVLST": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_DELIVERYBLOCKREASONTEXT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_DELIVERYBLOCKREASONTEXT"
+        }
+      ]
+    },
+    "TVM1": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_ADDITIONALMATERIALGROUP1",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_ADDITIONALMATERIALGROUP1"
+        }
+      ]
+    },
+    "TVM1T": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_ADDITIONALMATERIALGROUP1",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_ADDITIONALMATERIALGROUP1"
+        }
+      ]
+    },
+    "TVM2": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_ADDITIONALMATERIALGROUP2",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_ADDITIONALMATERIALGROUP2"
+        }
+      ]
+    },
+    "TVM2T": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_ADDITIONALMATERIALGROUP2",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_ADDITIONALMATERIALGROUP2"
+        }
+      ]
+    },
+    "TVM3": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_ADDITIONALMATERIALGROUP3",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_ADDITIONALMATERIALGROUP3"
+        }
+      ]
+    },
+    "TVM3T": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_ADDITIONALMATERIALGROUP3",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_ADDITIONALMATERIALGROUP3"
+        }
+      ]
+    },
+    "TVM4": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_ADDITIONALMATERIALGROUP4",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_ADDITIONALMATERIALGROUP4"
+        }
+      ]
+    },
+    "TVM4T": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_ADDITIONALMATERIALGROUP4",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_ADDITIONALMATERIALGROUP4"
+        }
+      ]
+    },
+    "TVM5": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_ADDITIONALMATERIALGROUP5",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_ADDITIONALMATERIALGROUP5"
+        }
+      ]
+    },
+    "TVM5T": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_ADDITIONALMATERIALGROUP5",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_ADDITIONALMATERIALGROUP5"
+        }
+      ]
+    },
+    "TVPT": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SALESDOCUMENTITEMCATEGORY",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SALESDOCUMENTITEMCATEGORY"
+        }
+      ]
+    },
+    "TVSB": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SHIPPINGCONDITION",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SHIPPINGCONDITION"
+        }
+      ]
+    },
+    "TVSBT": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SHIPPINGCONDITIONTEXT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SHIPPINGCONDITIONTEXT"
+        }
+      ]
+    },
+    "TVST": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SHIPPINGPOINT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SHIPPINGPOINT"
+        }
+      ]
+    },
+    "TVSTT": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SHIPPINGPOINT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SHIPPINGPOINT"
+        }
+      ]
+    },
+    "TVTA": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SALESAREA",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SALESAREA"
+        }
+      ]
+    },
+    "TVTW": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_DISTRIBUTIONCHANNEL",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_DISTRIBUTIONCHANNEL"
+        }
+      ]
+    },
+    "TVTWT": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_DISTRIBUTIONCHANNEL",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_DISTRIBUTIONCHANNEL"
+        }
+      ]
+    },
+    "TVV1": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_ADDITIONALCUSTOMERGROUP1",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_ADDITIONALCUSTOMERGROUP1"
+        }
+      ]
+    },
+    "TVV1T": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_ADDITIONALCUSTOMERGROUP1",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_ADDITIONALCUSTOMERGROUP1"
+        }
+      ]
+    },
+    "TVV2": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_ADDITIONALCUSTOMERGROUP2",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_ADDITIONALCUSTOMERGROUP2"
+        }
+      ]
+    },
+    "TVV2T": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_ADDITIONALCUSTOMERGROUP2",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_ADDITIONALCUSTOMERGROUP2"
+        }
+      ]
+    },
+    "TVV3": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_ADDITIONALCUSTOMERGROUP3",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_ADDITIONALCUSTOMERGROUP3"
+        }
+      ]
+    },
+    "TVV3T": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_ADDITIONALCUSTOMERGROUP3",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_ADDITIONALCUSTOMERGROUP3"
+        }
+      ]
+    },
+    "TVV4": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_ADDITIONALCUSTOMERGROUP4",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_ADDITIONALCUSTOMERGROUP4"
+        }
+      ]
+    },
+    "TVV4T": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_ADDITIONALCUSTOMERGROUP4",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_ADDITIONALCUSTOMERGROUP4"
+        }
+      ]
+    },
+    "TVV5": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_ADDITIONALCUSTOMERGROUP5",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_ADDITIONALCUSTOMERGROUP5"
+        }
+      ]
+    },
+    "TVV5T": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_ADDITIONALCUSTOMERGROUP5",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_ADDITIONALCUSTOMERGROUP5"
+        }
+      ]
+    },
+    "TVZBT": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CUSTOMERPAYMENTTERMS",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CUSTOMERPAYMENTTERMS"
+        }
+      ]
+    },
+    "UKMBP_CMS_SGM": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CREDITMANAGEMENTACCOUNT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CREDITMANAGEMENTACCOUNT"
+        }
+      ]
+    },
+    "UKMCRED_SGM0T": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_CREDITMANAGEMENTSEGMENT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_CREDITMANAGEMENTSEGMENT"
+        }
+      ]
+    },
+    "VBAK": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SALESDOCUMENT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SALESDOCUMENT"
+        }
+      ]
+    },
+    "VBAP": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SALESDOCUMENTITEM",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SALESDOCUMENTITEM"
+        }
+      ]
+    },
+    "VBEP": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SALESDOCUMENTSCHEDULELINE",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SALESDOCUMENTSCHEDULELINE"
+        }
+      ]
+    },
+    "VBFA": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SDDOCUMENTMULTILEVELPROCFLOW",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SDDOCUMENTMULTILEVELPROCFLOW"
+        }
+      ]
+    },
+    "VBFS": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_COLLECTIVEPROCESSINGERRORLOG",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_COLLECTIVEPROCESSINGERRORLOG"
+        }
+      ]
+    },
+    "VBKD": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SALESDOCUMENT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SALESDOCUMENT"
+        }
+      ]
+    },
+    "VBRK": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_BILLINGDOCUMENTBASIC",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_BILLINGDOCUMENTBASIC"
+        }
+      ]
+    },
+    "VBRP": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_BILLINGDOCUMENTITEMBASIC",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_BILLINGDOCUMENTITEMBASIC"
+        }
+      ]
+    },
+    "VEDA": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_SALESDOCUMENT",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_SALESDOCUMENT"
+        }
+      ]
+    },
+    "VEKP": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_HANDLINGUNITHEADER",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_HANDLINGUNITHEADER"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_HANDLINGUNITTP"
+        }
+      ]
+    },
+    "VEPO": {
+      "object_type": "TABL",
+      "state": "notToBeReleased",
+      "preferred": "I_HANDLINGUNITITEM",
+      "preferred_type": "CDS_STOB",
+      "all": [
+        {
+          "type": "CDS_STOB",
+          "key": "I_HANDLINGUNITITEM"
+        },
+        {
+          "type": "CDS_STOB",
+          "key": "I_HANDLINGUNITITEMTP"
+        }
+      ]
+    }
+  }
+}

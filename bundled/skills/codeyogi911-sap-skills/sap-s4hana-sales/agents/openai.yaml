@@ -1,0 +1,4 @@
+interface:
+  display_name: "SAP S/4HANA Sales APIs"
+  short_description: "SAP S/4HANA Sales API integration guide"
+  default_prompt: "Use $sap-s4hana-sales to integrate with SAP S/4HANA Sales APIs."

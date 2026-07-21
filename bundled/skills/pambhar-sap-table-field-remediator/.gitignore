@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+venv/
+env/
+.eggs/
+*.egg-info/
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+.env
+.env.local
+
+# Build / dist
+dist/
+build/
+# ...but mcp/build/ is KB *build tooling* (source, not output) — keep it tracked.
+!mcp/build/
+!mcp/build/**
+
+# Test / coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Node (abaplint detector deps — installed at runtime via scripts/setup.sh)
+node_modules/
+package-lock.json
+
+# Generated reports
+remediation-report.json
+suppressed-report.json
+review-queue.json
+
+# Bundled KB (docling intermediate is rebuildable, never ship)
+mcp/common/full.json
+mcp/common/full.md

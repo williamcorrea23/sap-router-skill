@@ -1,0 +1,32 @@
+meta {
+  name: MCP Tool - book-recommendation
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:4004/mcp
+  body: json
+  auth: inherit
+}
+
+headers {
+  mcp-session-id: {{SESSION_ID}}
+  Accept: application/json,text/event-stream
+}
+
+body:json {
+  {
+    "jsonrpc": "2.0",
+    "id": 2,
+    "method": "tools/call",
+    "params": {
+      "name": "book-recommendation",
+      "arguments": {}
+    }
+  }
+}
+
+vars:pre-request {
+  SESSION_ID: eae1122d-d40e-4d1c-9006-2623ea4728a8
+}

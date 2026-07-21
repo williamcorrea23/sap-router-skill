@@ -1,0 +1,14 @@
+@EndUserText.label: 'Airports access control'
+@MappingRole: true
+define role ZAKP_I_AIRPORTS {
+    grant
+        select
+            on
+                ZAKP_I_AIRPORTS
+                    where
+                        Country = 'DE';      --LITERAL
+//                        or entity_element_2 = aspect user;
+//                        ( Country ) = aspect pfcg_auth( /DMO/TRVL,
+//                                                        /DMO/CNTRY,
+//                                                       ACTVT = '03' );
+}

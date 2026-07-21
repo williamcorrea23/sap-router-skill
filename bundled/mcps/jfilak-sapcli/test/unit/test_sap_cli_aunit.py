@@ -1,0 +1,1377 @@
+#!/usr/bin/env python3
+
+import sys
+import contextlib
+import unittest
+from io import StringIO
+from types import SimpleNamespace
+from unittest.mock import patch, call, Mock, mock_open
+
+import sap.adt.cts
+import sap.cli.aunit
+from fixtures_adt_aunit import (
+    AUNIT_NO_TEST_RESULTS_XML,
+    AUNIT_RESULTS_XML,
+    GLOBAL_TEST_CLASS_AUNIT_RESULTS_XML,
+    AUNIT_RESULTS_NO_TEST_METHODS_XML,
+    AUNIT_SYNTAX_ERROR_XML,
+    AUNIT_RESULTS_SKIPPED_XML,
+    TEST_CLASS_WITH_SYS_ERROR_FOLLOWED_BY_GREEN_TEST_CLASS_AUNIT_RESULTS_XML,
+    AUNIT_API_RUN_STATUS_FINISHED_XML,
+    AUNIT_API_RUN_STATUS_FINISHED_REAL_XML,
+    AUNIT_API_JUNIT_RESULTS_XML,
+)
+from fixtures_adt_program import GET_INCLUDE_PROGRAM_WITH_CONTEXT_ADT_XML
+from fixtures_adt_coverage import ACOVERAGE_RESULTS_XML, ACOVERAGE_STATEMENTS_RESULTS_XML
+from fixtures_adt_acoverage import ACOVERAGE_MEASUREMENTS_XML, \
+    ACOVERAGE_NEXT_OBJECT_MEASUREMENTS_XML, ACOVERAGE_NEXT_2_OBJECT_MEASUREMENTS_XML
+from infra import generate_parse_args
+from mock import Connection, Response, BufferConsole, patch_get_print_console_with_buffer
+from sap.cli.aunit import ResultOptions
+from sap.errors import SAPCliError
+
+parse_args = generate_parse_args(sap.cli.aunit.CommandGroup())
+
+
+class TestAUnitWrite(unittest.TestCase):
+
+    def setUp(self):
+        self.connection = Connection()
+
+    def execute_run(self, *args, **kwargs):
+        cmd_args = parse_args('run', *args, **kwargs)
+        return cmd_args.execute(self.connection, cmd_args)
+
+    def assert_print_no_test_classes(self, fake_console):
+        self.assertEqual(
+            fake_console.capout,
+            'Successful: 0\n'
+            'Warnings:   0\n'
+            'Errors:     0\n')
+
+        self.assertEqual(
+            fake_console.caperr,
+            '* [tolerable] [noTestClasses] - The task definition does not refer to any test\n')
+
+    def test_aunit_invalid(self):
+        errors = StringIO()
+        with self.assertRaises(SystemExit) as caught, contextlib.redirect_stderr(errors):
+            self.execute_run('foo', 'bar')
+
+        self.assertRegex(errors.getvalue(), r".*invalid choice: 'foo'.*")
+        self.assertEqual('2', str(caught.exception))
+
+    def test_print_aunit_output_raises(self):
+        def noop():
+            pass
+
+        with self.assertRaises(SAPCliError) as cm:
+            sap.cli.aunit.print_aunit_output(SimpleNamespace(output='foo', console_factory=noop), Mock(), Mock())
+
+        self.assertEqual(str(cm.exception), 'Unsupported output type: foo')
+
+    def execute_run(self, *args, **kwargs):
+        cmd_args = parse_args('run', *args, **kwargs)
+        return cmd_args.execute(self.connection, cmd_args)
+
+    def test_aunit_program(self):
+        self.connection.set_responses(
+            Response(status_code=200, text=AUNIT_NO_TEST_RESULTS_XML, headers={})
+        )
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            self.execute_run('program', '--output', 'human', 'yprogram', '--result', ResultOptions.ONLY_UNIT.value, '--compat')
+
+        self.assertEqual(len(self.connection.execs), 1)
+        self.assertIn('programs/programs/yprogram', self.connection.execs[0].body)
+        self.assert_print_no_test_classes(fake_console)
+
+    def test_aunit_program_include_fetch(self):
+        self.connection.set_responses(
+            Response(status_code=200, text=GET_INCLUDE_PROGRAM_WITH_CONTEXT_ADT_XML, headers={}),
+            Response(status_code=200, text=AUNIT_NO_TEST_RESULTS_XML, headers={})
+        )
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            self.execute_run('program-include', '--output', 'human', 'ZHELLO_INCLUDE', '--result', ResultOptions.ONLY_UNIT.value, '--compat')
+
+        self.assertEqual(len(self.connection.execs), 2)
+        self.assertIn('programs/includes/zhello_include?context=%2Fsap%2Fbc%2Fadt%2Fprograms%2Fprograms%2Fzjakub_is_handsome_genius', self.connection.execs[1].body)
+        self.assert_print_no_test_classes(fake_console)
+
+    def test_aunit_program_include_explicit(self):
+        self.connection.set_responses(
+            Response(status_code=200, text=AUNIT_NO_TEST_RESULTS_XML, headers={})
+        )
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            self.execute_run('program-include', '--output', 'human', 'mainprogram\\someinclude', '--result', ResultOptions.ONLY_UNIT.value, '--compat')
+
+        self.assertEqual(len(self.connection.execs), 1)
+        self.assertIn('programs/includes/someinclude?context=%2Fsap%2Fbc%2Fadt%2Fprograms%2Fprograms%2Fmainprogram', self.connection.execs[0].body)
+        self.assert_print_no_test_classes(fake_console)
+
+    def test_aunit_program_include_invalid(self):
+        with patch_get_print_console_with_buffer() as fake_console:
+            ret = self.execute_run('program-include', '--output', 'human', 'invali\\mainprogram\\someinclude', '--result', ResultOptions.ONLY_UNIT.value, '--compat')
+
+        self.assertEqual(fake_console.caperr, 'Program include name can be: INCLUDE or MAIN\\INCLUDE\n')
+        self.assertEqual(ret, 1)
+
+    def test_aunit_function_group_explicit(self):
+        from sap.adt.api.aunit import ACCEPT_AUNIT_RESULTS
+
+        self.connection.set_responses(
+            Response(status_code=200, headers={'Location': '/sap/bc/adt/abapunit/results/42010AEF4C8E1FD19CAD9D1848D3ECFD'}),
+            Response(status_code=200, text=AUNIT_API_RUN_STATUS_FINISHED_XML),
+            Response(status_code=200, text=AUNIT_NO_TEST_RESULTS_XML, headers={'Content-Type': ACCEPT_AUNIT_RESULTS}),
+        )
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            self.execute_run('function-group', '--output', 'human', '/z/fabulous/sapcli/fugr', '--result', ResultOptions.ONLY_UNIT.value)
+
+        self.assertEqual(len(self.connection.execs), 3)
+        self.assertIn('<osl:object name="/Z/FABULOUS/SAPCLI/FUGR" type="FUGR"/>', self.connection.execs[0].body)
+        self.assert_print_no_test_classes(fake_console)
+
+    def test_aunit_function_module_explicit(self):
+        from sap.adt.api.aunit import ACCEPT_AUNIT_RESULTS
+
+        self.connection.set_responses(
+            Response(status_code=200, headers={'Location': '/sap/bc/adt/abapunit/results/42010AEF4C8E1FD19CAD9D1848D3ECFD'}),
+            Response(status_code=200, text=AUNIT_API_RUN_STATUS_FINISHED_XML),
+            Response(status_code=200, text=AUNIT_NO_TEST_RESULTS_XML, headers={'Content-Type': ACCEPT_AUNIT_RESULTS}),
+        )
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            self.execute_run('function-module', '--output', 'human', '/z/fabulous/sapcli/func', '--result', ResultOptions.ONLY_UNIT.value)
+
+        self.assertEqual(len(self.connection.execs), 3)
+        self.assertIn('<osl:object name="/Z/FABULOUS/SAPCLI/FUNC" type="FUNC"/>', self.connection.execs[0].body)
+        self.assert_print_no_test_classes(fake_console)
+
+    def test_aunit_class_human(self):
+        self.connection.set_responses(Response(status_code=200, text=AUNIT_NO_TEST_RESULTS_XML, headers={}))
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            self.execute_run('class', 'yclass', '--output', 'human', '--result', ResultOptions.ONLY_UNIT.value, '--compat')
+
+        self.assertEqual(len(self.connection.execs), 1)
+        self.assertIn('oo/classes/yclass', self.connection.execs[0].body)
+        self.assert_print_no_test_classes(fake_console)
+
+    def test_aunit_class_human_syntax_error(self):
+        self.connection.set_responses(Response(status_code=200, text=AUNIT_SYNTAX_ERROR_XML, headers={}))
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            retval = self.execute_run('class', 'yclass', '--output', 'human', '--result', ResultOptions.ONLY_UNIT.value, '--compat')
+
+        self.assertEqual(len(self.connection.execs), 1)
+        self.assertIn('oo/classes/yclass', self.connection.execs[0].body)
+        self.assertEqual(fake_console.capout,
+'''CL_FOO
+* [critical] [warning] - CL_FOO has syntax errors and cannot be analyzed for existence of unit tests
+
+Successful: 0
+Warnings:   0
+Errors:     1
+''')
+        self.assertEqual(retval, 1)
+
+    def test_aunit_package(self):
+        self.connection.set_responses(Response(status_code=200, text=AUNIT_NO_TEST_RESULTS_XML, headers={}))
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            self.execute_run('package', 'ypackage', '--output', 'human', '--result', ResultOptions.ONLY_UNIT.value, '--compat')
+
+        self.assertEqual(len(self.connection.execs), 1)
+        self.assertIn('packages/ypackage', self.connection.execs[0].body)
+
+    def test_aunit_junit4_no_test_methods(self):
+        self.connection.set_responses(Response(status_code=200, text=AUNIT_RESULTS_NO_TEST_METHODS_XML, headers={}))
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            self.execute_run('package', 'ypackage', '--output', 'junit4', '--result', ResultOptions.ONLY_UNIT.value, '--compat')
+
+        self.assertEqual(len(self.connection.execs), 1)
+        self.assertEqual(
+            fake_console.capout,
+            """<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="ypackage">
+  <testsuite name="LTCL_TEST" package="ZCL_THEKING_MANUAL_HARDCORE" tests="0"/>
+</testsuites>
+"""
+        )
+
+    def test_aunit_package_with_results(self):
+        self.connection.set_responses(Response(status_code=200, text=AUNIT_RESULTS_XML, headers={}))
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            exit_code = self.execute_run('package', 'ypackage', '--output', 'human', '--result', ResultOptions.ONLY_UNIT.value, '--compat')
+
+        self.assertEqual(exit_code, 3)
+        self.assertEqual(len(self.connection.execs), 1)
+        self.assertIn('packages/ypackage', self.connection.execs[0].body)
+
+        self.maxDiff = None
+        self.assertEqual(fake_console.capout,
+'''ZCL_THEKING_MANUAL_HARDCORE
+  LTCL_TEST
+    DO_THE_FAIL [ERR]
+    DO_THE_WARN [SKIP]
+    DO_THE_TEST [OK]
+  LTCL_TEST_HARDER
+    DO_THE_FAIL [ERR]
+    DO_THE_TEST [OK]
+ZEXAMPLE_TESTS
+  LTCL_TEST
+    DO_THE_FAIL [ERR]
+    DO_THE_TEST [OK]
+
+ZCL_THEKING_MANUAL_HARDCORE=>LTCL_TEST=>DO_THE_FAIL
+* [critical] [failedAssertion] - Critical Assertion Error: \'I am supposed to fail\'
+ZCL_THEKING_MANUAL_HARDCORE=>LTCL_TEST_HARDER=>DO_THE_FAIL
+* [critical] [failedAssertion] - Critical Assertion Error: \'I am supposed to fail\'
+ZEXAMPLE_TESTS=>LTCL_TEST=>DO_THE_FAIL
+* [critical] [failedAssertion] - Critical Assertion Error: \'I am supposed to fail\'
+* [critical] [failedAssertion] - Error<LOAD_PROGRAM_CLASS_MISMATCH>
+
+Successful: 3
+Warnings:   1
+Errors:     3
+''')
+
+    def test_aunit_package_with_results_raw(self):
+        self.connection.set_responses(Response(status_code=200, text=AUNIT_RESULTS_XML, headers={}))
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            exit_code = self.execute_run('package', 'ypackage', '--output', 'raw', '--result', ResultOptions.ONLY_UNIT.value, '--compat')
+
+        self.assertEqual(exit_code, 3)
+        self.assertEqual(len(self.connection.execs), 1)
+        self.assertIn('packages/ypackage', self.connection.execs[0].body)
+
+        self.assertEqual(fake_console.capout, AUNIT_RESULTS_XML + "\n")
+
+    def test_aunit_package_with_results_junit4(self):
+        self.connection.set_responses(Response(status_code=200, text=AUNIT_RESULTS_XML, headers={}))
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            exit_code = self.execute_run('package', 'ypackage', '--output', 'junit4', '--result', ResultOptions.ONLY_UNIT.value, '--compat')
+
+        self.assertEqual(exit_code, 3)
+        self.assertEqual(len(self.connection.execs), 1)
+        self.assertIn('packages/ypackage', self.connection.execs[0].body)
+
+        self.maxDiff = None
+        self.assertEqual(fake_console.capout,
+'''<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="ypackage">
+  <testsuite name="LTCL_TEST" package="ZCL_THEKING_MANUAL_HARDCORE" tests="3">
+    <testcase name="DO_THE_FAIL" classname="ZCL_THEKING_MANUAL_HARDCORE=&gt;LTCL_TEST" status="ERR">
+      <system-err>True expected
+Test 'LTCL_TEST-&gt;DO_THE_FAIL' in Main Program 'ZCL_THEKING_MANUAL_HARDCORE===CP'.</system-err>
+      <error type="failedAssertion" message="Critical Assertion Error: 'I am supposed to fail'">Include: &lt;ZCL_THEKING_MANUAL_HARDCORE===CCAU&gt; Line: &lt;19&gt; (DO_THE_FAIL)</error>
+    </testcase>
+    <testcase name="DO_THE_WARN" classname="ZCL_THEKING_MANUAL_HARDCORE=&gt;LTCL_TEST" status="SKIP">
+      <system-err>True expected
+Test 'LTCL_TEST-&gt;DO_THE_WARN' in Main Program 'ZCL_THEKING_MANUAL_HARDCORE===CP'.</system-err>
+      <error type="failedAssertion" message="Warning: 'I am supposed to warn'">Include: &lt;ZCL_THEKING_MANUAL_HARDCORE===CCAU&gt; Line: &lt;19&gt; (DO_THE_WARN)</error>
+    </testcase>
+    <testcase name="DO_THE_TEST" classname="ZCL_THEKING_MANUAL_HARDCORE=&gt;LTCL_TEST" status="OK"/>
+  </testsuite>
+  <testsuite name="LTCL_TEST_HARDER" package="ZCL_THEKING_MANUAL_HARDCORE" tests="2">
+    <testcase name="DO_THE_FAIL" classname="ZCL_THEKING_MANUAL_HARDCORE=&gt;LTCL_TEST_HARDER" status="ERR">
+      <system-err>True expected
+Test 'LTCL_TEST_HARDER-&gt;DO_THE_FAIL' in Main Program 'ZCL_THEKING_MANUAL_HARDCORE===CP'.</system-err>
+      <error type="failedAssertion" message="Critical Assertion Error: 'I am supposed to fail'">Include: &lt;ZCL_THEKING_MANUAL_HARDCORE===CCAU&gt; Line: &lt;19&gt; (DO_THE_FAIL)</error>
+    </testcase>
+    <testcase name="DO_THE_TEST" classname="ZCL_THEKING_MANUAL_HARDCORE=&gt;LTCL_TEST_HARDER" status="OK"/>
+  </testsuite>
+  <testsuite name="LTCL_TEST" package="ZEXAMPLE_TESTS" tests="2">
+    <testcase name="DO_THE_FAIL" classname="ZEXAMPLE_TESTS=&gt;LTCL_TEST" status="ERR">
+      <system-err>True expected
+Test 'LTCL_TEST-&gt;DO_THE_FAIL' in Main Program 'ZEXAMPLE_TESTS'.</system-err>
+      <error type="failedAssertion" message="Critical Assertion Error: 'I am supposed to fail'">Include: &lt;ZEXAMPLE_TESTS&gt; Line: &lt;24&gt; (DO_THE_FAIL)
+Include: &lt;ZEXAMPLE_TESTS&gt; Line: &lt;25&gt; (PREPARE_THE_FAIL)</error>
+      <error type="failedAssertion" message="Error&lt;LOAD_PROGRAM_CLASS_MISMATCH&gt;"/>
+    </testcase>
+    <testcase name="DO_THE_TEST" classname="ZEXAMPLE_TESTS=&gt;LTCL_TEST" status="OK"/>
+  </testsuite>
+</testsuites>
+''')
+
+    def test_aunit_class_junit4_syntax_error(self):
+        self.connection.set_responses(Response(status_code=200, text=AUNIT_SYNTAX_ERROR_XML, headers={}))
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            retval = self.execute_run('class', 'yclass', '--output', 'junit4', '--result', ResultOptions.ONLY_UNIT.value, '--compat')
+
+        self.assertEqual(len(self.connection.execs), 1)
+        self.assertIn('oo/classes/yclass', self.connection.execs[0].body)
+        self.maxDiff = None
+        self.assertEqual(fake_console.capout, '''<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="yclass">
+  <testcase name="CL_FOO" classname="CL_FOO" status="ERR">
+    <system-err>"ME-&gt;MEMBER" is not type-compatible with formal parameter "BAR".</system-err>
+    <error type="warning" message="CL_FOO has syntax errors and cannot be analyzed for existence of unit tests">CL_FOO======CCAU:428</error>
+  </testcase>
+</testsuites>
+''')
+        self.assertEqual(fake_console.caperr,
+'''''')
+        self.assertEqual(retval, 1)
+
+    def test_aunit_class_junit4_skipped(self):
+        self.connection.set_responses(Response(status_code=200, text=AUNIT_RESULTS_SKIPPED_XML, headers={}))
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            retval = self.execute_run('class', 'yclass', '--output', 'junit4', '--result', ResultOptions.ONLY_UNIT.value, '--compat')
+
+        self.maxDiff = None
+        self.assertEqual(fake_console.capout, '''<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="yclass">
+  <testsuite name="LTCL_TEST" package="ZCL_THEKING_MANUAL_HARDCORE" tests="1">
+    <testcase name="DO_THE_FAIL" classname="ZCL_THEKING_MANUAL_HARDCORE=&gt;LTCL_TEST" status="SKIP">
+      <system-err>Test execution skipped due to missing prerequisites
+Test 'LTCL_TEST-&gt;DO_THE_FAIL' in Main Program 'ZCL_THEKING_MANUAL_HARDCORE===CP'.</system-err>
+      <skipped message="Missing Prerequisites - This test should not be executed here."/>
+      <system-out>Include: &lt;ZCL_THEKING_MANUAL_HARDCORE===CCAU&gt; Line: &lt;19&gt; (DO_THE_FAIL)</system-out>
+    </testcase>
+  </testsuite>
+</testsuites>
+''')
+        self.assertEqual(fake_console.caperr,
+'''''')
+        self.assertEqual(retval, 0)
+
+    def test_aunit_alert_skip_no_stack(self):
+        alert = sap.adt.aunit.Alert(
+                    kind=sap.adt.aunit.AlertKind.ABORTION,
+                    severity=sap.adt.aunit.AlertSeverity.TOLERABLE,
+                    title='Skip without stack',
+                    details=[],
+                    stack=[]
+                )
+
+        buffer = BufferConsole()
+        with sap.cli.aunit.XMLWriter(buffer, 'root') as xml_writer:
+            sap.cli.aunit.print_junit4_testcase_skipped(xml_writer, alert)
+
+        self.assertEqual(buffer.capout, '''<?xml version="1.0" encoding="UTF-8" ?>
+<root>
+  <skipped message="Skip without stack"/>
+</root>
+''')
+
+    def test_aunit_alert_skip_multiline_stack(self):
+        alert = sap.adt.aunit.Alert(
+                    kind=sap.adt.aunit.AlertKind.ABORTION,
+                    severity=sap.adt.aunit.AlertSeverity.TOLERABLE,
+                    title='Skip with multiline stack',
+                    details=[],
+                    stack=['call 1', 'call 2']
+                )
+
+        buffer = BufferConsole()
+        with sap.cli.aunit.XMLWriter(buffer, 'root') as xml_writer:
+            sap.cli.aunit.print_junit4_testcase_skipped(xml_writer, alert)
+        self.assertEqual(buffer.capout, '''<?xml version="1.0" encoding="UTF-8" ?>
+<root>
+  <skipped message="Skip with multiline stack"/>
+  <system-out>call 1
+call 2</system-out>
+</root>
+''')
+
+    def test_aunit_package_with_results_sonar(self):
+        self.connection.set_responses(Response(status_code=200, text=AUNIT_RESULTS_XML, headers={}))
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            exit_code = self.execute_run('package', 'ypackage', '--output', 'sonar', '--result', ResultOptions.ONLY_UNIT.value, '--compat')
+
+        self.assertEqual(exit_code, 3)
+        self.assertEqual(len(self.connection.execs), 1)
+        self.assertIn('packages/ypackage', self.connection.execs[0].body)
+
+        self.maxDiff = None
+        self.assertEqual(fake_console.capout,
+'''<?xml version="1.0" encoding="UTF-8" ?>
+<testExecutions version="1">
+  <file path="ypackage/ZCL_THEKING_MANUAL_HARDCORE=&gt;LTCL_TEST">
+    <testCase name="DO_THE_FAIL" duration="33">
+      <error message="Critical Assertion Error: 'I am supposed to fail'">
+True expected
+Test 'LTCL_TEST-&gt;DO_THE_FAIL' in Main Program 'ZCL_THEKING_MANUAL_HARDCORE===CP'.
+
+Include: &lt;ZCL_THEKING_MANUAL_HARDCORE===CCAU&gt; Line: &lt;19&gt; (DO_THE_FAIL)
+      </error>
+    </testCase>
+    <testCase name="DO_THE_WARN" duration="33">
+      <skipped message="Warning: 'I am supposed to warn'">
+True expected
+Test 'LTCL_TEST-&gt;DO_THE_WARN' in Main Program 'ZCL_THEKING_MANUAL_HARDCORE===CP'.
+
+Include: &lt;ZCL_THEKING_MANUAL_HARDCORE===CCAU&gt; Line: &lt;19&gt; (DO_THE_WARN)
+      </skipped>
+    </testCase>
+    <testCase name="DO_THE_TEST" duration="0"/>
+  </file>
+  <file path="ypackage/ZCL_THEKING_MANUAL_HARDCORE=&gt;LTCL_TEST_HARDER">
+    <testCase name="DO_THE_FAIL" duration="0">
+      <error message="Critical Assertion Error: 'I am supposed to fail'">
+True expected
+Test 'LTCL_TEST_HARDER-&gt;DO_THE_FAIL' in Main Program 'ZCL_THEKING_MANUAL_HARDCORE===CP'.
+
+Include: &lt;ZCL_THEKING_MANUAL_HARDCORE===CCAU&gt; Line: &lt;19&gt; (DO_THE_FAIL)
+      </error>
+    </testCase>
+    <testCase name="DO_THE_TEST" duration="0"/>
+  </file>
+  <file path="ypackage/ZEXAMPLE_TESTS=&gt;LTCL_TEST">
+    <testCase name="DO_THE_FAIL" duration="0">
+      <error message="Critical Assertion Error: 'I am supposed to fail'">
+True expected
+Test 'LTCL_TEST-&gt;DO_THE_FAIL' in Main Program 'ZEXAMPLE_TESTS'.
+
+Include: &lt;ZEXAMPLE_TESTS&gt; Line: &lt;24&gt; (DO_THE_FAIL)
+Include: &lt;ZEXAMPLE_TESTS&gt; Line: &lt;25&gt; (PREPARE_THE_FAIL)
+      </error>
+      <error message="Error&lt;LOAD_PROGRAM_CLASS_MISMATCH&gt;">
+      </error>
+    </testCase>
+    <testCase name="DO_THE_TEST" duration="0"/>
+  </file>
+</testExecutions>
+''')
+
+    def test_aunit_parser_results_global_class_tests(self):
+        results = sap.adt.aunit.parse_aunit_response(GLOBAL_TEST_CLASS_AUNIT_RESULTS_XML).run_results
+        output = BufferConsole()
+        sap.cli.aunit.print_aunit_junit4(results, SimpleNamespace(name=['$TMP']), output)
+
+        self.maxDiff = None
+        self.assertEqual(output.capout,
+'''<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="$TMP">
+  <testsuite name="ZCL_TEST_CLASS" package="ZCL_TEST_CLASS" tests="1">
+    <testcase name="ZCL_TEST_CLASS" classname="ZCL_TEST_CLASS" status="SKIP">
+      <system-err>You can find further informations in document &lt;CHAP&gt; &lt;SAUNIT_TEST_CL_POOL&gt;</system-err>
+      <error type="warning" message="The global test class [ZCL_TEST_CLASS] is not abstract"/>
+    </testcase>
+    <testcase name="DO_THE_TEST" classname="ZCL_TEST_CLASS" status="OK"/>
+  </testsuite>
+</testsuites>
+''')
+
+    def test_aunit_parser_results_global_class_tests_multiple_targets(self):
+        results = sap.adt.aunit.parse_aunit_response(GLOBAL_TEST_CLASS_AUNIT_RESULTS_XML)
+        output = BufferConsole()
+        sap.cli.aunit.print_aunit_junit4(results.run_results, SimpleNamespace(name=['$TMP', '$LOCAL', '$BAR']), output)
+
+        self.maxDiff = None
+        self.assertEqual(output.capout,
+'''<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="$TMP|$LOCAL|$BAR">
+  <testsuite name="ZCL_TEST_CLASS" package="ZCL_TEST_CLASS" tests="1">
+    <testcase name="ZCL_TEST_CLASS" classname="ZCL_TEST_CLASS" status="SKIP">
+      <system-err>You can find further informations in document &lt;CHAP&gt; &lt;SAUNIT_TEST_CL_POOL&gt;</system-err>
+      <error type="warning" message="The global test class [ZCL_TEST_CLASS] is not abstract"/>
+    </testcase>
+    <testcase name="DO_THE_TEST" classname="ZCL_TEST_CLASS" status="OK"/>
+  </testsuite>
+</testsuites>
+''')
+
+    def test_aunit_parser_results_global_class_tests_sonar(self):
+        results = sap.adt.aunit.parse_aunit_response(GLOBAL_TEST_CLASS_AUNIT_RESULTS_XML).run_results
+        output = BufferConsole()
+        sap.cli.aunit.print_aunit_sonar(results, SimpleNamespace(name=['$TMP']), output)
+
+        self.maxDiff = None
+        self.assertEqual(output.capout,
+'''<?xml version="1.0" encoding="UTF-8" ?>
+<testExecutions version="1">
+  <file path="$TMP/ZCL_TEST_CLASS=&gt;ZCL_TEST_CLASS">
+    <testCase name="DO_THE_TEST" duration="0"/>
+    <testCase name="ZCL_TEST_CLASS" duration="0">
+      <skipped message="The global test class [ZCL_TEST_CLASS] is not abstract">
+You can find further informations in document &lt;CHAP&gt; &lt;SAUNIT_TEST_CL_POOL&gt;
+      </skipped>
+    </testCase>
+  </file>
+</testExecutions>
+''')
+
+    @patch('os.walk')
+    def test_print_aunit_sonar_filename_is_not_none(self, walk):
+        walk.return_value = [('.', None, ['zcl_theking_manual_hardcore.clas.testclasses.abap', 'bar'])]
+        results = sap.adt.aunit.parse_aunit_response(AUNIT_RESULTS_NO_TEST_METHODS_XML).run_results
+        output = BufferConsole()
+        sap.cli.aunit.print_aunit_sonar(results, SimpleNamespace(name=['foo']), output)
+
+        self.assertEqual(
+            output.capout,
+            '''<?xml version="1.0" encoding="UTF-8" ?>
+<testExecutions version="1">
+  <file path="zcl_theking_manual_hardcore.clas.testclasses.abap">
+  </file>
+</testExecutions>
+''')
+
+    def test_aunit_class_sonar_syntax_error(self):
+        self.connection.set_responses(Response(status_code=200, text=AUNIT_SYNTAX_ERROR_XML, headers={}))
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            retval = self.execute_run('class', 'yclass', '--output', 'sonar', '--result', ResultOptions.ONLY_UNIT.value, '--compat')
+
+        self.assertEqual(len(self.connection.execs), 1)
+        self.assertIn('oo/classes/yclass', self.connection.execs[0].body)
+        self.maxDiff = None
+        self.assertEqual(fake_console.capout, '''<?xml version="1.0" encoding="UTF-8" ?>
+<testExecutions version="1">
+    <testCase name="CL_FOO" duration="0">
+      <error message="CL_FOO has syntax errors and cannot be analyzed for existence of unit tests">
+"ME-&gt;MEMBER" is not type-compatible with formal parameter "BAR".
+
+CL_FOO======CCAU:428
+      </error>
+    </testCase>
+</testExecutions>
+''')
+        self.assertEqual(fake_console.caperr,
+'''''')
+        self.assertEqual(retval, 1)
+
+    def test_print_acoverage_output_raises(self):
+        with self.assertRaises(SAPCliError) as cm:
+            sap.cli.aunit.print_acoverage_output(SimpleNamespace(coverage_output='foo'), Mock(), Mock(), Mock())
+
+        self.assertEqual(str(cm.exception), 'Unsupported output type: foo')
+
+    @patch('sap.cli.aunit.get_acoverage_statements')
+    def test_acoverage_package_with_results_raw(self, get_acoverage_statements):
+        get_acoverage_statements.return_value = []
+
+        self.connection.set_responses(
+            Response(status_code=200, text=AUNIT_RESULTS_XML, headers={}),
+            Response(status_code=200, text=ACOVERAGE_RESULTS_XML, headers={})
+        )
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            exit_code = self.execute_run(
+                'package', 'ypackage', '--coverage-output', 'raw', '--result', ResultOptions.ONLY_COVERAGE.value, '--compat'
+            )
+
+        self.assertEqual(exit_code, None)
+        self.assertEqual(len(self.connection.execs), 2)
+
+        self.assertEqual(fake_console.capout, ACOVERAGE_RESULTS_XML + "\n")
+
+    @patch('sap.cli.aunit.get_acoverage_statements')
+    def test_acoverage_package_with_results_human(self, get_acoverage_statements):
+        get_acoverage_statements.return_value = []
+
+        self.connection.set_responses(
+            Response(status_code=200, text=AUNIT_RESULTS_XML, headers={}),
+            Response(status_code=200, text=ACOVERAGE_RESULTS_XML, headers={})
+        )
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            exit_code = self.execute_run(
+                'package', 'ypackage', '--coverage-output', 'human', '--result', ResultOptions.ONLY_COVERAGE.value, '--compat'
+            )
+
+        self.assertEqual(exit_code, None)
+        self.assertEqual(len(self.connection.execs), 2)
+
+        self.assertEqual(fake_console.capout,
+'''TEST_CHECK_LIST : 29.00% : 21.64% : 19.23%
+  FOO===========================CP : 95.24% : 75.86% : 100.00%
+    FOO : 95.24% : 75.86% : 100.00%
+      METHOD_A : 100.00% : 60.00% : 100.00%
+      METHOD_B : 75.00% : 50.00% : 100.00%
+  BAR===========================CP : 0.00% : 0.00% : 0.00%
+''')
+
+    def test_acoverage_package_with_results_jacoco(self):
+        self.connection.set_responses(
+            Response(status_code=200, text=AUNIT_RESULTS_XML, headers={}),
+            Response(status_code=200, text=ACOVERAGE_RESULTS_XML, headers={}),
+            Response(status_code=200, text=ACOVERAGE_STATEMENTS_RESULTS_XML, headers={}),
+        )
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            exit_code = self.execute_run(
+                'package', 'ypackage', '--coverage-output', 'jacoco', '--result', ResultOptions.ONLY_COVERAGE.value, '--compat'
+            )
+
+        self.assertEqual(exit_code, None)
+        self.assertEqual(len(self.connection.execs), 3)
+        self.assertEqual(fake_console.capout,
+'''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE report PUBLIC "-//JACOCO//DTD Report 1.1//EN" "report.dtd">
+<report name="ypackage">
+   <package name="TEST_CHECK_LIST">
+      <class name="FOO" sourcefilename="FOO">
+         <method name="METHOD_A" desc="" line="52">
+            <counter type="BRANCH" missed="2" covered="3"/>
+            <counter type="METHOD" missed="0" covered="1"/>
+            <counter type="INSTRUCTION" missed="0" covered="5"/>
+         </method>
+         <method name="METHOD_B" desc="" line="199">
+            <counter type="BRANCH" missed="1" covered="1"/>
+            <counter type="METHOD" missed="0" covered="1"/>
+            <counter type="INSTRUCTION" missed="2" covered="6"/>
+         </method>
+         <counter type="BRANCH" missed="7" covered="22"/>
+         <counter type="METHOD" missed="0" covered="8"/>
+         <counter type="INSTRUCTION" missed="3" covered="60"/>
+      </class>
+      <sourcefile name="FOO">
+         <line nr="53" mi="0" ci="1" mb="" cb=""/>
+         <line nr="54" mi="0" ci="1" mb="" cb=""/>
+         <line nr="55" mi="0" ci="1" mb="" cb=""/>
+         <line nr="56" mi="0" ci="1" mb="" cb=""/>
+         <line nr="59" mi="0" ci="1" mb="" cb=""/>
+         <line nr="209" mi="0" ci="1" mb="" cb=""/>
+         <line nr="212" mi="0" ci="1" mb="" cb=""/>
+         <line nr="215" mi="0" ci="1" mb="" cb=""/>
+         <line nr="216" mi="0" ci="1" mb="" cb=""/>
+         <line nr="219" mi="0" ci="1" mb="" cb=""/>
+         <line nr="220" mi="0" ci="1" mb="" cb=""/>
+         <line nr="224" mi="1" ci="0" mb="" cb=""/>
+         <line nr="225" mi="1" ci="0" mb="" cb=""/>
+      </sourcefile>
+      <class name="BAR" sourcefilename="BAR">
+         <counter type="BRANCH" missed="0" covered="0"/>
+         <counter type="METHOD" missed="0" covered="0"/>
+         <counter type="INSTRUCTION" missed="0" covered="0"/>
+      </class>
+      <counter type="BRANCH" missed="105" covered="29"/>
+      <counter type="METHOD" missed="42" covered="10"/>
+      <counter type="INSTRUCTION" missed="235" covered="96"/>
+   </package>
+</report>
+''')
+
+    def test_result_option_all(self):
+        self.connection.set_responses(
+            Response(status_code=200, text=AUNIT_RESULTS_XML, headers={}),
+            Response(status_code=200, text=ACOVERAGE_RESULTS_XML, headers={}),
+            Response(status_code=200, text=ACOVERAGE_STATEMENTS_RESULTS_XML, headers={}),
+        )
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            exit_code = self.execute_run(
+                'package', 'ypackage', '--output', 'raw', '--coverage-output', 'raw', '--result', ResultOptions.ALL.value, '--compat'
+            )
+
+        self.assertEqual(exit_code, 3)
+        self.assertEqual(len(self.connection.execs), 3)
+
+        self.assertEqual(fake_console.capout, AUNIT_RESULTS_XML + "\n" + ACOVERAGE_RESULTS_XML + "\n")
+
+    def test_result_option_unit(self):
+        self.connection.set_responses(
+            Response(status_code=200, text=AUNIT_RESULTS_XML, headers={})
+        )
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            exit_code = self.execute_run(
+                'package', 'ypackage', '--output', 'raw', '--coverage-output', 'raw', '--result', ResultOptions.ONLY_UNIT.value, '--compat'
+            )
+
+        self.assertEqual(exit_code, 3)
+        self.assertEqual(len(self.connection.execs), 1)
+
+        self.maxDiff = None
+        self.assertEqual(fake_console.capout, AUNIT_RESULTS_XML + "\n")
+
+    def test_result_option_coverage(self):
+        self.connection.set_responses(
+            Response(status_code=200, text=AUNIT_RESULTS_XML, headers={}),
+            Response(status_code=200, text=ACOVERAGE_RESULTS_XML, headers={}),
+            Response(status_code=200, text=ACOVERAGE_STATEMENTS_RESULTS_XML, headers={}),
+        )
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            exit_code = self.execute_run(
+                'package', 'ypackage', '--output', 'raw', '--coverage-output', 'raw', '--result', ResultOptions.ONLY_COVERAGE.value, '--compat'
+            )
+
+        self.assertEqual(exit_code, None)
+        self.assertEqual(len(self.connection.execs), 3)
+
+        self.assertEqual(fake_console.capout, ACOVERAGE_RESULTS_XML + "\n")
+
+    def test_coverage_filepath(self):
+        self.connection.set_responses(
+            Response(status_code=200, text=AUNIT_RESULTS_XML, headers={}),
+            Response(status_code=200, text=ACOVERAGE_RESULTS_XML, headers={}),
+            Response(status_code=200, text=ACOVERAGE_STATEMENTS_RESULTS_XML, headers={}),
+        )
+
+        coverage_filepath = 'path/to/coverage'
+        with patch('sap.cli.aunit.open', mock_open()) as mock_file:
+            exit_code = self.execute_run(
+                'package', 'ypackage', '--output', 'raw', '--coverage-output', 'raw', '--result', ResultOptions.ONLY_COVERAGE.value,
+                '--coverage-filepath', coverage_filepath, '--compat'
+            )
+
+        mock_file.assert_called_with(coverage_filepath, 'w+', encoding='utf8')
+
+    def test_aunit_parser_results_global_class_tests_sonar_multiple_targets(self):
+        results = sap.adt.aunit.parse_aunit_response(GLOBAL_TEST_CLASS_AUNIT_RESULTS_XML)
+        output = BufferConsole()
+        sap.cli.aunit.print_aunit_sonar(results.run_results, SimpleNamespace(name=['$LOCAL', '$TMP']), output)
+
+        self.maxDiff = None
+        self.assertEqual(output.capout,
+'''<?xml version="1.0" encoding="UTF-8" ?>
+<testExecutions version="1">
+  <file path="UNKNOWN_PACKAGE/ZCL_TEST_CLASS=&gt;ZCL_TEST_CLASS">
+    <testCase name="DO_THE_TEST" duration="0"/>
+    <testCase name="ZCL_TEST_CLASS" duration="0">
+      <skipped message="The global test class [ZCL_TEST_CLASS] is not abstract">
+You can find further informations in document &lt;CHAP&gt; &lt;SAUNIT_TEST_CL_POOL&gt;
+      </skipped>
+    </testCase>
+  </file>
+</testExecutions>
+''')
+
+    def test_aunit_parser_results_junit4_test_class_with_sys_error_followed_by_green_test_class(self):
+        results = sap.adt.aunit.parse_aunit_response(TEST_CLASS_WITH_SYS_ERROR_FOLLOWED_BY_GREEN_TEST_CLASS_AUNIT_RESULTS_XML).run_results
+        output = BufferConsole()
+        sap.cli.aunit.print_aunit_junit4(results, SimpleNamespace(name=['$TMP']), output)
+
+        self.maxDiff = None
+        self.assertEqual(output.capout,
+'''<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="$TMP">
+  <testsuite name="ZCL_TEST_CLASS_GREEN" package="ZCL_TEST_CLASS_GREEN" tests="1">
+    <testcase name="DO_THE_TEST" classname="ZCL_TEST_CLASS_GREEN" status="OK"/>
+  </testsuite>
+  <testsuite name="ZCL_TEST_CLASS" package="ZCL_TEST_CLASS" tests="0">
+    <testcase name="ZCL_TEST_CLASS" classname="ZCL_TEST_CLASS" status="ERR">
+      <system-err>Some detail text</system-err>
+      <error type="failedAssertion" message="The global test class [ZCL_TEST_CLASS] is not abstract">Include: &lt;ZCL_TEST_CLASS=======CM010&gt; Line: &lt;1&gt;</error>
+    </testcase>
+  </testsuite>
+</testsuites>
+''')
+
+    def test_aunit_parser_results_sonar_test_class_with_sys_error_followed_by_green_test_class(self):
+        results = sap.adt.aunit.parse_aunit_response(TEST_CLASS_WITH_SYS_ERROR_FOLLOWED_BY_GREEN_TEST_CLASS_AUNIT_RESULTS_XML)
+        output = BufferConsole()
+        sap.cli.aunit.print_aunit_sonar(results.run_results, SimpleNamespace(name=['$TMP']), output)
+
+        self.maxDiff = None
+        self.assertEqual(output.capout,
+'''<?xml version="1.0" encoding="UTF-8" ?>
+<testExecutions version="1">
+  <file path="$TMP/ZCL_TEST_CLASS_GREEN=&gt;ZCL_TEST_CLASS_GREEN">
+    <testCase name="DO_THE_TEST" duration="0"/>
+  </file>
+  <file path="$TMP/ZCL_TEST_CLASS=&gt;ZCL_TEST_CLASS">
+    <testCase name="ZCL_TEST_CLASS" duration="0">
+      <error message="The global test class [ZCL_TEST_CLASS] is not abstract">
+Some detail text
+
+Include: &lt;ZCL_TEST_CLASS=======CM010&gt; Line: &lt;1&gt;
+      </error>
+    </testCase>
+  </file>
+</testExecutions>
+''')
+
+    def test_aunit_parser_results_human_test_class_with_sys_error_followed_by_green_test_class(self):
+        results = sap.adt.aunit.parse_aunit_response(TEST_CLASS_WITH_SYS_ERROR_FOLLOWED_BY_GREEN_TEST_CLASS_AUNIT_RESULTS_XML)
+        output = BufferConsole()
+        sap.cli.aunit.print_aunit_human(results.run_results, output)
+
+        self.maxDiff = None
+        self.assertEqual(output.capout,
+'''ZCL_TEST_CLASS_GREEN
+  ZCL_TEST_CLASS_GREEN
+    DO_THE_TEST [OK]
+ZCL_TEST_CLASS
+  ZCL_TEST_CLASS
+* [critical] [failedAssertion] - The global test class [ZCL_TEST_CLASS] is not abstract
+
+Successful: 1
+Warnings:   0
+Errors:     1
+''')
+
+
+def make_statement(executed, uri):
+    from sap.adt.acoverage_statements import Statement
+    return Statement(executed=executed, uri=uri)
+
+
+class TestFormatLineRanges(unittest.TestCase):
+
+    def test_single_line(self):
+        self.assertEqual(sap.cli.aunit._format_line_ranges([5]), '5')
+
+    def test_consecutive_lines_collapsed_to_range(self):
+        self.assertEqual(sap.cli.aunit._format_line_ranges([183, 184, 185]), '183-185')
+
+    def test_two_consecutive_lines(self):
+        self.assertEqual(sap.cli.aunit._format_line_ranges([224, 225]), '224-225')
+
+    def test_mixed_singles_and_ranges(self):
+        self.assertEqual(sap.cli.aunit._format_line_ranges([55, 224, 225]), '55, 224-225')
+
+    def test_multiple_ranges(self):
+        self.assertEqual(sap.cli.aunit._format_line_ranges([1, 2, 5, 6, 7, 10]), '1-2, 5-7, 10')
+
+
+class TestPrintMissedStatements(unittest.TestCase):
+
+    def test_groups_unexecuted_statements(self):
+        from sap.adt.acoverage_statements import StatementResponse
+
+        responses = [
+            StatementResponse(name='METHOD_A', statements=[
+                make_statement('4', '/sap/bc/adt/oo/classes/foo/source/main#start=53,1;end=53,38'),
+                make_statement('0', '/sap/bc/adt/oo/classes/foo/source/main#start=55,1;end=55,10'),
+            ]),
+            StatementResponse(name='METHOD_B', statements=[
+                make_statement('0', '/sap/bc/adt/oo/classes/foo/source/main#start=224,1;end=224,24'),
+                make_statement('0', '/sap/bc/adt/oo/classes/foo/source/main#start=225,1;end=225,59'),
+            ]),
+        ]
+
+        output = BufferConsole()
+        sap.cli.aunit.print_missed_statements(responses, output)
+
+        self.assertEqual(output.capout,
+'''Missed statements:
+foo (source/main)
+- 55, 224-225
+''')
+
+    def test_skips_executed_statements(self):
+        from sap.adt.acoverage_statements import StatementResponse
+
+        responses = [
+            StatementResponse(name='METHOD_A', statements=[
+                make_statement('5', '/sap/bc/adt/oo/classes/foo/source/main#start=53,1;end=53,38'),
+            ]),
+        ]
+
+        output = BufferConsole()
+        sap.cli.aunit.print_missed_statements(responses, output)
+
+        self.assertEqual(output.capout, 'Missed statements:\n')
+
+
+class TestGetMethodLinesMapping(unittest.TestCase):
+
+    def test_uses_parsed_uri_start_line(self):
+        from sap.adt.acoverage_statements import StatementResponse
+
+        responses = [
+            StatementResponse(name='FOO.BAR.METHOD_A', statements=[
+                make_statement('4', '/sap/bc/adt/oo/classes/foo/source/main#start=53,1;end=53,38'),
+                make_statement('0', '/sap/bc/adt/oo/classes/foo/source/main#start=55,1;end=55,10'),
+            ]),
+        ]
+
+        result = sap.cli.aunit.get_method_lines_mapping(responses)
+
+        self.assertEqual(result[('BAR', 'METHOD_A')], [(53, True), (55, False)])
+
+    def test_skips_statement_with_unparseable_uri(self):
+        from sap.adt.acoverage_statements import Statement, StatementResponse
+
+        responses = [
+            StatementResponse(name='FOO.BAR.METHOD_A', statements=[
+                Statement(executed='1', uri='/sap/bc/adt/oo/classes/foo/source/main#start=52,9'),
+            ]),
+        ]
+
+        result = sap.cli.aunit.get_method_lines_mapping(responses)
+
+        self.assertEqual(result[('BAR', 'METHOD_A')], [])
+
+
+class TestReportMissingLines(unittest.TestCase):
+
+    def test_parse_statement_uri_fixture_data(self):
+        from sap.adt.acoverage_statements import parse_statements_response
+
+        parsed = parse_statements_response(ACOVERAGE_STATEMENTS_RESULTS_XML.encode('utf-8'))
+        output = BufferConsole()
+        sap.cli.aunit.print_missed_statements(parsed.statement_responses, output)
+
+        self.assertEqual(output.capout,
+'''Missed statements:
+foo (source/main)
+- 224-225
+''')
+
+    def test_print_acoverage_output_human_with_report_missed_lines(self):
+        from sap.adt.acoverage_statements import parse_statements_response
+        from sap.adt.acoverage import parse_acoverage_response
+
+        parsed_coverage = parse_acoverage_response(ACOVERAGE_RESULTS_XML.encode('utf-8'))
+        parsed_statements = parse_statements_response(ACOVERAGE_STATEMENTS_RESULTS_XML.encode('utf-8'))
+
+        output = BufferConsole()
+        args = SimpleNamespace(
+            coverage_output='human',
+            coverage_filepath=None,
+            report_missed_lines=True,
+            skip_covered=False,
+            console_factory=lambda: output,
+        )
+
+        acoverage_response = Mock()
+        acoverage_response.text = ACOVERAGE_RESULTS_XML
+
+        sap.cli.aunit.print_acoverage_output(
+            args, acoverage_response, parsed_coverage.root_node, parsed_statements.statement_responses
+        )
+
+        self.assertIn('Missed statements:', output.capout)
+        self.assertIn('foo (source/main)', output.capout)
+        self.assertIn('- 224-225', output.capout)
+
+
+class TestAUnitCommandRunTransport(unittest.TestCase):
+
+    @patch('sap.adt.cts.Workbench.fetch_transport_request')
+    def test_not_found_transport(self, fake_fetch_transports):
+        fake_fetch_transports.return_value = None
+
+        connection = Mock()
+        args = parse_args('run', 'transport', 'NPLK123456', '--compat')
+        with patch_get_print_console_with_buffer() as fake_console:
+            ret = args.execute(connection, args)
+
+        self.assertEqual(fake_console.caperr, 'The transport was not found: NPLK123456\n')
+        self.assertEqual(ret, 1)
+
+    @patch('sap.adt.cts.Workbench.fetch_transport_request')
+    def test_no_testable_objects(self, fake_fetch_transports):
+        connection = Mock()
+
+        fake_fetch_transports.return_value = sap.adt.cts.WorkbenchTransport(
+            [], connection, 'NPLK123456', 'FILAK', 'Description', 'D')
+
+        args = parse_args('run', 'transport', 'NPLK123456', '--compat')
+        with patch_get_print_console_with_buffer() as fake_console:
+            ret = args.execute(connection, args)
+
+        self.assertEqual(fake_console.caperr, 'No testable objects found\n')
+        self.assertEqual(ret, 1)
+
+    @patch('sap.adt.cts.Workbench.fetch_transport_request')
+    @patch('sap.adt.AUnit.execute')
+    def test_all_kinds_and_more(self, fake_execute, fake_fetch_transports):
+        connection = Connection()
+
+        fake_fetch_transports.return_value = sap.adt.cts.WorkbenchTransport(
+            [sap.adt.cts.WorkbenchTask('NPLK123456',
+                [sap.adt.cts.WorkbenchABAPObject('R3TR', 'PROG', 'program', 'T', 'descr', 'X', '000000'),
+                 sap.adt.cts.WorkbenchABAPObject('R3TR', 'CLAS', 'class', 'T', 'descr', 'X', '000001'),
+                ],
+                connection, 'NPLK123457', 'FILAK', 'Description', 'D'),
+             sap.adt.cts.WorkbenchTask('NPLK123456',
+                [sap.adt.cts.WorkbenchABAPObject('R3TR', 'FUGR', 'functions', 'T', 'descr', 'X', '000000'),
+                 sap.adt.cts.WorkbenchABAPObject('R3TR', 'TABU', 'table', 'T', 'descr', 'X', '000001'),
+                ],
+                connection, 'NPLK123458', 'FILAK', 'Description', 'D'),
+            ],
+            connection, 'NPLK123456', 'FILAK', 'Description', 'D')
+
+        class SentinelError(Exception):
+            pass
+
+        def assert_objects(obj_sets, activate_coverage):
+            inclusive = [(ref.uri, ref.name) for ref in obj_sets.inclusive.references.references]
+            self.assertEqual(inclusive, [('/sap/bc/adt/programs/programs/program', 'PROGRAM'),
+                                         ('/sap/bc/adt/oo/classes/class', 'CLASS'),
+                                         ('/sap/bc/adt/functions/groups/functions', 'FUNCTIONS')])
+            raise SentinelError()
+
+        fake_execute.side_effect = assert_objects
+
+        args = parse_args('run', 'transport', 'NPLK123456', '--compat')
+        with self.assertRaises(SentinelError):
+            args.execute(connection, args)
+
+
+class TestAUnitAPIProtocol(unittest.TestCase):
+    """Tests for the default API (async) protocol in the CLI"""
+
+    def setUp(self):
+        self.connection = Connection()
+
+    def execute_run(self, *args, **kwargs):
+        cmd_args = parse_args('run', *args, **kwargs)
+        return cmd_args.execute(self.connection, cmd_args)
+
+    def _make_api_responses(self, results_xml=AUNIT_NO_TEST_RESULTS_XML):
+        """Returns 3 responses for the API protocol: start, poll, results"""
+        from sap.adt.api.aunit import ACCEPT_AUNIT_RESULTS
+
+        return [
+            Response(status_code=200, text='',
+                     headers={'Location': '/sap/bc/adt/abapunit/runs/RUN_ID_123'}),
+            Response(status_code=200, text=AUNIT_API_RUN_STATUS_FINISHED_XML,
+                     headers={}),
+            Response(status_code=200, text=results_xml,
+                     headers={'Content-Type': ACCEPT_AUNIT_RESULTS}),
+        ]
+
+    def test_aunit_class_api_default(self):
+        self.connection.set_responses(*self._make_api_responses())
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            self.execute_run('class', 'yclass', '--output', 'human', '--result', ResultOptions.ONLY_UNIT.value)
+
+        self.assertEqual(len(self.connection.execs), 3)
+
+        # Step 1: POST to start run
+        self.assertEqual(self.connection.execs[0].method, 'POST')
+        self.assertIn('abapunit/runs', self.connection.execs[0].adt_uri)
+        self.assertIn('name="YCLASS"', self.connection.execs[0].body)
+        self.assertIn('type="CLAS"', self.connection.execs[0].body)
+
+        # Step 2: GET to poll
+        self.assertEqual(self.connection.execs[1].method, 'GET')
+        self.assertIn('abapunit/runs/RUN_ID_123', self.connection.execs[1].adt_uri)
+
+        # Step 3: GET results
+        self.assertEqual(self.connection.execs[2].method, 'GET')
+        self.assertIn('abapunit/results/RUN_ID_123', self.connection.execs[2].adt_uri)
+
+    def test_aunit_program_api(self):
+        self.connection.set_responses(*self._make_api_responses())
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            self.execute_run('program', 'yprogram', '--output', 'human', '--result', ResultOptions.ONLY_UNIT.value)
+
+        self.assertEqual(len(self.connection.execs), 3)
+        self.assertIn('name="YPROGRAM"', self.connection.execs[0].body)
+        self.assertIn('type="PROG"', self.connection.execs[0].body)
+
+    def test_aunit_package_api(self):
+        self.connection.set_responses(*self._make_api_responses())
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            self.execute_run('package', 'ypackage', '--output', 'human', '--result', ResultOptions.ONLY_UNIT.value)
+
+        self.assertEqual(len(self.connection.execs), 3)
+        self.assertIn('key="package"', self.connection.execs[0].body)
+        self.assertIn('value="YPACKAGE"', self.connection.execs[0].body)
+        self.assertIn('osl:multiPropertySet', self.connection.execs[0].body)
+
+    def test_aunit_api_with_results(self):
+        self.connection.set_responses(*self._make_api_responses(AUNIT_RESULTS_XML))
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            exit_code = self.execute_run('package', 'ypackage', '--output', 'human', '--result', ResultOptions.ONLY_UNIT.value)
+
+        self.assertEqual(exit_code, 3)
+        self.assertIn('ZCL_THEKING_MANUAL_HARDCORE', fake_console.capout)
+        self.assertIn('Successful: 3', fake_console.capout)
+
+    def test_aunit_api_raw_output(self):
+        self.connection.set_responses(*self._make_api_responses(AUNIT_RESULTS_XML))
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            exit_code = self.execute_run('package', 'ypackage', '--output', 'raw', '--result', ResultOptions.ONLY_UNIT.value)
+
+        self.assertEqual(exit_code, 3)
+        self.assertEqual(fake_console.capout, AUNIT_RESULTS_XML + "\n")
+
+    def test_aunit_api_program_include(self):
+        self.connection.set_responses(*self._make_api_responses())
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            self.execute_run('program-include', 'mainprogram\\someinclude', '--output', 'human', '--result', ResultOptions.ONLY_UNIT.value)
+
+        # Should use only the include name (last part after backslash)
+        self.assertIn('name="SOMEINCLUDE"', self.connection.execs[0].body)
+        self.assertIn('type="PROG"', self.connection.execs[0].body)
+
+    def test_aunit_api_program_include_invalid(self):
+        with patch_get_print_console_with_buffer() as fake_console:
+            ret = self.execute_run('program-include', 'invali\\mainprogram\\someinclude', '--output', 'human', '--result', ResultOptions.ONLY_UNIT.value)
+
+        self.assertEqual(fake_console.caperr, 'Program include name can be: INCLUDE or MAIN\\INCLUDE\n')
+        self.assertEqual(ret, 1)
+
+    @patch('sap.cli.aunit.get_acoverage_statements')
+    def test_aunit_api_with_coverage(self, get_acoverage_statements):
+        get_acoverage_statements.return_value = []
+
+        api_responses = self._make_api_responses(AUNIT_RESULTS_XML)
+        # After the 3 API calls, coverage needs ADTObjectSets (compat path for coverage)
+        # which triggers another POST for coverage
+        from fixtures_adt_coverage import ACOVERAGE_RESULTS_XML
+        api_responses.append(
+            Response(status_code=200, text=ACOVERAGE_RESULTS_XML, headers={})
+        )
+
+        self.connection.set_responses(*api_responses)
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            exit_code = self.execute_run(
+                'package', 'ypackage', '--coverage-output', 'raw', '--result', ResultOptions.ALL.value
+            )
+
+        # 3 API calls + coverage call
+        self.assertEqual(len(self.connection.execs), 4)
+        self.assertEqual(exit_code, 3)
+
+    @patch('sap.cli.aunit.get_acoverage_statements')
+    def test_aunit_api_with_coverage_human(self, get_acoverage_statements):
+        """API coverage with human output must match compat output for same data"""
+        get_acoverage_statements.return_value = []
+
+        api_responses = self._make_api_responses(AUNIT_RESULTS_XML)
+        api_responses.append(
+            Response(status_code=200, text=ACOVERAGE_MEASUREMENTS_XML, headers={})
+        )
+        api_responses.append(
+            Response(status_code=200, text=ACOVERAGE_NEXT_OBJECT_MEASUREMENTS_XML,
+                     headers={'Content-Type': 'application/vnd.sap.adt.coverage.measurements.v1+xml, application/xml'})
+        )
+        api_responses.append(
+            Response(status_code=200, text=ACOVERAGE_NEXT_2_OBJECT_MEASUREMENTS_XML,
+                     headers={'Content-Type': 'application/vnd.sap.adt.coverage.measurements.v1+xml, application/xml'})
+        )
+
+        self.connection.set_responses(*api_responses)
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            exit_code = self.execute_run(
+                'package', 'ypackage',
+                '--coverage-output', 'human',
+                '--result', ResultOptions.ONLY_COVERAGE.value,
+            )
+
+        # 3 API calls + 1 coverage POST + 2 GET next
+        self.assertEqual(len(self.connection.execs), 6)
+        self.assertIsNone(exit_code)
+
+        # Verify the GET next requests hit the correct URIs
+        self.assertEqual(self.connection.execs[4].method, 'GET')
+        self.assertIn('children/ADT_ROOT_NODE', self.connection.execs[4].adt_uri)
+        self.assertIn('CL_EXAMPLE_CLASS', self.connection.execs[4].adt_uri)
+        self.assertEqual(self.connection.execs[5].method, 'GET')
+        self.assertIn('children/ADT_ROOT_NODE', self.connection.execs[5].adt_uri)
+        self.assertIn('LCL_STUB_DECORATOR', self.connection.execs[5].adt_uri)
+
+        self.assertEqual(fake_console.capout,
+'''TEST_EXAMPLE_PACKAGE : 75.18% : 63.18% : 69.26%
+  CL_EXAMPLE_CLASS : 97.67% : 97.67% : 97.67%
+    CL_EXAMPLE_CLASS : 97.62% : 97.62% : 97.62%
+      /IWBEP/IF_MGW_REQ_COMMON~GET_SUPPORTED_RUNTIME_FEATURES : 100.00% : 100.00% : 100.00%
+      /IWBEP/IF_MGW_REQ_ENTITYSET~GET_AT : 100.00% : 100.00% : 100.00%
+    LCL_STUB_DECORATOR : 100.00% : 100.00% : 100.00%
+      CONSTRUCTOR : 100.00% : 100.00% : 100.00%
+''')
+
+    def test_aunit_api_junit4_output(self):
+        """When output=junit4 via API, fetch JUnit format directly from server"""
+        from sap.adt.api.aunit import ACCEPT_JUNIT_RESULTS
+
+        junit_xml = AUNIT_API_JUNIT_RESULTS_XML
+        self.connection.set_responses(
+            Response(status_code=200, text='',
+                     headers={'Location': '/sap/bc/adt/abapunit/runs/RUN_ID_123'}),
+            Response(status_code=200, text=AUNIT_API_RUN_STATUS_FINISHED_XML,
+                     headers={}),
+            Response(status_code=200, text=junit_xml,
+                     headers={'Content-Type': ACCEPT_JUNIT_RESULTS}),
+        )
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            exit_code = self.execute_run(
+                'class', 'cl_foo',
+                '--output', 'junit4',
+                '--result', ResultOptions.ONLY_UNIT.value,
+            )
+
+        self.assertEqual(len(self.connection.execs), 3)
+        # Verify Accept header requests JUnit format
+        self.assertEqual(
+            self.connection.execs[2].headers,
+            {'Accept': ACCEPT_JUNIT_RESULTS}
+        )
+        # Output is the raw JUnit XML from server, not re-serialized
+        self.assertEqual(fake_console.capout, junit_xml + '\n')
+        self.assertIsNone(exit_code)
+
+    def test_aunit_api_e2e_package_human(self):
+        """E2E test: API protocol produces the same human output as compat"""
+        from sap.adt.api.aunit import ACCEPT_AUNIT_RESULTS
+
+        run_id = '6D664D9B46CB1FE185BF306327ADDA18'
+        self.connection.set_responses(
+            # Step 1: POST start run
+            Response(status_code=200, text='',
+                     headers={'Location': f'/sap/bc/adt/abapunit/runs/{run_id}'}),
+            # Step 2: GET poll
+            Response(status_code=200, text=AUNIT_API_RUN_STATUS_FINISHED_XML,
+                     headers={}),
+            # Step 3: GET results - ABAPUnit format
+            Response(status_code=200, text=AUNIT_RESULTS_XML,
+                     headers={'Content-Type': ACCEPT_AUNIT_RESULTS}),
+        )
+
+        with patch_get_print_console_with_buffer() as fake_console:
+            exit_code = self.execute_run(
+                'package', 'ypackage',
+                '--output', 'human',
+                '--result', ResultOptions.ONLY_UNIT.value,
+            )
+
+        self.assertEqual(len(self.connection.execs), 3)
+
+        # Step 1: POST to start run
+        self.assertEqual(self.connection.execs[0].method, 'POST')
+        self.assertIn('abapunit/runs', self.connection.execs[0].adt_uri)
+        self.assertIn('value="YPACKAGE"', self.connection.execs[0].body)
+        self.assertIn('osl:multiPropertySet', self.connection.execs[0].body)
+
+        # Step 2: GET to poll
+        self.assertEqual(self.connection.execs[1].method, 'GET')
+        self.assertIn(f'abapunit/runs/{run_id}', self.connection.execs[1].adt_uri)
+
+        # Step 3: GET results with ABAPUnit accept
+        self.assertEqual(self.connection.execs[2].method, 'GET')
+        self.assertIn(f'abapunit/results/{run_id}', self.connection.execs[2].adt_uri)
+        self.assertEqual(
+            self.connection.execs[2].headers,
+            {'Accept': ACCEPT_AUNIT_RESULTS}
+        )
+
+        # Output must match the compat test_aunit_package_with_results
+        self.maxDiff = None
+        self.assertEqual(fake_console.capout,
+'''ZCL_THEKING_MANUAL_HARDCORE
+  LTCL_TEST
+    DO_THE_FAIL [ERR]
+    DO_THE_WARN [SKIP]
+    DO_THE_TEST [OK]
+  LTCL_TEST_HARDER
+    DO_THE_FAIL [ERR]
+    DO_THE_TEST [OK]
+ZEXAMPLE_TESTS
+  LTCL_TEST
+    DO_THE_FAIL [ERR]
+    DO_THE_TEST [OK]
+
+ZCL_THEKING_MANUAL_HARDCORE=>LTCL_TEST=>DO_THE_FAIL
+* [critical] [failedAssertion] - Critical Assertion Error: \'I am supposed to fail\'
+ZCL_THEKING_MANUAL_HARDCORE=>LTCL_TEST_HARDER=>DO_THE_FAIL
+* [critical] [failedAssertion] - Critical Assertion Error: \'I am supposed to fail\'
+ZEXAMPLE_TESTS=>LTCL_TEST=>DO_THE_FAIL
+* [critical] [failedAssertion] - Critical Assertion Error: \'I am supposed to fail\'
+* [critical] [failedAssertion] - Error<LOAD_PROGRAM_CLASS_MISMATCH>
+
+Successful: 3
+Warnings:   1
+Errors:     3
+''')
+        self.assertEqual(exit_code, 3)
+
+
+class TestPrintACoverageHumanSkipCovered(unittest.TestCase):
+
+    def _make_node(self, name, nodes=None, coverages=None):
+        from sap.adt.acoverage import Node
+        return Node(name=name, type='', uri='', nodes=nodes or [], coverages=coverages or [], parent_node=None)
+
+    def _make_coverage(self, cov_type, executed, total):
+        from sap.adt.acoverage import CoverageNode
+        return CoverageNode(type=cov_type, executed=executed, total=total)
+
+    def _fully_covered(self):
+        return [
+            self._make_coverage('statement', 10, 10),
+            self._make_coverage('branch', 5, 5),
+            self._make_coverage('procedure', 2, 2),
+        ]
+
+    def _partially_covered(self):
+        return [
+            self._make_coverage('statement', 7, 10),
+            self._make_coverage('branch', 3, 5),
+            self._make_coverage('procedure', 2, 2),
+        ]
+
+    def test_skip_covered_skips_fully_covered_subtree(self):
+        method_a = self._make_node('METHOD_A', coverages=self._fully_covered())
+        method_b = self._make_node('METHOD_B', coverages=self._fully_covered())
+        class_node = self._make_node('CLASS_FULL', nodes=[method_a, method_b], coverages=self._fully_covered())
+
+        method_c = self._make_node('METHOD_C', coverages=self._partially_covered())
+        class_partial = self._make_node('CLASS_PARTIAL', nodes=[method_c], coverages=self._partially_covered())
+
+        root = self._make_node('ROOT', nodes=[class_node, class_partial])
+
+        output = BufferConsole()
+        sap.cli.aunit.print_acoverage_human(root, output, skip_covered=True)
+
+        self.assertEqual(output.capout,
+'''CLASS_PARTIAL : 70.00% : 60.00% : 100.00%
+  METHOD_C : 70.00% : 60.00% : 100.00%
+''')
+
+    def test_skip_covered_false_shows_all(self):
+        method_a = self._make_node('METHOD_A', coverages=self._fully_covered())
+        class_node = self._make_node('CLASS_FULL', nodes=[method_a], coverages=self._fully_covered())
+        root = self._make_node('ROOT', nodes=[class_node])
+
+        output = BufferConsole()
+        sap.cli.aunit.print_acoverage_human(root, output, skip_covered=False)
+
+        self.assertEqual(output.capout,
+'''CLASS_FULL : 100.00% : 100.00% : 100.00%
+  METHOD_A : 100.00% : 100.00% : 100.00%
+''')
+
+    def test_skip_covered_keeps_parent_with_mixed_children(self):
+        method_a = self._make_node('METHOD_A', coverages=self._fully_covered())
+        method_b = self._make_node('METHOD_B', coverages=self._partially_covered())
+        class_node = self._make_node('CLASS_MIX', nodes=[method_a, method_b], coverages=self._partially_covered())
+        root = self._make_node('ROOT', nodes=[class_node])
+
+        output = BufferConsole()
+        sap.cli.aunit.print_acoverage_human(root, output, skip_covered=True)
+
+        self.assertEqual(output.capout,
+'''CLASS_MIX : 70.00% : 60.00% : 100.00%
+  METHOD_B : 70.00% : 60.00% : 100.00%
+''')
+
+    def test_skip_covered_zero_total_is_not_covered(self):
+        """Nodes with 0 total should not be considered fully covered"""
+        coverages = [
+            self._make_coverage('statement', 0, 0),
+            self._make_coverage('branch', 0, 0),
+            self._make_coverage('procedure', 0, 0),
+        ]
+        node = self._make_node('EMPTY', coverages=coverages)
+        root = self._make_node('ROOT', nodes=[node])
+
+        output = BufferConsole()
+        sap.cli.aunit.print_acoverage_human(root, output, skip_covered=True)
+
+        self.assertEqual(output.capout,
+'''EMPTY : 0.00% : 0.00% : 0.00%
+''')
+
+
+if __name__ == '__main__':
+    unittest.main()

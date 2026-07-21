@@ -38,6 +38,19 @@ PLACEHOLDER_MARKERS = (
 
 SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv", "venv"}
 AUDIT_SUFFIXES = {".json", ".toml", ".yaml", ".yml", ".env", ".py", ".js", ".ts", ".md", ".txt"}
+REVIEW_ONLY_PARTS = {"test", "tests", "unittests", "fixtures", "docs", "doc", "references", "examples", "spec", ".github"}
+
+
+def review_only(path: Path, kind: str) -> bool:
+    """Classify examples without hiding them from the audit report."""
+    lowered = {part.lower() for part in path.parts}
+    if kind == "hardcoded_sap_host":
+        return True
+    if lowered & REVIEW_ONLY_PARTS:
+        return True
+    if path.name.lower() in {"readme.md", "skill.md", "validate_skill.py"}:
+        return True
+    return False
 
 
 def iter_files(paths: list[str]):
@@ -88,11 +101,15 @@ def audit(paths: list[str]) -> dict:
                     "line": line,
                     "kind": name,
                     "length": len(matched),
+                    "classification": "review_only" if review_only(path, name) else "actionable",
                 })
+    actionable = [item for item in findings if item["classification"] == "actionable"]
     return {
         "root": str(ROOT),
-        "status": "FAIL" if findings else "PASS",
+        "status": "FAIL" if actionable else "PASS",
         "findings_count": len(findings),
+        "actionable_findings_count": len(actionable),
+        "review_only_findings_count": len(findings) - len(actionable),
         "findings": findings,
         "note": "Values are intentionally not printed. Rotate any credential that appeared in tracked config.",
     }

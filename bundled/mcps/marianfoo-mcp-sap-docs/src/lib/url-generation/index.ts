@@ -1,0 +1,173 @@
+/**
+ * Main entry point for URL generation across all documentation sources
+ * Dispatches to source-specific generators based on library ID
+ */
+
+import { DocUrlConfig } from '../metadata.js';
+import { CloudSdkUrlGenerator } from './cloud-sdk.js';
+import { SapUi5UrlGenerator } from './sapui5.js';
+import { CapUrlGenerator } from './cap.js';
+import { Wdi5UrlGenerator } from './wdi5.js';
+import { DsagUrlGenerator } from './dsag.js';
+import { AbapUrlGenerator } from './abap.js';
+import { TerraformBtpUrlGenerator } from './terraform-btp.js';
+import { GenericUrlGenerator } from './GenericUrlGenerator.js';
+import { ArchitectureCenterUrlGenerator } from './architecture-center.js';
+import { BaseUrlGenerator } from './BaseUrlGenerator.js';
+import { GithubBlobUrlGenerator } from './github-blob.js';
+import { MkDocsUrlGenerator } from './mkdocs.js';
+import { SapHelpLoioUrlGenerator } from './sap-help-loio.js';
+import { Ui5TypeScriptUrlGenerator } from './ui5-typescript.js';
+import { Ui5WebComponentsUrlGenerator } from './ui5-webcomponents.js';
+import { OpenUxGeneratedUrlGenerator } from './openux-generated.js';
+
+export interface UrlGenerationOptions {
+  libraryId: string;
+  relFile: string;
+  content: string;
+  config: DocUrlConfig;
+}
+
+/**
+ * URL Generator Registry
+ * Maps library IDs to their corresponding URL generator classes
+ */
+const URL_GENERATORS: Record<string, new (libraryId: string, config: DocUrlConfig) => BaseUrlGenerator> = {
+  // Cloud SDK variants
+  '/cloud-sdk-js': CloudSdkUrlGenerator,
+  '/cloud-sdk-java': CloudSdkUrlGenerator,
+  '/cloud-sdk-ai-js': CloudSdkUrlGenerator,
+  '/cloud-sdk-ai-java': CloudSdkUrlGenerator,
+  
+  // UI5 variants
+  '/sapui5': SapUi5UrlGenerator,
+  '/openui5-api': SapUi5UrlGenerator,
+  '/openui5-samples': SapUi5UrlGenerator,
+  
+  // CAP documentation
+  '/cap': CapUrlGenerator,
+  
+  // wdi5 testing framework
+  '/wdi5': Wdi5UrlGenerator,
+  
+  // DSAG ABAP Leitfaden with custom GitHub Pages URL pattern
+  '/dsag-abap-leitfaden': DsagUrlGenerator,
+  
+  // ABAP Keyword Documentation with SAP help.sap.com URLs
+  // Standard ABAP (on-premise, full syntax) - default
+  '/abap-docs-standard': AbapUrlGenerator,
+  // ABAP Cloud (BTP, restricted syntax)
+  '/abap-docs-cloud': AbapUrlGenerator,
+  
+  // Generic sources
+  '/btp-fiori-tools': GithubBlobUrlGenerator,
+  '/fiori-tools-samples': GithubBlobUrlGenerator,
+  '/fiori-tools-opa-guide': GithubBlobUrlGenerator,
+  '/sap-ux-create': GithubBlobUrlGenerator,
+  '/fiori-development-portal': OpenUxGeneratedUrlGenerator,
+  '/sap-fe-test-api': OpenUxGeneratedUrlGenerator,
+  '/fiori-tools-suite': OpenUxGeneratedUrlGenerator,
+  '/fiori-opa5-docu': OpenUxGeneratedUrlGenerator,
+  '/fiori-extension-instructions': OpenUxGeneratedUrlGenerator,
+  '/ux-ui5-tooling': OpenUxGeneratedUrlGenerator,
+  '/ui5-tooling': MkDocsUrlGenerator,
+  '/cloud-mta-build-tool': MkDocsUrlGenerator,
+  '/ui5-webcomponents': Ui5WebComponentsUrlGenerator,
+  '/ui5-typescript': Ui5TypeScriptUrlGenerator,
+  '/ui5-cc-spreadsheetimporter': MkDocsUrlGenerator,
+  '/abap-cheat-sheets': GithubBlobUrlGenerator,
+  '/sap-styleguides': GithubBlobUrlGenerator,
+  '/abap-fiori-showcase': GithubBlobUrlGenerator,
+  '/cap-fiori-showcase': GithubBlobUrlGenerator,
+  '/abap-platform-rap-opensap': GithubBlobUrlGenerator,
+  '/cloud-abap-rap': GithubBlobUrlGenerator,
+  '/abap-platform-reuse-services': GithubBlobUrlGenerator,
+  '/teched2025-dt260': GithubBlobUrlGenerator,
+  '/terraform-provider-btp': TerraformBtpUrlGenerator,
+  '/btp-cloud-platform': SapHelpLoioUrlGenerator,
+  '/sap-artificial-intelligence': SapHelpLoioUrlGenerator,
+
+  // SAP Architecture Center
+  '/architecture-center': ArchitectureCenterUrlGenerator,
+};
+
+/**
+ * Create URL generator for a given library ID
+ */
+function createUrlGenerator(libraryId: string, config: DocUrlConfig): BaseUrlGenerator {
+  const GeneratorClass = URL_GENERATORS[libraryId];
+  
+  if (GeneratorClass) {
+    return new GeneratorClass(libraryId, config);
+  }
+  
+  // Fallback to generic generator for unknown sources
+  console.log(`Using generic URL generator for unknown library: ${libraryId}`);
+  return new GenericUrlGenerator(libraryId, config);
+}
+
+/**
+ * Main URL generation function
+ * Uses class-based generators for cleaner, more maintainable code
+ * 
+ * @param libraryId - The library/source identifier (e.g., '/cloud-sdk-js')
+ * @param relFile - Relative file path within the source
+ * @param content - File content for extracting metadata
+ * @param config - URL configuration for this source
+ * @returns Generated URL or null if generation fails
+ */
+export function generateDocumentationUrl(
+  libraryId: string, 
+  relFile: string, 
+  content: string,
+  config: DocUrlConfig
+): string | null {
+  if (!config) {
+    console.warn(`No URL config available for library: ${libraryId}`);
+    return null;
+  }
+
+  try {
+    const generator = createUrlGenerator(libraryId, config);
+    const url = generator.generateUrl({
+      libraryId,
+      relFile,
+      content,
+      config
+    });
+    
+    return url;
+  } catch (error) {
+    console.warn(`Error generating URL for ${libraryId}:`, error);
+    return null;
+  }
+}
+
+// Re-export utilities and generator classes for external use
+export { parseFrontmatter, detectContentSection, extractSectionFromPath, buildUrl, extractLibraryIdFromPath, extractRelativeFileFromPath, formatSearchResult } from './utils.js';
+export { BaseUrlGenerator } from './BaseUrlGenerator.js';
+export type { UrlGenerationContext } from './BaseUrlGenerator.js';
+
+// Re-export generator classes
+export { CloudSdkUrlGenerator } from './cloud-sdk.js';
+export { SapUi5UrlGenerator } from './sapui5.js';
+export { CapUrlGenerator } from './cap.js';
+export { Wdi5UrlGenerator } from './wdi5.js';
+export { DsagUrlGenerator } from './dsag.js';
+export { TerraformBtpUrlGenerator } from './terraform-btp.js';
+export { GenericUrlGenerator } from './GenericUrlGenerator.js';
+export { ArchitectureCenterUrlGenerator } from './architecture-center.js';
+export { GithubBlobUrlGenerator } from './github-blob.js';
+export { MkDocsUrlGenerator } from './mkdocs.js';
+export { SapHelpLoioUrlGenerator } from './sap-help-loio.js';
+export { Ui5TypeScriptUrlGenerator } from './ui5-typescript.js';
+export { Ui5WebComponentsUrlGenerator } from './ui5-webcomponents.js';
+export { OpenUxGeneratedUrlGenerator } from './openux-generated.js';
+
+// Re-export convenience functions for backward compatibility
+export { generateCloudSdkUrl, generateCloudSdkAiUrl, generateCloudSdkUrlForLibrary } from './cloud-sdk.js';
+export { generateSapUi5Url, generateOpenUi5ApiUrl, generateOpenUi5SampleUrl, generateUi5UrlForLibrary } from './sapui5.js';
+export { generateCapUrl, generateCapCdsUrl, generateCapTutorialUrl } from './cap.js';
+export { generateWdi5Url, generateWdi5ConfigUrl, generateWdi5SelectorUrl } from './wdi5.js';
+export { generateDsagUrl } from './dsag.js';
+export { generateAbapUrl } from './abap.js';

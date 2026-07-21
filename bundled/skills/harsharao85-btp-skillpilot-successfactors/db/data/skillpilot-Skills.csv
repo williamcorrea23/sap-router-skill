@@ -1,0 +1,5 @@
+ID,name,proficiencyLevel,description
+1,SAP S/4HANA Configuration,Intermediate,"Ability to configure S/4HANA modules (FI, CO, MM, SD) and participate in fit-to-standard workshops. Includes understanding of universal journal, embedded analytics, and Fiori launchpad setup."
+2,SAP BTP Integration Development,Advanced,"Design and implement integration flows using SAP Integration Suite (Cloud Integration). Covers iFlow design, adapter configuration (SFTP, HTTP, OData, IDOC), error handling, and monitoring via Operations Cockpit."
+3,Change Management and Adoption,Beginner,"Application of structured change management frameworks (Prosci ADKAR, Kotter) to SAP transformation programs. Includes stakeholder mapping, resistance management, and adoption KPI tracking."
+4,Generative AI and Prompt Engineering,Intermediate,"Design and evaluate prompts for large language models in enterprise SAP contexts. Covers RAG (Retrieval-Augmented Generation) patterns, grounding techniques, hallucination mitigation, and responsible AI principles aligned with SAP AI Ethics guidelines."

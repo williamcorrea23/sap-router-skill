@@ -1,0 +1,967 @@
+// ============================================================================
+// Unit tests for the SAP-aware tokenizer and scoring engine
+// ============================================================================
+
+import { describe, it, expect } from "vitest";
+import {
+  tokenizeSAPName,
+  tokenizeComponent,
+  tokenizeQuery,
+  scoreObject,
+  commonPrefixLength,
+  prefixSimilarity,
+} from "./search.js";
+import { expandQueryTokens } from "./abbreviation-dictionary.js";
+import type { SAPObject, IndexedObject } from "../types.js";
+
+// ---------------------------------------------------------------------------
+// Helpers — build lightweight IndexedObject fixtures
+// ---------------------------------------------------------------------------
+
+function makeSAPObject(
+  overrides: Partial<SAPObject> & Pick<SAPObject, "objectName">,
+): SAPObject {
+  return {
+    objectType: "CLAS",
+    objectName: overrides.objectName,
+    softwareComponent: "S4CORE",
+    applicationComponent: "",
+    state: "released",
+    cleanCoreLevel: "A",
+    source: "released",
+    ...overrides,
+  };
+}
+
+function makeIndexed(
+  overrides: Partial<SAPObject> & Pick<SAPObject, "objectName">,
+): IndexedObject {
+  const obj = makeSAPObject(overrides);
+  return {
+    object: obj,
+    nameTokens: tokenizeSAPName(obj.objectName),
+    componentTokens: tokenizeComponent(obj.applicationComponent),
+  };
+}
+
+/** Score helper — tokenize the query then score a single object */
+function score(query: string, indexed: IndexedObject): number {
+  const { tokens } = tokenizeQuery(query);
+  return scoreObject(indexed, tokens, query).score;
+}
+
+// ===========================================================================
+// tokenizeSAPName
+// ===========================================================================
+
+describe("tokenizeSAPName", () => {
+  it("strips technical prefix I_ and keeps the rest as one token (all-uppercase)", () => {
+    expect(tokenizeSAPName("I_PURCHASEORDERITEM")).toEqual([
+      "purchaseorderitem",
+    ]);
+  });
+
+  it("strips CL_ prefix and splits on underscores", () => {
+    expect(tokenizeSAPName("CL_BCS_SEND_REQUEST")).toEqual([
+      "bcs",
+      "send",
+      "request",
+    ]);
+  });
+
+  it("extracts namespace prefix", () => {
+    expect(tokenizeSAPName("/SCWM/CL_WM_PACKING")).toEqual([
+      "scwm",
+      "wm",
+      "packing",
+    ]);
+  });
+
+  it("handles single-segment names with technical prefix (no stripping)", () => {
+    // Only 1 part after split → prefix not stripped
+    expect(tokenizeSAPName("MARA")).toEqual(["mara"]);
+  });
+
+  it("drops single-character and numeric-only tokens", () => {
+    expect(tokenizeSAPName("CL_A_1_FOO")).toEqual(["foo"]);
+  });
+
+  it("splits camelCase when present", () => {
+    expect(tokenizeSAPName("CL_PurchaseOrderApi")).toEqual([
+      "Purchase",
+      "Order",
+      "Api",
+    ].map((s) => s.toLowerCase()));
+  });
+
+  it("handles names with multiple underscores (EDO Italian objects)", () => {
+    const tokens = tokenizeSAPName("EDO_IT_ALLEGATI_TYPE_TAB2");
+    expect(tokens).toContain("edo");
+    expect(tokens).toContain("it");
+    expect(tokens).toContain("allegati");
+    expect(tokens).toContain("type");
+    expect(tokens).toContain("tab2");
+  });
+
+  it("handles ZCL_ custom class prefix", () => {
+    expect(tokenizeSAPName("ZCL_MY_CUSTOM_CLASS")).toEqual([
+      "my",
+      "custom",
+      "class",
+    ]);
+  });
+
+  it("handles IF_ interface prefix", () => {
+    expect(tokenizeSAPName("IF_ABAP_UNIT_ASSERT")).toEqual([
+      "abap",
+      "unit",
+      "assert",
+    ]);
+  });
+
+  it("returns empty array for empty string", () => {
+    expect(tokenizeSAPName("")).toEqual([]);
+  });
+});
+
+// ===========================================================================
+// tokenizeComponent
+// ===========================================================================
+
+describe("tokenizeComponent", () => {
+  it("splits on dashes and lowercases", () => {
+    expect(tokenizeComponent("MM-PUR-PO")).toEqual(["mm", "pur", "po"]);
+  });
+
+  it("drops single-char segments", () => {
+    expect(tokenizeComponent("A-BC-D")).toEqual(["bc"]);
+  });
+
+  it("returns empty for empty string", () => {
+    expect(tokenizeComponent("")).toEqual([]);
+  });
+
+  it("handles deep component paths", () => {
+    expect(tokenizeComponent("CA-GTF-CSC-EDO-IT")).toEqual([
+      "ca",
+      "gtf",
+      "csc",
+      "edo",
+      "it",
+    ]);
+  });
+});
+
+// ===========================================================================
+// tokenizeQuery
+// ===========================================================================
+
+describe("tokenizeQuery", () => {
+  it("detects exact mode for all-uppercase SAP name", () => {
+    const result = tokenizeQuery("I_HANDLINGUNIT");
+    expect(result.isExactMode).toBe(true);
+    expect(result.tokens).toEqual(["handlingunit"]);
+  });
+
+  it("detects exact mode for full object name with underscores", () => {
+    const result = tokenizeQuery("CL_BCS_SEND_REQUEST");
+    expect(result.isExactMode).toBe(true);
+    // "CL" is a TECHNICAL_PREFIX → stripped from tokens, becomes mandatoryPrefix
+    expect(result.mandatoryPrefix).toBe("CL_");
+    expect(result.tokens).toEqual(["bcs", "send", "request"]);
+  });
+
+  it("is not exact mode for natural language query", () => {
+    const result = tokenizeQuery("purchase order");
+    expect(result.isExactMode).toBe(false);
+    expect(result.tokens).toEqual(["purchase", "order"]);
+  });
+
+  it("splits camelCase in query", () => {
+    const result = tokenizeQuery("PurchaseOrder");
+    expect(result.tokens).toEqual(["purchase", "order"]);
+  });
+
+  it("drops single-char tokens from query", () => {
+    const result = tokenizeQuery("I HANDLINGUNIT");
+    // "I" dropped (single char)
+    expect(result.tokens).toEqual(["handlingunit"]);
+  });
+
+  it("falls back to whole query when all tokens are filtered out", () => {
+    const result = tokenizeQuery("I");
+    expect(result.tokens).toEqual(["i"]);
+  });
+
+  it("handles namespace-like query", () => {
+    const result = tokenizeQuery("/SCWM/PACKING");
+    expect(result.isExactMode).toBe(true);
+    expect(result.tokens).toEqual(["scwm", "packing"]);
+  });
+});
+
+// ===========================================================================
+// scoreObject — individual scoring rules
+// ===========================================================================
+
+describe("scoreObject", () => {
+  // -----------------------------------------------------------------------
+  // Exact match
+  // -----------------------------------------------------------------------
+  describe("exact match", () => {
+    it("gives 1000 points for exact name match (case-insensitive)", () => {
+      const idx = makeIndexed({ objectName: "I_PRODUCT" });
+      const s = score("I_PRODUCT", idx);
+      expect(s).toBeGreaterThanOrEqual(1000);
+    });
+
+    it("exact match is case-insensitive", () => {
+      const idx = makeIndexed({ objectName: "I_PRODUCT" });
+      const s1 = score("I_PRODUCT", idx);
+      const s2 = score("i_product", idx);
+      // Both should contain the 1000 exact-match bonus
+      // s2 won't be exact mode but the objectName compare is case-insensitive
+      expect(s1).toBeGreaterThanOrEqual(1000);
+      expect(s2).toBeGreaterThanOrEqual(1000);
+    });
+  });
+
+  // -----------------------------------------------------------------------
+  // Token-level matching
+  // -----------------------------------------------------------------------
+  describe("token matching", () => {
+    it("scores full token match at 10 points plus nameContains bonus", () => {
+      const idx = makeIndexed({ objectName: "CL_BCS_SEND_REQUEST" });
+      // query "send" → tokens ["send"], nameTokens ["bcs", "send", "request"]
+      // full match on "send" = 10
+      // nameContains: "CL_BCS_SEND_REQUEST" contains "SEND" → 8
+      const s = score("send", idx);
+      expect(s).toBe(10 + 8);
+    });
+
+    it("scores partial match (name contains query) at 3 points", () => {
+      const idx = makeIndexed({ objectName: "I_HANDLINGUNITHEADER" });
+      // nameTokens: ["handlingunitheader"], query token: ["handlingunit"]
+      // "handlingunitheader".includes("handlingunit") → partial = 3
+      // nameContains: "I_HANDLINGUNITHEADER".includes("I_HANDLINGUNIT") → 8
+      // namePrefix: starts with → 20
+      const s = score("I_HANDLINGUNIT", idx);
+      expect(s).toBe(3 + 8 + 20); // 31
+    });
+
+    it("allows reverse partial match when name token is >= 4 chars", () => {
+      // Query "purchaseorderitem", name token "order" (5 chars >= 4)
+      const idx = makeIndexed({
+        objectName: "CL_ORDER_SERVICE",
+      });
+      // nameTokens: ["order", "service"]
+      // "purchaseorderitem".includes("order") → true, "order".length=5 ≥ 4 → partial
+      const { tokens } = tokenizeQuery("purchaseorderitem");
+      const s = scoreObject(idx, tokens, "purchaseorderitem").score;
+      expect(s).toBeGreaterThan(0);
+    });
+
+    it("blocks reverse partial match when name token is < 4 chars", () => {
+      // Name token "it" (2 chars) should NOT match inside "handlingunit"
+      const idx = makeIndexed({
+        objectName: "EDO_IT_ALLEGATI_TYPE_TAB2",
+      });
+      const s = score("I_HANDLINGUNIT", idx);
+      expect(s).toBe(0);
+    });
+  });
+
+  // -----------------------------------------------------------------------
+  // Component matching
+  // -----------------------------------------------------------------------
+  describe("component matching", () => {
+    it("scores component token match", () => {
+      const idx = makeIndexed({
+        objectName: "SOME_OBJECT",
+        applicationComponent: "MM-PUR-PO",
+      });
+      // query "pur" → tokens ["pur"]
+      // componentTokens: ["mm", "pur", "po"] → "pur" === "pur" → 5 pts
+      const s = score("pur", idx);
+      expect(s).toBe(5);
+    });
+
+    it("blocks short component tokens from reverse matching", () => {
+      const idx = makeIndexed({
+        objectName: "SOME_OBJECT",
+        applicationComponent: "CA-GTF-CSC-EDO-IT",
+      });
+      // query "handlingunit" → tokens ["handlingunit"]
+      // "it" (2 chars) inside "handlingunit" → blocked (< 4 chars)
+      const s = score("handlingunit", idx);
+      expect(s).toBe(0);
+    });
+
+    it("allows long component tokens in reverse matching", () => {
+      const idx = makeIndexed({
+        objectName: "SOME_OBJECT",
+        applicationComponent: "LO-SHIP-DELIVERY",
+      });
+      // query "deliveryprocess" → tokens ["deliveryprocess"]
+      // componentTokens: ["lo", "ship", "delivery"]
+      // "deliveryprocess".includes("delivery") → true, "delivery".length=8 ≥ 4 → 5 pts
+      const s = score("deliveryprocess", idx);
+      expect(s).toBe(5);
+    });
+  });
+
+  // -----------------------------------------------------------------------
+  // nameContains / namePrefix
+  // -----------------------------------------------------------------------
+  describe("nameContains and namePrefix", () => {
+    it("gives 8 points when raw query is a substring of object name", () => {
+      const idx = makeIndexed({ objectName: "ZCL_I_PRODUCT_HANDLER" });
+      // "I_PRODUCT" is a substring of "ZCL_I_PRODUCT_HANDLER"
+      // nameContains = 8, namePrefix = 0 (doesn't start with "I_PRODUCT")
+      const s = score("I_PRODUCT", idx);
+      // Also token matches may contribute
+      expect(s).toBeGreaterThanOrEqual(8);
+    });
+
+    it("gives 20 extra points when object name starts with query", () => {
+      const idx = makeIndexed({ objectName: "I_PRODUCT" });
+      // "I_PROD" is a prefix of "I_PRODUCT"
+      // nameContains = 8, namePrefix = 20
+      const s = score("I_PROD", idx);
+      expect(s).toBeGreaterThanOrEqual(28); // 8 + 20
+    });
+
+    it("namePrefix is 0 when query is not a prefix", () => {
+      const idx = makeIndexed({ objectName: "XCL_PRODUCT" });
+      // "PRODUCT" is contained but not a prefix
+      const { tokens } = tokenizeQuery("PRODUCT");
+      const s = scoreObject(idx, tokens, "PRODUCT").score;
+      // nameContains = 8, namePrefix = 0
+      // Also "product" === "product" (full token match) = 10
+      expect(s).toBe(10 + 8); // no prefix bonus
+    });
+  });
+
+  // -----------------------------------------------------------------------
+  // Compound word matching (multi-token query vs concatenated name token)
+  // -----------------------------------------------------------------------
+  describe("compound word matching", () => {
+    it("gives compoundPrefix bonus when joined tokens prefix a name token", () => {
+      const idx = makeIndexed({ objectName: "I_HANDLINGUNITHEADER" });
+      // query "handling unit" → tokens ["handling", "unit"] → joined "handlingunit"
+      // nameToken "handlingunitheader".startsWith("handlingunit") → compoundPrefix = 25
+      // + partialTokenMatches = 2 × 3 = 6
+      const s = score("handling unit", idx);
+      expect(s).toBe(6 + 25); // 31
+    });
+
+    it("gives compoundContains bonus (order-independent) when all tokens in one name token", () => {
+      const idx = makeIndexed({ objectName: "I_HANDLINGUNITHEADER" });
+      // query "unit handling" (reversed) → joined "unithandling" → NOT a prefix
+      // but "handlingunitheader" contains both "unit" and "handling" → compoundContains = 15
+      const s = score("unit handling", idx);
+      expect(s).toBe(6 + 15); // 21
+    });
+
+    it("compoundPrefix beats compoundContains for correct word order", () => {
+      const idx = makeIndexed({ objectName: "I_HANDLINGUNITHEADER" });
+      const correctOrder = score("handling unit", idx);
+      const reversedOrder = score("unit handling", idx);
+      expect(correctOrder).toBeGreaterThan(reversedOrder);
+    });
+
+    it("no compound bonus for single-token queries", () => {
+      const idx = makeIndexed({ objectName: "I_HANDLINGUNITHEADER" });
+      // single token → compound check skipped (queryTokens.length === 1)
+      const s = score("handlingunit", idx);
+      // partial: "handlingunitheader".includes("handlingunit") → 3
+      // nameContains: "I_HANDLINGUNITHEADER".includes("HANDLINGUNIT") → 8
+      // namePrefix: no → 0
+      // no compound bonus
+      expect(s).toBe(3 + 8);
+    });
+
+    it("no compound bonus when tokens are in separate name tokens", () => {
+      const idx = makeIndexed({ objectName: "CL_HANDLING_UNIT_MANAGER" });
+      // nameTokens: ["handling", "unit", "manager"]
+      // "handling" and "unit" are separate name tokens → no single token contains both
+      // But they get full token matches (10 each) = 20
+      // nameContains: normalized "CL_HANDLING_UNIT_MANAGER".includes("HANDLING_UNIT") → YES (+8)
+      // compound: no single token has both → 0
+      const s = score("handling unit", idx);
+      expect(s).toBe(28);
+    });
+  });
+
+  // -----------------------------------------------------------------------
+  // Zero score for irrelevant objects
+  // -----------------------------------------------------------------------
+  describe("zero score for unrelated objects", () => {
+    it("scores near-zero for marginally related object", () => {
+      const idx = makeIndexed({
+        objectName: "CL_ABAP_UNIT_ASSERT",
+        applicationComponent: "BC-DWB",
+      });
+      // "unit" (4 chars ≥ 4) is inside "handlingunit" → partial match = 3
+      // This is technically valid but very low, dwarfed by real matches (31 pts)
+      const s = score("I_HANDLINGUNIT", idx);
+      expect(s).toBe(3);
+    });
+
+    it("scores 0 for completely unrelated object", () => {
+      const idx = makeIndexed({
+        objectName: "CL_ABAP_REGEX",
+        applicationComponent: "BC-DWB",
+      });
+      const s = score("I_HANDLINGUNIT", idx);
+      expect(s).toBe(0);
+    });
+
+    it("scores 0 for EDO Italian objects against HANDLINGUNIT query", () => {
+      const cases = [
+        "EDO_IT_ALLEGATI_TYPE_TAB2",
+        "EDO_IT_ALTRI_DATI_GESTION_TAB2",
+        "EDO_IT_ANAGRAFICA_TYPE2",
+        "EDO_IT_CEDENTE_PRESTATORE_TYP2",
+        "EDO_IT_CODICE_ARTICOLO_TYPE2",
+        "EDO_IT_CONTATTI_TYPE2",
+      ];
+      for (const name of cases) {
+        const idx = makeIndexed({
+          objectName: name,
+          applicationComponent: "CA-GTF-CSC-EDO-IT",
+        });
+        const s = score("I_HANDLINGUNIT", idx);
+        expect(s, `${name} should score 0`).toBe(0);
+      }
+    });
+  });
+});
+
+// ===========================================================================
+// Ranking integration tests — verify relative ordering
+// ===========================================================================
+
+describe("search ranking", () => {
+  /**
+   * Helper: given a query and a list of object names, returns them sorted
+   * by score descending (same logic as register-tools.ts).
+   */
+  function rank(
+    query: string,
+    objects: Array<Partial<SAPObject> & Pick<SAPObject, "objectName">>,
+  ): Array<{ name: string; score: number }> {
+    const { tokens } = tokenizeQuery(query);
+    return objects
+      .map((o) => {
+        const idx = makeIndexed(o);
+        return {
+          name: o.objectName,
+          score: scoreObject(idx, tokens, query).score,
+        };
+      })
+      .filter((r) => r.score > 0)
+      .sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        return a.name.localeCompare(b.name);
+      });
+  }
+
+  // -----------------------------------------------------------------------
+  // The original bug: I_HANDLINGUNIT must rank CDS views above EDO objects
+  // -----------------------------------------------------------------------
+  it("ranks I_HANDLINGUNIT* CDS views above unrelated EDO objects", () => {
+    const results = rank("I_HANDLINGUNIT", [
+      { objectName: "I_HANDLINGUNITHEADER", objectType: "DDLS", applicationComponent: "LO-HU-VDM" },
+      { objectName: "I_HANDLINGUNITITEM", objectType: "DDLS", applicationComponent: "LO-HU-VDM" },
+      { objectName: "EDO_IT_ALLEGATI_TYPE_TAB2", objectType: "TTYP", applicationComponent: "CA-GTF-CSC-EDO-IT" },
+      { objectName: "EDO_IT_ANAGRAFICA_TYPE2", objectType: "TABL", applicationComponent: "CA-GTF-CSC-EDO-IT" },
+      { objectName: "EDO_IT_CONTATTI_TYPE2", objectType: "TABL", applicationComponent: "CA-GTF-CSC-EDO-IT" },
+    ]);
+
+    // CDS views must appear, EDO objects must be filtered out (score 0)
+    expect(results.length).toBe(2);
+    expect(results[0].name).toBe("I_HANDLINGUNITHEADER");
+    expect(results[1].name).toBe("I_HANDLINGUNITITEM");
+  });
+
+  // -----------------------------------------------------------------------
+  // Natural language "handling unit" must rank CDS views first
+  // -----------------------------------------------------------------------
+  it("ranks I_HANDLINGUNIT* above separate-token objects for 'handling unit'", () => {
+    const results = rank("handling unit", [
+      { objectName: "I_HANDLINGUNITHEADER", objectType: "DDLS", applicationComponent: "LO-HU-VDM" },
+      { objectName: "I_HANDLINGUNITITEM", objectType: "DDLS", applicationComponent: "LO-HU-VDM" },
+      { objectName: "I_HANDLINGUNITTP", objectType: "DDLS", applicationComponent: "LO-HU-API" },
+      { objectName: "EDO_TR_TRANSPORT_HANDLING_UNIT", objectType: "TABL", applicationComponent: "CA-GTF-CSC-EDO-TR" },
+      { objectName: "ES_HANDLING_UNIT", objectType: "ENHS", applicationComponent: "LO-HU-BF-2CL" },
+      { objectName: "CL_ABAP_UNIT_ASSERT", objectType: "CLAS", applicationComponent: "BC-DWB-TOO-UT" },
+    ]);
+
+    // CDS views with compound word "handlingunit*" must rank above objects
+    // where "handling" and "unit" are separate tokens
+    expect(results[0].name).toBe("I_HANDLINGUNITHEADER");
+    expect(results[1].name).toBe("I_HANDLINGUNITITEM");
+    expect(results[2].name).toBe("I_HANDLINGUNITTP");
+
+    // Objects with separate tokens should still appear but lower
+    const separateTokenObjs = results.filter(
+      (r) => r.name === "EDO_TR_TRANSPORT_HANDLING_UNIT" || r.name === "ES_HANDLING_UNIT",
+    );
+    expect(separateTokenObjs.length).toBe(2);
+    expect(separateTokenObjs[0].score).toBeLessThan(results[0].score);
+  });
+
+  // -----------------------------------------------------------------------
+  // Exact match should always be first
+  // -----------------------------------------------------------------------
+  it("ranks exact match first", () => {
+    const results = rank("I_PRODUCT", [
+      { objectName: "I_PRODUCT" },
+      { objectName: "I_PRODUCTDESCRIPTION" },
+      { objectName: "I_PRODUCTGROUP" },
+      { objectName: "CL_PRODUCT_HELPER" },
+    ]);
+
+    expect(results[0].name).toBe("I_PRODUCT");
+    expect(results[0].score).toBeGreaterThanOrEqual(1000);
+  });
+
+  // -----------------------------------------------------------------------
+  // Prefix matches should rank above substring matches
+  // -----------------------------------------------------------------------
+  it("ranks prefix matches above non-prefix substring matches", () => {
+    const results = rank("I_PURCHASE", [
+      { objectName: "I_PURCHASEORDER" },
+      { objectName: "I_PURCHASEORDERITEM" },
+      { objectName: "ZCL_I_PURCHASE_HELPER" }, // contains but not prefix
+    ]);
+
+    // Both I_PURCHASE* should rank above the ZCL object
+    const prefixResults = results.filter((r) => r.name.startsWith("I_PURCHASE"));
+    const nonPrefixResults = results.filter((r) => !r.name.startsWith("I_PURCHASE"));
+
+    expect(prefixResults.length).toBe(2);
+    if (nonPrefixResults.length > 0) {
+      expect(prefixResults[0].score).toBeGreaterThan(nonPrefixResults[0].score);
+    }
+  });
+
+  // -----------------------------------------------------------------------
+  // Multi-token query should match objects with all tokens
+  // -----------------------------------------------------------------------
+  it("scores higher when more query tokens match", () => {
+    const results = rank("BCS SEND", [
+      { objectName: "CL_BCS_SEND_REQUEST" }, // matches both "bcs" and "send"
+      { objectName: "CL_BCS_MAIL" },         // matches only "bcs"
+      { objectName: "CL_SEND_HELPER" },      // matches only "send"
+    ]);
+
+    expect(results[0].name).toBe("CL_BCS_SEND_REQUEST");
+    expect(results[0].score).toBeGreaterThan(results[1].score);
+    expect(results[0].score).toBeGreaterThan(results[2].score);
+  });
+
+  // -----------------------------------------------------------------------
+  // Namespace query
+  // -----------------------------------------------------------------------
+  it("finds namespaced objects", () => {
+    const results = rank("/SCWM/PACKING", [
+      { objectName: "/SCWM/CL_WM_PACKING" },
+      { objectName: "CL_PACKING_HELPER" },
+    ]);
+
+    // The namespaced object should rank first because it matches both "scwm" and "packing"
+    expect(results[0].name).toBe("/SCWM/CL_WM_PACKING");
+  });
+
+  // -----------------------------------------------------------------------
+  // Natural language query
+  // -----------------------------------------------------------------------
+  it("handles natural language queries", () => {
+    const results = rank("purchase order", [
+      { objectName: "I_PURCHASEORDERITEM" },
+      { objectName: "CL_ABAP_UNIT_ASSERT" },
+    ]);
+
+    // "purchase" and "order" won't token-match I_PURCHASEORDERITEM directly
+    // because nameTokens = ["purchaseorderitem"] (single all-uppercase token)
+    // But "purchaseorderitem".includes("purchase") and .includes("order") → partial matches
+    expect(results.length).toBeGreaterThanOrEqual(1);
+    expect(results[0].name).toBe("I_PURCHASEORDERITEM");
+  });
+
+  // -----------------------------------------------------------------------
+  // Component-only matches should rank lower than name matches
+  // -----------------------------------------------------------------------
+  it("ranks name matches above component-only matches", () => {
+    const results = rank("PURCHASE", [
+      { objectName: "I_PURCHASEORDER", applicationComponent: "MM-PUR" },
+      { objectName: "SOME_RANDOM_OBJ", applicationComponent: "MM-PURCHASE" },
+    ]);
+
+    expect(results[0].name).toBe("I_PURCHASEORDER");
+  });
+
+  // -----------------------------------------------------------------------
+  // Short query tokens should not pollute results
+  // -----------------------------------------------------------------------
+  it("does not match 2-char name tokens against long query tokens", () => {
+    const results = rank("MATERIALMANAGEMENT", [
+      { objectName: "CL_MM_UTIL", applicationComponent: "MM" },
+      // "mm" (2 chars) should NOT match inside "materialmanagement"
+    ]);
+
+    // "mm" is 2 chars → blocked. No name/prefix match either.
+    expect(results.length).toBe(0);
+  });
+
+  it("does match 4+ char name tokens against long query tokens", () => {
+    const results = rank("MATERIALMANAGEMENT", [
+      { objectName: "CL_MATERIAL_SERVICE" },
+      // nameTokens: ["material", "service"]
+      // "materialmanagement".includes("material") → true, length 8 ≥ 4 → partial match
+    ]);
+
+    expect(results.length).toBe(1);
+    expect(results[0].name).toBe("CL_MATERIAL_SERVICE");
+  });
+});
+
+// ===========================================================================
+// commonPrefixLength
+// ===========================================================================
+
+describe("commonPrefixLength", () => {
+  it("returns full length for identical strings", () => {
+    expect(commonPrefixLength("abc", "abc")).toBe(3);
+  });
+
+  it("returns 0 for no common prefix", () => {
+    expect(commonPrefixLength("abc", "xyz")).toBe(0);
+  });
+
+  it("returns correct prefix length for partial overlap", () => {
+    expect(commonPrefixLength("physical", "phys")).toBe(4);
+    expect(commonPrefixLength("purchase", "purch")).toBe(5);
+  });
+
+  it("handles empty strings", () => {
+    expect(commonPrefixLength("", "abc")).toBe(0);
+    expect(commonPrefixLength("abc", "")).toBe(0);
+  });
+});
+
+// ===========================================================================
+// prefixSimilarity
+// ===========================================================================
+
+describe("prefixSimilarity", () => {
+  it("returns 1.0 when shorter token is exact prefix of longer", () => {
+    expect(prefixSimilarity("phys", "physical")).toBe(1.0); // 4/4
+  });
+
+  it("returns high similarity for SAP abbreviations", () => {
+    expect(prefixSimilarity("inv", "inventory")).toBe(1.0); // 3/3
+    expect(prefixSimilarity("invtry", "inventory")).toBe(0.5); // 3/6
+    expect(prefixSimilarity("purch", "purchase")).toBe(1.0); // 5/5 ("purch" is full prefix of "purchase")
+    expect(prefixSimilarity("doc", "document")).toBe(1.0); // 3/3
+  });
+
+  it("returns 0 when prefix is too short", () => {
+    expect(prefixSimilarity("it", "inventory")).toBe(0); // prefix "i" = 1 char < 3
+    expect(prefixSimilarity("ab", "abcd")).toBe(0); // prefix "ab" = 2 chars < 3
+  });
+
+  it("returns 0 for unrelated tokens", () => {
+    expect(prefixSimilarity("handling", "physical")).toBe(0);
+    expect(prefixSimilarity("order", "allegati")).toBe(0);
+  });
+});
+
+// ===========================================================================
+// Prefix matching — scoring integration tests
+// ===========================================================================
+
+describe("prefix matching scoring", () => {
+  it("scores prefix match at token level for 'physical' vs 'phys' name token", () => {
+    // EDO_HR_PHYSICAL_ATTRIBUTE has nameTokens including "physical"
+    // but I_PHYSINVTRYDOCHEADER has nameToken "physinvtrydocheader"
+    // For query "physical": prefixSimilarity("physical", "physinvtrydocheader")
+    // = commonPrefix "phys" = 4, min(8, 18) = 8, ratio = 4/8 = 0.5 → matches
+    const idx = makeIndexed({ objectName: "I_PHYSINVTRYDOCHEADER" });
+    const s = score("physical", idx);
+    expect(s).toBeGreaterThan(0);
+  });
+
+  it("does not give prefix match for unrelated short tokens", () => {
+    // "handling" vs "phys..." → no common prefix
+    const idx = makeIndexed({ objectName: "I_PHYSINVTRYDOCHEADER" });
+    const s = score("handling", idx);
+    expect(s).toBe(0);
+  });
+});
+
+// ===========================================================================
+// Compound prefix fuzzy matching — ranking integration tests
+// ===========================================================================
+
+describe("compound prefix fuzzy matching", () => {
+  /**
+   * Helper: given a query and a list of object names, returns them sorted
+   * by score descending (same logic as register-tools.ts).
+   */
+  function rank(
+    query: string,
+    objects: Array<Partial<SAPObject> & Pick<SAPObject, "objectName">>,
+  ): Array<{ name: string; score: number }> {
+    const { tokens } = tokenizeQuery(query);
+    return objects
+      .map((o) => {
+        const idx = makeIndexed(o);
+        return {
+          name: o.objectName,
+          score: scoreObject(idx, tokens, query).score,
+        };
+      })
+      .filter((r) => r.score > 0)
+      .sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        return a.name.localeCompare(b.name);
+      });
+  }
+
+  it("ranks PHYSINVTRY* objects for 'physical inventory' query via prefix matching", () => {
+    const results = rank("physical inventory", [
+      { objectName: "I_PHYSICALINVENTORYDOCUMENTTP" },
+      { objectName: "I_PHYSINVTRYDOCHEADER" },
+      { objectName: "I_PHYSINVTRYDOCITEM" },
+      { objectName: "I_PHYSINVTRYCOUNTSTS" },
+      { objectName: "EDO_HR_PHYSICAL_ATTRIBUTE", applicationComponent: "CA-GTF-CSC-EDO-HR" },
+    ]);
+
+    // PHYSICALINVENTORY* should still rank first (compound match)
+    expect(results[0].name).toBe("I_PHYSICALINVENTORYDOCUMENTTP");
+
+    // PHYSINVTRY* objects must now appear (they were previously score 0)
+    const physInvResults = results.filter(r => r.name.startsWith("I_PHYSINVTRY"));
+    expect(physInvResults.length).toBe(3);
+    expect(physInvResults[0].score).toBeGreaterThan(0);
+  });
+
+  it("ranks abbreviated purchase order objects for 'purchase order' query", () => {
+    const results = rank("purchase order", [
+      { objectName: "I_PURCHASEORDERITEM" },
+      { objectName: "I_PURCHORDSCHEDGLINE" },
+      { objectName: "CL_SOME_UNRELATED_THING" },
+    ]);
+
+    // I_PURCHASEORDERITEM ranks first (compound match)
+    expect(results[0].name).toBe("I_PURCHASEORDERITEM");
+    // I_PURCHORDSCHEDGLINE should now appear via compoundPrefixFuzzy
+    expect(results.some(r => r.name === "I_PURCHORDSCHEDGLINE")).toBe(true);
+  });
+
+  it("still scores 0 for EDO objects against HANDLINGUNIT query with prefix matching", () => {
+    const edoCases = [
+      "EDO_IT_ALLEGATI_TYPE_TAB2",
+      "EDO_IT_ALTRI_DATI_GESTION_TAB2",
+    ];
+    for (const name of edoCases) {
+      const idx = makeIndexed({
+        objectName: name,
+        applicationComponent: "CA-GTF-CSC-EDO-IT",
+      });
+      const s = score("I_HANDLINGUNIT", idx);
+      expect(s, `${name} should still score 0`).toBe(0);
+    }
+  });
+
+  it("compound prefix fuzzy is weaker than compound prefix", () => {
+    const idxFull = makeIndexed({ objectName: "I_PHYSICALINVENTORYDOCUMENTTP" });
+    const idxAbbrev = makeIndexed({ objectName: "I_PHYSINVTRYDOCHEADER" });
+
+    const scoreFull = score("physical inventory", idxFull);
+    const scoreAbbrev = score("physical inventory", idxAbbrev);
+
+    expect(scoreFull).toBeGreaterThan(scoreAbbrev);
+  });
+});
+
+// ===========================================================================
+// Multi-token coverage penalty
+// ===========================================================================
+
+describe("multi-token coverage proportion", () => {
+  it("does not penalize when all query tokens match", () => {
+    const idx = makeIndexed({ objectName: "I_PURCHASEORDERITEM" });
+    const s = score("purchase order", idx);
+    // compound match → full coverage → no penalty
+    expect(s).toBe(31);
+  });
+
+  it("penalizes single-token match on 2-token query", () => {
+    const idx = makeIndexed({ objectName: "CL_ORDER_HELPER" });
+    const fullScore = score("order", idx);   // single-token query → no penalty
+    const penalized = score("purchase order", idx); // "purchase" doesn't match
+    // "order" full token match (10) + nameContains "ORDER" in "CL_ORDER_HELPER" (8) = 18
+    expect(fullScore).toBe(18);
+    // penalized = round(10 × 0.5) = 5
+    expect(penalized).toBe(5);
+    expect(penalized).toBeLessThan(fullScore);
+  });
+
+  it("does not penalize single-token queries", () => {
+    const idx = makeIndexed({ objectName: "CL_ORDER_HELPER" });
+    const s = score("order", idx);
+    // full token match (10) + nameContains (8) = 18
+    expect(s).toBe(18); // unchanged
+  });
+
+  it("compounds correctly imply full coverage", () => {
+    const idx = makeIndexed({ objectName: "I_HANDLINGUNITHEADER" });
+    const s = score("handling unit", idx);
+    expect(s).toBe(31); // compoundPrefix → no penalty
+  });
+
+  it("compoundPrefixFuzzy credits only 2 tokens, not all", () => {
+    const idx = makeIndexed({ objectName: "I_PURORDSCHEDGLINE" });
+
+    // 2-token: fuzzy matches both → full coverage → no penalty
+    const s2 = score("purchase order", idx);
+    expect(s2).toBe(12);
+
+    // 3-token with irrelevant third word: fuzzy credits 2, "banana" = 0 → coverage 2/3
+    const s3 = score("purchase order banana", idx);
+    // round(12 × 2/3) = 8
+    expect(s3).toBe(8);
+    expect(s3).toBeLessThan(s2);
+  });
+
+  it("penalizes harder with 3-token query and 1 match", () => {
+    const idx = makeIndexed({ objectName: "CL_ORDER_HELPER" });
+    const s2 = score("purchase order", idx);     // 1/2 match → round(10 × 0.5) = 5
+    const s3 = score("purchase order item", idx); // 1/3 match → round(10 × 0.33) = 3
+    expect(s2).toBe(5);
+    expect(s3).toBe(3);
+    expect(s3).toBeLessThan(s2); // more tokens unmatched → more penalty
+  });
+
+  it("'handling unit' scores much higher than 'handling unit banana'", () => {
+    const idx = makeIndexed({ objectName: "I_HANDLINGUNITHEADER" });
+    const s2 = score("handling unit", idx);   // 2/2 match → 31 (compoundPrefix, no penalty)
+    const s3 = score("handling unit banana", idx);
+    // "banana" prevents compoundPrefix (all 3 joined ≠ prefix), falls back to
+    // compoundPrefixFuzzy (12) + 2 partial matches (6) = 18 raw
+    // coverage 2/3 → round(18 × 2/3) = 12
+    expect(s2).toBe(31);
+    expect(s3).toBe(12);
+    // Significant drop: the unmatched token both reduces the compound bonus
+    // AND applies the proportional coverage penalty
+    expect(s3).toBeLessThan(s2 * 2 / 3);
+  });
+});
+
+// ===========================================================================
+// Abbreviation matching — scoring integration tests
+// ===========================================================================
+
+describe("abbreviation matching scoring", () => {
+  /** Score helper that includes abbreviation expansion */
+  function scoreWithAbbr(query: string, indexed: IndexedObject): number {
+    const { tokens } = tokenizeQuery(query);
+    const expanded = expandQueryTokens(tokens);
+    return scoreObject(indexed, tokens, query, expanded).score;
+  }
+
+  // -----------------------------------------------------------------------
+  // Single-token abbreviation matching
+  // -----------------------------------------------------------------------
+  describe("single-token abbreviation matching", () => {
+    it("'account' matches objects with ACCT in name", () => {
+      const idx = makeIndexed({ objectName: "I_ACCTGDOCITM" });
+      const s = scoreWithAbbr("account", idx);
+      // "account" → alternatives include "acct", "accnt"
+      // nameToken "acctgdocitm" contains "acct" (len 4 >= 3) → abbreviationMatch
+      expect(s).toBeGreaterThan(0);
+    });
+
+    it("'billing' matches objects with BILLG in name", () => {
+      const idx = makeIndexed({ objectName: "CL_BILLG_PROCESSOR" });
+      const s = scoreWithAbbr("billing", idx);
+      expect(s).toBeGreaterThan(0);
+    });
+
+    it("'supplier' matches objects with SUPLR in name", () => {
+      const idx = makeIndexed({ objectName: "I_SUPLRITM" });
+      const s = scoreWithAbbr("supplier", idx);
+      expect(s).toBeGreaterThan(0);
+    });
+
+    it("'material' matches objects with MATL in name", () => {
+      const idx = makeIndexed({ objectName: "I_MATLGRP" });
+      const s = scoreWithAbbr("material", idx);
+      expect(s).toBeGreaterThan(0);
+    });
+  });
+
+  // -----------------------------------------------------------------------
+  // Direct match should score higher than abbreviation match
+  // -----------------------------------------------------------------------
+  describe("direct match > abbreviation match", () => {
+    it("CL_BILLING_SERVICE scores higher than CL_BILLG_SERVICE for 'billing'", () => {
+      const idxDirect = makeIndexed({ objectName: "CL_BILLING_SERVICE" });
+      const idxAbbr = makeIndexed({ objectName: "CL_BILLG_SERVICE" });
+      const sDirect = scoreWithAbbr("billing", idxDirect);
+      const sAbbr = scoreWithAbbr("billing", idxAbbr);
+      expect(sDirect).toBeGreaterThan(sAbbr);
+    });
+  });
+
+  // -----------------------------------------------------------------------
+  // Backward compatibility: scoreObject without expandedTokens
+  // -----------------------------------------------------------------------
+  describe("backward compatibility", () => {
+    it("scoreObject without expandedTokens gives identical scores to before", () => {
+      const idx = makeIndexed({ objectName: "I_PURCHASEORDERITEM" });
+      const { tokens } = tokenizeQuery("purchase order");
+      const scoreWithout = scoreObject(idx, tokens, "purchase order").score;
+      const scoreWith = scoreObject(idx, tokens, "purchase order", undefined).score;
+      expect(scoreWithout).toBe(scoreWith);
+    });
+  });
+
+  // -----------------------------------------------------------------------
+  // Compound abbreviation matching
+  // -----------------------------------------------------------------------
+  describe("compound abbreviation matching", () => {
+    it("'purchase order' matches objects with PO prefix via compound abbreviation", () => {
+      const idx = makeIndexed({ objectName: "I_POITEM" });
+      const s = scoreWithAbbr("purchase order", idx);
+      // "purchase order" → compound abbreviation "po"
+      // nameToken "poitem".startsWith("po") → compoundAbbreviation = 18
+      expect(s).toBeGreaterThan(0);
+    });
+
+    it("compound abbreviation scores less than compound prefix (full words)", () => {
+      const idxFull = makeIndexed({ objectName: "I_PURCHASEORDERITEM" });
+      const idxAbbr = makeIndexed({ objectName: "I_POITEM" });
+      const sFull = scoreWithAbbr("purchase order", idxFull);
+      const sAbbr = scoreWithAbbr("purchase order", idxAbbr);
+      expect(sFull).toBeGreaterThan(sAbbr);
+    });
+  });
+
+  // -----------------------------------------------------------------------
+  // Cross-alternative compound
+  // -----------------------------------------------------------------------
+  describe("cross-alternative compound", () => {
+    it("'billing document' matches objects with BILLGDOC via cross-alternative", () => {
+      const idx = makeIndexed({ objectName: "I_BILLGDOCITM" });
+      const s = scoreWithAbbr("billing document", idx);
+      // "billing" → alt "billg", "document" → alt "doc"
+      // cross-alt: "billg" + "doc" = "billgdoc", nameToken "billgdocitm".startsWith("billgdoc") → yes
+      expect(s).toBeGreaterThan(0);
+    });
+  });
+});

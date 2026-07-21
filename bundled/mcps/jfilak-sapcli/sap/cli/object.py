@@ -1,0 +1,504 @@
+"""ADT Object CLI templates"""
+
+import sys
+import os
+import shlex
+import subprocess
+import tempfile
+import collections
+
+import sap.cli.core
+from sap.cli.core import InvalidCommandLineError
+import sap.errors
+
+import sap.adt
+import sap.adt.checks
+import sap.adt.errors
+import sap.adt.wb
+import sap.adt.whereused
+import sap.cli.wb
+from sap.config import config_get
+
+
+_NAME_INDEX = 0
+_SUFFIX_INDEX = 1
+
+
+def object_name_from_source_file(filesystem_path):
+    """Splits the given file system path into object name and suffix.
+
+       It is expected that the object name makes the file name prefix up to
+       the first dot.
+
+       Example:
+         ./src/object.abap
+                      ^^^^--- suffix (the 2nd return value)
+               ^^^^^^-------- object name (the 1st return value)
+    """
+
+    basename = os.path.basename(filesystem_path)
+    parts = basename.split('.', 1)
+
+    if len(parts) <= 1 or not parts[_NAME_INDEX] or not parts[_SUFFIX_INDEX]:
+        raise InvalidCommandLineError(f'"{basename}" does not match the pattern NAME.SUFFIX')
+
+    return parts
+
+
+def edit_text_in_editor(content, suffix='.abap'):
+    """Writes content to a temporary file, opens it in the user's editor,
+       and returns the (possibly modified) content after the editor exits.
+
+       The editor is selected from the environment variables in the order
+       SAPCLI_EDITOR, EDITOR, VISUAL and falls back to 'vi'.
+    """
+
+    editor = (os.environ.get('SAPCLI_EDITOR')
+              or os.environ.get('EDITOR')
+              or os.environ.get('VISUAL')
+              or 'vi')
+
+    handle, path = tempfile.mkstemp(suffix=suffix)
+    try:
+        with os.fdopen(handle, 'w', encoding='utf8') as tmp:
+            tmp.write(content)
+
+        try:
+            result = subprocess.run(shlex.split(editor) + [path], check=False)
+        except (ValueError, OSError) as ex:
+            raise sap.errors.SAPCliError(
+                f'Failed to launch the editor "{editor}": {ex}') from ex
+
+        if result.returncode != 0:
+            raise sap.errors.SAPCliError(
+                f'The editor "{editor}" exited with non-zero status {result.returncode}')
+
+        with open(path, 'r', encoding='utf8') as tmp:
+            return tmp.read()
+    finally:
+        os.unlink(path)
+
+
+def write_args_to_objects(command, connection, args, metadata=None):
+    """Converts parameters of the action 'write object' into a iteration of
+       objects with the text lines content
+    """
+
+    name = args.name
+    text_lines = None
+
+    if name == '-':
+        for filepath in args.source:
+            if filepath == '-':
+                raise InvalidCommandLineError('Source file cannot be - when Object name is - too')
+
+            obj = command.instance_from_file_path(connection, filepath, args, metadata=metadata)
+
+            with open(filepath, 'r', encoding='utf8') as filesrc:
+                text_lines = filesrc.readlines()
+
+            yield (obj, text_lines)
+
+    elif len(args.source) == 1:
+        if args.source[0] == '-':
+            text_lines = sys.stdin.readlines()
+        else:
+            with open(args.source[0], 'r', encoding='utf8') as filesrc:
+                text_lines = filesrc.readlines()
+
+        yield (command.instance(connection, args.name, args, metadata=metadata), text_lines)
+
+    else:
+        raise InvalidCommandLineError('Source file can be a list only when Object name is -')
+
+
+def printout_activation_stats(console, stats):
+    """Prints out activation statistics"""
+
+    console.printout('Warnings:', stats.warnings)
+    console.printout('Errors:', stats.errors)
+
+
+def printout_adt_object(console, prefix, obj):
+    """Prints out ADT object in identifiable way"""
+
+    console.printout(f'{prefix}{obj.objtype.code} {obj.name}')
+
+
+def activate_object_list(activator, object_enumerable, count, console):
+    """Starts object activation and handles results"""
+
+    try:
+        stats = activator.activate_sequentially(object_enumerable, count)
+    except sap.cli.wb.StopObjectActivation as ex:
+        console.printout('Activation has stopped')
+
+        printout_activation_stats(console, ex.stats)
+
+        if ex.stats.active_objects:
+            console.printout('Active objects:')
+            for obj in ex.stats.active_objects:
+                printout_adt_object(console, '  ', obj)
+
+        return 1
+
+    console.printout('Activation has finished')
+    printout_activation_stats(console, stats)
+
+    if stats.inactive_objects:
+        console.printout('Inactive objects:')
+        for obj in stats.inactive_objects:
+            printout_adt_object(console, '  ', obj)
+
+        return 1
+
+    return 1 if stats.errors > 0 else 0
+
+
+class CommandGroupObjectTemplate(sap.cli.core.CommandGroup):
+    """Template Class converting command line parameters to ADT Object methods
+       calls.
+    """
+
+    def instance(self, connection, name, args, metadata=None):
+        """Returns new instance of the ADT Object proxy class"""
+
+        raise NotImplementedError()
+
+    def instance_from_file_path(self, connection, filepath, args, metadata=None):
+        """Returns new instance of the ADT Object proxy class
+           where the object name should be deduced from
+           the given file path.
+        """
+
+        name, _ = object_name_from_source_file(filepath)
+        return self.instance(connection, name, args, metadata=metadata)
+
+    def build_new_metadata(self, connection, args):
+        """Creates an instance of the ADT Object Metadata class for a new object"""
+
+        raise NotImplementedError()
+
+    def define_create(self, commands):
+        """Declares the Create command with its parameters and returns
+           the definition.
+
+           Notice, that this command does not declare the parameter package
+           which should be create by descendants if necessary.
+        """
+
+        create_cmd = commands.add_command(self.create_object, name='create')
+        create_cmd.append_argument('name')
+        create_cmd.append_argument('description')
+        create_cmd.declare_corrnr()
+
+        return create_cmd
+
+    def define_read(self, commands):
+        """Declares the Read command with its parameters and returns
+           the definition
+        """
+
+        read_cmd = commands.add_command(self.read_object_text, name='read')
+        read_cmd.append_argument('name')
+
+        return read_cmd
+
+    def define_write(self, commands):
+        """Declares the Write command with its parameters and returns
+           the definition.
+        """
+
+        write_cmd = commands.add_command(self.write_object_text, name='write')
+        write_cmd.append_argument('name',
+                                  help='an object name or - for getting it from the source file name')
+        write_cmd.append_argument('source', nargs='+',
+                                  help='a path or - for reading stdin; multiple allowed only when name is -')
+        write_cmd.append_argument('-a', '--activate', action='store_true',
+                                  default=False, help='activate after write')
+        write_cmd.append_argument('--ignore-errors', action='store_true',
+                                  default=False, help='Do not stop activation in case of errors')
+        write_cmd.append_argument('--warning-errors', action='store_true',
+                                  default=False, help='Treat Activation warnings as errors')
+        write_cmd.append_argument('--check', dest='check', action='store_true', default=None,
+                                  help='Run abapCheckRun before writing source code'
+                                       ' (overrides SAPCLI_CHECK_BEFORE_SAVE)')
+        write_cmd.append_argument('--no-check', dest='check', action='store_false',
+                                  help='Skip abapCheckRun before writing source code'
+                                       ' (overrides SAPCLI_CHECK_BEFORE_SAVE)')
+        write_cmd.declare_corrnr()
+
+        return write_cmd
+
+    def define_activate(self, commands):
+        """Declares the Activate command with its parameters and returns the
+           definition.
+
+           Notice that it allows multiple names on input.
+        """
+
+        activate_cmd = commands.add_command(self.activate_objects, name='activate')
+        activate_cmd.append_argument('name', nargs='+')
+        activate_cmd.append_argument('--ignore-errors', action='store_true',
+                                     default=False, help='Do not stop activation in case of errors')
+        activate_cmd.append_argument('--warning-errors', action='store_true',
+                                     default=False, help='Treat Activation warnings as errors')
+
+        return activate_cmd
+
+    def define_delete(self, commands):
+        """Declares the Delete command with its parameters and returns
+           the definition.
+        """
+
+        delete_cmd = commands.add_command(self.delete_object, name='delete')
+        delete_cmd.append_argument('name', nargs='+')
+        delete_cmd.declare_corrnr()
+
+        return delete_cmd
+
+    def define_whereused(self, commands):
+        """Declares the Where-Used command with its parameters and returns
+           the definition.
+        """
+
+        whereused_cmd = commands.add_command(self.whereused_object, name='whereused')
+        whereused_cmd.append_argument('name')
+
+        return whereused_cmd
+
+    def define_edit(self, commands):
+        """Declares the Edit command with its parameters and returns
+           the definition.
+        """
+
+        edit_cmd = commands.add_command(self.edit_object, name='edit')
+        edit_cmd.append_argument('name')
+        edit_cmd.append_argument('-a', '--activate', action='store_true',
+                                 default=False, help='activate after edit')
+        edit_cmd.append_argument('--ignore-errors', action='store_true',
+                                 default=False, help='Do not stop activation in case of errors')
+        edit_cmd.append_argument('--warning-errors', action='store_true',
+                                 default=False, help='Treat Activation warnings as errors')
+        edit_cmd.append_argument('--check', dest='check', action='store_true', default=None,
+                                 help='Run abapCheckRun before writing source code'
+                                      ' (overrides SAPCLI_CHECK_BEFORE_SAVE)')
+        edit_cmd.append_argument('--no-check', dest='check', action='store_false',
+                                 help='Skip abapCheckRun before writing source code'
+                                      ' (overrides SAPCLI_CHECK_BEFORE_SAVE)')
+        edit_cmd.declare_corrnr()
+
+        return edit_cmd
+
+    def define(self):
+        """Defines the commands Create, Read, Write, Activate, and Delete
+           and returns the command list
+        """
+
+        cls = self.__class__
+
+        if hasattr(cls, '_instance'):
+            return None
+
+        # pylint: disable=protected-access
+        cls._instance = self
+
+        commands = cls.get_commands()
+
+        self.define_create(commands)
+        self.define_read(commands)
+        self.define_write(commands)
+        self.define_activate(commands)
+        self.define_delete(commands)
+        self.define_whereused(commands)
+        self.define_edit(commands)
+
+        return commands
+
+    def build_new_object(self, connection, args, metadata):
+        """Creates an instance of the ADT Object proxy class for a new object"""
+
+        return self.instance(connection, args.name, args, metadata=metadata)
+
+    def create_object(self, connection, args):
+        """Creates the given object."""
+
+        metadata = self.build_new_metadata(connection, args)
+        obj = self.build_new_object(connection, args, metadata)
+
+        obj.description = args.description
+
+        obj.create(corrnr=args.corrnr)
+
+    def read_object_text(self, connection, args):
+        """Retrieves the request command prints it out based on command line
+           configuration.
+        """
+
+        obj = self.instance(connection, args.name, args)
+        args.console_factory().printout(obj.text)
+
+    def delete_object(self, connection, args):
+        """Deletes the given objects."""
+
+        console = args.console_factory()
+
+        for name in args.name:
+            obj = self.instance(connection, name, args)
+
+            console.printout(f'Deleting {name} ...')
+            obj.delete(corrnr=args.corrnr)
+            console.printout(f'Deleted {name}')
+
+    def whereused_object(self, connection, args):
+        """Finds objects that reference the given object."""
+
+        console = args.console_factory()
+
+        obj = self.instance(connection, args.name, args)
+        result = sap.adt.whereused.where_used(connection, obj.full_adt_uri)
+
+        for ref_obj in result.referenced_objects:
+            adt_obj = ref_obj.adt_object
+            typ = adt_obj.typ or ''
+            console.printout(f'  {typ} {adt_obj.name}')
+
+    def build_activator(self, args):
+        """For children to customize"""
+
+        activator = sap.cli.wb.ObjectActivationWorker()
+
+        activator.continue_on_errors = args.ignore_errors
+        activator.warnings_as_errors = args.warning_errors
+
+        return activator
+
+    def _save_object_text(self, obj, code, check_before_save, corrnr=None, editor=None):
+        """Runs the optional pre-check and writes the source code, with a
+           post-failure recheck to surface a readable diagnostic instead of
+           the cryptic ADT save error.
+
+           If an already open editor is given, the source is written through it
+           so the PUT happens while the caller's lock is still held. Otherwise
+           the object is locked and unlocked implicitly around the write.
+        """
+
+        if check_before_save:
+            result = sap.adt.checks.run_object_check(obj, code)
+            if result.has_errors:
+                raise sap.adt.checks.ObjectCheckFindings(obj, result)
+
+        try:
+            if editor is not None:
+                editor.write(code)
+            else:
+                with obj.open_editor(corrnr=corrnr) as new_editor:
+                    new_editor.write(code)
+        except sap.adt.errors.ExceptionResourceSaveFailure as save_exc:
+            # The PUT to source/main rejected the source. Re-run abapCheckRun
+            # on the same source to surface a readable diagnostic instead of
+            # the cryptic ADT save error. If the check has nothing to say,
+            # the original failure carries the real reason (lock, missing
+            # inactive version, etc.) - re-raise it.
+            result = sap.adt.checks.run_object_check(obj, code)
+            if result.has_errors:
+                raise sap.adt.checks.ObjectCheckFindings(obj, result) from save_exc
+            raise
+
+    def write_object_text(self, connection, args):
+        """Changes source code of the given program include"""
+
+        toactivate = collections.OrderedDict()
+
+        console = args.console_factory()
+        console.printout('Writing:')
+
+        flag = getattr(args, 'check', None)
+        check_before_save = flag if flag is not None else config_get('check_before_save', False)
+
+        for obj, text in write_args_to_objects(self, connection, args):
+            console.printout('*', str(obj))
+            code = ''.join(text)
+
+            self._save_object_text(obj, code, check_before_save, args.corrnr)
+
+            toactivate[obj.name] = obj
+
+        if not args.activate:
+            return 0
+
+        activated_items = toactivate.items()
+        return activate_object_list(self.build_activator(args), activated_items, len(activated_items), console)
+
+    def edit_object(self, connection, args):
+        """Fetches the object's source, opens it in the user's editor and
+           writes it back if it was modified.
+        """
+
+        console = args.console_factory()
+
+        obj = self.instance(connection, args.name, args)
+
+        flag = getattr(args, 'check', None)
+        check_before_save = flag if flag is not None else config_get('check_before_save', False)
+
+        # Lock the object before reading its source and keep the lock held
+        # until the source is written back. This prevents a lost update where
+        # somebody else changes the object between the read and the write.
+        with obj.open_editor(corrnr=args.corrnr) as editor:
+            original = obj.text
+            edited = edit_text_in_editor(original)
+
+            if edited == original:
+                console.printout(f'No changes to {args.name}')
+                return 0
+
+            # Re-check the source under the lock right before writing. If it no
+            # longer matches what was opened in the editor, abort instead of
+            # silently overwriting the newer version.
+            if obj.text != original:
+                raise sap.errors.SAPCliError(
+                    f'Cannot save {args.name}: its source changed on the server '
+                    f'while it was being edited')
+
+            console.printout('Writing:', str(obj))
+            self._save_object_text(obj, edited, check_before_save, editor=editor)
+
+        if not args.activate:
+            return 0
+
+        return activate_object_list(self.build_activator(args), [(obj.name, obj)], 1, console)
+
+    def activate_objects(self, connection, args):
+        """Actives the given object."""
+
+        console = args.console_factory()
+        activated_items = ((name, self.instance(connection, name, args)) for name in args.name)
+        return activate_object_list(self.build_activator(args), activated_items, len(args.name), console)
+
+
+# pylint: disable=abstract-method
+class CommandGroupObjectMaster(CommandGroupObjectTemplate):
+    """Commands for objects that belongs to a package.
+
+       The class CommandGroupObjectTemplate defines the command create without the
+       parameter packages because there are objects that belongs to a container
+       object (i.e. Function Module).
+    """
+
+    def build_new_metadata(self, connection, args):
+        """Creates an instance of the ADT Object Metadata class for a new object"""
+
+        return sap.adt.ADTCoreData(language='EN', master_language='EN',
+                                   package=args.package.upper(), responsible=connection.user.upper())
+
+    def define_create(self, commands):
+        """Calls the super's define_create and inserts the parameter package
+           right behind the parameter description
+        """
+
+        create_cmd = super().define_create(commands)
+
+        create_cmd.insert_argument(2, 'package')
+
+        return create_cmd

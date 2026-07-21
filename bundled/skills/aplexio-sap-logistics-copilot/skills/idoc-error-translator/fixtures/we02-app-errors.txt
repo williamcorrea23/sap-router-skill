@@ -1,0 +1,47 @@
+WE02 — IDoc Display
+
+Selection: Direction = Inbound, Date = 2026-04-18, Status = 51
+
+IDoc Number       Direction  Status  Basic Type     Message Type  Partner No.    Port            Application  Message ID
+0000000099001547  Inbound    51      DELVRY07       DESADV        SUPP_DELTA     A000000017      V2           M7
+0000000099001548  Inbound    51      DELVRY07       DESADV        SUPP_DELTA     A000000017      V2           M7
+0000000099001549  Inbound    51      ORDERS05       ORDERS        CUST_ECHO      A000000017      VA           06
+0000000099001550  Inbound    51      INVOIC02       INVOIC        VEND_FOXTROT   A000000017      MR           M8
+0000000099001551  Inbound    51      INVOIC02       INVOIC        VEND_FOXTROT   A000000017      MR           M8
+
+Status record detail (status 51):
+
+IDoc 0000000099001547
+  Status: 51  Application document not posted
+  Message-ID: M7 043
+  Message text: Purchase order 4500728341 item 00010 does not exist or is fully delivered
+  Application: MM_IN_INB_DELIVERY
+  Module: IDOC_INPUT_DESADV1
+
+IDoc 0000000099001548
+  Status: 51  Application document not posted
+  Message-ID: M7 043
+  Message text: Purchase order 4500728341 item 00020 does not exist or is fully delivered
+  Module: IDOC_INPUT_DESADV1
+
+IDoc 0000000099001549
+  Status: 51  Application document not posted
+  Message-ID: VA 067
+  Message text: Material KLR-0042-TNT not found in plant BR01
+  Application: SALES_ORDER
+  Module: IDOC_INPUT_ORDERS
+
+IDoc 0000000099001550
+  Status: 51  Application document not posted
+  Message-ID: M8 521
+  Message text: No goods receipt posted for purchase order 4500731120 item 00030; GR-based IV is active
+  Application: LIV
+  Module: IDOC_INPUT_INVOIC_MRM
+
+IDoc 0000000099001551
+  Status: 51  Application document not posted
+  Message-ID: M8 083
+  Message text: Price variance 12.40% exceeds tolerance limit PP (upper limit 5.00%)
+  Module: IDOC_INPUT_INVOIC_MRM
+
+Additional context (from user): "Delta and Echo are new suppliers onboarded last week. Foxtrot is our main DE vendor."

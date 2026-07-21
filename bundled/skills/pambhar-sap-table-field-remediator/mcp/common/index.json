@@ -1,0 +1,10344 @@
+{
+  "meta": {
+    "built_from": "common/items/*.md + common/kb-index-catalog.yaml",
+    "method": "sap-note-join (primary) + object-name-scan (secondary, labeled)",
+    "chunk_count": 429,
+    "catalog_object_count": 39
+  },
+  "items": {
+    "SI-10.1": {
+      "title": "10.1 S4TWL - DATA STRUCTURE CHANGES IN ASSET ACCOUNTING",
+      "pages": "270-272",
+      "sap_notes": [
+        "2270387",
+        "2297425",
+        "2383115"
+      ],
+      "components": [
+        "FI-AA"
+      ]
+    },
+    "SI-10.2": {
+      "title": "10.2 S4TWL - ASSET ACCOUNTING",
+      "pages": "272-293",
+      "sap_notes": [
+        "1069166",
+        "2220152",
+        "2255555",
+        "2257555",
+        "2270387",
+        "2270388",
+        "2270391",
+        "2270392",
+        "2297425",
+        "2332030",
+        "2344012",
+        "2383115",
+        "2403248",
+        "2419194",
+        "2913340"
+      ],
+      "components": [
+        "FI-AA",
+        "FIN-MIG-AA"
+      ]
+    },
+    "SI-10.3": {
+      "title": "10.3 S4TWL - INTEGRATION TO LEASE ACCOUNTING ENGINE (LAE)",
+      "pages": "293-294",
+      "sap_notes": [
+        "2211665",
+        "2270391",
+        "2328754"
+      ],
+      "components": [
+        "CRM-LAM",
+        "FI-LA"
+      ]
+    },
+    "SI-10.4": {
+      "title": "10.4 S4TWL - Asset management transfers  in Joint Venture Acccounting (JVA)",
+      "pages": "294-296",
+      "sap_notes": [
+        "2137314",
+        "2270392"
+      ],
+      "components": [
+        "FI-AA"
+      ]
+    },
+    "SI-10.5": {
+      "title": "10.5 S4TWL - SELECTED BUSINESS FUNCTIONS IN FINANCIAL ACCOUNTING (FI-GL AND FI-AA)",
+      "pages": "296-299",
+      "sap_notes": [
+        "1852519",
+        "2257555",
+        "2270414",
+        "2375643"
+      ],
+      "components": [
+        "FI-AA"
+      ]
+    },
+    "SI-10.6": {
+      "title": "10.6 S4TWL - Check for duplicate internal asset line items (FAAT_DOC_IT)",
+      "pages": "299-299",
+      "sap_notes": [
+        "2948964",
+        "2977180"
+      ],
+      "components": [
+        "FI-AA"
+      ]
+    },
+    "SI-10.7": {
+      "title": "10.7 S4TWL - Group Assets",
+      "pages": "299-301",
+      "sap_notes": [
+        "2269324",
+        "3014869",
+        "3532580"
+      ],
+      "components": [
+        "FI-AA",
+        "CA-JVA"
+      ]
+    },
+    "SI-11.1": {
+      "title": "11.1 S4TWL - Electronic Payment Integration for China",
+      "pages": "301-302",
+      "sap_notes": [
+        "3087756"
+      ],
+      "components": [
+        "FI-LOC-EPI-CN"
+      ]
+    },
+    "SI-11.2": {
+      "title": "11.2 S4TWL - CASH MANAGEMENT - GENERAL",
+      "pages": "302-310",
+      "sap_notes": [
+        "2270400",
+        "2270420"
+      ],
+      "components": [
+        "FIN-FSCM-CLM"
+      ]
+    },
+    "SI-11.3": {
+      "title": "11.3 S4TWL - CASH MANAGEMENT - Bank Accounts",
+      "pages": "310-317",
+      "sap_notes": [
+        "2165520",
+        "2870766"
+      ],
+      "components": [
+        "FIN-FSCM-CLM-BAM"
+      ]
+    },
+    "SI-11.4": {
+      "title": "11.4 S4TWL - CASH MANAGEMENT - Memo Record",
+      "pages": "317-320",
+      "sap_notes": [
+        "2719289",
+        "2781585"
+      ],
+      "components": [
+        "FIN-FSCM-CLM-COP"
+      ]
+    },
+    "SI-11.5": {
+      "title": "11.5 S4TWL - Logic changes in Flow Builder",
+      "pages": "320-325",
+      "sap_notes": [
+        "3111810",
+        "3128064",
+        "3144000",
+        "3211170",
+        "3249131"
+      ],
+      "components": [
+        "FIN-FSCM-CLM"
+      ]
+    },
+    "SI-11.6": {
+      "title": "11.6 S4TWL - Fiori app Adjust Assigned Liquidity Items deprecated",
+      "pages": "325-326",
+      "sap_notes": [
+        "3227455"
+      ],
+      "components": [
+        "FIN-FSCM-CLM"
+      ]
+    },
+    "SI-11.7": {
+      "title": "11.7 S4TWL - End-of-Day Memo Record Reconciliation",
+      "pages": "326-328",
+      "sap_notes": [
+        "3351947"
+      ],
+      "components": [
+        "FIN-FSCM-CLM-COP"
+      ]
+    },
+    "SI-12.1": {
+      "title": "12.1 S4TWL - Reference and Simulation Costing",
+      "pages": "328-329",
+      "sap_notes": [
+        "2349294"
+      ],
+      "components": [
+        "CO-PC-PCP-REF"
+      ]
+    },
+    "SI-12.2": {
+      "title": "12.2 S4TWL - Summarization Hierarchies in Controlling",
+      "pages": "329-330",
+      "sap_notes": [
+        "2349282"
+      ],
+      "components": [
+        "CO-PC-IS"
+      ]
+    },
+    "SI-12.3": {
+      "title": "12.3 S4TWL- Legacy MDI Cost Center Replication",
+      "pages": "331-331",
+      "sap_notes": [
+        "3232417",
+        "3247070"
+      ],
+      "components": [
+        "FI-GL-IS"
+      ]
+    },
+    "SI-12.4": {
+      "title": "12.4 S4TWL - Technical Changes in Material Ledger with Actual Costing",
+      "pages": "331-343",
+      "sap_notes": [
+        "2267835",
+        "2338387",
+        "2352383",
+        "2354768",
+        "2378468",
+        "2467398",
+        "2495950",
+        "2613656",
+        "2876478",
+        "2939972",
+        "3313290",
+        "3490605",
+        "3512654"
+      ],
+      "components": [
+        "FIN-MIG-ML",
+        "CO-PC-ACT"
+      ]
+    },
+    "SI-12.5": {
+      "title": "12.5 S4TWL - Material Ledger: deprecated table for currency and valuation types",
+      "pages": "343-344",
+      "sap_notes": [
+        "3017994"
+      ],
+      "components": [
+        "CO-PC-ML"
+      ]
+    },
+    "SI-12.6": {
+      "title": "12.6 S4TWL -  EC-PCA - Classical profit center accounting planning",
+      "pages": "344-346",
+      "sap_notes": [
+        "2269324",
+        "2425255",
+        "2993220",
+        "3572033"
+      ],
+      "components": [
+        "EC-PCA"
+      ]
+    },
+    "SI-12.7": {
+      "title": "12.7 S4TWL - Changes in EBRR backend transactions",
+      "pages": "346-349",
+      "sap_notes": [
+        "3226957"
+      ],
+      "components": [
+        "CO-PC-OBJ-EBR"
+      ]
+    },
+    "SI-12.8": {
+      "title": "12.8 S4TWL - EC-PCA Actual deprecation",
+      "pages": "349-351",
+      "sap_notes": [
+        "2425255",
+        "2993220",
+        "3572033"
+      ],
+      "components": [
+        "EC-PCA"
+      ]
+    },
+    "SI-12.9": {
+      "title": "12.9 S4TWL - TECHNICAL CHANGES IN CONTROLLING",
+      "pages": "351-381",
+      "sap_notes": [
+        "1852519",
+        "1972819",
+        "2061419",
+        "2081400",
+        "2162222",
+        "2185026",
+        "2225831",
+        "2253067",
+        "2270404",
+        "2270407",
+        "2270408",
+        "2270411",
+        "2270414",
+        "2270416",
+        "2270419",
+        "2313341",
+        "2313879",
+        "2345118",
+        "2349278",
+        "2349297",
+        "2355812",
+        "2366171",
+        "2457163",
+        "2516083",
+        "2661581",
+        "2977560",
+        "3126356"
+      ],
+      "components": [
+        "CO-PA",
+        "CO-OM",
+        "CO-PC"
+      ]
+    },
+    "SI-13.1": {
+      "title": "13.1 S4TWL - Profitability Segment Number Change of Type",
+      "pages": "381-385",
+      "sap_notes": [
+        "2436688",
+        "3320010",
+        "3320427",
+        "3321347"
+      ],
+      "components": [
+        "CO-PA"
+      ]
+    },
+    "SI-14.1": {
+      "title": "14.1 S4TWL - DMEE_BADI_01",
+      "pages": "385-386",
+      "sap_notes": [
+        "3370503",
+        "3452702"
+      ],
+      "components": [
+        "CA-GTF-CSC-DME"
+      ]
+    },
+    "SI-15.1": {
+      "title": "15.1 S4TWL - Profit Center and Segment Reorganisation",
+      "pages": "386-387",
+      "sap_notes": [
+        "3087195"
+      ],
+      "components": [
+        "FI-GL-REO"
+      ]
+    },
+    "SI-15.2": {
+      "title": "15.2 S4TWL - GENERAL LEDGER",
+      "pages": "387-389",
+      "sap_notes": [
+        "2270339",
+        "2431747"
+      ],
+      "components": [
+        "FI-GL"
+      ]
+    },
+    "SI-15.3": {
+      "title": "15.3 S4TWL - SAP HANA ODP ON HANA CALC VIEW-BASED REPORTING",
+      "pages": "389-390",
+      "sap_notes": [
+        "2270360"
+      ],
+      "components": [
+        "FI-GL"
+      ]
+    },
+    "SI-15.4": {
+      "title": "15.4 S4TWL - Closing Cockpit with S/4 HANA OP",
+      "pages": "390-391",
+      "sap_notes": [
+        "2332547"
+      ],
+      "components": [
+        "CA-GTF-SCM",
+        "FI-GL-GL-G"
+      ]
+    },
+    "SI-15.5": {
+      "title": "15.5 S4TWL - Currencies in Universal Journal",
+      "pages": "391-397",
+      "sap_notes": [
+        "2344012",
+        "2579584"
+      ],
+      "components": [
+        "FI-GL"
+      ]
+    },
+    "SI-15.6": {
+      "title": "15.6 S4TWL - Manual Accruals (Accrual Engine)",
+      "pages": "397-400",
+      "sap_notes": [
+        "2582883",
+        "2795791"
+      ],
+      "components": [
+        "FI-GL-GL-ACE",
+        "FI-GL-GL-AAC"
+      ]
+    },
+    "SI-15.7": {
+      "title": "15.7 S4TWL - Amount Field Length Extension",
+      "pages": "400-409",
+      "sap_notes": [
+        "2610650",
+        "2628040",
+        "2628617",
+        "2628641",
+        "2628654",
+        "2628699",
+        "2628704",
+        "2628706",
+        "2628714",
+        "2628724"
+      ],
+      "components": [
+        "FI-GL"
+      ]
+    },
+    "SI-15.8": {
+      "title": "15.8 S4TWL - Removal of D/C Indicator from Editing Options",
+      "pages": "409-410",
+      "sap_notes": [
+        "2865285"
+      ],
+      "components": [
+        "FI-GL-GL-A"
+      ]
+    },
+    "SI-16.1": {
+      "title": "16.1 S4TWL - Material classification with commodity codes",
+      "pages": "410-411",
+      "sap_notes": [
+        "2376556",
+        "2432527"
+      ],
+      "components": [
+        "SLL-LEG-FUN-CLS"
+      ]
+    },
+    "SI-16.2": {
+      "title": "16.2 S4TWL - Personal Data in Provider of Information",
+      "pages": "412-413",
+      "sap_notes": [
+        "2471388"
+      ],
+      "components": [
+        "SLL-LEG-ISR"
+      ]
+    },
+    "SI-16.3": {
+      "title": "16.3 S4TWL - Determination of default values in Intrastat reporting",
+      "pages": "413-416",
+      "sap_notes": [
+        "2468294"
+      ],
+      "components": [
+        "SD-FT-GOV",
+        "SLL-ITR-ISR"
+      ]
+    },
+    "SI-16.4": {
+      "title": "16.4 S4TWL - Company code address data in provider of information",
+      "pages": "416-417",
+      "sap_notes": [
+        "2782281"
+      ],
+      "components": [
+        "SLL-ITR-ISR"
+      ]
+    },
+    "SI-17.1": {
+      "title": "17.1 S4TWL - Drilldown Reporting in Treasury and Risk Management",
+      "pages": "417-419",
+      "sap_notes": [
+        "2270522"
+      ],
+      "components": [
+        "FIN-FSCM-TRM"
+      ]
+    },
+    "SI-17.2": {
+      "title": "17.2 S4TWL - Master Agreements",
+      "pages": "419-420",
+      "sap_notes": [
+        "2270523"
+      ],
+      "components": [
+        "FIN-FSCM-TRM"
+      ]
+    },
+    "SI-17.3": {
+      "title": "17.3 S4TWL - Offers",
+      "pages": "420-421",
+      "sap_notes": [
+        "2270526"
+      ],
+      "components": [
+        "FIN-FSCM-TRM"
+      ]
+    },
+    "SI-17.4": {
+      "title": "17.4 S4TWL - Simulation in Transaction Management",
+      "pages": "421-421",
+      "sap_notes": [
+        "2270527"
+      ],
+      "components": [
+        "FIN-FSCM-TRM"
+      ]
+    },
+    "SI-17.5": {
+      "title": "17.5 S4TWL - Quantity Ledger Always Active for Money Market Transactions",
+      "pages": "421-423",
+      "sap_notes": [
+        "2270529"
+      ],
+      "components": [
+        "FIN-FSCM-TRM"
+      ]
+    },
+    "SI-17.6": {
+      "title": "17.6 S4TWL - FTBP table Standing Instructions Correspondence (VTBSTA2) obsolete",
+      "pages": "423-424",
+      "sap_notes": [
+        "3444441"
+      ],
+      "components": [
+        "FS-BP"
+      ]
+    },
+    "SI-17.7": {
+      "title": "17.7 S4TWL - Several Kinds of Financial Objects Disabled",
+      "pages": "424-427",
+      "sap_notes": [
+        "2270530"
+      ],
+      "components": [
+        "FIN-FSCM-TRM"
+      ]
+    },
+    "SI-17.8": {
+      "title": "17.8 S4TWL - Allocation of FX Transactions to Financial Documents and Cash Management",
+      "pages": "427-437",
+      "sap_notes": [
+        "1873119",
+        "2270339",
+        "2270400",
+        "2270450",
+        "2270461",
+        "2270462",
+        "2270470",
+        "2270521",
+        "2340804",
+        "2524941"
+      ],
+      "components": [
+        "FIN-FSCM-TRM"
+      ]
+    },
+    "SI-18.1": {
+      "title": "18.1 S4TWL - Credit Management",
+      "pages": "437-442",
+      "sap_notes": [
+        "2217124",
+        "2227014",
+        "2270544"
+      ],
+      "components": [
+        "FI-AR-CR",
+        "FIN-FSCM-CR"
+      ]
+    },
+    "SI-18.2": {
+      "title": "18.2 S4TWL - Technical Changes in Material Ledger",
+      "pages": "442-446",
+      "sap_notes": [
+        "1497354",
+        "1604155",
+        "2269324",
+        "2291076",
+        "2332591",
+        "3493409"
+      ],
+      "components": [
+        "CO-PC-ACT"
+      ]
+    },
+    "SI-18.4": {
+      "title": "18.4 S4TWL - Real Estate Classic",
+      "pages": "446-447",
+      "sap_notes": [
+        "2270550"
+      ],
+      "components": [
+        "RE-RT",
+        "RE-BP",
+        "RE-BD",
+        "RE-TP",
+        "RE-CP",
+        "FS-CML",
+        "RE-IS",
+        "RE-PR"
+      ]
+    },
+    "SI-18.5": {
+      "title": "18.5 S4TWL - Conversion to S/4HANA Material Ledger and Actual Costing",
+      "pages": "447-455",
+      "sap_notes": [
+        "2345739",
+        "2352383"
+      ],
+      "components": [
+        "FIN-MIG-ML"
+      ]
+    },
+    "SI-18.6": {
+      "title": "18.6 S4TWL - Differentiation Category Dependent FS Datasets Not Available in S/4HANA",
+      "pages": "455-457",
+      "sap_notes": [
+        "2448350"
+      ],
+      "components": [
+        "FS-BP"
+      ]
+    },
+    "SI-18.7": {
+      "title": "18.7 S4TWL - Product Design Cost Estimate",
+      "pages": "457-460",
+      "sap_notes": [
+        "2190420",
+        "2241080",
+        "2442292"
+      ],
+      "components": [
+        "FIN-BA"
+      ]
+    },
+    "SI-19.1": {
+      "title": "19.1 S4TWL - Compensation Management",
+      "pages": "460-461",
+      "sap_notes": [
+        "2269324",
+        "3091160",
+        "3224317",
+        "3443536"
+      ],
+      "components": [
+        "PA-CM"
+      ]
+    },
+    "SI-19.2": {
+      "title": "19.2 S4TWL -  Personnel Cost Planning",
+      "pages": "461-463",
+      "sap_notes": [
+        "2269324",
+        "3091160",
+        "3224288",
+        "3443536"
+      ],
+      "components": [
+        "PA-CM-CP"
+      ]
+    },
+    "SI-19.3": {
+      "title": "19.3 S4TWL -  HR Employee Interaction Center",
+      "pages": "463-464",
+      "sap_notes": [
+        "3091160",
+        "3224334",
+        "3443536"
+      ],
+      "components": [
+        "PA-EIC"
+      ]
+    },
+    "SI-19.4": {
+      "title": "19.4 S4TWL - Enterprise Services Personnel Administration",
+      "pages": "464-465",
+      "sap_notes": [
+        "2269324",
+        "3091160",
+        "3224335",
+        "3443536"
+      ],
+      "components": [
+        "PA-PA-SOA",
+        "PT-SOA"
+      ]
+    },
+    "SI-19.5": {
+      "title": "19.5 S4TWL - Expert Finder",
+      "pages": "466-467",
+      "sap_notes": [
+        "3091160",
+        "3224305",
+        "3443536"
+      ],
+      "components": [
+        "PA-XF"
+      ]
+    },
+    "SI-19.6": {
+      "title": "19.6 S4TWL - Funds and Position Management",
+      "pages": "467-468",
+      "sap_notes": [
+        "2269324",
+        "3091160",
+        "3224336",
+        "3443536"
+      ],
+      "components": [
+        "PA-PM"
+      ]
+    },
+    "SI-19.7": {
+      "title": "19.7 S4TWL - HCM Processes and Forms JAVA and Adobe",
+      "pages": "468-470",
+      "sap_notes": [
+        "2269324",
+        "2560753",
+        "3006433",
+        "3091160",
+        "3224318",
+        "3443536"
+      ],
+      "components": [
+        "PA-AS"
+      ]
+    },
+    "SI-19.8": {
+      "title": "19.8 S4TWL - Landing Pages and Suite Page Builder",
+      "pages": "470-472",
+      "sap_notes": [
+        "2269324",
+        "3091160",
+        "3224337",
+        "3443536"
+      ],
+      "components": [
+        "PA-PAO",
+        "CA-UI2-AR-FE"
+      ]
+    },
+    "SI-19.9": {
+      "title": "19.9 S4TWL - HCM Obsolete Packages",
+      "pages": "472-524",
+      "sap_notes": [
+        "1007341",
+        "1497354",
+        "1604155",
+        "1838192",
+        "2269324",
+        "2273108",
+        "2340095",
+        "2364562",
+        "2383837",
+        "2383879",
+        "2383888",
+        "2430071",
+        "2560753",
+        "2665372",
+        "2772355",
+        "2954033",
+        "2966518",
+        "2976262",
+        "3029126",
+        "3062197",
+        "3085487",
+        "3086299",
+        "3091160",
+        "3138281",
+        "3138644",
+        "3139908",
+        "3140931",
+        "3145947",
+        "3146771",
+        "3193560",
+        "3213848",
+        "3217773",
+        "3218111",
+        "3218356",
+        "3219250",
+        "3221404",
+        "3224315",
+        "3224316",
+        "3224319",
+        "3224320",
+        "3224325",
+        "3224337",
+        "3224338",
+        "3224339",
+        "3224340",
+        "3224341",
+        "3224353",
+        "3238079",
+        "3238213",
+        "3250816",
+        "3255864",
+        "3257544",
+        "3394928",
+        "3443536",
+        "3468595",
+        "3468604",
+        "3493409"
+      ],
+      "components": [
+        "PA-PA-XX",
+        "PA-PA"
+      ]
+    },
+    "SI-2.1": {
+      "title": "2.1 ABAPTWL - Visualization of SAP Business Workflow Metadata",
+      "pages": "33-38",
+      "sap_notes": [
+        "1829697",
+        "2862972",
+        "2862992",
+        "2865890",
+        "2886479",
+        "2896183",
+        "2926680",
+        "2926764"
+      ],
+      "components": [
+        "BC-BMT-WFM"
+      ]
+    },
+    "SI-2.10": {
+      "title": "2.10 ABAPTWL - SSCR license key procedure is no longer supported",
+      "pages": "40-41",
+      "sap_notes": [
+        "2309060"
+      ],
+      "components": [
+        "BC-ABA-LA"
+      ]
+    },
+    "SI-2.11": {
+      "title": "2.11 S4TWL - Removal of Business Application Accelerator",
+      "pages": "41-42",
+      "sap_notes": [
+        "1694697"
+      ],
+      "components": [
+        "BC-DB-DBI"
+      ]
+    },
+    "SI-2.12": {
+      "title": "2.12 ABAPTWL - VM Container not supported",
+      "pages": "43-43",
+      "sap_notes": [
+        "2560708"
+      ],
+      "components": [
+        "BC-VMC"
+      ]
+    },
+    "SI-2.13": {
+      "title": "2.13 ABAPTWL - AS Java not available",
+      "pages": "43-44",
+      "sap_notes": [
+        "2560753"
+      ],
+      "components": [
+        "BC-JAS-SF"
+      ]
+    },
+    "SI-2.14": {
+      "title": "2.14 ABAPTWL - Dual Stack not supported",
+      "pages": "44-45",
+      "sap_notes": [
+        "2560791"
+      ],
+      "components": [
+        "BC-CST"
+      ]
+    },
+    "SI-2.15": {
+      "title": "2.15 ABAPTWL - Instances without ICM not supported",
+      "pages": "45-45",
+      "sap_notes": [
+        "2560792"
+      ],
+      "components": [
+        "BC-CST-IC"
+      ]
+    },
+    "SI-2.16": {
+      "title": "2.16 ABAPTWL - Removal of OSS1 (Logon to SAP Service Marketplace)",
+      "pages": "45-46",
+      "sap_notes": [
+        "2738426",
+        "2797047"
+      ],
+      "components": [
+        "BC-CCM-MON"
+      ]
+    },
+    "SI-2.17": {
+      "title": "2.17 ABAPTWL - End of Support for Pool Tables",
+      "pages": "46-49",
+      "sap_notes": [
+        "2234970",
+        "2577406"
+      ],
+      "components": [
+        "BC-DWB-DIC"
+      ]
+    },
+    "SI-2.18": {
+      "title": "2.18 S4TWL - FIORI APPLICATIONS FOR SUITE ON HANA ONPREMISE",
+      "pages": "49-51",
+      "sap_notes": [
+        "2242596",
+        "2288828",
+        "2290488"
+      ],
+      "components": [
+        "XX-SER-REL"
+      ]
+    },
+    "SI-2.19": {
+      "title": "2.19 S4TWL - SAP S/4HANA AND SAP BUSINESS WAREHOUSE CONTENT",
+      "pages": "51-53",
+      "sap_notes": [
+        "2289424",
+        "2360258",
+        "2500202",
+        "2548065"
+      ],
+      "components": [
+        "BW-BCT-GEN"
+      ]
+    },
+    "SI-2.20": {
+      "title": "2.20 S4TWL - Social Intelligence",
+      "pages": "53-53",
+      "sap_notes": [
+        "2323655"
+      ],
+      "components": [
+        "CA-EPT-SMI"
+      ]
+    },
+    "SI-2.21": {
+      "title": "2.21 S4TWL - Custom Fields",
+      "pages": "53-55",
+      "sap_notes": [
+        "2320132"
+      ],
+      "components": [
+        "BC-SRV-APS-EXT-FLD"
+      ]
+    },
+    "SI-2.22": {
+      "title": "2.22 S4TWL - Side Panel functionality in SAP S/4HANA (on-premise)",
+      "pages": "55-58",
+      "sap_notes": [
+        "2340424"
+      ],
+      "components": [
+        "FI"
+      ]
+    },
+    "SI-2.23": {
+      "title": "2.23 S4TWL - Changed Interfaces",
+      "pages": "58-60",
+      "sap_notes": [
+        "2249880",
+        "2259818",
+        "2408693"
+      ],
+      "components": [
+        "XX-SER-REL"
+      ]
+    },
+    "SI-2.24": {
+      "title": "2.24 S4TWL - SAP Support Desk ($$-Messages)",
+      "pages": "60-61",
+      "sap_notes": [
+        "2852082"
+      ],
+      "components": [
+        "CA-NO",
+        "QM-QN"
+      ]
+    },
+    "SI-2.25": {
+      "title": "2.25 S4TWL - Changes in Process Observer",
+      "pages": "61-64",
+      "sap_notes": [
+        "2412899",
+        "2461687",
+        "2879911"
+      ],
+      "components": [
+        "CA-EPT-POC"
+      ]
+    },
+    "SI-2.27": {
+      "title": "2.27 S4TWL - BI Extractors in SAP S/4HANA",
+      "pages": "64-69",
+      "sap_notes": [
+        "2267784",
+        "2270133",
+        "2270505",
+        "2270550",
+        "2273294",
+        "2299213",
+        "2333141",
+        "2382662",
+        "2496759",
+        "2498211",
+        "2498786",
+        "2499310",
+        "2499589",
+        "2499716",
+        "2499728",
+        "2500202",
+        "2504508",
+        "2533548",
+        "2543469",
+        "2543543",
+        "2544193",
+        "2546102",
+        "2552797",
+        "2556359",
+        "2559556",
+        "2576363",
+        "2796696"
+      ],
+      "components": [
+        "XX-SER-REL"
+      ]
+    },
+    "SI-2.28": {
+      "title": "2.28 S4TWL - MRS Enhancements for Material Master",
+      "pages": "69-69",
+      "sap_notes": [
+        "2493452"
+      ],
+      "components": [
+        "CA-MRS"
+      ]
+    },
+    "SI-2.29": {
+      "title": "2.29 S4TWL - Change of Situation Types in Situation Handling",
+      "pages": "69-71",
+      "sap_notes": [
+        "3271299",
+        "3324958"
+      ],
+      "components": [
+        "CA-SIT"
+      ]
+    },
+    "SI-2.30": {
+      "title": "2.30 ABAPTWL - Change of workflow system user and workflow system jobs",
+      "pages": "71-73",
+      "sap_notes": [
+        "2190119",
+        "2568271"
+      ],
+      "components": [
+        "BC-BMT-WFM"
+      ]
+    },
+    "SI-2.31": {
+      "title": "2.31 ABAPTWL - Change of authorization checks SAP Business Workflow",
+      "pages": "73-77",
+      "sap_notes": [
+        "2979517"
+      ],
+      "components": [
+        "BC-BMT-WFM"
+      ]
+    },
+    "SI-2.32": {
+      "title": "2.32 S4TWL - Business User Management",
+      "pages": "77-87",
+      "sap_notes": [
+        "2340095",
+        "2548303",
+        "2567604",
+        "2570961",
+        "2571544",
+        "2591138",
+        "2763781",
+        "2883989"
+      ],
+      "components": [
+        "BC-SEC-USR-ADM",
+        "CA-HR-S4"
+      ]
+    },
+    "SI-2.33": {
+      "title": "2.33 S4TWL - Generic Check for SAP S/4HANA Conversion and Upgrade",
+      "pages": "87-90",
+      "sap_notes": [
+        "1484142",
+        "2241080",
+        "2618018",
+        "2749796"
+      ],
+      "components": [
+        "CA-TRS-PRCK"
+      ]
+    },
+    "SI-2.34": {
+      "title": "2.34 S4TWL - Removal of Add-On CTS_PLUG",
+      "pages": "90-90",
+      "sap_notes": [
+        "2630240",
+        "2820229"
+      ],
+      "components": [
+        "BC-CTS-TMS-CTR"
+      ]
+    },
+    "SI-2.35": {
+      "title": "2.35 S4TWL - Removal of obsolete Data Modeler (SD11) content",
+      "pages": "91-92",
+      "sap_notes": [
+        "2206980",
+        "2267306",
+        "2267308",
+        "2270333",
+        "2337383",
+        "2850096"
+      ],
+      "components": [
+        "XX-SER-REL",
+        "BC-DWB-TOO-DMO"
+      ]
+    },
+    "SI-2.36": {
+      "title": "2.36 S4TWL - Simplified data model in Joint Venture Accounting",
+      "pages": "92-94",
+      "sap_notes": [
+        "2941622",
+        "2967210",
+        "2993369",
+        "3044558"
+      ],
+      "components": [
+        "CA-JVA"
+      ]
+    },
+    "SI-2.37": {
+      "title": "2.37 S4TWL - New Default Security Settings for SAP S/4HANA",
+      "pages": "94-95",
+      "sap_notes": [
+        "2926224"
+      ],
+      "components": [
+        "XX-PROJ-CON-SEC"
+      ]
+    },
+    "SI-2.38": {
+      "title": "2.38 S4TWL - Extended Check of Output Device in Output Control",
+      "pages": "95-97",
+      "sap_notes": [
+        "3057330",
+        "3093397"
+      ],
+      "components": [
+        "CA-GTF-OC"
+      ]
+    },
+    "SI-2.39": {
+      "title": "2.39 S4TWL - Deprecation of Design Studio Apps",
+      "pages": "97-98",
+      "sap_notes": [
+        "3081996",
+        "3112220",
+        "3133221",
+        "3170381"
+      ],
+      "components": [
+        "CA-UX"
+      ]
+    },
+    "SI-2.40": {
+      "title": "2.40 SWTL - Deprecation of Obsolete Data Handling Tool",
+      "pages": "99-100",
+      "sap_notes": [
+        "2661837",
+        "3335020",
+        "3358954"
+      ],
+      "components": [
+        "CA-EPT-ODH",
+        "BC-CCM-ODH"
+      ]
+    },
+    "SI-2.41": {
+      "title": "2.41 S4TWL - CATSXT",
+      "pages": "100-101",
+      "sap_notes": [
+        "3150537",
+        "3445075",
+        "3445096"
+      ],
+      "components": [
+        "CA-TS-SV"
+      ]
+    },
+    "SI-2.42": {
+      "title": "2.42 S4TWL - Replacement of Add-ons in Compatibility Scope",
+      "pages": "101-103",
+      "sap_notes": [
+        "2269324",
+        "3502536"
+      ],
+      "components": [
+        "BC-UPG-ADDON"
+      ]
+    },
+    "SI-2.43": {
+      "title": "2.43 S4TWL - OUTPUT MANAGEMENT",
+      "pages": "103-105",
+      "sap_notes": [
+        "2228611",
+        "2470711"
+      ],
+      "components": [
+        "CA-GTF-OC"
+      ]
+    },
+    "SI-2.44": {
+      "title": "2.44 S4TWL - SAP HANA LIVE REPORTING",
+      "pages": "106-107",
+      "sap_notes": [
+        "2270382"
+      ],
+      "components": [
+        "XX-SER-REL"
+      ]
+    },
+    "SI-2.45": {
+      "title": "2.45 S4TWL - ENTERPRISE SEARCH",
+      "pages": "107-108",
+      "sap_notes": [
+        "2227007",
+        "2318521"
+      ],
+      "components": [
+        "BC-EIM-ESH"
+      ]
+    },
+    "SI-2.46": {
+      "title": "2.46 S4TWL - Duplicate request entries in Output Management",
+      "pages": "108-109",
+      "sap_notes": [
+        "2679118"
+      ],
+      "components": [
+        "CA-GTF-OC"
+      ]
+    },
+    "SI-2.47": {
+      "title": "2.47 S4TWL - Ariba Network Integration",
+      "pages": "109-113",
+      "sap_notes": [
+        "2182725",
+        "2237932",
+        "2246865",
+        "2341836",
+        "2406571",
+        "2502552",
+        "2705047"
+      ],
+      "components": [
+        "BNS-ARI-SE"
+      ]
+    },
+    "SI-2.48": {
+      "title": "2.48 S4TWL - INTERNET PRICING AND CONFIGURATOR (SAP IPC)",
+      "pages": "113-115",
+      "sap_notes": [
+        "2238670",
+        "2318509"
+      ],
+      "components": [
+        "AP-CFG"
+      ]
+    },
+    "SI-2.49": {
+      "title": "2.49 S4TWL - JOB SCHEDULING",
+      "pages": "115-117",
+      "sap_notes": [
+        "2190119",
+        "2318468",
+        "2499529"
+      ],
+      "components": [
+        "BC-CCM-BTC"
+      ]
+    },
+    "SI-2.50": {
+      "title": "2.50 S4TWL - LEGACY SYSTEM MIGRATION WORKBENCH",
+      "pages": "117-122",
+      "sap_notes": [
+        "2239701",
+        "2287723"
+      ],
+      "components": [
+        "BC-SRV-DX-LSM"
+      ]
+    },
+    "SI-2.51": {
+      "title": "2.51 ABAPTWL - Deprecation of Hana Rules Framework",
+      "pages": "122-124",
+      "sap_notes": [
+        "3150564",
+        "3243120"
+      ],
+      "components": [
+        "BC-SRV-BR"
+      ]
+    },
+    "SI-2.8": {
+      "title": "2.8 ABAPTWL - No support for non simplified system flavour",
+      "pages": "38-39",
+      "sap_notes": [
+        "2656503"
+      ],
+      "components": [
+        "BC-ABA-LA"
+      ]
+    },
+    "SI-2.9": {
+      "title": "2.9 ABAPTWL - Cleanup of orphaned objects",
+      "pages": "39-40",
+      "sap_notes": [
+        "2190420",
+        "2241080",
+        "2672757"
+      ],
+      "components": [
+        "BC"
+      ]
+    },
+    "SI-20.1": {
+      "title": "20.1 S4TWL - Advanced Track & Trace",
+      "pages": "524-525",
+      "sap_notes": [
+        "2668899",
+        "2716224"
+      ],
+      "components": [
+        "LO-GEN-ATT"
+      ]
+    },
+    "SI-20.2": {
+      "title": "20.2 S4TWL - Season Field Length Extension",
+      "pages": "525-526",
+      "sap_notes": [
+        "2624475"
+      ],
+      "components": [
+        "LO-RFM-CA",
+        "LO-RFM"
+      ]
+    },
+    "SI-21.1": {
+      "title": "21.1 S4TWL - Agency Business",
+      "pages": "526-552",
+      "sap_notes": [
+        "2197892",
+        "2197898",
+        "2203518",
+        "2204135",
+        "2267743"
+      ],
+      "components": [
+        "LO-AB"
+      ]
+    },
+    "SI-22.1": {
+      "title": "22.1 S4TWL - New advanced ATP in SAP S/4HANA - Table VBBS",
+      "pages": "552-554",
+      "sap_notes": [
+        "2209696",
+        "2267745"
+      ],
+      "components": [
+        "SD-BF-AC"
+      ]
+    },
+    "SI-23.1": {
+      "title": "23.1 S4TWL - Direct Store Delivery",
+      "pages": "554-555",
+      "sap_notes": [
+        "2269324",
+        "2273317"
+      ],
+      "components": [
+        "LE-DSD"
+      ]
+    },
+    "SI-23.2": {
+      "title": "23.2 S4TWL - Direct Store Delivery in SAP S/4HANA",
+      "pages": "556-557",
+      "sap_notes": [
+        "2269324",
+        "2273317"
+      ],
+      "components": [
+        "LE-DSD"
+      ]
+    },
+    "SI-24.1": {
+      "title": "24.1 S4TWL - Deprecation of EHS Data Series and Amounts",
+      "pages": "557-558",
+      "sap_notes": [
+        "2065178",
+        "2338405"
+      ],
+      "components": [
+        "EHS-MGM",
+        "EHS-SUS-FND"
+      ]
+    },
+    "SI-24.2": {
+      "title": "24.2 S4TWL - Deprecation of 'Inspect Safety Control' Fiori app",
+      "pages": "558-559",
+      "sap_notes": [
+        "2343825"
+      ],
+      "components": [
+        "EHS-SUS-HS",
+        "EHS-MGM-RAS"
+      ]
+    },
+    "SI-24.3": {
+      "title": "24.3 S4TWL - Deprecation of 'Retrieve Safety Information' Fiori app",
+      "pages": "559-560",
+      "sap_notes": [
+        "2343826"
+      ],
+      "components": [
+        "EHS-MGM-RAS",
+        "EHS-SUS-HS"
+      ]
+    },
+    "SI-24.4": {
+      "title": "24.4 S4TWL - Simplification of Authorizations in Incident Management",
+      "pages": "560-563",
+      "sap_notes": [
+        "2350330"
+      ],
+      "components": [
+        "EHS-MGM-INC",
+        "EHS-SUS-IM"
+      ]
+    },
+    "SI-24.5": {
+      "title": "24.5 S4TWL - Removal of EHS Home Screens",
+      "pages": "563-564",
+      "sap_notes": [
+        "2350447"
+      ],
+      "components": [
+        "EHS-MGM-INC",
+        "EHS-SUS-IM",
+        "EHS-MGM-RAS",
+        {
+          "EHS-SUS-HS Related Notes": null
+        }
+      ]
+    },
+    "SI-24.6": {
+      "title": "24.6 S4TWL - Specification Workbench Adjustments",
+      "pages": "564-565",
+      "sap_notes": [
+        "2439345"
+      ],
+      "components": [
+        "EHS-BD-SPE"
+      ]
+    },
+    "SI-24.7": {
+      "title": "24.7 S4TWL - Simplification of Incident Management workflows",
+      "pages": "565-567",
+      "sap_notes": [
+        "2350795"
+      ],
+      "components": [
+        "EHS-SUS-IM",
+        "EHS-MGM-INC"
+      ]
+    },
+    "SI-24.8": {
+      "title": "24.8 S4TWL - Changed data model for listed substances",
+      "pages": "567-569",
+      "sap_notes": [
+        "2376165"
+      ],
+      "components": [
+        "EHS-MGM-RAS",
+        "EHS-SUS-FND",
+        "EHS-SUS-EM",
+        "EHS-SUS-PMA",
+        "EHSSUS-HS",
+        "EHS-MGM-FND",
+        "EHS-MGM-ENV",
+        "EHS-MGM-PRC"
+      ]
+    },
+    "SI-24.9": {
+      "title": "24.9 S4TWL - Changed data model for Occupational Exposure Limits",
+      "pages": "569-616",
+      "sap_notes": [
+        "2065178",
+        "2217202",
+        "2217206",
+        "2217208",
+        "2267781",
+        "2267782",
+        "2267783",
+        "2267784",
+        "2329574",
+        "2329611",
+        "2330017",
+        "2336396",
+        "2408533",
+        "2429619",
+        "2442150",
+        "2442566",
+        "2442567",
+        "2446055",
+        "2504323",
+        "2590858",
+        "2603300",
+        "2612110",
+        "2801072",
+        "2900458",
+        "2903938",
+        "2905234",
+        "2917169",
+        "2927227",
+        "2975797",
+        "3036325",
+        "3039679",
+        "3055767",
+        "3127469",
+        "3139973",
+        "3253390",
+        "3344198"
+      ],
+      "components": [
+        "EHS-MGM-RAS",
+        "EHS-SUS-HS"
+      ]
+    },
+    "SI-25.1": {
+      "title": "25.1 S4TWL - Global Trade Management",
+      "pages": "616-618",
+      "sap_notes": [
+        "2198031",
+        "2198035",
+        "2204137",
+        "2267785"
+      ],
+      "components": [
+        "LO-GT"
+      ]
+    },
+    "SI-25.2": {
+      "title": "25.2 S4TWL - Invoice Forecasting Worklist not available in SAP S/4HANA",
+      "pages": "618-619",
+      "sap_notes": [
+        "2739164"
+      ],
+      "components": [
+        "LO-AB-IFW"
+      ]
+    },
+    "SI-26.1": {
+      "title": "26.1 S4TWL - Simplifications in Management of Change",
+      "pages": "619-623",
+      "sap_notes": [
+        "2409939",
+        "2570961",
+        "2616203"
+      ],
+      "components": [
+        "CA-IAM-MOC"
+      ]
+    },
+    "SI-27.1": {
+      "title": "27.1 S4TWL - FMP in S4HANA",
+      "pages": "623-625",
+      "sap_notes": [
+        "2296016",
+        "2358928",
+        "2414624"
+      ],
+      "components": [
+        "IS-CWM",
+        "MM-IM-GF-CWM"
+      ]
+    },
+    "SI-27.2": {
+      "title": "27.2 S4TWL - Blocked customer or supplier in Inventory Management",
+      "pages": "625-628",
+      "sap_notes": [
+        "2502552",
+        "2516223",
+        "2524011",
+        "2536568",
+        "2585925",
+        "2629400"
+      ],
+      "components": [
+        "MM-IM-GF",
+        "BNS-INT-ARI-IM",
+        "MM-IM-RS",
+        {
+          "MM-IM-PI Related Notes": null
+        }
+      ]
+    },
+    "SI-27.3": {
+      "title": "27.3 S4TWL - Document Flow Consistency for Goods Receipt to Inbound Delivery",
+      "pages": "628-633",
+      "sap_notes": [
+        "2542099"
+      ],
+      "components": [
+        "IS-A-GR",
+        "MM-IM-GR",
+        "LE-SHP-DL-LA"
+      ]
+    },
+    "SI-27.4": {
+      "title": "27.4 S4TWL  - Change in default IDoc inbound processing with message type DESADV",
+      "pages": "633-634",
+      "sap_notes": [
+        "2404011"
+      ],
+      "components": [
+        "IS-A-GR"
+      ]
+    },
+    "SI-27.5": {
+      "title": "27.5 S4TWL - DATA MODEL IN INVENTORY MANAGEMENT (MMIM)",
+      "pages": "634-644",
+      "sap_notes": [
+        "2194618",
+        "2197392",
+        "2206980",
+        "2240878",
+        "2242679"
+      ],
+      "components": [
+        "MM-IM-GF"
+      ]
+    },
+    "SI-27.6": {
+      "title": "27.6 S4TWL - AVAILABILITY OF TRANSACTIONS IN MM-IM",
+      "pages": "644-646",
+      "sap_notes": [
+        "2210569",
+        "2319579"
+      ],
+      "components": [
+        "MM-IM-GF"
+      ]
+    },
+    "SI-27.7": {
+      "title": "27.7 S4TWL - Material Ledger Obligatory for Material Valuation",
+      "pages": "646-649",
+      "sap_notes": [
+        "1804812",
+        "2129306",
+        "2194618",
+        "2267834",
+        "2337383"
+      ],
+      "components": [
+        "MM-IM-GF-VAL"
+      ]
+    },
+    "SI-27.8": {
+      "title": "27.8 S4TWL - Material Valuation - Statistical moving average price",
+      "pages": "649-653",
+      "sap_notes": [
+        "2267835",
+        "2338387"
+      ],
+      "components": [
+        "MM-IM-GF-LOCK",
+        "MM-IM-GF-VAL"
+      ]
+    },
+    "SI-27.9": {
+      "title": "27.9 S4TWL - Performance optimizations within Material Document Processing - lock beh",
+      "pages": "653-669",
+      "sap_notes": [
+        "1450225",
+        "1704534",
+        "2267835",
+        "2319579",
+        "2337383",
+        "2338387",
+        "2358909",
+        "2358928",
+        "2414624"
+      ],
+      "components": [
+        "MM-IM",
+        "MM-IM-GF"
+      ]
+    },
+    "SI-28.1": {
+      "title": "28.1 S4TWL - Engineering Desktop (EDesk)",
+      "pages": "669-670",
+      "sap_notes": [
+        "2234028",
+        "2267868"
+      ],
+      "components": [
+        "PLM-WUI-APP-EDK"
+      ]
+    },
+    "SI-28.2": {
+      "title": "28.2 S4TWL - DMS - STEP Support",
+      "pages": "670-671",
+      "sap_notes": [
+        "2216258",
+        "2267870"
+      ],
+      "components": [
+        "LO-PDM-GF"
+      ]
+    },
+    "SI-28.3": {
+      "title": "28.3 S4TWL - DMS Documents@WEB",
+      "pages": "671-672",
+      "sap_notes": [
+        "2217857",
+        "2267871"
+      ],
+      "components": [
+        "CA-DMS"
+      ]
+    },
+    "SI-28.4": {
+      "title": "28.4 S4TWL - Variant Configuration",
+      "pages": "672-674",
+      "sap_notes": [
+        "2210904",
+        "2214906",
+        "2267873"
+      ],
+      "components": [
+        "LO-VC"
+      ]
+    },
+    "SI-28.5": {
+      "title": "28.5 S4TWL - Classification",
+      "pages": "674-678",
+      "sap_notes": [
+        "2213569",
+        "2267878"
+      ],
+      "components": [
+        "CA-CL"
+      ]
+    },
+    "SI-28.6": {
+      "title": "28.6 S4TWL - IPPE-BOM Converter",
+      "pages": "678-679",
+      "sap_notes": [
+        "2226275",
+        "2267879"
+      ],
+      "components": [
+        "PLM-PPM-PDN"
+      ]
+    },
+    "SI-28.7": {
+      "title": "28.7 S4TWL - BOM, Routing, Production Version",
+      "pages": "679-681",
+      "sap_notes": [
+        "2215061",
+        "2215123",
+        "2267880"
+      ],
+      "components": [
+        "LO-MD-BOM"
+      ]
+    },
+    "SI-28.8": {
+      "title": "28.8 S4TWL - SAP PLM Recipe Development",
+      "pages": "681-682",
+      "sap_notes": [
+        "2212999",
+        "2267893"
+      ],
+      "components": [
+        "PLM-WUI-RCP-LBL",
+        "PLM-WUI-RCP-RCP",
+        "PLM-WUI-RCP-SPE"
+      ]
+    },
+    "SI-28.9": {
+      "title": "28.9 S4TWL - Engineering Change Management ECR/ECO",
+      "pages": "682-715",
+      "sap_notes": [
+        "2117843",
+        "2212593",
+        "2216303",
+        "2217234",
+        "2224778",
+        "2226357",
+        "2226431",
+        "2226803",
+        "2234028",
+        "2267836",
+        "2267840",
+        "2267841",
+        "2267842",
+        "2267845",
+        "2267850",
+        "2267863",
+        "2267864",
+        "2267866",
+        "2267918",
+        "2267920",
+        "2267943",
+        "2268017",
+        "2268018",
+        "2268041",
+        "2268042",
+        "2268043",
+        "2269324",
+        "2387911",
+        "2401762",
+        "2601548",
+        "2704849",
+        "2935353",
+        "2948953",
+        "2949845",
+        "3190519",
+        "3300448"
+      ],
+      "components": [
+        "CA-GTF-ECM",
+        "LO-ECH",
+        "PLM-WUI-OBJ-ECN"
+      ]
+    },
+    "SI-29.1": {
+      "title": "29.1 S4TWL - Object List Number Field Length Extension",
+      "pages": "715-716",
+      "sap_notes": [
+        "2580670"
+      ],
+      "components": [
+        "LO-MD-SN",
+        "LO-HU",
+        "SD-SLS",
+        "QM-IM",
+        "PP-SFC-EXE",
+        "MM-PUR",
+        "MM-IM",
+        "LE-SHP"
+      ]
+    },
+    "SI-29.2": {
+      "title": "29.2 S4TWL - Obsolete predictive scenarios in PM",
+      "pages": "716-717",
+      "sap_notes": [
+        "3259029"
+      ],
+      "components": [
+        "PM-WOC",
+        "PM-FIO"
+      ]
+    },
+    "SI-29.3": {
+      "title": "29.3 S4TWL -  Obsolete POWL Applications in Maintenance Management",
+      "pages": "717-718",
+      "sap_notes": [
+        "3372889"
+      ],
+      "components": [
+        "PM-PRM-MP"
+      ]
+    },
+    "SI-29.4": {
+      "title": "29.4 S4TWL - LIS in EAM",
+      "pages": "718-721",
+      "sap_notes": [
+        "2232362",
+        "2267463"
+      ],
+      "components": [
+        "PM-IS"
+      ]
+    },
+    "SI-29.5": {
+      "title": "29.5 S4TWL - Download Data in MS Access out of List",
+      "pages": "721-722",
+      "sap_notes": [
+        "2270076"
+      ],
+      "components": [
+        "PM-EQM-LE",
+        "PM-WOC-LE",
+        "PM"
+      ]
+    },
+    "SI-29.6": {
+      "title": "29.6 S4TWL - Scheduling of Maintenance Plan",
+      "pages": "722-723",
+      "sap_notes": [
+        "2270078"
+      ],
+      "components": [
+        "PM",
+        "PM-PRM"
+      ]
+    },
+    "SI-29.7": {
+      "title": "29.7 S4TWL - Mobile Asset Management (MAM)",
+      "pages": "723-724",
+      "sap_notes": [
+        "2250183",
+        "2270080"
+      ],
+      "components": [
+        "PM-WOC-MB",
+        "PM"
+      ]
+    },
+    "SI-29.8": {
+      "title": "29.8 S4TWL - Batch Input for Enterprise Asset Management (EAM)",
+      "pages": "724-726",
+      "sap_notes": [
+        "2270107"
+      ],
+      "components": [
+        "PM"
+      ]
+    },
+    "SI-29.9": {
+      "title": "29.9 S4TWL - Changes In List Reports For Order and Notification",
+      "pages": "726-730",
+      "sap_notes": [
+        "2217234",
+        "2270108",
+        "2270110",
+        "2270123",
+        "2482659"
+      ],
+      "components": [
+        "PM-WOC-MN",
+        "PM-WOC-MO",
+        "PM"
+      ]
+    },
+    "SI-3.1": {
+      "title": "3.1 S4TWL - MDM 3.0 integration",
+      "pages": "124-125",
+      "sap_notes": [
+        "1529387",
+        "2267295"
+      ],
+      "components": [
+        "LO-MD-MM"
+      ]
+    },
+    "SI-3.10": {
+      "title": "3.10 S4TWL - BADI ADDRESS_SEARCH (Duplicate Check) is Not Supported in SAP S/4HANA",
+      "pages": "141-142",
+      "sap_notes": [
+        "2416027"
+      ],
+      "components": [
+        "LO-MD-BP"
+      ]
+    },
+    "SI-3.11": {
+      "title": "3.11 S4TWL - Business Partner Hierarchy Not Available",
+      "pages": "143-144",
+      "sap_notes": [
+        "2409939"
+      ],
+      "components": [
+        "LO-MD-BP"
+      ]
+    },
+    "SI-3.12": {
+      "title": "3.12 S4TWL - MDG in Lama",
+      "pages": "144-145",
+      "sap_notes": [
+        "2182725",
+        "2379272"
+      ],
+      "components": [
+        "CA-MDG"
+      ]
+    },
+    "SI-3.13": {
+      "title": "3.13 S4TWL - Migration of Business Partner Data specific to GST India",
+      "pages": "145-146",
+      "sap_notes": [
+        "2285611",
+        "2387589",
+        "2421394",
+        "2877717"
+      ],
+      "components": [
+        "XX-CSC-IN-SD",
+        "XX-CSC-IN-MM",
+        "XX-CSC-IN"
+      ]
+    },
+    "SI-3.14": {
+      "title": "3.14 S4TWL - MDG_MDC in Lama",
+      "pages": "146-147",
+      "sap_notes": [
+        "2182725",
+        "2442665"
+      ],
+      "components": [
+        "CA-MDG-CMP"
+      ]
+    },
+    "SI-3.15": {
+      "title": "3.15 S4TWL - Batch Input for Customer Master/Supplier Master",
+      "pages": "147-148",
+      "sap_notes": [
+        "2472030",
+        "2492904"
+      ],
+      "components": [
+        "LO-MD-BP"
+      ]
+    },
+    "SI-3.16": {
+      "title": "3.16 S4TWL - API RFC_CVI_EI_INBOUND_MAIN is obsolete",
+      "pages": "148-149",
+      "sap_notes": [
+        "2417298",
+        "2506041"
+      ],
+      "components": [
+        "LO-MD-BP"
+      ]
+    },
+    "SI-3.17": {
+      "title": "3.17 S4TWL - Removal of Gender Domain Fixed Values",
+      "pages": "149-152",
+      "sap_notes": [
+        "2928897"
+      ],
+      "components": [
+        "LO-MD-BP",
+        "BC-SRV-ADR",
+        "BC-SRV-BP"
+      ]
+    },
+    "SI-3.18": {
+      "title": "3.18 S4TWL - Usage of obsolete links in tables BD001 / BC001",
+      "pages": "152-153",
+      "sap_notes": [
+        "3010257"
+      ],
+      "components": [
+        "LO-MD-BP"
+      ]
+    },
+    "SI-3.19": {
+      "title": "3.19 S4TWL - Business Partner Approach",
+      "pages": "153-159",
+      "sap_notes": [
+        "1623677",
+        "2265093",
+        "2310884",
+        "2472030"
+      ],
+      "components": [
+        "LO-MD-BP"
+      ]
+    },
+    "SI-3.2": {
+      "title": "3.2 S4TWL - SRM Product Master",
+      "pages": "125-127",
+      "sap_notes": [
+        "2267297"
+      ],
+      "components": [
+        "AP-MD-PRO"
+      ]
+    },
+    "SI-3.20": {
+      "title": "3.20 S4TWL - Reduction of Redundant Business Partner Data Storage in the 'BUTADRSEARC",
+      "pages": "159-161",
+      "sap_notes": [
+        "2576961"
+      ],
+      "components": [
+        "LO-MD-BP"
+      ]
+    },
+    "SI-3.21": {
+      "title": "3.21 S4TWL - Simplified Product Master Tables Related to OMSR Transaction",
+      "pages": "161-162",
+      "sap_notes": [
+        "2267138"
+      ],
+      "components": [
+        "LO-MD-MM"
+      ]
+    },
+    "SI-3.22": {
+      "title": "3.22 S4TWL - Material Number Field Length Extension",
+      "pages": "162-171",
+      "sap_notes": [
+        "1597790",
+        "1696821",
+        "2214213",
+        "2215424",
+        "2215852",
+        "2216958",
+        "2229860",
+        "2229892",
+        "2232362",
+        "2232366",
+        "2232391",
+        "2232396",
+        "2232497",
+        "2233100",
+        "2267140",
+        "2270396",
+        "2270836",
+        "2333141"
+      ],
+      "components": [
+        "LO-MD-MM",
+        "CA-FLE-MAT"
+      ]
+    },
+    "SI-3.23": {
+      "title": "3.23 S4TWL - Simplification of copy/reference handling",
+      "pages": "171-173",
+      "sap_notes": [
+        "2206932",
+        "2323185",
+        "2324325",
+        "2330063"
+      ],
+      "components": [
+        "LO-MD-MM"
+      ]
+    },
+    "SI-3.24": {
+      "title": "3.24 S4TWL - Foreign Trade fields in Material Master",
+      "pages": "173-174",
+      "sap_notes": [
+        "2204534",
+        "2267225",
+        "2458666",
+        "2641097"
+      ],
+      "components": [
+        "LO-MD-MM"
+      ]
+    },
+    "SI-3.25": {
+      "title": "3.25 S4TWL - MRP fields in Material Master",
+      "pages": "174-178",
+      "sap_notes": [
+        "2224371",
+        "2267246"
+      ],
+      "components": [
+        "LO-MD-MM"
+      ]
+    },
+    "SI-3.26": {
+      "title": "3.26 S4TWL - Material Type SERV",
+      "pages": "178-182",
+      "sap_notes": [
+        "2224251",
+        "2267247"
+      ],
+      "components": [
+        "LO-MD-MM"
+      ]
+    },
+    "SI-3.3": {
+      "title": "3.3 S4TWL - Logistics Batch Management",
+      "pages": "127-128",
+      "sap_notes": [
+        "2267298"
+      ],
+      "components": [
+        "LO-BM-MD"
+      ]
+    },
+    "SI-3.4": {
+      "title": "3.4 S4TWL - Product catalog",
+      "pages": "129-131",
+      "sap_notes": [
+        "2267292",
+        "2269324",
+        "2371157"
+      ],
+      "components": [
+        "LO-MD-PC"
+      ]
+    },
+    "SI-3.5": {
+      "title": "3.5 S4TWL - Object Identifier Type Code",
+      "pages": "131-132",
+      "sap_notes": [
+        "2267294"
+      ],
+      "components": [
+        "CA-MDG-KM"
+      ]
+    },
+    "SI-3.6": {
+      "title": "3.6 S4TWL - Deprecation of 4 fields from FSBP table BP1010",
+      "pages": "132-135",
+      "sap_notes": [
+        "1000009",
+        "1765305",
+        "3216733",
+        "3327581"
+      ],
+      "components": [
+        "FS-BP"
+      ]
+    },
+    "SI-3.7": {
+      "title": "3.7 S4TWL: Business partner data exchange between SAP CRM and S/4HANA",
+      "pages": "135-138",
+      "sap_notes": [
+        "1968132",
+        "2070408",
+        "2231667",
+        "2265093",
+        "2283695",
+        "2283810",
+        "2285062",
+        "2286880",
+        "2289876",
+        "2304337"
+      ],
+      "components": [
+        "S4CORE",
+        "CRM-MD-BP-IF"
+      ]
+    },
+    "SI-3.8": {
+      "title": "3.8 S4TWL - HANA-based Analytics for Master Data Governance",
+      "pages": "138-139",
+      "sap_notes": [
+        "2375319"
+      ],
+      "components": [
+        "CA-MDG-ANR"
+      ]
+    },
+    "SI-3.9": {
+      "title": "3.9 S4TWL - Business Partner BUT000/Header Level Time Dependency",
+      "pages": "139-141",
+      "sap_notes": [
+        "1759416",
+        "2379157"
+      ],
+      "components": [
+        "LO-MD-BP"
+      ]
+    },
+    "SI-30.1": {
+      "title": "30.1 S4TWL - ERP Line-Balancing and Sequencing",
+      "pages": "730-732",
+      "sap_notes": [
+        "2268084",
+        "2269324"
+      ],
+      "components": [
+        "PP-FLW-SEQ",
+        "PP-FLW-LDS",
+        "PP-FLW"
+      ]
+    },
+    "SI-30.2": {
+      "title": "30.2 S4TWL - MRP in HANA",
+      "pages": "732-739",
+      "sap_notes": [
+        "1914010",
+        "2268085",
+        "2268088",
+        "2269324",
+        "3233524",
+        "3348184",
+        "3489493"
+      ],
+      "components": [
+        "PP-MRP"
+      ]
+    },
+    "SI-30.3": {
+      "title": "30.3 S4TWL - Planning File",
+      "pages": "739-741",
+      "sap_notes": [
+        "2227059",
+        "2268088"
+      ],
+      "components": [
+        "PP-MP-LTP",
+        "PP-MRP"
+      ]
+    },
+    "SI-30.4": {
+      "title": "30.4 S4TWL - Total Dependent Requirements",
+      "pages": "741-742",
+      "sap_notes": [
+        "2229126",
+        "2268089"
+      ],
+      "components": [
+        "PP-MRP"
+      ]
+    },
+    "SI-30.5": {
+      "title": "30.5 S4TWL - Forecast Based Planning",
+      "pages": "742-744",
+      "sap_notes": [
+        "2268095",
+        "2269324",
+        "2844909"
+      ],
+      "components": [
+        "PP-MRP",
+        "MM-CBP-CBP"
+      ]
+    },
+    "SI-30.6": {
+      "title": "30.6 S4TWL - Release status for different RFC function modules revoked",
+      "pages": "744-745",
+      "sap_notes": [
+        "2199837",
+        "2268112"
+      ],
+      "components": [
+        "PP-SFC"
+      ]
+    },
+    "SI-30.7": {
+      "title": "30.7 S4TWL - Computer Aided Processing Planning (CAP)",
+      "pages": "745-748",
+      "sap_notes": [
+        "2268114"
+      ],
+      "components": [
+        "PP-BD-CAP"
+      ]
+    },
+    "SI-30.8": {
+      "title": "30.8 S4TWL - ABAP-List-Based PI-Sheets",
+      "pages": "748-751",
+      "sap_notes": [
+        "2268116",
+        "3413719",
+        "3413777",
+        "3417131"
+      ],
+      "components": [
+        "PP-PI-PMA-MGT"
+      ]
+    },
+    "SI-30.9": {
+      "title": "30.9 S4TWL - ANSI/ISA S95 Interface",
+      "pages": "751-835",
+      "sap_notes": [
+        "1425152",
+        "1793291",
+        "2216528",
+        "2224356",
+        "2226333",
+        "2226966",
+        "2227532",
+        "2227579",
+        "2228178",
+        "2232362",
+        "2240359",
+        "2268044",
+        "2268045",
+        "2268048",
+        "2268050",
+        "2268063",
+        "2268064",
+        "2268069",
+        "2268070",
+        "2268082",
+        "2268084",
+        "2268116",
+        "2268117",
+        "2268131",
+        "2269324",
+        "2270200",
+        "2270216",
+        "2270218",
+        "2270231",
+        "2270233",
+        "2270235",
+        "2270236",
+        "2270237",
+        "2270240",
+        "2270241",
+        "2270242",
+        "2270267",
+        "2271203",
+        "2271204",
+        "2271206",
+        "2273079",
+        "2466264",
+        "2578952",
+        "2614920",
+        "2655077",
+        "2666947",
+        "2688804",
+        "2697512",
+        "2935734",
+        "2941708",
+        "2999251",
+        "3018123",
+        "3035649",
+        "3156358",
+        "3156360",
+        "3156361",
+        "3156432",
+        "3156433",
+        "3156434",
+        "3196066",
+        "3215965",
+        "3413719",
+        "3413777",
+        "3417131",
+        "3494892"
+      ],
+      "components": [
+        "LO-S95"
+      ]
+    },
+    "SI-31.1": {
+      "title": "31.1 S4TWL - Performance optimizations for publication of planning orders",
+      "pages": "835-838",
+      "sap_notes": [
+        "2267169",
+        "2267283",
+        "2643483"
+      ],
+      "components": [
+        "SCM-APO-PPS",
+        "SCM-APO-INT"
+      ]
+    },
+    "SI-32.2": {
+      "title": "32.2 S4TWL - Selected Project System Interfaces",
+      "pages": "838-839",
+      "sap_notes": [
+        "1670678",
+        "2267288"
+      ],
+      "components": [
+        "PS-ST-INT"
+      ]
+    },
+    "SI-32.3": {
+      "title": "32.3 S4TWL - Construction Progress Report and Valuation",
+      "pages": "839-840",
+      "sap_notes": [
+        "2267289"
+      ],
+      "components": [
+        "PS-REV-CPR"
+      ]
+    },
+    "SI-32.4": {
+      "title": "32.4 S4TWL - Project System ITS Services",
+      "pages": "841-841",
+      "sap_notes": [
+        "2267331"
+      ],
+      "components": [
+        "PS-CON"
+      ]
+    },
+    "SI-32.5": {
+      "title": "32.5 S4TWL - Selected Project System BAPIs",
+      "pages": "841-842",
+      "sap_notes": [
+        "2267386"
+      ],
+      "components": [
+        "PS-ST"
+      ]
+    },
+    "SI-32.6": {
+      "title": "32.6 S4TWL - Handling Large Projects Business Functions",
+      "pages": "842-844",
+      "sap_notes": [
+        "2240359",
+        "2352369"
+      ],
+      "components": [
+        "PS-HLP"
+      ]
+    },
+    "SI-32.7": {
+      "title": "32.7 S4TWL - Hierarchy Graphics in Project Systems",
+      "pages": "844-845",
+      "sap_notes": [
+        "2269324",
+        "3000979"
+      ],
+      "components": [
+        "PS"
+      ]
+    },
+    "SI-32.8": {
+      "title": "32.8 S4TWL - Project System Analytical Apps",
+      "pages": "845-847",
+      "sap_notes": [
+        "3112420"
+      ],
+      "components": [
+        "PS-IS"
+      ]
+    },
+    "SI-32.9": {
+      "title": "32.9 S4TWL - Project System - Compatibility Scope",
+      "pages": "847-857",
+      "sap_notes": [
+        "2269324",
+        "2270261",
+        "2270262",
+        "2270265",
+        "2270266",
+        "2677564",
+        "3000979",
+        "3265838",
+        "3331626"
+      ],
+      "components": [
+        "PS"
+      ]
+    },
+    "SI-33.1": {
+      "title": "33.1 S4TWL - PS&S SARA Reports",
+      "pages": "857-858",
+      "sap_notes": [
+        "2267438"
+      ],
+      "components": [
+        "EHS-HSM"
+      ]
+    },
+    "SI-33.2": {
+      "title": "33.2 S4TWL - Substance Volume Tracking Selection Criteria based on tables VBUK and VB",
+      "pages": "858-860",
+      "sap_notes": [
+        "2198406",
+        "2267439"
+      ],
+      "components": [
+        "EHS-SAF-RCK"
+      ]
+    },
+    "SI-33.3": {
+      "title": "33.3 S4TWL - Simplification in Product Compliance for Discrete Industry",
+      "pages": "860-862",
+      "sap_notes": [
+        "2267461"
+      ],
+      "components": [
+        "EHS-MGM-PRC"
+      ]
+    },
+    "SI-33.4": {
+      "title": "33.4 S4TWL - Replacement of Event Type Linkages",
+      "pages": "862-864",
+      "sap_notes": [
+        "3015382",
+        "3196565"
+      ],
+      "components": [
+        "EHS-SUS-DG",
+        "EHS-SUS-SDS",
+        "EHS-SUS-PMA"
+      ]
+    },
+    "SI-33.5": {
+      "title": "33.5 S4TWL - QM Interface",
+      "pages": "865-865",
+      "sap_notes": [
+        "2267387"
+      ],
+      "components": [
+        "EHS-SAF"
+      ]
+    },
+    "SI-33.6": {
+      "title": "33.6 S4TWL - PS&S Enterprise Search Model",
+      "pages": "866-866",
+      "sap_notes": [
+        "2267421"
+      ],
+      "components": [
+        "EHS-SAF"
+      ]
+    },
+    "SI-33.7": {
+      "title": "33.7 S4TWL - Hazardous Substance Management",
+      "pages": "866-867",
+      "sap_notes": [
+        "2267422"
+      ],
+      "components": [
+        "EHS-HSM"
+      ]
+    },
+    "SI-33.8": {
+      "title": "33.8 S4TWL - Add-On: SAP Product and REACH Compliance (SPRC)",
+      "pages": "867-869",
+      "sap_notes": [
+        "1489703",
+        "2267423",
+        "2298456"
+      ],
+      "components": [
+        "EHS-SRC"
+      ]
+    },
+    "SI-33.9": {
+      "title": "33.9 S4TWL - Add-On: EHS Web-Interface",
+      "pages": "870-872",
+      "sap_notes": [
+        "2267426",
+        "2267427",
+        "2267432",
+        "2307624"
+      ],
+      "components": [
+        "EHS-BD"
+      ]
+    },
+    "SI-34.1": {
+      "title": "34.1 S4TWL - Quality Management Information System (QMIS)",
+      "pages": "872-874",
+      "sap_notes": [
+        "2269324",
+        "2270193"
+      ],
+      "components": [
+        "QM-QC-IS"
+      ]
+    },
+    "SI-34.2": {
+      "title": "34.2 S4TWL - Redundant Transactions in QM",
+      "pages": "874-876",
+      "sap_notes": [
+        "2338215"
+      ],
+      "components": [
+        "QM-PT-BD",
+        "QM-IM-SM",
+        "QM-CA-MD",
+        "QM-PT-BD-SPL",
+        "QM-PT-RPPRC",
+        "QM"
+      ]
+    },
+    "SI-34.3": {
+      "title": "34.3 S4TWL - Removed Navigation to Transactions for Evaluations in QM",
+      "pages": "876-877",
+      "sap_notes": [
+        "2340996"
+      ],
+      "components": [
+        "QM-IM",
+        "QM",
+        "QM-QN",
+        "QM-QC-IS"
+      ]
+    },
+    "SI-34.4": {
+      "title": "34.4 S4TWL - Authorization Objects in QM",
+      "pages": "877-879",
+      "sap_notes": [
+        "2505099"
+      ],
+      "components": [
+        "QM"
+      ]
+    },
+    "SI-34.5": {
+      "title": "34.5 S4TWL - Results Recording",
+      "pages": "879-880",
+      "sap_notes": [
+        "2270124"
+      ],
+      "components": [
+        "QM-IM-RR"
+      ]
+    },
+    "SI-34.6": {
+      "title": "34.6 S4TWL - ITS services in QM",
+      "pages": "880-882",
+      "sap_notes": [
+        "2270126"
+      ],
+      "components": [
+        "QM-QC",
+        "QM-IM-RR",
+        "QM-QN"
+      ]
+    },
+    "SI-34.7": {
+      "title": "34.7 S4TWL - QM WEB Workplace (MiniApps) based on ITS Services",
+      "pages": "882-884",
+      "sap_notes": [
+        "2270129"
+      ],
+      "components": [
+        "QM"
+      ]
+    },
+    "SI-35.1": {
+      "title": "35.1 S4TWL - Transportation (LE-TRA)",
+      "pages": "884-887",
+      "sap_notes": [
+        "2269324",
+        "2270199",
+        "2714892",
+        "3530443"
+      ],
+      "components": [
+        "LE-TRA"
+      ]
+    },
+    "SI-36.1": {
+      "title": "36.1 S4TWL - Task & Resource Management",
+      "pages": "887-888",
+      "sap_notes": [
+        "2241080",
+        "2269324",
+        "2889253"
+      ],
+      "components": [
+        "LE-TRM"
+      ]
+    },
+    "SI-36.2": {
+      "title": "36.2 S4TWL - Warehouse Control Interface",
+      "pages": "889-890",
+      "sap_notes": [
+        "2269324",
+        "2889468"
+      ],
+      "components": [
+        "LE-WM-IFC"
+      ]
+    },
+    "SI-36.3": {
+      "title": "36.3 S4TWL - Decentral WM",
+      "pages": "890-891",
+      "sap_notes": [
+        "2241080",
+        "2269324",
+        "2889540"
+      ],
+      "components": [
+        "LE-WM-IFC"
+      ]
+    },
+    "SI-36.4": {
+      "title": "36.4 S4TWL - Wave Management",
+      "pages": "891-892",
+      "sap_notes": [
+        "2241080",
+        "2269324",
+        "2889652"
+      ],
+      "components": [
+        "LE-WM-TFM-CP"
+      ]
+    },
+    "SI-36.5": {
+      "title": "36.5 S4TWL - Cross Docking",
+      "pages": "893-894",
+      "sap_notes": [
+        "2241080",
+        "2269324",
+        "2889636"
+      ],
+      "components": [
+        "LE-WM-CD"
+      ]
+    },
+    "SI-36.6": {
+      "title": "36.6 S4TWL - Yard Management",
+      "pages": "894-895",
+      "sap_notes": [
+        "2241080",
+        "2269324",
+        "2889637"
+      ],
+      "components": [
+        "LE-YM"
+      ]
+    },
+    "SI-36.7": {
+      "title": "36.7 S4TWL - Value Added Services",
+      "pages": "895-897",
+      "sap_notes": [
+        "2241080",
+        "2269324",
+        "2889638"
+      ],
+      "components": [
+        "LE-WM-VAS"
+      ]
+    },
+    "SI-37.1": {
+      "title": "37.1 S4TWL - Web Dynpro Applications for Resource Maintenance in SAP Portfolio and Pr",
+      "pages": "897-898",
+      "sap_notes": [
+        "2358376",
+        "2379542"
+      ],
+      "components": [
+        "PPM-PRO",
+        "PPM-PFM"
+      ]
+    },
+    "SI-37.2": {
+      "title": "37.2 S4TWL - Workforce Deployment (WFD) integration in SAP Portfolio and Project Mana",
+      "pages": "898-899",
+      "sap_notes": [
+        "2358519"
+      ],
+      "components": [
+        "PPM-PRO",
+        "PPM-PFM"
+      ]
+    },
+    "SI-37.3": {
+      "title": "37.3 S4TWL - Integration to SAP cFolders in SAP Portfolio and Project Management for",
+      "pages": "899-900",
+      "sap_notes": [
+        "2358921"
+      ],
+      "components": [
+        "PPM-PFM",
+        "PPM-PRO"
+      ]
+    },
+    "SI-37.4": {
+      "title": "37.4 S4TWL - KM Documents in SAP Portfolio and Project Management for SAP S/4HANA",
+      "pages": "900-901",
+      "sap_notes": [
+        "2354985",
+        "2445069"
+      ],
+      "components": [
+        "PPM-PFM"
+      ]
+    },
+    "SI-37.5": {
+      "title": "37.5 S4TWL - SRM Integration in SAP Portfolio and Project Management for SAP S/4HANA",
+      "pages": "901-902",
+      "sap_notes": [
+        "2359354",
+        "2445069"
+      ],
+      "components": [
+        "PPM-PRO"
+      ]
+    },
+    "SI-37.6": {
+      "title": "37.6 S4TWL - cFolders not available anymore in SAP Portfolio and Project Management f",
+      "pages": "902-915",
+      "sap_notes": [
+        "1391444",
+        "1427365",
+        "1457426",
+        "1677356",
+        "1755486",
+        "1756616",
+        "1759150",
+        "1769591",
+        "1780409",
+        "2321885",
+        "2348430",
+        "2353984",
+        "2359662",
+        "2445069"
+      ],
+      "components": [
+        "PLM-CFO"
+      ]
+    },
+    "SI-37.8": {
+      "title": "37.8 S4TWL - Fiori apps of UI FOR SAP PORTF PROJ MGMT 6.0 in SAP Portfolio and Projec",
+      "pages": "915-916",
+      "sap_notes": [
+        "2360044"
+      ],
+      "components": [
+        "PPM-PFM",
+        "PPM-PRO",
+        "PPM-FIO"
+      ]
+    },
+    "SI-37.9": {
+      "title": "37.9 S4TWL - Portfolio Structure Graphic in SAP Portfolio and Project Management for",
+      "pages": "916-939",
+      "sap_notes": [
+        "2283330",
+        "2321885",
+        "2343374",
+        "2349633",
+        "2353885",
+        "2353984",
+        "2358463",
+        "2359065",
+        "2359330",
+        "2359421",
+        "2359479",
+        "2360046",
+        "2361179",
+        "2361181",
+        "2361186",
+        "2361194",
+        "2361201",
+        "2361202",
+        "2363785",
+        "2368899",
+        "2379542",
+        "2445069",
+        "2570961",
+        "2630630",
+        "2645827",
+        "2768224",
+        "2823375"
+      ],
+      "components": [
+        "PPM-PFM"
+      ]
+    },
+    "SI-38.1": {
+      "title": "38.1 S4TWL - MM-PUR WebDynpro Applications",
+      "pages": "939-940",
+      "sap_notes": [
+        "2228261",
+        "2267445"
+      ],
+      "components": [
+        "MM-PUR-GF"
+      ]
+    },
+    "SI-38.2": {
+      "title": "38.2 S4TWL - Classic MM-PUR GUI Transactions replacement",
+      "pages": "941-942",
+      "sap_notes": [
+        "1803189",
+        "2267449"
+      ],
+      "components": [
+        "MM-PUR-GF"
+      ]
+    },
+    "SI-38.3": {
+      "title": "38.3 S4TWL - Dedicated SAP Supplier Lifecycle Management (SAP SLC) business processes",
+      "pages": "942-944",
+      "sap_notes": [
+        "2186288",
+        "2187627",
+        "2271188",
+        "2441434"
+      ],
+      "components": [
+        "SLC-SUP"
+      ]
+    },
+    "SI-38.4": {
+      "title": "38.4 S4TWL - Supplier Distribution via MDG-S",
+      "pages": "944-945",
+      "sap_notes": [
+        "2267719"
+      ],
+      "components": [
+        "SLC-SUP"
+      ]
+    },
+    "SI-38.5": {
+      "title": "38.5 S4TWL - Authorization Concept for Supplier Invoice",
+      "pages": "945-946",
+      "sap_notes": [
+        "2271189"
+      ],
+      "components": [
+        "MM-IV"
+      ]
+    },
+    "SI-38.6": {
+      "title": "38.6 S4TWL - Foreign Trade within SAP S/4HANA Procurement",
+      "pages": "946-957",
+      "sap_notes": [
+        "2223144",
+        "2267740"
+      ],
+      "components": [
+        "MM-FT"
+      ]
+    },
+    "SI-38.7": {
+      "title": "38.7 S4TWL - RFQ Simplified Transaction",
+      "pages": "957-959",
+      "sap_notes": [
+        "2332710"
+      ],
+      "components": [
+        "MM-PUR-RFQ"
+      ]
+    },
+    "SI-38.8": {
+      "title": "38.8 S4TWL - Webdynpro Applications for Purchase Requisition Transfer from ERP to SRM",
+      "pages": "959-960",
+      "sap_notes": [
+        "2200412"
+      ],
+      "components": [
+        "MM-PUR-REQ"
+      ]
+    },
+    "SI-38.9": {
+      "title": "38.9 S4TWL - Co-Deployment of SAP SRM",
+      "pages": "960-979",
+      "sap_notes": [
+        "2186288",
+        "2187627",
+        "2188695",
+        "2188735",
+        "2189301",
+        "2216943",
+        "2220005",
+        "2228247",
+        "2228250",
+        "2232362",
+        "2251946",
+        "2267413",
+        "2267414",
+        "2267441",
+        "2267442",
+        "2267444",
+        "2271166",
+        "2271168",
+        "2271184",
+        "2441434",
+        "2578291",
+        "2899836",
+        "3053636",
+        "3092824",
+        "3101906",
+        "3282761",
+        "3319787",
+        "3326565",
+        "3334975",
+        "3338301",
+        "3345237",
+        "3376141"
+      ],
+      "components": [
+        "SRM-EBP-SHP",
+        "SRM-CAT",
+        "MM-PUR-GF"
+      ]
+    },
+    "SI-39.1": {
+      "title": "39.1 S4TWL - Business Role Internal Sales Representative",
+      "pages": "979-980",
+      "sap_notes": [
+        "2223838",
+        "2271150"
+      ],
+      "components": [
+        "SD-SLS"
+      ]
+    },
+    "SI-39.2": {
+      "title": "39.2 S4TWL - Webshops by Internet Sales or Web Channel Experience Management",
+      "pages": "980-982",
+      "sap_notes": [
+        "2271161"
+      ],
+      "components": [
+        "WEC-APP-SLS-ERP"
+      ]
+    },
+    "SI-39.3": {
+      "title": "39.3 S4TWL - Sales Activities",
+      "pages": "982-986",
+      "sap_notes": [
+        "2214585",
+        "2267375"
+      ],
+      "components": [
+        "SD-CAS"
+      ]
+    },
+    "SI-39.4": {
+      "title": "39.4 S4TWL - Billing Document Output Management",
+      "pages": "986-987",
+      "sap_notes": [
+        "2790427"
+      ],
+      "components": [
+        "SD-BIL"
+      ]
+    },
+    "SI-39.5": {
+      "title": "39.5 S4TWL - SD Rebate Processing replaced by Settlement Management",
+      "pages": "987-989",
+      "sap_notes": [
+        "2226380",
+        "2267344",
+        "2267377"
+      ],
+      "components": [
+        "SD-BIL-RB"
+      ]
+    },
+    "SI-39.6": {
+      "title": "39.6 S4TWL -Miscellaneous minor functionalities in SD Area",
+      "pages": "989-990",
+      "sap_notes": [
+        "2228098",
+        "2267395"
+      ],
+      "components": [
+        "SD-SLS-GF",
+        "SD-BIL",
+        "SD-MD-CM"
+      ]
+    },
+    "SI-39.7": {
+      "title": "39.7 S4TWL - SD Complaint Handling",
+      "pages": "990-991",
+      "sap_notes": [
+        "2239184",
+        "2267398"
+      ],
+      "components": [
+        "SD-BIL-IV-CP"
+      ]
+    },
+    "SI-39.8": {
+      "title": "39.8 S4TWL - SD Simplified Data Models",
+      "pages": "991-994",
+      "sap_notes": [
+        "2198647",
+        "2224436",
+        "2267306",
+        "2267377",
+        "2270544"
+      ],
+      "components": [
+        "SD-BF-MIG",
+        "SD-BF"
+      ]
+    },
+    "SI-39.9": {
+      "title": "39.9 S4TWL - VBFA - Indirect Docflow Relationships",
+      "pages": "994-1030",
+      "sap_notes": [
+        "1812828",
+        "2188695",
+        "2188735",
+        "2189301",
+        "2200691",
+        "2205202",
+        "2217124",
+        "2220005",
+        "2223144",
+        "2223800",
+        "2225170",
+        "2226380",
+        "2227014",
+        "2227750",
+        "2227824",
+        "2228056",
+        "2232362",
+        "2249880",
+        "2267306",
+        "2267308",
+        "2267310",
+        "2267342",
+        "2267344",
+        "2267348",
+        "2267350",
+        "2267351",
+        "2267377",
+        "2269324",
+        "2270544",
+        "2313318",
+        "2418242",
+        "2469315",
+        "2470721",
+        "2500202",
+        "2582784",
+        "2591055",
+        "2733866",
+        "2869019",
+        "3052214"
+      ],
+      "components": [
+        "SD-BF-MIG"
+      ]
+    },
+    "SI-4.1": {
+      "title": "4.1 S4TWL - CPM - Rate Card",
+      "pages": "182-183",
+      "sap_notes": [
+        "2318716"
+      ],
+      "components": [
+        "CA-CPD"
+      ]
+    },
+    "SI-4.2": {
+      "title": "4.2 S4TWL - Interface of SAP CPM with SAP Cloud for Customer",
+      "pages": "183-184",
+      "sap_notes": [
+        "2318733"
+      ],
+      "components": [
+        "CA-CPD"
+      ]
+    },
+    "SI-4.3": {
+      "title": "4.3 S4TWL - Fiori Apps of SAP Commercial Project Management",
+      "pages": "184-185",
+      "sap_notes": [
+        "2320143"
+      ],
+      "components": [
+        "CA-CPD"
+      ]
+    },
+    "SI-4.4": {
+      "title": "4.4 S4TWL - Launchpads of Gantt Chart and Commercial Project Inception",
+      "pages": "185-186",
+      "sap_notes": [
+        "2318728"
+      ],
+      "components": [
+        "CA-CPD"
+      ]
+    },
+    "SI-4.5": {
+      "title": "4.5 S4TWL - Workbooks in Project Cost and Revenue Planning",
+      "pages": "186-187",
+      "sap_notes": [
+        "2323806"
+      ],
+      "components": [
+        "CA-CPD"
+      ]
+    },
+    "SI-4.6": {
+      "title": "4.6 S4TWL - CPM - Forecast from financial plan versions",
+      "pages": "187-188",
+      "sap_notes": [
+        "2711002"
+      ],
+      "components": [
+        "CA-CPD",
+        "CA-CPD-FP"
+      ]
+    },
+    "SI-4.7": {
+      "title": "4.7 S4TWL - CPM - Personal Activity List",
+      "pages": "188-189",
+      "sap_notes": [
+        "2712156"
+      ],
+      "components": [
+        "CA-CPD",
+        "CA-CPD-PCM"
+      ]
+    },
+    "SI-41.1": {
+      "title": "41.1 S4TWL - Simplified customizing of Transportation Manangement (TM) integration",
+      "pages": "1030-1033",
+      "sap_notes": [
+        "2465978"
+      ],
+      "components": [
+        "TM-FRS-IP",
+        "TM-FRS",
+        "TM-FRS-IV"
+      ]
+    },
+    "SI-41.2": {
+      "title": "41.2 S4TWL - Forwarding Settlement Document Transfer in TM",
+      "pages": "1033-1037",
+      "sap_notes": [
+        "2639847"
+      ],
+      "components": [
+        "TM-FWS",
+        "TM-FWS-BIL"
+      ]
+    },
+    "SI-41.3": {
+      "title": "41.3 S4TWL - Location Geo-Coding Adjustments",
+      "pages": "1037-1040",
+      "sap_notes": [
+        "3290708"
+      ],
+      "components": [
+        "TM-MD-TN-LOC"
+      ]
+    },
+    "SI-41.4": {
+      "title": "41.4 S4TWL - Sales Order Scheduling Integration into S/4HANA TM",
+      "pages": "1040-1042",
+      "sap_notes": [
+        "3444020"
+      ],
+      "components": [
+        "TM-INT-LI"
+      ]
+    },
+    "SI-42.1": {
+      "title": "42.1 S4TWL - Business Place: Enablement of language dependent name",
+      "pages": "1042-1042",
+      "sap_notes": [
+        "3404390"
+      ],
+      "components": [
+        "FI-LOC-BUP"
+      ]
+    },
+    "SI-42.2": {
+      "title": "42.2 S4TWL - Globalization - Financials",
+      "pages": "1043-1043",
+      "sap_notes": [
+        "2029012",
+        "2227963",
+        "2270311"
+      ],
+      "components": [
+        "FI-LOC",
+        "XX-CSC-XX"
+      ]
+    },
+    "SI-42.3": {
+      "title": "42.3 S4TWL - Annexing Solution for Israel",
+      "pages": "1043-1045",
+      "sap_notes": [
+        "2298073",
+        "2323282",
+        "2349004",
+        "2437547"
+      ],
+      "components": [
+        "XX-CSC-IL"
+      ]
+    },
+    "SI-42.4": {
+      "title": "42.4 S4TWL - Funds Management Portugal",
+      "pages": "1045-1046",
+      "sap_notes": [
+        "2469984",
+        "2595915",
+        "2674217",
+        "3236088"
+      ],
+      "components": [
+        "XX-CSC-PT-PSM-FM"
+      ]
+    },
+    "SI-42.5": {
+      "title": "42.5 S4TWL - Golden Tax Interface for China",
+      "pages": "1047-1047",
+      "sap_notes": [
+        "2727947",
+        "2771861"
+      ],
+      "components": [
+        "FI-LOC-FI-CN",
+        "XX-CSC-CN-GTI"
+      ]
+    },
+    "SI-42.6": {
+      "title": "42.6 S4TWL - Replacement of legal reports with SAP S/4HANA ACR",
+      "pages": "1047-1053",
+      "sap_notes": [
+        "2269324",
+        "2304519",
+        "2351241",
+        "2465179",
+        "2480067",
+        "2835816",
+        "2869393",
+        "2926588",
+        "3096074",
+        "3526880"
+      ],
+      "components": [
+        "FI-LOC-SRF-RUN"
+      ]
+    },
+    "SI-42.8": {
+      "title": "42.8 S4TWL - Russia Manage Additional Payment Attributes app",
+      "pages": "1053-1056",
+      "sap_notes": [
+        "2931354",
+        "3120536"
+      ],
+      "components": [
+        "FI-LOC-FI-RU"
+      ]
+    },
+    "SI-42.9": {
+      "title": "42.9 S4TWL - SAF-T RO: Replacement of ABAP Report Solution with DRC Solution",
+      "pages": "1056-1057",
+      "sap_notes": [
+        "2480067",
+        "3237660",
+        "3256877"
+      ],
+      "components": [
+        "FI-LOC-SAF-RO",
+        {
+          "FI-LOC-FI-RO Related Notes": null
+        }
+      ]
+    },
+    "SI-43.1": {
+      "title": "43.1 S4TWL - Globalization - Logistics",
+      "pages": "1057-1060",
+      "sap_notes": [
+        "2195701",
+        "2244803",
+        "2270312",
+        "2421589",
+        "2523749"
+      ],
+      "components": [
+        "FI-LOC-LO",
+        "XX-CSC-BR-REP",
+        "XX-CSC-BR",
+        "FI-LOC"
+      ]
+    },
+    "SI-44.1": {
+      "title": "44.1 S4TWL - Billing Document Number and Invoicing Document Number Change of Type",
+      "pages": "1060-1064",
+      "sap_notes": [
+        "2436688",
+        "3463454"
+      ],
+      "components": [
+        "FI-CA-INV"
+      ]
+    },
+    "SI-44.2": {
+      "title": "44.2 S4TWL - BRIM - Billing of Event Detail Records (EDR)",
+      "pages": "1064-1065",
+      "sap_notes": [
+        "2271210"
+      ],
+      "components": [
+        "FI-CA-BI"
+      ]
+    },
+    "SI-44.3": {
+      "title": "44.3 S4TWL - BRIM - Common Object Layer (COL)",
+      "pages": "1065-1066",
+      "sap_notes": [
+        "2270317"
+      ],
+      "components": [
+        "FI-CA"
+      ]
+    },
+    "SI-44.4": {
+      "title": "44.4 S4TWL - BRIM - Integration with FSCM Biller Direct (FI-CA)",
+      "pages": "1066-1067",
+      "sap_notes": [
+        "2269324",
+        "2271233"
+      ],
+      "components": [
+        "FI-CA"
+      ]
+    },
+    "SI-44.5": {
+      "title": "44.5 S4TWL - BRIM - Solution Sales and Billing",
+      "pages": "1067-1069",
+      "sap_notes": [
+        "2271236",
+        "2347269",
+        "2348426"
+      ],
+      "components": [
+        "SD-BIL-IV-CB",
+        "FI-CAX"
+      ]
+    },
+    "SI-44.6": {
+      "title": "44.6 S4TWL - BRIM - Immediate Master Data Replication to SAP Convergent Charging",
+      "pages": "1069-1077",
+      "sap_notes": [
+        "2271238",
+        "2387353",
+        "2401583",
+        "2900607",
+        "2907836"
+      ],
+      "components": [
+        "FI-CA"
+      ]
+    },
+    "SI-45.2": {
+      "title": "45.2 S4TWL - FSBP Table Additional Partner Numbers (BPID001) obsolete",
+      "pages": "1077-1078",
+      "sap_notes": [
+        "1000009",
+        "1556353",
+        "3004812"
+      ],
+      "components": [
+        "FS-BP"
+      ]
+    },
+    "SI-45.3": {
+      "title": "45.3 S4TWL - SEM Banking",
+      "pages": "1078-1080",
+      "sap_notes": [
+        "2211665",
+        "2270318"
+      ],
+      "components": [
+        "IS-B-PA",
+        "IS-B-DP",
+        "IS-B-RA",
+        "IS-B-SA"
+      ]
+    },
+    "SI-45.4": {
+      "title": "45.4 S4TWL - CML-specific functions with regard to collaterals and collateral objects",
+      "pages": "1080-1081",
+      "sap_notes": [
+        "2369934"
+      ],
+      "components": [
+        "FS-CML"
+      ]
+    },
+    "SI-45.5": {
+      "title": "45.5 S4TWL - Tax Classification and Reporting in Compatibility Scope",
+      "pages": "1082-1083",
+      "sap_notes": [
+        "1497354",
+        "1604155",
+        "2269324",
+        "3493409"
+      ],
+      "components": [
+        "FS-FBS-TXC"
+      ]
+    },
+    "SI-45.6": {
+      "title": "45.6 S4TWL - Deprecation of app F3987",
+      "pages": "1083-1086",
+      "sap_notes": [
+        "3209838",
+        "3472563"
+      ],
+      "components": [
+        "FI-GL-GL-ADB"
+      ]
+    },
+    "SI-46.1": {
+      "title": "46.1 S4TWL - IS-Beverage (Excise Duty)",
+      "pages": "1086-1086",
+      "sap_notes": [
+        "2190420",
+        "2531942"
+      ],
+      "components": [
+        "SD-SLS-PLL"
+      ]
+    },
+    "SI-46.2": {
+      "title": "46.2 S4TWL - IS-Beverage (Sales Returns)",
+      "pages": "1087-1087",
+      "sap_notes": [
+        "2190420",
+        "2531884"
+      ],
+      "components": [
+        "MM-IM-ED",
+        "SD-SLS-PLL",
+        "SD-BF-EC",
+        "SD-BF-AC",
+        "SD-SLS-RE-SR"
+      ]
+    },
+    "SI-46.3": {
+      "title": "46.3 S4TWL - IS-Beverage (Pendulum List)",
+      "pages": "1088-1090",
+      "sap_notes": [
+        "2190420",
+        "2273297",
+        "2531962"
+      ],
+      "components": [
+        "SD-BIL-RB-PL"
+      ]
+    },
+    "SI-47.2": {
+      "title": "47.2 S4TWL - BI content, Datasources and extractors for DFPS",
+      "pages": "1090-1091",
+      "sap_notes": [
+        "2273294"
+      ],
+      "components": [
+        "BW-BCT-DFS-PM",
+        "BW-BCT-DFS-OF",
+        "BW-BCT-DFS-MM"
+      ]
+    },
+    "SI-47.3": {
+      "title": "47.3 S4TWL - Integration of DFPS with Investigative Case Management (ICM)",
+      "pages": "1091-1093",
+      "sap_notes": [
+        "2273299"
+      ],
+      "components": [
+        "IS-DFS-ICM"
+      ]
+    },
+    "SI-47.4": {
+      "title": "47.4 S4TWL - Integration of DFPS with Environmental Compliance",
+      "pages": "1093-1094",
+      "sap_notes": [
+        "1161250",
+        "2273311"
+      ],
+      "components": [
+        "IS-DFS-EHS"
+      ]
+    },
+    "SI-47.5": {
+      "title": "47.5 S4TWL - Force organization, personnel and sustainment for DFPS",
+      "pages": "1094-1095",
+      "sap_notes": [
+        "2269324",
+        "3018378",
+        "7017755",
+        "7017756"
+      ],
+      "components": [
+        "IS-DFS"
+      ]
+    },
+    "SI-48.1": {
+      "title": "48.1 S4TWL - Collective Processing Pegging",
+      "pages": "1095-1096",
+      "sap_notes": [
+        "2200942",
+        "2270832"
+      ],
+      "components": [
+        "IS-ADEC-GPD",
+        "IS-ADEC"
+      ]
+    },
+    "SI-48.2": {
+      "title": "48.2 S4TWL - Actual labor and costing",
+      "pages": "1096-1097",
+      "sap_notes": [
+        "2445654"
+      ],
+      "components": [
+        "IS-ADEC-ALC"
+      ]
+    },
+    "SI-48.3": {
+      "title": "48.3 S4TWL - Renovation of Grouping, Pegging and Distribution Functionality",
+      "pages": "1097-1103",
+      "sap_notes": [
+        "2933435",
+        "3246460"
+      ],
+      "components": [
+        "IS-ADEC-GPD"
+      ]
+    },
+    "SI-48.4": {
+      "title": "48.4 S4TWL - Cost Distribution Processing",
+      "pages": "1103-1104",
+      "sap_notes": [
+        "2200942",
+        "2270834"
+      ],
+      "components": [
+        "IS-ADEC",
+        "IS-ADEC-GPD"
+      ]
+    },
+    "SI-48.5": {
+      "title": "48.5 S4TWL - Manufacturer Part Number",
+      "pages": "1104-1110",
+      "sap_notes": [
+        "2228241",
+        "2270836",
+        "2334008",
+        "2334012",
+        "2348023"
+      ],
+      "components": [
+        "IS-ADEC-MPN"
+      ]
+    },
+    "SI-48.6": {
+      "title": "48.6 S4TWL - Flight Scheduling",
+      "pages": "1110-1111",
+      "sap_notes": [
+        "2270837",
+        "2382229"
+      ],
+      "components": [
+        "IS-ADEC"
+      ]
+    },
+    "SI-48.7": {
+      "title": "48.7 S4TWL - Enhancements Actual Labour Costing / Time Recording",
+      "pages": "1111-1112",
+      "sap_notes": [
+        "2270838"
+      ],
+      "components": [
+        "IS-ADEC-ALC"
+      ]
+    },
+    "SI-48.8": {
+      "title": "48.8 S4TWL - Enhancements Subcontracting Special Stock Types Not Available",
+      "pages": "1112-1113",
+      "sap_notes": [
+        "2270839"
+      ],
+      "components": [
+        "IS-ADEC",
+        "IS-ADEC-SUB"
+      ]
+    },
+    "SI-48.9": {
+      "title": "48.9 S4TWL - AECMA SPEC 2000M Military Version",
+      "pages": "1113-1117",
+      "sap_notes": [
+        "2270840",
+        "2349033",
+        "2382203",
+        "2445653"
+      ],
+      "components": [
+        "IS-ADEC",
+        "IS-ADEC-SPC"
+      ]
+    },
+    "SI-49.1": {
+      "title": "49.1 S4TWL - Vehicle search using SAP TREX as external search engine",
+      "pages": "1117-1118",
+      "sap_notes": [
+        "2456102"
+      ],
+      "components": [
+        "IS-A-VMS",
+        "IS-A",
+        "IS-A-VMS-SR"
+      ]
+    },
+    "SI-49.2": {
+      "title": "49.2 S4TWL - Handling Unit Management - Obsolete Transactions",
+      "pages": "1118-1123",
+      "sap_notes": [
+        "2633572"
+      ],
+      "components": [
+        "IS-A-HUM",
+        "LO-HU"
+      ]
+    },
+    "SI-49.3": {
+      "title": "49.3 S4TWL - JIT Inbound",
+      "pages": "1123-1126",
+      "sap_notes": [
+        "3159740"
+      ],
+      "components": [
+        "IS-A-JIT"
+      ]
+    },
+    "SI-49.4": {
+      "title": "49.4 S4TWL - JIT Outbound",
+      "pages": "1126-1129",
+      "sap_notes": [
+        "3155820"
+      ],
+      "components": [
+        "IS-A-JIT"
+      ]
+    },
+    "SI-49.5": {
+      "title": "49.5 S4TWL - Self-Billing Cockpit",
+      "pages": "1129-1133",
+      "sap_notes": [
+        "3168667"
+      ],
+      "components": [
+        "SD-BIL-IV-SBI"
+      ]
+    },
+    "SI-49.6": {
+      "title": "49.6 S4TWL - Sales Scheduling Agreement with TAM processing",
+      "pages": "1134-1136",
+      "sap_notes": [
+        "3159740",
+        "3192264"
+      ],
+      "components": [
+        "SD-SLS-OA-SCH"
+      ]
+    },
+    "SI-49.7": {
+      "title": "49.7 S4TWL - Returnable Packaging Logistics",
+      "pages": "1136-1138",
+      "sap_notes": [
+        "3213566"
+      ],
+      "components": [
+        "IS-A-RL"
+      ]
+    },
+    "SI-49.8": {
+      "title": "49.8 S4TWL - Tracking Inbound",
+      "pages": "1138-1140",
+      "sap_notes": [
+        "2228139",
+        "2270352"
+      ],
+      "components": [
+        "IS-A-TRI"
+      ]
+    },
+    "SI-49.9": {
+      "title": "49.9 S4TWL - Supplier Workplace",
+      "pages": "1140-1157",
+      "sap_notes": [
+        "2227568",
+        "2228218",
+        "2228219",
+        "2228220",
+        "2228241",
+        "2228242",
+        "2228244",
+        "2267140",
+        "2270354",
+        "2270357",
+        "2270358",
+        "2270396",
+        "2270398",
+        "2270399",
+        "2273102",
+        "2301522",
+        "2326776",
+        "2326822",
+        "2341690",
+        "2349033",
+        "2352485",
+        "2360860",
+        "2384347"
+      ],
+      "components": [
+        "IS-A-SWP"
+      ]
+    },
+    "SI-5.1": {
+      "title": "5.1 S4TWL -  CM: Simplified Market Data",
+      "pages": "189-190",
+      "sap_notes": [
+        "2460737"
+      ],
+      "components": [
+        "SD-BF-CPE",
+        "LO-CMM-BF",
+        "MM-PUR-GF-CPE"
+      ]
+    },
+    "SI-5.10": {
+      "title": "5.10 S4TWL - Position Reporting on versioned pricing data",
+      "pages": "198-199",
+      "sap_notes": [
+        "2547347"
+      ],
+      "components": [
+        "LO-CMM-ANL",
+        "LO-CMM-BF"
+      ]
+    },
+    "SI-5.11": {
+      "title": "5.11 S4TWL - Hedge Management for logistics transactions",
+      "pages": "199-200",
+      "sap_notes": [
+        "2556106"
+      ],
+      "components": [
+        "LO-CMM-ANL",
+        "FIN-FSCM-TRM-CRM",
+        "LO-CMM-BF"
+      ]
+    },
+    "SI-5.12": {
+      "title": "5.12 S4TWL - Position Reports delivered by Agricultural Contract Management",
+      "pages": "200-202",
+      "sap_notes": [
+        "2556134"
+      ],
+      "components": [
+        "LO-CMM-BF",
+        "LO-CMM-ANL"
+      ]
+    },
+    "SI-5.13": {
+      "title": "5.13 S4TWL - Risk Determination and Pricing for MM Contracts not supported yet",
+      "pages": "202-203",
+      "sap_notes": [
+        "2560298"
+      ],
+      "components": [
+        "LO-CMM-BF",
+        "LO-CMM-ANL"
+      ]
+    },
+    "SI-5.14": {
+      "title": "5.14 S4TWL - Unification of supported technologies in analytical data provisioning",
+      "pages": "203-204",
+      "sap_notes": [
+        "2555990"
+      ],
+      "components": [
+        "LO-CMM-ANL",
+        "FIN-FSCM-TRM-CRM",
+        {
+          "LO-CMM-BF Related Notes": null
+        }
+      ]
+    },
+    "SI-5.15": {
+      "title": "5.15 S4TWL - Risk Determination on a schedule line level",
+      "pages": "204-205",
+      "sap_notes": [
+        "2556063"
+      ],
+      "components": [
+        "LO-CMM-ANL",
+        "LO-CMM-BF"
+      ]
+    },
+    "SI-5.16": {
+      "title": "5.16 S4TWL - Simplification of DCS based Market Data Handling for Fin Transactions",
+      "pages": "205-206",
+      "sap_notes": [
+        "2553281",
+        "2556164"
+      ],
+      "components": [
+        "FIN-FSCM-TRM-CRM",
+        "LO-CMM-BF"
+      ]
+    },
+    "SI-5.17": {
+      "title": "5.17 S4TWL - Deprecation of Non DCS based Market Data for Financial Transactions",
+      "pages": "206-208",
+      "sap_notes": [
+        "2553281",
+        "2556220"
+      ],
+      "components": [
+        "FIN-FSCM-TRM-CRM",
+        "LO-CMM-BF"
+      ]
+    },
+    "SI-5.18": {
+      "title": "5.18 S4TWL - Deprecation of functions using Non DCS based Market Data",
+      "pages": "208-209",
+      "sap_notes": [
+        "2556176"
+      ],
+      "components": [
+        "LO-CMM-BF",
+        "FIN-FSCM-TRM-CRM"
+      ]
+    },
+    "SI-5.19": {
+      "title": "5.19 S4TWL - Simplified Data Model/Master Data",
+      "pages": "209-210",
+      "sap_notes": [
+        "2553281",
+        "2554440",
+        "2556176"
+      ],
+      "components": [
+        "LO-CMM-BF"
+      ]
+    },
+    "SI-5.2": {
+      "title": "5.2 S4TWL -  CM: Simplified CPE Activation",
+      "pages": "191-191",
+      "sap_notes": [
+        "2461004"
+      ],
+      "components": [
+        "LO-CMM-BF",
+        "SD-BF-CPE",
+        "MM-PUR-GF-CPE"
+      ]
+    },
+    "SI-5.20": {
+      "title": "5.20 S4TWL - Contract Processing Monitor & Logistical Options w/ GTM not supported",
+      "pages": "210-211",
+      "sap_notes": [
+        "2672696"
+      ],
+      "components": [
+        "LO-GT-CMM",
+        "LO-CMM-BF"
+      ]
+    },
+    "SI-5.21": {
+      "title": "5.21 S4TWL - Mark-to-Market & Profit-and-Loss Reporting for logistics transactions",
+      "pages": "211-213",
+      "sap_notes": [
+        "2591598"
+      ],
+      "components": [
+        "LO-CMM-BF",
+        "LO-CMM-ANL"
+      ]
+    },
+    "SI-5.22": {
+      "title": "5.22 S4TWL - Mark-to-Market & Profit-and-Loss Reporting for Derivatives",
+      "pages": "213-214",
+      "sap_notes": [
+        "2596369"
+      ],
+      "components": [
+        "FIN-FSCM-TRM-CRM"
+      ]
+    },
+    "SI-5.23": {
+      "title": "5.23 S4TWL - Mark to Market Accounting Changes",
+      "pages": "214-215",
+      "sap_notes": [
+        "2608098"
+      ],
+      "components": [
+        "LO-CMM-BF",
+        "LO-CMM-ANL"
+      ]
+    },
+    "SI-5.24": {
+      "title": "5.24 S4TWL - Integration of Pricing and Payment Events in GTM with Commodity Mngmt.",
+      "pages": "215-216",
+      "sap_notes": [
+        "2551942",
+        "2671009",
+        "2671010"
+      ],
+      "components": [
+        "LO-CMM-BF",
+        "LO-GT-CMM"
+      ]
+    },
+    "SI-5.25": {
+      "title": "5.25 S4TWL - Performance Optimization of Risk Analytics CDS Views",
+      "pages": "216-218",
+      "sap_notes": [
+        "3327638"
+      ],
+      "components": [
+        "LO-CMM-BF",
+        "LO-CMM-ANL"
+      ]
+    },
+    "SI-5.26": {
+      "title": "5.26 S4TWL - Simplified Commodity Pricing Engine Data Model",
+      "pages": "219-222",
+      "sap_notes": [
+        "3203753",
+        "3207069"
+      ],
+      "components": [
+        "CA-GTF-CPE"
+      ]
+    },
+    "SI-5.27": {
+      "title": "5.27 S4TWL - Data Model Change in the Commodity Condition Types Mapping",
+      "pages": "222-223",
+      "sap_notes": [
+        "3203820"
+      ],
+      "components": [
+        "CA-GTF-CPE"
+      ]
+    },
+    "SI-5.3": {
+      "title": "5.3 S4TWL - CM: CPE Simplified Formula Assembly & Formula Evaluation",
+      "pages": "191-192",
+      "sap_notes": [
+        "2461021"
+      ],
+      "components": [
+        "MM-PUR-GF-CPE",
+        "SD-BF-CPE",
+        "LO-CMM-BF"
+      ]
+    },
+    "SI-5.4": {
+      "title": "5.4 S4TWL -  CM: CPE Simplification of Routines & Rules",
+      "pages": "192-193",
+      "sap_notes": [
+        "2461014"
+      ],
+      "components": [
+        "MM-PUR-GF-CPE",
+        "LO-CMM-BF",
+        "SD-BF-CPE"
+      ]
+    },
+    "SI-5.5": {
+      "title": "5.5 S4TWL -  CM: CPE Simplified Data Model",
+      "pages": "193-194",
+      "sap_notes": [
+        "2461007"
+      ],
+      "components": [
+        "MM-PUR-GF-CPE",
+        "LO-CMM-BF",
+        "SD-BF-CPE"
+      ]
+    },
+    "SI-5.6": {
+      "title": "5.6 S4TWL - Simplified Commodity Curves",
+      "pages": "194-195",
+      "sap_notes": [
+        "2551913",
+        "2553281"
+      ],
+      "components": [
+        "LO-CMM-BF",
+        "FIN-FSCM-TRM-MR"
+      ]
+    },
+    "SI-5.7": {
+      "title": "5.7 S4TWL - Simplified DCS Access",
+      "pages": "195-195",
+      "sap_notes": [
+        "2551960"
+      ],
+      "components": [
+        "LO-CMM-BF"
+      ]
+    },
+    "SI-5.8": {
+      "title": "5.8 S4TWL - Simplification in Position Reporting for Financial Transactions",
+      "pages": "195-197",
+      "sap_notes": [
+        "2556089"
+      ],
+      "components": [
+        "LO-CMM-BF"
+      ]
+    },
+    "SI-5.9": {
+      "title": "5.9 S4TWL - Simplified Data Flow of logistics data for Risk Reporting Database",
+      "pages": "197-198",
+      "sap_notes": [
+        "2547343"
+      ],
+      "components": [
+        "LO-CMM-BF",
+        "LO-CMM-ANL"
+      ]
+    },
+    "SI-50.2": {
+      "title": "50.2 S4TWL - BOS Cost Transfer to PS removed",
+      "pages": "1157-1159",
+      "sap_notes": [
+        "2267182",
+        "2273314"
+      ],
+      "components": [
+        "IS-ADEC-BOQ"
+      ]
+    },
+    "SI-50.3": {
+      "title": "50.3 S4TWL - ZDEP ETM CATS package",
+      "pages": "1159-1160",
+      "sap_notes": [
+        "2350332"
+      ],
+      "components": [
+        "IS-ADEC-ETM"
+      ]
+    },
+    "SI-50.4": {
+      "title": "50.4 S4TWL - ETM General",
+      "pages": "1160-1162",
+      "sap_notes": [
+        "2265093",
+        "2269324",
+        "2326777"
+      ],
+      "components": [
+        "IS-ADEC-ETM"
+      ]
+    },
+    "SI-50.5": {
+      "title": "50.5 S4TWL - ETM Tables obsolete",
+      "pages": "1162-1163",
+      "sap_notes": [
+        "2301533"
+      ],
+      "components": [
+        "IS-ADEC-ETM"
+      ]
+    },
+    "SI-50.6": {
+      "title": "50.6 S4TWL - REAL ESTATE SALES (HOMEBUILDING)",
+      "pages": "1163-1164",
+      "sap_notes": [
+        "2197116",
+        "2343388"
+      ],
+      "components": [
+        "IS-ADEC-HBS"
+      ]
+    },
+    "SI-50.7": {
+      "title": "50.7 S4TWL Business Package for Subcontracting (EC&O)",
+      "pages": "1164-1165",
+      "sap_notes": [
+        "2389447"
+      ],
+      "components": [
+        "EP-PCT-IEC-S"
+      ]
+    },
+    "SI-51.1": {
+      "title": "51.1 S4TWL - Manufacturing Execution Systems",
+      "pages": "1165-1166",
+      "sap_notes": [
+        "1162438",
+        "2383042"
+      ],
+      "components": [
+        "IS-HT-MES"
+      ]
+    },
+    "SI-51.2": {
+      "title": "51.2 S4TWL - RosettaNet",
+      "pages": "1166-1167",
+      "sap_notes": [
+        "1168556",
+        "2383076"
+      ],
+      "components": [
+        "IS-HT-RN"
+      ]
+    },
+    "SI-51.3": {
+      "title": "51.3 S4TWL - Software License Management",
+      "pages": "1167-1168",
+      "sap_notes": [
+        "2270848"
+      ],
+      "components": [
+        "IS-HT-SW-LIC"
+      ]
+    },
+    "SI-51.4": {
+      "title": "51.4 S4TWL - Installed Base Management for IS-SW",
+      "pages": "1168-1169",
+      "sap_notes": [
+        "2270849"
+      ],
+      "components": [
+        "IS-HT-SW-IB"
+      ]
+    },
+    "SI-51.5": {
+      "title": "51.5 S4TWL - Contract Management Enhancements",
+      "pages": "1169-1170",
+      "sap_notes": [
+        "2270850"
+      ],
+      "components": [
+        "IS-HT-SW-CM"
+      ]
+    },
+    "SI-51.6": {
+      "title": "51.6 S4TWL - Billing Process Enhancements",
+      "pages": "1170-1171",
+      "sap_notes": [
+        "2270851"
+      ],
+      "components": [
+        "IS-HT-SW-BIL"
+      ]
+    },
+    "SI-51.7": {
+      "title": "51.7 S4TWL - Software Maintenance Processing",
+      "pages": "1171-1171",
+      "sap_notes": [
+        "2270852"
+      ],
+      "components": [
+        "IS-HT-SW-SMP"
+      ]
+    },
+    "SI-51.8": {
+      "title": "51.8 S4TWL - User Exits in DRM",
+      "pages": "1172-1172",
+      "sap_notes": [
+        "2270853"
+      ],
+      "components": [
+        "IS-HT-DRM"
+      ]
+    },
+    "SI-51.9": {
+      "title": "51.9 S4TWL - Condition Technique in DRM: Rule Configuration",
+      "pages": "1173-1177",
+      "sap_notes": [
+        "2270855",
+        "2270856",
+        "2270858"
+      ],
+      "components": [
+        "IS-HT-DRM"
+      ]
+    },
+    "SI-52.1": {
+      "title": "52.1 S4TWL - Sales Order Versions",
+      "pages": "1177-1178",
+      "sap_notes": [
+        "2226678",
+        "2270405"
+      ],
+      "components": [
+        "IS-MP-SD"
+      ]
+    },
+    "SI-52.2": {
+      "title": "52.2 S4TWL - Stock Overview and Object Search by Characteristics",
+      "pages": "1178-1180",
+      "sap_notes": [
+        "2226677",
+        "2270409"
+      ],
+      "components": [
+        "IS-MP-MM"
+      ]
+    },
+    "SI-52.3": {
+      "title": "52.3 S4TWL - Mill specific enhancements to scheduling PRTs",
+      "pages": "1180-1181",
+      "sap_notes": [
+        "2226674",
+        "2270410"
+      ],
+      "components": [
+        "IS-MP-PP"
+      ]
+    },
+    "SI-52.4": {
+      "title": "52.4 S4TWL - Process batch",
+      "pages": "1181-1182",
+      "sap_notes": [
+        "2270412",
+        "2326769",
+        "2346054"
+      ],
+      "components": [
+        "IS-MP-PP"
+      ]
+    },
+    "SI-52.5": {
+      "title": "52.5 S4TWL - Fast entry of characteristic values in trading contract",
+      "pages": "1182-1183",
+      "sap_notes": [
+        "2337868",
+        "2381873"
+      ],
+      "components": [
+        "IS-MP-LO"
+      ]
+    },
+    "SI-52.6": {
+      "title": "52.6 S4TWL - Selection by characteristics in mass processing of orders",
+      "pages": "1183-1184",
+      "sap_notes": [
+        "2358159",
+        "2381891"
+      ],
+      "components": [
+        "IS-MP-PP"
+      ]
+    },
+    "SI-52.7": {
+      "title": "52.7 S4TWL - Fast entry of characteristic values in sales document",
+      "pages": "1184-1185",
+      "sap_notes": [
+        "2319234",
+        "2381843"
+      ],
+      "components": [
+        "IS-MP-SD"
+      ]
+    },
+    "SI-52.8": {
+      "title": "52.8 S4TWL - Changes in non ferrous metals",
+      "pages": "1186-1188",
+      "sap_notes": [
+        "2357870",
+        "2815395",
+        "2918965",
+        "3306899"
+      ],
+      "components": [
+        "IS-MP-NF"
+      ]
+    },
+    "SI-53.1": {
+      "title": "53.1 S4TWL - SAP Patient Management (IS-H) is not available in SAP S/4HANA",
+      "pages": "1188-1189",
+      "sap_notes": [
+        "2689873"
+      ],
+      "components": [
+        "IS-H"
+      ]
+    },
+    "SI-54.1": {
+      "title": "54.1 S4TWL - FS-RI - Deletion of obsolete packages",
+      "pages": "1189-1190",
+      "sap_notes": [
+        "2818762"
+      ],
+      "components": [
+        "FS-RI"
+      ]
+    },
+    "SI-54.2": {
+      "title": "54.2 S4TWL - Technical changes to Statutory Reporting Tables",
+      "pages": "1190-1191",
+      "sap_notes": [
+        "2771381",
+        "2810717"
+      ],
+      "components": [
+        "FS-SR",
+        "FS-SR-DE"
+      ]
+    },
+    "SI-54.3": {
+      "title": "54.3 S4TWL - FS-RI - Replacement of msg.PM Connection by SAP Standard",
+      "pages": "1191-1194",
+      "sap_notes": [
+        "2954199"
+      ],
+      "components": [
+        "XX-PART-MSG-LRM",
+        "FS-RI-LRM"
+      ]
+    },
+    "SI-54.4": {
+      "title": "54.4 S4TWL - FS-RI - Redesign Data Access Framework",
+      "pages": "1194-1222",
+      "sap_notes": [
+        "3054946"
+      ],
+      "components": [
+        "FS-RI-LRM",
+        "XX-PART-MSG-LRM"
+      ]
+    },
+    "SI-54.5": {
+      "title": "54.5 S4TWL - Deletion of obsolete objects (Compat-Packages)",
+      "pages": "1222-1223",
+      "sap_notes": [
+        "3047902"
+      ],
+      "components": [
+        "FS-RI-LRM",
+        "XX-PART-MSG-LRM"
+      ]
+    },
+    "SI-54.6": {
+      "title": "54.6 S4TWL - FS-RI - Deletion of LSMW Integration",
+      "pages": "1223-1226",
+      "sap_notes": [
+        "2887844",
+        "2970970"
+      ],
+      "components": [
+        "FS-RI-LRM",
+        "XX-PART-MSG-LRM"
+      ]
+    },
+    "SI-54.8": {
+      "title": "54.8 S4TWL - FS-RI - Ensuring the functionality of the Extension Service",
+      "pages": "1226-1229",
+      "sap_notes": [
+        "2972152"
+      ],
+      "components": [
+        "FS-RI-LRM",
+        "FS-RI-ES",
+        {
+          "XX-PART-MSG-LRM Related Notes": null
+        }
+      ]
+    },
+    "SI-54.9": {
+      "title": "54.9 S4TWL - FS-RI deletion of obsolete functionality for FI-AR",
+      "pages": "1229-1275",
+      "sap_notes": [
+        "2964772",
+        "2978033",
+        "3040673",
+        "3061212",
+        "3104363",
+        "3105510",
+        "3164537",
+        "3210235",
+        "3225429",
+        "3227549",
+        "3260792",
+        "3310949",
+        "3385743",
+        "3399310",
+        "3400287",
+        "3472166",
+        "3535910",
+        "3543564"
+      ],
+      "components": [
+        "FS-RI"
+      ]
+    },
+    "SI-55.1": {
+      "title": "55.1 S4TWL - SAP Media availability in SAP S/4HANA",
+      "pages": "1275-1276",
+      "sap_notes": [
+        "2499057",
+        "2506999"
+      ],
+      "components": [
+        "IS-M"
+      ]
+    },
+    "SI-55.2": {
+      "title": "55.2 S4TWL - Media Product Master",
+      "pages": "1276-1280",
+      "sap_notes": [
+        "2468737",
+        "2481713",
+        "2481873",
+        "2499057"
+      ],
+      "components": [
+        "CA-MDG"
+      ]
+    },
+    "SI-56.2": {
+      "title": "56.2 S4TWL- ACM: Simplification for Pre-payment and External Interfacing",
+      "pages": "1280-1280",
+      "sap_notes": [
+        "2468737",
+        "2468819"
+      ],
+      "components": [
+        "LO-AGR"
+      ]
+    },
+    "SI-56.3": {
+      "title": "56.3 S4TWL - ACM: Simplification of Cross Topics",
+      "pages": "1281-1281",
+      "sap_notes": [
+        "2468737",
+        "2468833"
+      ],
+      "components": [
+        "LO-AGR"
+      ]
+    },
+    "SI-56.4": {
+      "title": "56.4 S4TWL - ACM: Simplification of Application Document Batch Split Process",
+      "pages": "1281-1282",
+      "sap_notes": [
+        "3017200"
+      ],
+      "components": [
+        "LO-AGR"
+      ]
+    },
+    "SI-56.5": {
+      "title": "56.5 S4TWL - ACM Temporary Lots for Draft Contracts",
+      "pages": "1282-1284",
+      "sap_notes": [
+        "3086524",
+        "3094714",
+        "9999999"
+      ],
+      "components": [
+        "LO-AGR"
+      ]
+    },
+    "SI-56.6": {
+      "title": "56.6 S4TWL - BF /ACCGO/BF_FP01 is removed from S/4 HANA 2025 SP 00 rel",
+      "pages": "1284-1286",
+      "sap_notes": [
+        "3519685"
+      ],
+      "components": [
+        "LO-AGR"
+      ]
+    },
+    "SI-56.7": {
+      "title": "56.7 S4TWL - Handling Oil & Gas obsolete t-codes Oil",
+      "pages": "1286-1288",
+      "sap_notes": [
+        "2328674"
+      ],
+      "components": [
+        "IS-OIL-DS"
+      ]
+    },
+    "SI-56.8": {
+      "title": "56.8 S4TWL - Optimization in Oil & Gas - TD module for STO and sales order with POD b",
+      "pages": "1288-1289",
+      "sap_notes": [
+        "2328639"
+      ],
+      "components": [
+        "IS-OIL-DS"
+      ]
+    },
+    "SI-56.9": {
+      "title": "56.9 S4TWL - Data Model in Oil & Gas Inventory management",
+      "pages": "1289-1322",
+      "sap_notes": [
+        "2226096",
+        "2269324",
+        "2270199",
+        "2293641",
+        "2328017",
+        "2328419",
+        "2328444",
+        "2328455",
+        "2328459",
+        "2328538",
+        "2328548",
+        "2328561",
+        "2347421",
+        "2350150",
+        "2396065",
+        "2534268",
+        "2534360",
+        "2534442",
+        "2534454",
+        "2572363",
+        "2599569",
+        "3009925",
+        "3027954",
+        "3046934",
+        "3050713",
+        "3051698"
+      ],
+      "components": [
+        "IS-OIL-DS"
+      ]
+    },
+    "SI-57.1": {
+      "title": "57.1 S4TWL - OGSD - Classic Data Collation",
+      "pages": "1322-1324",
+      "sap_notes": [
+        "2477777"
+      ],
+      "components": [
+        "IS-OIL-DS-OGSD"
+      ]
+    },
+    "SI-57.2": {
+      "title": "57.2 S4TWL - OGSD - Classic OGSD Interfaces",
+      "pages": "1324-1326",
+      "sap_notes": [
+        "2477777",
+        "2489544"
+      ],
+      "components": [
+        "IS-OIL-DS-OGSD"
+      ]
+    },
+    "SI-57.3": {
+      "title": "57.3 S4TWL - OGSD - Sales Logistics Cockpit",
+      "pages": "1326-1329",
+      "sap_notes": [
+        "2477777",
+        "2489544",
+        "2489567",
+        "2489643"
+      ],
+      "components": [
+        "IS-OIL-DS-OGSD"
+      ]
+    },
+    "SI-57.5": {
+      "title": "57.5 S4TWL - OGSD - Infosheet",
+      "pages": "1330-1331",
+      "sap_notes": [
+        "2491123"
+      ],
+      "components": [
+        "IS-OIL-DS-OGSD"
+      ]
+    },
+    "SI-57.6": {
+      "title": "57.6 S4TWL - OGSD - Best Buy",
+      "pages": "1331-1333",
+      "sap_notes": [
+        "2489567",
+        "2490540"
+      ],
+      "components": [
+        "IS-OIL-DS-OGSD"
+      ]
+    },
+    "SI-57.7": {
+      "title": "57.7 S4TWL - OGSD - Formroutines Telesales",
+      "pages": "1333-1335",
+      "sap_notes": [
+        "2458477",
+        "2461340",
+        "2491727"
+      ],
+      "components": [
+        "IS-OIL-DS-OGSD"
+      ]
+    },
+    "SI-57.8": {
+      "title": "57.8 S4TWL - OGSD - Intercompany Processes",
+      "pages": "1335-1336",
+      "sap_notes": [
+        "2491134"
+      ],
+      "components": [
+        "IS-OIL-DS-OGSD"
+      ]
+    },
+    "SI-57.9": {
+      "title": "57.9 S4TWL - OGSD - Classic Method Framework",
+      "pages": "1336-1340",
+      "sap_notes": [
+        "1476702",
+        "2383036",
+        "2491245",
+        "2491700"
+      ],
+      "components": [
+        "IS-OIL-DS-OGSD"
+      ]
+    },
+    "SI-58.1": {
+      "title": "58.1 S4TWL - OTAS - Integrated Dispatch Managment",
+      "pages": "1340-1342",
+      "sap_notes": [
+        "2490435"
+      ],
+      "components": [
+        "LO-BSLM"
+      ]
+    },
+    "SI-58.2": {
+      "title": "58.2 S4TWL - OTAS - Integrated Petroleum Report",
+      "pages": "1342-1343",
+      "sap_notes": [
+        "2490467"
+      ],
+      "components": [
+        "LO-BSLM"
+      ]
+    },
+    "SI-58.3": {
+      "title": "58.3 S4TWL - OTAS - Sales Activities",
+      "pages": "1343-1346",
+      "sap_notes": [
+        "2226072",
+        "2270467",
+        "2490447",
+        "2868358"
+      ],
+      "components": [
+        "LO-BSLM"
+      ]
+    },
+    "SI-59.2": {
+      "title": "59.2 S4TWL - Authorization in Funds Management",
+      "pages": "1346-1348",
+      "sap_notes": [
+        "2339149"
+      ],
+      "components": [
+        "PSM-FM"
+      ]
+    },
+    "SI-59.3": {
+      "title": "59.3 S4TWL - Public Sector localization for Hungary Deprecation",
+      "pages": "1348-1349",
+      "sap_notes": [
+        "3347307"
+      ],
+      "components": [
+        "FI-LOC-PS-HU"
+      ]
+    },
+    "SI-59.4": {
+      "title": "59.4 S4TWL - Former Budgeting System (FBS) in Funds Management",
+      "pages": "1349-1351",
+      "sap_notes": [
+        "2226048",
+        "2270413"
+      ],
+      "components": [
+        "PSM-FM"
+      ]
+    },
+    "SI-59.5": {
+      "title": "59.5 S4TWL - Functionality for FACTS I and FACTS II (Federal Agencies Centralized Tri",
+      "pages": "1351-1353",
+      "sap_notes": [
+        "2225817",
+        "2270415"
+      ],
+      "components": [
+        "PSM-FG"
+      ]
+    },
+    "SI-59.6": {
+      "title": "59.6 S4TWL - Expenditure Certification",
+      "pages": "1353-1355",
+      "sap_notes": [
+        "2270418",
+        "3258666"
+      ],
+      "components": [
+        "PSM-EC"
+      ]
+    },
+    "SI-59.7": {
+      "title": "59.7 S4TWL - Specific fields on Business Partner",
+      "pages": "1355-1357",
+      "sap_notes": [
+        "2226131",
+        "2265093",
+        "2270420"
+      ],
+      "components": [
+        "PSM-FG"
+      ]
+    },
+    "SI-59.8": {
+      "title": "59.8 S4TWL - Fund Accounting based on Special Ledger",
+      "pages": "1357-1358",
+      "sap_notes": [
+        "2270444"
+      ],
+      "components": [
+        "PSM-FA"
+      ]
+    },
+    "SI-59.9": {
+      "title": "59.9 S4TWL - Data Structure changes in BCS",
+      "pages": "1359-1366",
+      "sap_notes": [
+        "2226071",
+        "2226122",
+        "2226129",
+        "2226134",
+        "2270445",
+        "2270449",
+        "2270464",
+        "2270466"
+      ],
+      "components": [
+        "PSM-FM"
+      ]
+    },
+    "SI-6.1": {
+      "title": "6.1 S4TWL - Usage of long Material Number in EC-CS",
+      "pages": "223-224",
+      "sap_notes": [
+        "2209784",
+        "2471287"
+      ],
+      "components": [
+        "EC-CS"
+      ]
+    },
+    "SI-6.2": {
+      "title": "6.2 S4TWL - Consolidation (EC-CS) and preparations for consolidation",
+      "pages": "224-226",
+      "sap_notes": [
+        "2269324",
+        "2371973",
+        "2659672",
+        "2833748",
+        "2999249"
+      ],
+      "components": [
+        "EC-CS"
+      ]
+    },
+    "SI-6.3": {
+      "title": "6.3 S4TWL - Consolidation (EC-CS) and preparations for consolidation",
+      "pages": "226-227",
+      "sap_notes": [
+        "2269324",
+        "2371973",
+        "2659672",
+        "2833748",
+        "2999249"
+      ],
+      "components": [
+        "EC-CS"
+      ]
+    },
+    "SI-6.4": {
+      "title": "6.4 S4TWL - Real-Time Consolidation (RTC)",
+      "pages": "227-229",
+      "sap_notes": [
+        "2659672",
+        "3205500"
+      ],
+      "components": [
+        "FIN-RTC"
+      ]
+    },
+    "SI-6.5": {
+      "title": "6.5 S4TWL - Business Consolidation (SEM-BCS)",
+      "pages": "229-230",
+      "sap_notes": [
+        "1330000",
+        "2360258",
+        "2659672",
+        "3205515"
+      ],
+      "components": [
+        "FIN-SEM-BCS"
+      ]
+    },
+    "SI-6.6": {
+      "title": "6.6 S4TWL - Configuration Changes in Group Reporting",
+      "pages": "230-233",
+      "sap_notes": [
+        "3326805"
+      ],
+      "components": [
+        "FIN-CS"
+      ]
+    },
+    "SI-60.1": {
+      "title": "60.1 S4TWL - Retail Power Lists",
+      "pages": "1366-1367",
+      "sap_notes": [
+        "2269324",
+        "2371193"
+      ],
+      "components": [
+        "LO-SRS-IM",
+        "LO-SRS"
+      ]
+    },
+    "SI-60.2": {
+      "title": "60.2 S4TWL - Retail Closed BW Scenarios",
+      "pages": "1367-1368",
+      "sap_notes": [
+        "2269324",
+        "2371195"
+      ],
+      "components": [
+        "BW-BCT",
+        "BW-BCT-ISR-AA",
+        "BW-BCT-ISR"
+      ]
+    },
+    "SI-60.3": {
+      "title": "60.3 S4TWL - Retail Markdown Plan",
+      "pages": "1368-1369",
+      "sap_notes": [
+        "2269324",
+        "2371590"
+      ],
+      "components": [
+        "LO-MD",
+        "LO-MD-PR"
+      ]
+    },
+    "SI-60.4": {
+      "title": "60.4 S4TWL - Retail Bonus Buy",
+      "pages": "1369-1370",
+      "sap_notes": [
+        "2269324",
+        "2371559"
+      ],
+      "components": [
+        "SD-BF-FG",
+        "SD-BF"
+      ]
+    },
+    "SI-60.5": {
+      "title": "60.5 S4TWL - Retail Sales Forecasting",
+      "pages": "1370-1371",
+      "sap_notes": [
+        "2269324",
+        "2371616"
+      ],
+      "components": [
+        "IS-R-PUR-AHD"
+      ]
+    },
+    "SI-60.6": {
+      "title": "60.6 S4TWL - Retail Order Optimizing: Load Build, Investment Buy",
+      "pages": "1371-1372",
+      "sap_notes": [
+        "2269324",
+        "2371602"
+      ],
+      "components": [
+        "IS-R-PUR-LB",
+        "IS-R-PUR",
+        "IS-R"
+      ]
+    },
+    "SI-60.7": {
+      "title": "60.7 S4TWL - Retail Rapid Replenishment",
+      "pages": "1372-1373",
+      "sap_notes": [
+        "2269324",
+        "2371539",
+        "3472264"
+      ],
+      "components": [
+        "IS-R-PUR-RP",
+        "IS-R-PUR",
+        "IS-R"
+      ]
+    },
+    "SI-60.8": {
+      "title": "60.8 S4TWL - Automatic Document Adjustment",
+      "pages": "1373-1375",
+      "sap_notes": [
+        "2192984",
+        "2215169",
+        "2267742"
+      ],
+      "components": [
+        "IS-R-PUR-ADA"
+      ]
+    },
+    "SI-60.9": {
+      "title": "60.9 S4TWL - Retail Additionals",
+      "pages": "1375-1447",
+      "sap_notes": [
+        "2194923",
+        "2215220",
+        "2267415",
+        "2269324",
+        "2303155",
+        "2304479",
+        "2326511",
+        "2331707",
+        "2337368",
+        "2339008",
+        "2339010",
+        "2339317",
+        "2340247",
+        "2340264",
+        "2342914",
+        "2350650",
+        "2365503",
+        "2368655",
+        "2368680",
+        "2368683",
+        "2368716",
+        "2368736",
+        "2368739",
+        "2368741",
+        "2368747",
+        "2368785",
+        "2368803",
+        "2368835",
+        "2368870",
+        "2368913",
+        "2370106",
+        "2370131",
+        "2370133",
+        "2370138",
+        "2370146",
+        "2370148",
+        "2370151",
+        "2370164",
+        "2370183",
+        "2370655",
+        "2371149",
+        "2371157",
+        "2371161",
+        "2371631",
+        "2377767",
+        "2377780",
+        "2377816",
+        "2465556",
+        "2467506",
+        "2468952",
+        "2516743",
+        "2522971",
+        "2535093",
+        "2536676",
+        "2627238",
+        "2629241",
+        "2637163",
+        "2640859",
+        "2652842",
+        "2655797",
+        "2712569",
+        "2772474",
+        "2843173",
+        "2885547",
+        "3035561",
+        "3043856",
+        "3421323",
+        "3472264"
+      ],
+      "components": [
+        "LO-ADM"
+      ]
+    },
+    "SI-61.1": {
+      "title": "61.1 S4TWL - Lock and unlock services using IST_TDATA",
+      "pages": "1447-1448",
+      "sap_notes": [
+        "2270468"
+      ],
+      "components": [
+        "IS-T-CA"
+      ]
+    },
+    "SI-61.2": {
+      "title": "61.2 S4TWL - PORTAL ROLES FOR NETWORK LIFECYCLE MANAGEMENT (NLM)",
+      "pages": "1448-1449",
+      "sap_notes": [
+        "2273101"
+      ],
+      "components": [
+        "IS-T-NM-PCT"
+      ]
+    },
+    "SI-62.1": {
+      "title": "62.1 S4TWL - CVI Integration for SAP ISU",
+      "pages": "1449-1451",
+      "sap_notes": [
+        "1830886",
+        "2202282",
+        "2265093",
+        "2344100",
+        "2354282",
+        "2456502"
+      ],
+      "components": [
+        "IS-U"
+      ]
+    },
+    "SI-62.2": {
+      "title": "62.2 S4TWL - Multichannel Foundation for Utilities",
+      "pages": "1451-1453",
+      "sap_notes": [
+        "2329190",
+        "2352104"
+      ],
+      "components": [
+        "IS-U"
+      ]
+    },
+    "SI-62.3": {
+      "title": "62.3 S4TWL - SAP Waste and Recycling: Activation",
+      "pages": "1453-1454",
+      "sap_notes": [
+        "2437332"
+      ],
+      "components": [
+        "IS-U-WA",
+        "CRM-WA",
+        "XX-EOD-IS-U-WA",
+        "XX-PART-PLG-WAS",
+        "BWBCT-WA",
+        "SV-SMG-ICO-IWR"
+      ]
+    },
+    "SI-62.4": {
+      "title": "62.4 S4TWL - IDE Outgoing Payment Processing",
+      "pages": "1454-1455",
+      "sap_notes": [
+        "2574483"
+      ],
+      "components": [
+        "IS-U-IDE"
+      ]
+    },
+    "SI-62.5": {
+      "title": "62.5 S4TWL - SAP Waste and Recycling: Service orders in EWACONTS",
+      "pages": "1455-1457",
+      "sap_notes": [
+        "3245321"
+      ],
+      "components": [
+        "IS-U-WA"
+      ]
+    },
+    "SI-62.6": {
+      "title": "62.6 S4TWL - Late Payment Change",
+      "pages": "1457-1458",
+      "sap_notes": [
+        "2681020"
+      ],
+      "components": [
+        "IS-U-IN"
+      ]
+    },
+    "SI-62.7": {
+      "title": "62.7 S4TWL - IS-Utilities Settlement Control",
+      "pages": "1458-1459",
+      "sap_notes": [
+        "2694441"
+      ],
+      "components": [
+        "IS-U-IN"
+      ]
+    },
+    "SI-62.8": {
+      "title": "62.8 S4TWL - Maintenance of non-billable Point of Delivery services",
+      "pages": "1459-1460",
+      "sap_notes": [
+        "2843756"
+      ],
+      "components": [
+        "IS-U-IDE"
+      ]
+    },
+    "SI-62.9": {
+      "title": "62.9 S4TWL - Deprecation of transaction EA22_TOOL",
+      "pages": "1460-1479",
+      "sap_notes": [
+        "1014997",
+        "1527380",
+        "1541831",
+        "2267412",
+        "2270502",
+        "2270504",
+        "2270505",
+        "2270507",
+        "2270509",
+        "2270510",
+        "2270511",
+        "2270513",
+        "2314696",
+        "2338097",
+        "2495833",
+        "2500202",
+        "2631182",
+        "3014556",
+        "3279875",
+        "3322223",
+        "3326146",
+        "3345830",
+        "3375865",
+        "3422783",
+        "3480987",
+        "3521524"
+      ],
+      "components": [
+        "IS-U-BI",
+        "IS-U-DM-MR",
+        "IS-U-IN"
+      ]
+    },
+    "SI-63.1": {
+      "title": "63.1 S4TWL - Ariba Cloud Integration",
+      "pages": "1479-1482",
+      "sap_notes": [
+        "2400737",
+        "2402191"
+      ],
+      "components": [
+        "BNS-ARI-TRF"
+      ]
+    },
+    "SI-7.1": {
+      "title": "7.1 S4TWL - Customer Service",
+      "pages": "233-234",
+      "sap_notes": [
+        "2269324",
+        "2962632"
+      ],
+      "components": [
+        "CS"
+      ]
+    },
+    "SI-7.2": {
+      "title": "7.2 S4TWL - PH_Sample iView",
+      "pages": "234-235",
+      "sap_notes": [
+        "2271201"
+      ],
+      "components": [
+        "LO-PDM-GF"
+      ]
+    },
+    "SI-7.3": {
+      "title": "7.3 S4TWL - Customer Interaction Center (CIC)",
+      "pages": "235-236",
+      "sap_notes": [
+        "2229726",
+        "2267412"
+      ],
+      "components": [
+        "CS-CI"
+      ]
+    },
+    "SI-8.1": {
+      "title": "8.1 S4TWL - DMEE",
+      "pages": "236-239",
+      "sap_notes": [
+        "3370503",
+        "3435447",
+        "3452702",
+        "3515844"
+      ],
+      "components": [
+        "CA-GTF-CSC-DME"
+      ]
+    },
+    "SI-8.10": {
+      "title": "8.10 S4TWL - Schedule Manager",
+      "pages": "267-268",
+      "sap_notes": [
+        "2269324",
+        "2332547",
+        "2873915",
+        "3003364"
+      ],
+      "components": [
+        "CA-GTF-SCM",
+        "FI-GL-GL-G"
+      ]
+    },
+    "SI-8.2": {
+      "title": "8.2 S4TWL - DATA MODEL CHANGES IN FIN",
+      "pages": "239-247",
+      "sap_notes": [
+        "1976487",
+        "2270333",
+        "2332030"
+      ],
+      "components": [
+        "CO",
+        "FI"
+      ]
+    },
+    "SI-8.3": {
+      "title": "8.3 S4TWL - REPLACED TRANSACTION CODES AND PROGRAMS IN FIN",
+      "pages": "247-249",
+      "sap_notes": [
+        "1972819",
+        "2119188",
+        "2253067",
+        "2257555",
+        "2270387",
+        "2270388",
+        "2474069",
+        "2726778",
+        "2742613"
+      ],
+      "components": [
+        "FI",
+        "AC",
+        "FIN-FSCM",
+        "CO"
+      ]
+    },
+    "SI-8.4": {
+      "title": "8.4 S4TWL - SAP Travel Management in SAP S/4HANA Suite",
+      "pages": "249-255",
+      "sap_notes": [
+        "2719018",
+        "2892303",
+        "3260453",
+        "3296253"
+      ],
+      "components": [
+        "FI-TV"
+      ]
+    },
+    "SI-8.5": {
+      "title": "8.5 S4TWL - Plan data is not migrated to SAP S/4HANA",
+      "pages": "255-260",
+      "sap_notes": [
+        "1009299",
+        "2226649",
+        "2227515",
+        "2253067",
+        "2270407",
+        "2346854",
+        "2403964",
+        "2474069",
+        "2924568",
+        "2977560"
+      ],
+      "components": [
+        "FI-SL-SL"
+      ]
+    },
+    "SI-8.6": {
+      "title": "8.6 S4TWL - Migration from account solution to ledger solution",
+      "pages": "261-262",
+      "sap_notes": [
+        "3042755"
+      ],
+      "components": [
+        "FI-AA",
+        "FI-GL"
+      ]
+    },
+    "SI-8.7": {
+      "title": "8.7 S4TWL -  Special Purpose Ledger",
+      "pages": "262-263",
+      "sap_notes": [
+        "2269324",
+        "2993220",
+        "2999249",
+        "3006586",
+        "3015013",
+        "3572033"
+      ],
+      "components": [
+        "FI-SL"
+      ]
+    },
+    "SI-8.8": {
+      "title": "8.8 S4TWL -  Cost of Sales Ledger",
+      "pages": "263-265",
+      "sap_notes": [
+        "2269324",
+        "2680760",
+        "3006586"
+      ],
+      "components": [
+        "FI-SL"
+      ]
+    },
+    "SI-8.9": {
+      "title": "8.9 S4TWL -  Report Writer / Report Painter in Finance and Controlling",
+      "pages": "265-267",
+      "sap_notes": [
+        "2269324",
+        "2579584",
+        "2993220",
+        "2997574",
+        "2999249",
+        "3006586",
+        "3572033"
+      ],
+      "components": [
+        "FI-GL-IS",
+        "FI-SL-IS",
+        "EC-PCA-IS",
+        "PS-IS",
+        "SD-IS",
+        "QM-QC-IS",
+        "PM-IS",
+        "PP-IS"
+      ]
+    },
+    "SI-9.1": {
+      "title": "9.1 S4TWL - Integration with FSCM Biller Direct (FI-AR)",
+      "pages": "268-269",
+      "sap_notes": [
+        "2269324",
+        "2270384",
+        "3505741"
+      ],
+      "components": [
+        "FIN-FSCM-BD-AR"
+      ]
+    },
+    "SI-9.2": {
+      "title": "9.2 S4TWL - Integration with FSCM Biller Direct (FI-AP)",
+      "pages": "269-270",
+      "sap_notes": [
+        "2269324",
+        "2270386"
+      ],
+      "components": [
+        "FIN-FSCM-BD"
+      ]
+    }
+  },
+  "note_to_items": {
+    "2270387": [
+      "SI-10.1",
+      "SI-10.2",
+      "SI-8.3"
+    ],
+    "2297425": [
+      "SI-10.1",
+      "SI-10.2"
+    ],
+    "2383115": [
+      "SI-10.1",
+      "SI-10.2"
+    ],
+    "1069166": [
+      "SI-10.2"
+    ],
+    "2220152": [
+      "SI-10.2"
+    ],
+    "2255555": [
+      "SI-10.2"
+    ],
+    "2257555": [
+      "SI-10.2",
+      "SI-10.5",
+      "SI-8.3"
+    ],
+    "2270388": [
+      "SI-10.2",
+      "SI-8.3"
+    ],
+    "2270391": [
+      "SI-10.2",
+      "SI-10.3"
+    ],
+    "2270392": [
+      "SI-10.2",
+      "SI-10.4"
+    ],
+    "2332030": [
+      "SI-10.2",
+      "SI-8.2"
+    ],
+    "2344012": [
+      "SI-10.2",
+      "SI-15.5"
+    ],
+    "2403248": [
+      "SI-10.2"
+    ],
+    "2419194": [
+      "SI-10.2"
+    ],
+    "2913340": [
+      "SI-10.2"
+    ],
+    "2211665": [
+      "SI-10.3",
+      "SI-45.3"
+    ],
+    "2328754": [
+      "SI-10.3"
+    ],
+    "2137314": [
+      "SI-10.4"
+    ],
+    "1852519": [
+      "SI-10.5",
+      "SI-12.9"
+    ],
+    "2270414": [
+      "SI-10.5",
+      "SI-12.9"
+    ],
+    "2375643": [
+      "SI-10.5"
+    ],
+    "2948964": [
+      "SI-10.6"
+    ],
+    "2977180": [
+      "SI-10.6"
+    ],
+    "2269324": [
+      "SI-10.7",
+      "SI-12.6",
+      "SI-18.2",
+      "SI-19.1",
+      "SI-19.2",
+      "SI-19.4",
+      "SI-19.6",
+      "SI-19.7",
+      "SI-19.8",
+      "SI-19.9",
+      "SI-2.42",
+      "SI-23.1",
+      "SI-23.2",
+      "SI-28.9",
+      "SI-3.4",
+      "SI-30.1",
+      "SI-30.2",
+      "SI-30.5",
+      "SI-30.9",
+      "SI-32.7",
+      "SI-32.9",
+      "SI-34.1",
+      "SI-35.1",
+      "SI-36.1",
+      "SI-36.2",
+      "SI-36.3",
+      "SI-36.4",
+      "SI-36.5",
+      "SI-36.6",
+      "SI-36.7",
+      "SI-39.9",
+      "SI-42.6",
+      "SI-44.4",
+      "SI-45.5",
+      "SI-47.5",
+      "SI-50.4",
+      "SI-56.9",
+      "SI-6.2",
+      "SI-6.3",
+      "SI-60.1",
+      "SI-60.2",
+      "SI-60.3",
+      "SI-60.4",
+      "SI-60.5",
+      "SI-60.6",
+      "SI-60.7",
+      "SI-60.9",
+      "SI-7.1",
+      "SI-8.10",
+      "SI-8.7",
+      "SI-8.8",
+      "SI-8.9",
+      "SI-9.1",
+      "SI-9.2"
+    ],
+    "3014869": [
+      "SI-10.7"
+    ],
+    "3532580": [
+      "SI-10.7"
+    ],
+    "3087756": [
+      "SI-11.1"
+    ],
+    "2270400": [
+      "SI-11.2",
+      "SI-17.8"
+    ],
+    "2270420": [
+      "SI-11.2",
+      "SI-59.7"
+    ],
+    "2165520": [
+      "SI-11.3"
+    ],
+    "2870766": [
+      "SI-11.3"
+    ],
+    "2719289": [
+      "SI-11.4"
+    ],
+    "2781585": [
+      "SI-11.4"
+    ],
+    "3111810": [
+      "SI-11.5"
+    ],
+    "3128064": [
+      "SI-11.5"
+    ],
+    "3144000": [
+      "SI-11.5"
+    ],
+    "3211170": [
+      "SI-11.5"
+    ],
+    "3249131": [
+      "SI-11.5"
+    ],
+    "3227455": [
+      "SI-11.6"
+    ],
+    "3351947": [
+      "SI-11.7"
+    ],
+    "2349294": [
+      "SI-12.1"
+    ],
+    "2349282": [
+      "SI-12.2"
+    ],
+    "3232417": [
+      "SI-12.3"
+    ],
+    "3247070": [
+      "SI-12.3"
+    ],
+    "2267835": [
+      "SI-12.4",
+      "SI-27.8",
+      "SI-27.9"
+    ],
+    "2338387": [
+      "SI-12.4",
+      "SI-27.8",
+      "SI-27.9"
+    ],
+    "2352383": [
+      "SI-12.4",
+      "SI-18.5"
+    ],
+    "2354768": [
+      "SI-12.4"
+    ],
+    "2378468": [
+      "SI-12.4"
+    ],
+    "2467398": [
+      "SI-12.4"
+    ],
+    "2495950": [
+      "SI-12.4"
+    ],
+    "2613656": [
+      "SI-12.4"
+    ],
+    "2876478": [
+      "SI-12.4"
+    ],
+    "2939972": [
+      "SI-12.4"
+    ],
+    "3313290": [
+      "SI-12.4"
+    ],
+    "3490605": [
+      "SI-12.4"
+    ],
+    "3512654": [
+      "SI-12.4"
+    ],
+    "3017994": [
+      "SI-12.5"
+    ],
+    "2425255": [
+      "SI-12.6",
+      "SI-12.8"
+    ],
+    "2993220": [
+      "SI-12.6",
+      "SI-12.8",
+      "SI-8.7",
+      "SI-8.9"
+    ],
+    "3572033": [
+      "SI-12.6",
+      "SI-12.8",
+      "SI-8.7",
+      "SI-8.9"
+    ],
+    "3226957": [
+      "SI-12.7"
+    ],
+    "1972819": [
+      "SI-12.9",
+      "SI-8.3"
+    ],
+    "2061419": [
+      "SI-12.9"
+    ],
+    "2081400": [
+      "SI-12.9"
+    ],
+    "2162222": [
+      "SI-12.9"
+    ],
+    "2185026": [
+      "SI-12.9"
+    ],
+    "2225831": [
+      "SI-12.9"
+    ],
+    "2253067": [
+      "SI-12.9",
+      "SI-8.3",
+      "SI-8.5"
+    ],
+    "2270404": [
+      "SI-12.9"
+    ],
+    "2270407": [
+      "SI-12.9",
+      "SI-8.5"
+    ],
+    "2270408": [
+      "SI-12.9"
+    ],
+    "2270411": [
+      "SI-12.9"
+    ],
+    "2270416": [
+      "SI-12.9"
+    ],
+    "2270419": [
+      "SI-12.9"
+    ],
+    "2313341": [
+      "SI-12.9"
+    ],
+    "2313879": [
+      "SI-12.9"
+    ],
+    "2345118": [
+      "SI-12.9"
+    ],
+    "2349278": [
+      "SI-12.9"
+    ],
+    "2349297": [
+      "SI-12.9"
+    ],
+    "2355812": [
+      "SI-12.9"
+    ],
+    "2366171": [
+      "SI-12.9"
+    ],
+    "2457163": [
+      "SI-12.9"
+    ],
+    "2516083": [
+      "SI-12.9"
+    ],
+    "2661581": [
+      "SI-12.9"
+    ],
+    "2977560": [
+      "SI-12.9",
+      "SI-8.5"
+    ],
+    "3126356": [
+      "SI-12.9"
+    ],
+    "2436688": [
+      "SI-13.1",
+      "SI-44.1"
+    ],
+    "3320010": [
+      "SI-13.1"
+    ],
+    "3320427": [
+      "SI-13.1"
+    ],
+    "3321347": [
+      "SI-13.1"
+    ],
+    "3370503": [
+      "SI-14.1",
+      "SI-8.1"
+    ],
+    "3452702": [
+      "SI-14.1",
+      "SI-8.1"
+    ],
+    "3087195": [
+      "SI-15.1"
+    ],
+    "2270339": [
+      "SI-15.2",
+      "SI-17.8"
+    ],
+    "2431747": [
+      "SI-15.2"
+    ],
+    "2270360": [
+      "SI-15.3"
+    ],
+    "2332547": [
+      "SI-15.4",
+      "SI-8.10"
+    ],
+    "2579584": [
+      "SI-15.5",
+      "SI-8.9"
+    ],
+    "2582883": [
+      "SI-15.6"
+    ],
+    "2795791": [
+      "SI-15.6"
+    ],
+    "2610650": [
+      "SI-15.7"
+    ],
+    "2628040": [
+      "SI-15.7"
+    ],
+    "2628617": [
+      "SI-15.7"
+    ],
+    "2628641": [
+      "SI-15.7"
+    ],
+    "2628654": [
+      "SI-15.7"
+    ],
+    "2628699": [
+      "SI-15.7"
+    ],
+    "2628704": [
+      "SI-15.7"
+    ],
+    "2628706": [
+      "SI-15.7"
+    ],
+    "2628714": [
+      "SI-15.7"
+    ],
+    "2628724": [
+      "SI-15.7"
+    ],
+    "2865285": [
+      "SI-15.8"
+    ],
+    "2376556": [
+      "SI-16.1"
+    ],
+    "2432527": [
+      "SI-16.1"
+    ],
+    "2471388": [
+      "SI-16.2"
+    ],
+    "2468294": [
+      "SI-16.3"
+    ],
+    "2782281": [
+      "SI-16.4"
+    ],
+    "2270522": [
+      "SI-17.1"
+    ],
+    "2270523": [
+      "SI-17.2"
+    ],
+    "2270526": [
+      "SI-17.3"
+    ],
+    "2270527": [
+      "SI-17.4"
+    ],
+    "2270529": [
+      "SI-17.5"
+    ],
+    "3444441": [
+      "SI-17.6"
+    ],
+    "2270530": [
+      "SI-17.7"
+    ],
+    "1873119": [
+      "SI-17.8"
+    ],
+    "2270450": [
+      "SI-17.8"
+    ],
+    "2270461": [
+      "SI-17.8"
+    ],
+    "2270462": [
+      "SI-17.8"
+    ],
+    "2270470": [
+      "SI-17.8"
+    ],
+    "2270521": [
+      "SI-17.8"
+    ],
+    "2340804": [
+      "SI-17.8"
+    ],
+    "2524941": [
+      "SI-17.8"
+    ],
+    "2217124": [
+      "SI-18.1",
+      "SI-39.9"
+    ],
+    "2227014": [
+      "SI-18.1",
+      "SI-39.9"
+    ],
+    "2270544": [
+      "SI-18.1",
+      "SI-39.8",
+      "SI-39.9"
+    ],
+    "1497354": [
+      "SI-18.2",
+      "SI-19.9",
+      "SI-45.5"
+    ],
+    "1604155": [
+      "SI-18.2",
+      "SI-19.9",
+      "SI-45.5"
+    ],
+    "2291076": [
+      "SI-18.2"
+    ],
+    "2332591": [
+      "SI-18.2"
+    ],
+    "3493409": [
+      "SI-18.2",
+      "SI-19.9",
+      "SI-45.5"
+    ],
+    "2270550": [
+      "SI-18.4",
+      "SI-2.27"
+    ],
+    "2345739": [
+      "SI-18.5"
+    ],
+    "2448350": [
+      "SI-18.6"
+    ],
+    "2190420": [
+      "SI-18.7",
+      "SI-2.9",
+      "SI-46.1",
+      "SI-46.2",
+      "SI-46.3"
+    ],
+    "2241080": [
+      "SI-18.7",
+      "SI-2.33",
+      "SI-2.9",
+      "SI-36.1",
+      "SI-36.3",
+      "SI-36.4",
+      "SI-36.5",
+      "SI-36.6",
+      "SI-36.7"
+    ],
+    "2442292": [
+      "SI-18.7"
+    ],
+    "3091160": [
+      "SI-19.1",
+      "SI-19.2",
+      "SI-19.3",
+      "SI-19.4",
+      "SI-19.5",
+      "SI-19.6",
+      "SI-19.7",
+      "SI-19.8",
+      "SI-19.9"
+    ],
+    "3224317": [
+      "SI-19.1"
+    ],
+    "3443536": [
+      "SI-19.1",
+      "SI-19.2",
+      "SI-19.3",
+      "SI-19.4",
+      "SI-19.5",
+      "SI-19.6",
+      "SI-19.7",
+      "SI-19.8",
+      "SI-19.9"
+    ],
+    "3224288": [
+      "SI-19.2"
+    ],
+    "3224334": [
+      "SI-19.3"
+    ],
+    "3224335": [
+      "SI-19.4"
+    ],
+    "3224305": [
+      "SI-19.5"
+    ],
+    "3224336": [
+      "SI-19.6"
+    ],
+    "2560753": [
+      "SI-19.7",
+      "SI-19.9",
+      "SI-2.13"
+    ],
+    "3006433": [
+      "SI-19.7"
+    ],
+    "3224318": [
+      "SI-19.7"
+    ],
+    "3224337": [
+      "SI-19.8",
+      "SI-19.9"
+    ],
+    "1007341": [
+      "SI-19.9"
+    ],
+    "1838192": [
+      "SI-19.9"
+    ],
+    "2273108": [
+      "SI-19.9"
+    ],
+    "2340095": [
+      "SI-19.9",
+      "SI-2.32"
+    ],
+    "2364562": [
+      "SI-19.9"
+    ],
+    "2383837": [
+      "SI-19.9"
+    ],
+    "2383879": [
+      "SI-19.9"
+    ],
+    "2383888": [
+      "SI-19.9"
+    ],
+    "2430071": [
+      "SI-19.9"
+    ],
+    "2665372": [
+      "SI-19.9"
+    ],
+    "2772355": [
+      "SI-19.9"
+    ],
+    "2954033": [
+      "SI-19.9"
+    ],
+    "2966518": [
+      "SI-19.9"
+    ],
+    "2976262": [
+      "SI-19.9"
+    ],
+    "3029126": [
+      "SI-19.9"
+    ],
+    "3062197": [
+      "SI-19.9"
+    ],
+    "3085487": [
+      "SI-19.9"
+    ],
+    "3086299": [
+      "SI-19.9"
+    ],
+    "3138281": [
+      "SI-19.9"
+    ],
+    "3138644": [
+      "SI-19.9"
+    ],
+    "3139908": [
+      "SI-19.9"
+    ],
+    "3140931": [
+      "SI-19.9"
+    ],
+    "3145947": [
+      "SI-19.9"
+    ],
+    "3146771": [
+      "SI-19.9"
+    ],
+    "3193560": [
+      "SI-19.9"
+    ],
+    "3213848": [
+      "SI-19.9"
+    ],
+    "3217773": [
+      "SI-19.9"
+    ],
+    "3218111": [
+      "SI-19.9"
+    ],
+    "3218356": [
+      "SI-19.9"
+    ],
+    "3219250": [
+      "SI-19.9"
+    ],
+    "3221404": [
+      "SI-19.9"
+    ],
+    "3224315": [
+      "SI-19.9"
+    ],
+    "3224316": [
+      "SI-19.9"
+    ],
+    "3224319": [
+      "SI-19.9"
+    ],
+    "3224320": [
+      "SI-19.9"
+    ],
+    "3224325": [
+      "SI-19.9"
+    ],
+    "3224338": [
+      "SI-19.9"
+    ],
+    "3224339": [
+      "SI-19.9"
+    ],
+    "3224340": [
+      "SI-19.9"
+    ],
+    "3224341": [
+      "SI-19.9"
+    ],
+    "3224353": [
+      "SI-19.9"
+    ],
+    "3238079": [
+      "SI-19.9"
+    ],
+    "3238213": [
+      "SI-19.9"
+    ],
+    "3250816": [
+      "SI-19.9"
+    ],
+    "3255864": [
+      "SI-19.9"
+    ],
+    "3257544": [
+      "SI-19.9"
+    ],
+    "3394928": [
+      "SI-19.9"
+    ],
+    "3468595": [
+      "SI-19.9"
+    ],
+    "3468604": [
+      "SI-19.9"
+    ],
+    "1829697": [
+      "SI-2.1"
+    ],
+    "2862972": [
+      "SI-2.1"
+    ],
+    "2862992": [
+      "SI-2.1"
+    ],
+    "2865890": [
+      "SI-2.1"
+    ],
+    "2886479": [
+      "SI-2.1"
+    ],
+    "2896183": [
+      "SI-2.1"
+    ],
+    "2926680": [
+      "SI-2.1"
+    ],
+    "2926764": [
+      "SI-2.1"
+    ],
+    "2309060": [
+      "SI-2.10"
+    ],
+    "1694697": [
+      "SI-2.11"
+    ],
+    "2560708": [
+      "SI-2.12"
+    ],
+    "2560791": [
+      "SI-2.14"
+    ],
+    "2560792": [
+      "SI-2.15"
+    ],
+    "2738426": [
+      "SI-2.16"
+    ],
+    "2797047": [
+      "SI-2.16"
+    ],
+    "2234970": [
+      "SI-2.17"
+    ],
+    "2577406": [
+      "SI-2.17"
+    ],
+    "2242596": [
+      "SI-2.18"
+    ],
+    "2288828": [
+      "SI-2.18"
+    ],
+    "2290488": [
+      "SI-2.18"
+    ],
+    "2289424": [
+      "SI-2.19"
+    ],
+    "2360258": [
+      "SI-2.19",
+      "SI-6.5"
+    ],
+    "2500202": [
+      "SI-2.19",
+      "SI-2.27",
+      "SI-39.9",
+      "SI-62.9"
+    ],
+    "2548065": [
+      "SI-2.19"
+    ],
+    "2323655": [
+      "SI-2.20"
+    ],
+    "2320132": [
+      "SI-2.21"
+    ],
+    "2340424": [
+      "SI-2.22"
+    ],
+    "2249880": [
+      "SI-2.23",
+      "SI-39.9"
+    ],
+    "2259818": [
+      "SI-2.23"
+    ],
+    "2408693": [
+      "SI-2.23"
+    ],
+    "2852082": [
+      "SI-2.24"
+    ],
+    "2412899": [
+      "SI-2.25"
+    ],
+    "2461687": [
+      "SI-2.25"
+    ],
+    "2879911": [
+      "SI-2.25"
+    ],
+    "2267784": [
+      "SI-2.27",
+      "SI-24.9"
+    ],
+    "2270133": [
+      "SI-2.27"
+    ],
+    "2270505": [
+      "SI-2.27",
+      "SI-62.9"
+    ],
+    "2273294": [
+      "SI-2.27",
+      "SI-47.2"
+    ],
+    "2299213": [
+      "SI-2.27"
+    ],
+    "2333141": [
+      "SI-2.27",
+      "SI-3.22"
+    ],
+    "2382662": [
+      "SI-2.27"
+    ],
+    "2496759": [
+      "SI-2.27"
+    ],
+    "2498211": [
+      "SI-2.27"
+    ],
+    "2498786": [
+      "SI-2.27"
+    ],
+    "2499310": [
+      "SI-2.27"
+    ],
+    "2499589": [
+      "SI-2.27"
+    ],
+    "2499716": [
+      "SI-2.27"
+    ],
+    "2499728": [
+      "SI-2.27"
+    ],
+    "2504508": [
+      "SI-2.27"
+    ],
+    "2533548": [
+      "SI-2.27"
+    ],
+    "2543469": [
+      "SI-2.27"
+    ],
+    "2543543": [
+      "SI-2.27"
+    ],
+    "2544193": [
+      "SI-2.27"
+    ],
+    "2546102": [
+      "SI-2.27"
+    ],
+    "2552797": [
+      "SI-2.27"
+    ],
+    "2556359": [
+      "SI-2.27"
+    ],
+    "2559556": [
+      "SI-2.27"
+    ],
+    "2576363": [
+      "SI-2.27"
+    ],
+    "2796696": [
+      "SI-2.27"
+    ],
+    "2493452": [
+      "SI-2.28"
+    ],
+    "3271299": [
+      "SI-2.29"
+    ],
+    "3324958": [
+      "SI-2.29"
+    ],
+    "2190119": [
+      "SI-2.30",
+      "SI-2.49"
+    ],
+    "2568271": [
+      "SI-2.30"
+    ],
+    "2979517": [
+      "SI-2.31"
+    ],
+    "2548303": [
+      "SI-2.32"
+    ],
+    "2567604": [
+      "SI-2.32"
+    ],
+    "2570961": [
+      "SI-2.32",
+      "SI-26.1",
+      "SI-37.9"
+    ],
+    "2571544": [
+      "SI-2.32"
+    ],
+    "2591138": [
+      "SI-2.32"
+    ],
+    "2763781": [
+      "SI-2.32"
+    ],
+    "2883989": [
+      "SI-2.32"
+    ],
+    "1484142": [
+      "SI-2.33"
+    ],
+    "2618018": [
+      "SI-2.33"
+    ],
+    "2749796": [
+      "SI-2.33"
+    ],
+    "2630240": [
+      "SI-2.34"
+    ],
+    "2820229": [
+      "SI-2.34"
+    ],
+    "2206980": [
+      "SI-2.35",
+      "SI-27.5"
+    ],
+    "2267306": [
+      "SI-2.35",
+      "SI-39.8",
+      "SI-39.9"
+    ],
+    "2267308": [
+      "SI-2.35",
+      "SI-39.9"
+    ],
+    "2270333": [
+      "SI-2.35",
+      "SI-8.2"
+    ],
+    "2337383": [
+      "SI-2.35",
+      "SI-27.7",
+      "SI-27.9"
+    ],
+    "2850096": [
+      "SI-2.35"
+    ],
+    "2941622": [
+      "SI-2.36"
+    ],
+    "2967210": [
+      "SI-2.36"
+    ],
+    "2993369": [
+      "SI-2.36"
+    ],
+    "3044558": [
+      "SI-2.36"
+    ],
+    "2926224": [
+      "SI-2.37"
+    ],
+    "3057330": [
+      "SI-2.38"
+    ],
+    "3093397": [
+      "SI-2.38"
+    ],
+    "3081996": [
+      "SI-2.39"
+    ],
+    "3112220": [
+      "SI-2.39"
+    ],
+    "3133221": [
+      "SI-2.39"
+    ],
+    "3170381": [
+      "SI-2.39"
+    ],
+    "2661837": [
+      "SI-2.40"
+    ],
+    "3335020": [
+      "SI-2.40"
+    ],
+    "3358954": [
+      "SI-2.40"
+    ],
+    "3150537": [
+      "SI-2.41"
+    ],
+    "3445075": [
+      "SI-2.41"
+    ],
+    "3445096": [
+      "SI-2.41"
+    ],
+    "3502536": [
+      "SI-2.42"
+    ],
+    "2228611": [
+      "SI-2.43"
+    ],
+    "2470711": [
+      "SI-2.43"
+    ],
+    "2270382": [
+      "SI-2.44"
+    ],
+    "2227007": [
+      "SI-2.45"
+    ],
+    "2318521": [
+      "SI-2.45"
+    ],
+    "2679118": [
+      "SI-2.46"
+    ],
+    "2182725": [
+      "SI-2.47",
+      "SI-3.12",
+      "SI-3.14"
+    ],
+    "2237932": [
+      "SI-2.47"
+    ],
+    "2246865": [
+      "SI-2.47"
+    ],
+    "2341836": [
+      "SI-2.47"
+    ],
+    "2406571": [
+      "SI-2.47"
+    ],
+    "2502552": [
+      "SI-2.47",
+      "SI-27.2"
+    ],
+    "2705047": [
+      "SI-2.47"
+    ],
+    "2238670": [
+      "SI-2.48"
+    ],
+    "2318509": [
+      "SI-2.48"
+    ],
+    "2318468": [
+      "SI-2.49"
+    ],
+    "2499529": [
+      "SI-2.49"
+    ],
+    "2239701": [
+      "SI-2.50"
+    ],
+    "2287723": [
+      "SI-2.50"
+    ],
+    "3150564": [
+      "SI-2.51"
+    ],
+    "3243120": [
+      "SI-2.51"
+    ],
+    "2656503": [
+      "SI-2.8"
+    ],
+    "2672757": [
+      "SI-2.9"
+    ],
+    "2668899": [
+      "SI-20.1"
+    ],
+    "2716224": [
+      "SI-20.1"
+    ],
+    "2624475": [
+      "SI-20.2"
+    ],
+    "2197892": [
+      "SI-21.1"
+    ],
+    "2197898": [
+      "SI-21.1"
+    ],
+    "2203518": [
+      "SI-21.1"
+    ],
+    "2204135": [
+      "SI-21.1"
+    ],
+    "2267743": [
+      "SI-21.1"
+    ],
+    "2209696": [
+      "SI-22.1"
+    ],
+    "2267745": [
+      "SI-22.1"
+    ],
+    "2273317": [
+      "SI-23.1",
+      "SI-23.2"
+    ],
+    "2065178": [
+      "SI-24.1",
+      "SI-24.9"
+    ],
+    "2338405": [
+      "SI-24.1"
+    ],
+    "2343825": [
+      "SI-24.2"
+    ],
+    "2343826": [
+      "SI-24.3"
+    ],
+    "2350330": [
+      "SI-24.4"
+    ],
+    "2350447": [
+      "SI-24.5"
+    ],
+    "2439345": [
+      "SI-24.6"
+    ],
+    "2350795": [
+      "SI-24.7"
+    ],
+    "2376165": [
+      "SI-24.8"
+    ],
+    "2217202": [
+      "SI-24.9"
+    ],
+    "2217206": [
+      "SI-24.9"
+    ],
+    "2217208": [
+      "SI-24.9"
+    ],
+    "2267781": [
+      "SI-24.9"
+    ],
+    "2267782": [
+      "SI-24.9"
+    ],
+    "2267783": [
+      "SI-24.9"
+    ],
+    "2329574": [
+      "SI-24.9"
+    ],
+    "2329611": [
+      "SI-24.9"
+    ],
+    "2330017": [
+      "SI-24.9"
+    ],
+    "2336396": [
+      "SI-24.9"
+    ],
+    "2408533": [
+      "SI-24.9"
+    ],
+    "2429619": [
+      "SI-24.9"
+    ],
+    "2442150": [
+      "SI-24.9"
+    ],
+    "2442566": [
+      "SI-24.9"
+    ],
+    "2442567": [
+      "SI-24.9"
+    ],
+    "2446055": [
+      "SI-24.9"
+    ],
+    "2504323": [
+      "SI-24.9"
+    ],
+    "2590858": [
+      "SI-24.9"
+    ],
+    "2603300": [
+      "SI-24.9"
+    ],
+    "2612110": [
+      "SI-24.9"
+    ],
+    "2801072": [
+      "SI-24.9"
+    ],
+    "2900458": [
+      "SI-24.9"
+    ],
+    "2903938": [
+      "SI-24.9"
+    ],
+    "2905234": [
+      "SI-24.9"
+    ],
+    "2917169": [
+      "SI-24.9"
+    ],
+    "2927227": [
+      "SI-24.9"
+    ],
+    "2975797": [
+      "SI-24.9"
+    ],
+    "3036325": [
+      "SI-24.9"
+    ],
+    "3039679": [
+      "SI-24.9"
+    ],
+    "3055767": [
+      "SI-24.9"
+    ],
+    "3127469": [
+      "SI-24.9"
+    ],
+    "3139973": [
+      "SI-24.9"
+    ],
+    "3253390": [
+      "SI-24.9"
+    ],
+    "3344198": [
+      "SI-24.9"
+    ],
+    "2198031": [
+      "SI-25.1"
+    ],
+    "2198035": [
+      "SI-25.1"
+    ],
+    "2204137": [
+      "SI-25.1"
+    ],
+    "2267785": [
+      "SI-25.1"
+    ],
+    "2739164": [
+      "SI-25.2"
+    ],
+    "2409939": [
+      "SI-26.1",
+      "SI-3.11"
+    ],
+    "2616203": [
+      "SI-26.1"
+    ],
+    "2296016": [
+      "SI-27.1"
+    ],
+    "2358928": [
+      "SI-27.1",
+      "SI-27.9"
+    ],
+    "2414624": [
+      "SI-27.1",
+      "SI-27.9"
+    ],
+    "2516223": [
+      "SI-27.2"
+    ],
+    "2524011": [
+      "SI-27.2"
+    ],
+    "2536568": [
+      "SI-27.2"
+    ],
+    "2585925": [
+      "SI-27.2"
+    ],
+    "2629400": [
+      "SI-27.2"
+    ],
+    "2542099": [
+      "SI-27.3"
+    ],
+    "2404011": [
+      "SI-27.4"
+    ],
+    "2194618": [
+      "SI-27.5",
+      "SI-27.7"
+    ],
+    "2197392": [
+      "SI-27.5"
+    ],
+    "2240878": [
+      "SI-27.5"
+    ],
+    "2242679": [
+      "SI-27.5"
+    ],
+    "2210569": [
+      "SI-27.6"
+    ],
+    "2319579": [
+      "SI-27.6",
+      "SI-27.9"
+    ],
+    "1804812": [
+      "SI-27.7"
+    ],
+    "2129306": [
+      "SI-27.7"
+    ],
+    "2267834": [
+      "SI-27.7"
+    ],
+    "1450225": [
+      "SI-27.9"
+    ],
+    "1704534": [
+      "SI-27.9"
+    ],
+    "2358909": [
+      "SI-27.9"
+    ],
+    "2234028": [
+      "SI-28.1",
+      "SI-28.9"
+    ],
+    "2267868": [
+      "SI-28.1"
+    ],
+    "2216258": [
+      "SI-28.2"
+    ],
+    "2267870": [
+      "SI-28.2"
+    ],
+    "2217857": [
+      "SI-28.3"
+    ],
+    "2267871": [
+      "SI-28.3"
+    ],
+    "2210904": [
+      "SI-28.4"
+    ],
+    "2214906": [
+      "SI-28.4"
+    ],
+    "2267873": [
+      "SI-28.4"
+    ],
+    "2213569": [
+      "SI-28.5"
+    ],
+    "2267878": [
+      "SI-28.5"
+    ],
+    "2226275": [
+      "SI-28.6"
+    ],
+    "2267879": [
+      "SI-28.6"
+    ],
+    "2215061": [
+      "SI-28.7"
+    ],
+    "2215123": [
+      "SI-28.7"
+    ],
+    "2267880": [
+      "SI-28.7"
+    ],
+    "2212999": [
+      "SI-28.8"
+    ],
+    "2267893": [
+      "SI-28.8"
+    ],
+    "2117843": [
+      "SI-28.9"
+    ],
+    "2212593": [
+      "SI-28.9"
+    ],
+    "2216303": [
+      "SI-28.9"
+    ],
+    "2217234": [
+      "SI-28.9",
+      "SI-29.9"
+    ],
+    "2224778": [
+      "SI-28.9"
+    ],
+    "2226357": [
+      "SI-28.9"
+    ],
+    "2226431": [
+      "SI-28.9"
+    ],
+    "2226803": [
+      "SI-28.9"
+    ],
+    "2267836": [
+      "SI-28.9"
+    ],
+    "2267840": [
+      "SI-28.9"
+    ],
+    "2267841": [
+      "SI-28.9"
+    ],
+    "2267842": [
+      "SI-28.9"
+    ],
+    "2267845": [
+      "SI-28.9"
+    ],
+    "2267850": [
+      "SI-28.9"
+    ],
+    "2267863": [
+      "SI-28.9"
+    ],
+    "2267864": [
+      "SI-28.9"
+    ],
+    "2267866": [
+      "SI-28.9"
+    ],
+    "2267918": [
+      "SI-28.9"
+    ],
+    "2267920": [
+      "SI-28.9"
+    ],
+    "2267943": [
+      "SI-28.9"
+    ],
+    "2268017": [
+      "SI-28.9"
+    ],
+    "2268018": [
+      "SI-28.9"
+    ],
+    "2268041": [
+      "SI-28.9"
+    ],
+    "2268042": [
+      "SI-28.9"
+    ],
+    "2268043": [
+      "SI-28.9"
+    ],
+    "2387911": [
+      "SI-28.9"
+    ],
+    "2401762": [
+      "SI-28.9"
+    ],
+    "2601548": [
+      "SI-28.9"
+    ],
+    "2704849": [
+      "SI-28.9"
+    ],
+    "2935353": [
+      "SI-28.9"
+    ],
+    "2948953": [
+      "SI-28.9"
+    ],
+    "2949845": [
+      "SI-28.9"
+    ],
+    "3190519": [
+      "SI-28.9"
+    ],
+    "3300448": [
+      "SI-28.9"
+    ],
+    "2580670": [
+      "SI-29.1"
+    ],
+    "3259029": [
+      "SI-29.2"
+    ],
+    "3372889": [
+      "SI-29.3"
+    ],
+    "2232362": [
+      "SI-29.4",
+      "SI-3.22",
+      "SI-30.9",
+      "SI-38.9",
+      "SI-39.9"
+    ],
+    "2267463": [
+      "SI-29.4"
+    ],
+    "2270076": [
+      "SI-29.5"
+    ],
+    "2270078": [
+      "SI-29.6"
+    ],
+    "2250183": [
+      "SI-29.7"
+    ],
+    "2270080": [
+      "SI-29.7"
+    ],
+    "2270107": [
+      "SI-29.8"
+    ],
+    "2270108": [
+      "SI-29.9"
+    ],
+    "2270110": [
+      "SI-29.9"
+    ],
+    "2270123": [
+      "SI-29.9"
+    ],
+    "2482659": [
+      "SI-29.9"
+    ],
+    "1529387": [
+      "SI-3.1"
+    ],
+    "2267295": [
+      "SI-3.1"
+    ],
+    "2416027": [
+      "SI-3.10"
+    ],
+    "2379272": [
+      "SI-3.12"
+    ],
+    "2285611": [
+      "SI-3.13"
+    ],
+    "2387589": [
+      "SI-3.13"
+    ],
+    "2421394": [
+      "SI-3.13"
+    ],
+    "2877717": [
+      "SI-3.13"
+    ],
+    "2442665": [
+      "SI-3.14"
+    ],
+    "2472030": [
+      "SI-3.15",
+      "SI-3.19"
+    ],
+    "2492904": [
+      "SI-3.15"
+    ],
+    "2417298": [
+      "SI-3.16"
+    ],
+    "2506041": [
+      "SI-3.16"
+    ],
+    "2928897": [
+      "SI-3.17"
+    ],
+    "3010257": [
+      "SI-3.18"
+    ],
+    "1623677": [
+      "SI-3.19"
+    ],
+    "2265093": [
+      "SI-3.19",
+      "SI-3.7",
+      "SI-50.4",
+      "SI-59.7",
+      "SI-62.1"
+    ],
+    "2310884": [
+      "SI-3.19"
+    ],
+    "2267297": [
+      "SI-3.2"
+    ],
+    "2576961": [
+      "SI-3.20"
+    ],
+    "2267138": [
+      "SI-3.21"
+    ],
+    "1597790": [
+      "SI-3.22"
+    ],
+    "1696821": [
+      "SI-3.22"
+    ],
+    "2214213": [
+      "SI-3.22"
+    ],
+    "2215424": [
+      "SI-3.22"
+    ],
+    "2215852": [
+      "SI-3.22"
+    ],
+    "2216958": [
+      "SI-3.22"
+    ],
+    "2229860": [
+      "SI-3.22"
+    ],
+    "2229892": [
+      "SI-3.22"
+    ],
+    "2232366": [
+      "SI-3.22"
+    ],
+    "2232391": [
+      "SI-3.22"
+    ],
+    "2232396": [
+      "SI-3.22"
+    ],
+    "2232497": [
+      "SI-3.22"
+    ],
+    "2233100": [
+      "SI-3.22"
+    ],
+    "2267140": [
+      "SI-3.22",
+      "SI-49.9"
+    ],
+    "2270396": [
+      "SI-3.22",
+      "SI-49.9"
+    ],
+    "2270836": [
+      "SI-3.22",
+      "SI-48.5"
+    ],
+    "2206932": [
+      "SI-3.23"
+    ],
+    "2323185": [
+      "SI-3.23"
+    ],
+    "2324325": [
+      "SI-3.23"
+    ],
+    "2330063": [
+      "SI-3.23"
+    ],
+    "2204534": [
+      "SI-3.24"
+    ],
+    "2267225": [
+      "SI-3.24"
+    ],
+    "2458666": [
+      "SI-3.24"
+    ],
+    "2641097": [
+      "SI-3.24"
+    ],
+    "2224371": [
+      "SI-3.25"
+    ],
+    "2267246": [
+      "SI-3.25"
+    ],
+    "2224251": [
+      "SI-3.26"
+    ],
+    "2267247": [
+      "SI-3.26"
+    ],
+    "2267298": [
+      "SI-3.3"
+    ],
+    "2267292": [
+      "SI-3.4"
+    ],
+    "2371157": [
+      "SI-3.4",
+      "SI-60.9"
+    ],
+    "2267294": [
+      "SI-3.5"
+    ],
+    "1000009": [
+      "SI-3.6",
+      "SI-45.2"
+    ],
+    "1765305": [
+      "SI-3.6"
+    ],
+    "3216733": [
+      "SI-3.6"
+    ],
+    "3327581": [
+      "SI-3.6"
+    ],
+    "1968132": [
+      "SI-3.7"
+    ],
+    "2070408": [
+      "SI-3.7"
+    ],
+    "2231667": [
+      "SI-3.7"
+    ],
+    "2283695": [
+      "SI-3.7"
+    ],
+    "2283810": [
+      "SI-3.7"
+    ],
+    "2285062": [
+      "SI-3.7"
+    ],
+    "2286880": [
+      "SI-3.7"
+    ],
+    "2289876": [
+      "SI-3.7"
+    ],
+    "2304337": [
+      "SI-3.7"
+    ],
+    "2375319": [
+      "SI-3.8"
+    ],
+    "1759416": [
+      "SI-3.9"
+    ],
+    "2379157": [
+      "SI-3.9"
+    ],
+    "2268084": [
+      "SI-30.1",
+      "SI-30.9"
+    ],
+    "1914010": [
+      "SI-30.2"
+    ],
+    "2268085": [
+      "SI-30.2"
+    ],
+    "2268088": [
+      "SI-30.2",
+      "SI-30.3"
+    ],
+    "3233524": [
+      "SI-30.2"
+    ],
+    "3348184": [
+      "SI-30.2"
+    ],
+    "3489493": [
+      "SI-30.2"
+    ],
+    "2227059": [
+      "SI-30.3"
+    ],
+    "2229126": [
+      "SI-30.4"
+    ],
+    "2268089": [
+      "SI-30.4"
+    ],
+    "2268095": [
+      "SI-30.5"
+    ],
+    "2844909": [
+      "SI-30.5"
+    ],
+    "2199837": [
+      "SI-30.6"
+    ],
+    "2268112": [
+      "SI-30.6"
+    ],
+    "2268114": [
+      "SI-30.7"
+    ],
+    "2268116": [
+      "SI-30.8",
+      "SI-30.9"
+    ],
+    "3413719": [
+      "SI-30.8",
+      "SI-30.9"
+    ],
+    "3413777": [
+      "SI-30.8",
+      "SI-30.9"
+    ],
+    "3417131": [
+      "SI-30.8",
+      "SI-30.9"
+    ],
+    "1425152": [
+      "SI-30.9"
+    ],
+    "1793291": [
+      "SI-30.9"
+    ],
+    "2216528": [
+      "SI-30.9"
+    ],
+    "2224356": [
+      "SI-30.9"
+    ],
+    "2226333": [
+      "SI-30.9"
+    ],
+    "2226966": [
+      "SI-30.9"
+    ],
+    "2227532": [
+      "SI-30.9"
+    ],
+    "2227579": [
+      "SI-30.9"
+    ],
+    "2228178": [
+      "SI-30.9"
+    ],
+    "2240359": [
+      "SI-30.9",
+      "SI-32.6"
+    ],
+    "2268044": [
+      "SI-30.9"
+    ],
+    "2268045": [
+      "SI-30.9"
+    ],
+    "2268048": [
+      "SI-30.9"
+    ],
+    "2268050": [
+      "SI-30.9"
+    ],
+    "2268063": [
+      "SI-30.9"
+    ],
+    "2268064": [
+      "SI-30.9"
+    ],
+    "2268069": [
+      "SI-30.9"
+    ],
+    "2268070": [
+      "SI-30.9"
+    ],
+    "2268082": [
+      "SI-30.9"
+    ],
+    "2268117": [
+      "SI-30.9"
+    ],
+    "2268131": [
+      "SI-30.9"
+    ],
+    "2270200": [
+      "SI-30.9"
+    ],
+    "2270216": [
+      "SI-30.9"
+    ],
+    "2270218": [
+      "SI-30.9"
+    ],
+    "2270231": [
+      "SI-30.9"
+    ],
+    "2270233": [
+      "SI-30.9"
+    ],
+    "2270235": [
+      "SI-30.9"
+    ],
+    "2270236": [
+      "SI-30.9"
+    ],
+    "2270237": [
+      "SI-30.9"
+    ],
+    "2270240": [
+      "SI-30.9"
+    ],
+    "2270241": [
+      "SI-30.9"
+    ],
+    "2270242": [
+      "SI-30.9"
+    ],
+    "2270267": [
+      "SI-30.9"
+    ],
+    "2271203": [
+      "SI-30.9"
+    ],
+    "2271204": [
+      "SI-30.9"
+    ],
+    "2271206": [
+      "SI-30.9"
+    ],
+    "2273079": [
+      "SI-30.9"
+    ],
+    "2466264": [
+      "SI-30.9"
+    ],
+    "2578952": [
+      "SI-30.9"
+    ],
+    "2614920": [
+      "SI-30.9"
+    ],
+    "2655077": [
+      "SI-30.9"
+    ],
+    "2666947": [
+      "SI-30.9"
+    ],
+    "2688804": [
+      "SI-30.9"
+    ],
+    "2697512": [
+      "SI-30.9"
+    ],
+    "2935734": [
+      "SI-30.9"
+    ],
+    "2941708": [
+      "SI-30.9"
+    ],
+    "2999251": [
+      "SI-30.9"
+    ],
+    "3018123": [
+      "SI-30.9"
+    ],
+    "3035649": [
+      "SI-30.9"
+    ],
+    "3156358": [
+      "SI-30.9"
+    ],
+    "3156360": [
+      "SI-30.9"
+    ],
+    "3156361": [
+      "SI-30.9"
+    ],
+    "3156432": [
+      "SI-30.9"
+    ],
+    "3156433": [
+      "SI-30.9"
+    ],
+    "3156434": [
+      "SI-30.9"
+    ],
+    "3196066": [
+      "SI-30.9"
+    ],
+    "3215965": [
+      "SI-30.9"
+    ],
+    "3494892": [
+      "SI-30.9"
+    ],
+    "2267169": [
+      "SI-31.1"
+    ],
+    "2267283": [
+      "SI-31.1"
+    ],
+    "2643483": [
+      "SI-31.1"
+    ],
+    "1670678": [
+      "SI-32.2"
+    ],
+    "2267288": [
+      "SI-32.2"
+    ],
+    "2267289": [
+      "SI-32.3"
+    ],
+    "2267331": [
+      "SI-32.4"
+    ],
+    "2267386": [
+      "SI-32.5"
+    ],
+    "2352369": [
+      "SI-32.6"
+    ],
+    "3000979": [
+      "SI-32.7",
+      "SI-32.9"
+    ],
+    "3112420": [
+      "SI-32.8"
+    ],
+    "2270261": [
+      "SI-32.9"
+    ],
+    "2270262": [
+      "SI-32.9"
+    ],
+    "2270265": [
+      "SI-32.9"
+    ],
+    "2270266": [
+      "SI-32.9"
+    ],
+    "2677564": [
+      "SI-32.9"
+    ],
+    "3265838": [
+      "SI-32.9"
+    ],
+    "3331626": [
+      "SI-32.9"
+    ],
+    "2267438": [
+      "SI-33.1"
+    ],
+    "2198406": [
+      "SI-33.2"
+    ],
+    "2267439": [
+      "SI-33.2"
+    ],
+    "2267461": [
+      "SI-33.3"
+    ],
+    "3015382": [
+      "SI-33.4"
+    ],
+    "3196565": [
+      "SI-33.4"
+    ],
+    "2267387": [
+      "SI-33.5"
+    ],
+    "2267421": [
+      "SI-33.6"
+    ],
+    "2267422": [
+      "SI-33.7"
+    ],
+    "1489703": [
+      "SI-33.8"
+    ],
+    "2267423": [
+      "SI-33.8"
+    ],
+    "2298456": [
+      "SI-33.8"
+    ],
+    "2267426": [
+      "SI-33.9"
+    ],
+    "2267427": [
+      "SI-33.9"
+    ],
+    "2267432": [
+      "SI-33.9"
+    ],
+    "2307624": [
+      "SI-33.9"
+    ],
+    "2270193": [
+      "SI-34.1"
+    ],
+    "2338215": [
+      "SI-34.2"
+    ],
+    "2340996": [
+      "SI-34.3"
+    ],
+    "2505099": [
+      "SI-34.4"
+    ],
+    "2270124": [
+      "SI-34.5"
+    ],
+    "2270126": [
+      "SI-34.6"
+    ],
+    "2270129": [
+      "SI-34.7"
+    ],
+    "2270199": [
+      "SI-35.1",
+      "SI-56.9"
+    ],
+    "2714892": [
+      "SI-35.1"
+    ],
+    "3530443": [
+      "SI-35.1"
+    ],
+    "2889253": [
+      "SI-36.1"
+    ],
+    "2889468": [
+      "SI-36.2"
+    ],
+    "2889540": [
+      "SI-36.3"
+    ],
+    "2889652": [
+      "SI-36.4"
+    ],
+    "2889636": [
+      "SI-36.5"
+    ],
+    "2889637": [
+      "SI-36.6"
+    ],
+    "2889638": [
+      "SI-36.7"
+    ],
+    "2358376": [
+      "SI-37.1"
+    ],
+    "2379542": [
+      "SI-37.1",
+      "SI-37.9"
+    ],
+    "2358519": [
+      "SI-37.2"
+    ],
+    "2358921": [
+      "SI-37.3"
+    ],
+    "2354985": [
+      "SI-37.4"
+    ],
+    "2445069": [
+      "SI-37.4",
+      "SI-37.5",
+      "SI-37.6",
+      "SI-37.9"
+    ],
+    "2359354": [
+      "SI-37.5"
+    ],
+    "1391444": [
+      "SI-37.6"
+    ],
+    "1427365": [
+      "SI-37.6"
+    ],
+    "1457426": [
+      "SI-37.6"
+    ],
+    "1677356": [
+      "SI-37.6"
+    ],
+    "1755486": [
+      "SI-37.6"
+    ],
+    "1756616": [
+      "SI-37.6"
+    ],
+    "1759150": [
+      "SI-37.6"
+    ],
+    "1769591": [
+      "SI-37.6"
+    ],
+    "1780409": [
+      "SI-37.6"
+    ],
+    "2321885": [
+      "SI-37.6",
+      "SI-37.9"
+    ],
+    "2348430": [
+      "SI-37.6"
+    ],
+    "2353984": [
+      "SI-37.6",
+      "SI-37.9"
+    ],
+    "2359662": [
+      "SI-37.6"
+    ],
+    "2360044": [
+      "SI-37.8"
+    ],
+    "2283330": [
+      "SI-37.9"
+    ],
+    "2343374": [
+      "SI-37.9"
+    ],
+    "2349633": [
+      "SI-37.9"
+    ],
+    "2353885": [
+      "SI-37.9"
+    ],
+    "2358463": [
+      "SI-37.9"
+    ],
+    "2359065": [
+      "SI-37.9"
+    ],
+    "2359330": [
+      "SI-37.9"
+    ],
+    "2359421": [
+      "SI-37.9"
+    ],
+    "2359479": [
+      "SI-37.9"
+    ],
+    "2360046": [
+      "SI-37.9"
+    ],
+    "2361179": [
+      "SI-37.9"
+    ],
+    "2361181": [
+      "SI-37.9"
+    ],
+    "2361186": [
+      "SI-37.9"
+    ],
+    "2361194": [
+      "SI-37.9"
+    ],
+    "2361201": [
+      "SI-37.9"
+    ],
+    "2361202": [
+      "SI-37.9"
+    ],
+    "2363785": [
+      "SI-37.9"
+    ],
+    "2368899": [
+      "SI-37.9"
+    ],
+    "2630630": [
+      "SI-37.9"
+    ],
+    "2645827": [
+      "SI-37.9"
+    ],
+    "2768224": [
+      "SI-37.9"
+    ],
+    "2823375": [
+      "SI-37.9"
+    ],
+    "2228261": [
+      "SI-38.1"
+    ],
+    "2267445": [
+      "SI-38.1"
+    ],
+    "1803189": [
+      "SI-38.2"
+    ],
+    "2267449": [
+      "SI-38.2"
+    ],
+    "2186288": [
+      "SI-38.3",
+      "SI-38.9"
+    ],
+    "2187627": [
+      "SI-38.3",
+      "SI-38.9"
+    ],
+    "2271188": [
+      "SI-38.3"
+    ],
+    "2441434": [
+      "SI-38.3",
+      "SI-38.9"
+    ],
+    "2267719": [
+      "SI-38.4"
+    ],
+    "2271189": [
+      "SI-38.5"
+    ],
+    "2223144": [
+      "SI-38.6",
+      "SI-39.9"
+    ],
+    "2267740": [
+      "SI-38.6"
+    ],
+    "2332710": [
+      "SI-38.7"
+    ],
+    "2200412": [
+      "SI-38.8"
+    ],
+    "2188695": [
+      "SI-38.9",
+      "SI-39.9"
+    ],
+    "2188735": [
+      "SI-38.9",
+      "SI-39.9"
+    ],
+    "2189301": [
+      "SI-38.9",
+      "SI-39.9"
+    ],
+    "2216943": [
+      "SI-38.9"
+    ],
+    "2220005": [
+      "SI-38.9",
+      "SI-39.9"
+    ],
+    "2228247": [
+      "SI-38.9"
+    ],
+    "2228250": [
+      "SI-38.9"
+    ],
+    "2251946": [
+      "SI-38.9"
+    ],
+    "2267413": [
+      "SI-38.9"
+    ],
+    "2267414": [
+      "SI-38.9"
+    ],
+    "2267441": [
+      "SI-38.9"
+    ],
+    "2267442": [
+      "SI-38.9"
+    ],
+    "2267444": [
+      "SI-38.9"
+    ],
+    "2271166": [
+      "SI-38.9"
+    ],
+    "2271168": [
+      "SI-38.9"
+    ],
+    "2271184": [
+      "SI-38.9"
+    ],
+    "2578291": [
+      "SI-38.9"
+    ],
+    "2899836": [
+      "SI-38.9"
+    ],
+    "3053636": [
+      "SI-38.9"
+    ],
+    "3092824": [
+      "SI-38.9"
+    ],
+    "3101906": [
+      "SI-38.9"
+    ],
+    "3282761": [
+      "SI-38.9"
+    ],
+    "3319787": [
+      "SI-38.9"
+    ],
+    "3326565": [
+      "SI-38.9"
+    ],
+    "3334975": [
+      "SI-38.9"
+    ],
+    "3338301": [
+      "SI-38.9"
+    ],
+    "3345237": [
+      "SI-38.9"
+    ],
+    "3376141": [
+      "SI-38.9"
+    ],
+    "2223838": [
+      "SI-39.1"
+    ],
+    "2271150": [
+      "SI-39.1"
+    ],
+    "2271161": [
+      "SI-39.2"
+    ],
+    "2214585": [
+      "SI-39.3"
+    ],
+    "2267375": [
+      "SI-39.3"
+    ],
+    "2790427": [
+      "SI-39.4"
+    ],
+    "2226380": [
+      "SI-39.5",
+      "SI-39.9"
+    ],
+    "2267344": [
+      "SI-39.5",
+      "SI-39.9"
+    ],
+    "2267377": [
+      "SI-39.5",
+      "SI-39.8",
+      "SI-39.9"
+    ],
+    "2228098": [
+      "SI-39.6"
+    ],
+    "2267395": [
+      "SI-39.6"
+    ],
+    "2239184": [
+      "SI-39.7"
+    ],
+    "2267398": [
+      "SI-39.7"
+    ],
+    "2198647": [
+      "SI-39.8"
+    ],
+    "2224436": [
+      "SI-39.8"
+    ],
+    "1812828": [
+      "SI-39.9"
+    ],
+    "2200691": [
+      "SI-39.9"
+    ],
+    "2205202": [
+      "SI-39.9"
+    ],
+    "2223800": [
+      "SI-39.9"
+    ],
+    "2225170": [
+      "SI-39.9"
+    ],
+    "2227750": [
+      "SI-39.9"
+    ],
+    "2227824": [
+      "SI-39.9"
+    ],
+    "2228056": [
+      "SI-39.9"
+    ],
+    "2267310": [
+      "SI-39.9"
+    ],
+    "2267342": [
+      "SI-39.9"
+    ],
+    "2267348": [
+      "SI-39.9"
+    ],
+    "2267350": [
+      "SI-39.9"
+    ],
+    "2267351": [
+      "SI-39.9"
+    ],
+    "2313318": [
+      "SI-39.9"
+    ],
+    "2418242": [
+      "SI-39.9"
+    ],
+    "2469315": [
+      "SI-39.9"
+    ],
+    "2470721": [
+      "SI-39.9"
+    ],
+    "2582784": [
+      "SI-39.9"
+    ],
+    "2591055": [
+      "SI-39.9"
+    ],
+    "2733866": [
+      "SI-39.9"
+    ],
+    "2869019": [
+      "SI-39.9"
+    ],
+    "3052214": [
+      "SI-39.9"
+    ],
+    "2318716": [
+      "SI-4.1"
+    ],
+    "2318733": [
+      "SI-4.2"
+    ],
+    "2320143": [
+      "SI-4.3"
+    ],
+    "2318728": [
+      "SI-4.4"
+    ],
+    "2323806": [
+      "SI-4.5"
+    ],
+    "2711002": [
+      "SI-4.6"
+    ],
+    "2712156": [
+      "SI-4.7"
+    ],
+    "2465978": [
+      "SI-41.1"
+    ],
+    "2639847": [
+      "SI-41.2"
+    ],
+    "3290708": [
+      "SI-41.3"
+    ],
+    "3444020": [
+      "SI-41.4"
+    ],
+    "3404390": [
+      "SI-42.1"
+    ],
+    "2029012": [
+      "SI-42.2"
+    ],
+    "2227963": [
+      "SI-42.2"
+    ],
+    "2270311": [
+      "SI-42.2"
+    ],
+    "2298073": [
+      "SI-42.3"
+    ],
+    "2323282": [
+      "SI-42.3"
+    ],
+    "2349004": [
+      "SI-42.3"
+    ],
+    "2437547": [
+      "SI-42.3"
+    ],
+    "2469984": [
+      "SI-42.4"
+    ],
+    "2595915": [
+      "SI-42.4"
+    ],
+    "2674217": [
+      "SI-42.4"
+    ],
+    "3236088": [
+      "SI-42.4"
+    ],
+    "2727947": [
+      "SI-42.5"
+    ],
+    "2771861": [
+      "SI-42.5"
+    ],
+    "2304519": [
+      "SI-42.6"
+    ],
+    "2351241": [
+      "SI-42.6"
+    ],
+    "2465179": [
+      "SI-42.6"
+    ],
+    "2480067": [
+      "SI-42.6",
+      "SI-42.9"
+    ],
+    "2835816": [
+      "SI-42.6"
+    ],
+    "2869393": [
+      "SI-42.6"
+    ],
+    "2926588": [
+      "SI-42.6"
+    ],
+    "3096074": [
+      "SI-42.6"
+    ],
+    "3526880": [
+      "SI-42.6"
+    ],
+    "2931354": [
+      "SI-42.8"
+    ],
+    "3120536": [
+      "SI-42.8"
+    ],
+    "3237660": [
+      "SI-42.9"
+    ],
+    "3256877": [
+      "SI-42.9"
+    ],
+    "2195701": [
+      "SI-43.1"
+    ],
+    "2244803": [
+      "SI-43.1"
+    ],
+    "2270312": [
+      "SI-43.1"
+    ],
+    "2421589": [
+      "SI-43.1"
+    ],
+    "2523749": [
+      "SI-43.1"
+    ],
+    "3463454": [
+      "SI-44.1"
+    ],
+    "2271210": [
+      "SI-44.2"
+    ],
+    "2270317": [
+      "SI-44.3"
+    ],
+    "2271233": [
+      "SI-44.4"
+    ],
+    "2271236": [
+      "SI-44.5"
+    ],
+    "2347269": [
+      "SI-44.5"
+    ],
+    "2348426": [
+      "SI-44.5"
+    ],
+    "2271238": [
+      "SI-44.6"
+    ],
+    "2387353": [
+      "SI-44.6"
+    ],
+    "2401583": [
+      "SI-44.6"
+    ],
+    "2900607": [
+      "SI-44.6"
+    ],
+    "2907836": [
+      "SI-44.6"
+    ],
+    "1556353": [
+      "SI-45.2"
+    ],
+    "3004812": [
+      "SI-45.2"
+    ],
+    "2270318": [
+      "SI-45.3"
+    ],
+    "2369934": [
+      "SI-45.4"
+    ],
+    "3209838": [
+      "SI-45.6"
+    ],
+    "3472563": [
+      "SI-45.6"
+    ],
+    "2531942": [
+      "SI-46.1"
+    ],
+    "2531884": [
+      "SI-46.2"
+    ],
+    "2273297": [
+      "SI-46.3"
+    ],
+    "2531962": [
+      "SI-46.3"
+    ],
+    "2273299": [
+      "SI-47.3"
+    ],
+    "1161250": [
+      "SI-47.4"
+    ],
+    "2273311": [
+      "SI-47.4"
+    ],
+    "3018378": [
+      "SI-47.5"
+    ],
+    "7017755": [
+      "SI-47.5"
+    ],
+    "7017756": [
+      "SI-47.5"
+    ],
+    "2200942": [
+      "SI-48.1",
+      "SI-48.4"
+    ],
+    "2270832": [
+      "SI-48.1"
+    ],
+    "2445654": [
+      "SI-48.2"
+    ],
+    "2933435": [
+      "SI-48.3"
+    ],
+    "3246460": [
+      "SI-48.3"
+    ],
+    "2270834": [
+      "SI-48.4"
+    ],
+    "2228241": [
+      "SI-48.5",
+      "SI-49.9"
+    ],
+    "2334008": [
+      "SI-48.5"
+    ],
+    "2334012": [
+      "SI-48.5"
+    ],
+    "2348023": [
+      "SI-48.5"
+    ],
+    "2270837": [
+      "SI-48.6"
+    ],
+    "2382229": [
+      "SI-48.6"
+    ],
+    "2270838": [
+      "SI-48.7"
+    ],
+    "2270839": [
+      "SI-48.8"
+    ],
+    "2270840": [
+      "SI-48.9"
+    ],
+    "2349033": [
+      "SI-48.9",
+      "SI-49.9"
+    ],
+    "2382203": [
+      "SI-48.9"
+    ],
+    "2445653": [
+      "SI-48.9"
+    ],
+    "2456102": [
+      "SI-49.1"
+    ],
+    "2633572": [
+      "SI-49.2"
+    ],
+    "3159740": [
+      "SI-49.3",
+      "SI-49.6"
+    ],
+    "3155820": [
+      "SI-49.4"
+    ],
+    "3168667": [
+      "SI-49.5"
+    ],
+    "3192264": [
+      "SI-49.6"
+    ],
+    "3213566": [
+      "SI-49.7"
+    ],
+    "2228139": [
+      "SI-49.8"
+    ],
+    "2270352": [
+      "SI-49.8"
+    ],
+    "2227568": [
+      "SI-49.9"
+    ],
+    "2228218": [
+      "SI-49.9"
+    ],
+    "2228219": [
+      "SI-49.9"
+    ],
+    "2228220": [
+      "SI-49.9"
+    ],
+    "2228242": [
+      "SI-49.9"
+    ],
+    "2228244": [
+      "SI-49.9"
+    ],
+    "2270354": [
+      "SI-49.9"
+    ],
+    "2270357": [
+      "SI-49.9"
+    ],
+    "2270358": [
+      "SI-49.9"
+    ],
+    "2270398": [
+      "SI-49.9"
+    ],
+    "2270399": [
+      "SI-49.9"
+    ],
+    "2273102": [
+      "SI-49.9"
+    ],
+    "2301522": [
+      "SI-49.9"
+    ],
+    "2326776": [
+      "SI-49.9"
+    ],
+    "2326822": [
+      "SI-49.9"
+    ],
+    "2341690": [
+      "SI-49.9"
+    ],
+    "2352485": [
+      "SI-49.9"
+    ],
+    "2360860": [
+      "SI-49.9"
+    ],
+    "2384347": [
+      "SI-49.9"
+    ],
+    "2460737": [
+      "SI-5.1"
+    ],
+    "2547347": [
+      "SI-5.10"
+    ],
+    "2556106": [
+      "SI-5.11"
+    ],
+    "2556134": [
+      "SI-5.12"
+    ],
+    "2560298": [
+      "SI-5.13"
+    ],
+    "2555990": [
+      "SI-5.14"
+    ],
+    "2556063": [
+      "SI-5.15"
+    ],
+    "2553281": [
+      "SI-5.16",
+      "SI-5.17",
+      "SI-5.19",
+      "SI-5.6"
+    ],
+    "2556164": [
+      "SI-5.16"
+    ],
+    "2556220": [
+      "SI-5.17"
+    ],
+    "2556176": [
+      "SI-5.18",
+      "SI-5.19"
+    ],
+    "2554440": [
+      "SI-5.19"
+    ],
+    "2461004": [
+      "SI-5.2"
+    ],
+    "2672696": [
+      "SI-5.20"
+    ],
+    "2591598": [
+      "SI-5.21"
+    ],
+    "2596369": [
+      "SI-5.22"
+    ],
+    "2608098": [
+      "SI-5.23"
+    ],
+    "2551942": [
+      "SI-5.24"
+    ],
+    "2671009": [
+      "SI-5.24"
+    ],
+    "2671010": [
+      "SI-5.24"
+    ],
+    "3327638": [
+      "SI-5.25"
+    ],
+    "3203753": [
+      "SI-5.26"
+    ],
+    "3207069": [
+      "SI-5.26"
+    ],
+    "3203820": [
+      "SI-5.27"
+    ],
+    "2461021": [
+      "SI-5.3"
+    ],
+    "2461014": [
+      "SI-5.4"
+    ],
+    "2461007": [
+      "SI-5.5"
+    ],
+    "2551913": [
+      "SI-5.6"
+    ],
+    "2551960": [
+      "SI-5.7"
+    ],
+    "2556089": [
+      "SI-5.8"
+    ],
+    "2547343": [
+      "SI-5.9"
+    ],
+    "2267182": [
+      "SI-50.2"
+    ],
+    "2273314": [
+      "SI-50.2"
+    ],
+    "2350332": [
+      "SI-50.3"
+    ],
+    "2326777": [
+      "SI-50.4"
+    ],
+    "2301533": [
+      "SI-50.5"
+    ],
+    "2197116": [
+      "SI-50.6"
+    ],
+    "2343388": [
+      "SI-50.6"
+    ],
+    "2389447": [
+      "SI-50.7"
+    ],
+    "1162438": [
+      "SI-51.1"
+    ],
+    "2383042": [
+      "SI-51.1"
+    ],
+    "1168556": [
+      "SI-51.2"
+    ],
+    "2383076": [
+      "SI-51.2"
+    ],
+    "2270848": [
+      "SI-51.3"
+    ],
+    "2270849": [
+      "SI-51.4"
+    ],
+    "2270850": [
+      "SI-51.5"
+    ],
+    "2270851": [
+      "SI-51.6"
+    ],
+    "2270852": [
+      "SI-51.7"
+    ],
+    "2270853": [
+      "SI-51.8"
+    ],
+    "2270855": [
+      "SI-51.9"
+    ],
+    "2270856": [
+      "SI-51.9"
+    ],
+    "2270858": [
+      "SI-51.9"
+    ],
+    "2226678": [
+      "SI-52.1"
+    ],
+    "2270405": [
+      "SI-52.1"
+    ],
+    "2226677": [
+      "SI-52.2"
+    ],
+    "2270409": [
+      "SI-52.2"
+    ],
+    "2226674": [
+      "SI-52.3"
+    ],
+    "2270410": [
+      "SI-52.3"
+    ],
+    "2270412": [
+      "SI-52.4"
+    ],
+    "2326769": [
+      "SI-52.4"
+    ],
+    "2346054": [
+      "SI-52.4"
+    ],
+    "2337868": [
+      "SI-52.5"
+    ],
+    "2381873": [
+      "SI-52.5"
+    ],
+    "2358159": [
+      "SI-52.6"
+    ],
+    "2381891": [
+      "SI-52.6"
+    ],
+    "2319234": [
+      "SI-52.7"
+    ],
+    "2381843": [
+      "SI-52.7"
+    ],
+    "2357870": [
+      "SI-52.8"
+    ],
+    "2815395": [
+      "SI-52.8"
+    ],
+    "2918965": [
+      "SI-52.8"
+    ],
+    "3306899": [
+      "SI-52.8"
+    ],
+    "2689873": [
+      "SI-53.1"
+    ],
+    "2818762": [
+      "SI-54.1"
+    ],
+    "2771381": [
+      "SI-54.2"
+    ],
+    "2810717": [
+      "SI-54.2"
+    ],
+    "2954199": [
+      "SI-54.3"
+    ],
+    "3054946": [
+      "SI-54.4"
+    ],
+    "3047902": [
+      "SI-54.5"
+    ],
+    "2887844": [
+      "SI-54.6"
+    ],
+    "2970970": [
+      "SI-54.6"
+    ],
+    "2972152": [
+      "SI-54.8"
+    ],
+    "2964772": [
+      "SI-54.9"
+    ],
+    "2978033": [
+      "SI-54.9"
+    ],
+    "3040673": [
+      "SI-54.9"
+    ],
+    "3061212": [
+      "SI-54.9"
+    ],
+    "3104363": [
+      "SI-54.9"
+    ],
+    "3105510": [
+      "SI-54.9"
+    ],
+    "3164537": [
+      "SI-54.9"
+    ],
+    "3210235": [
+      "SI-54.9"
+    ],
+    "3225429": [
+      "SI-54.9"
+    ],
+    "3227549": [
+      "SI-54.9"
+    ],
+    "3260792": [
+      "SI-54.9"
+    ],
+    "3310949": [
+      "SI-54.9"
+    ],
+    "3385743": [
+      "SI-54.9"
+    ],
+    "3399310": [
+      "SI-54.9"
+    ],
+    "3400287": [
+      "SI-54.9"
+    ],
+    "3472166": [
+      "SI-54.9"
+    ],
+    "3535910": [
+      "SI-54.9"
+    ],
+    "3543564": [
+      "SI-54.9"
+    ],
+    "2499057": [
+      "SI-55.1",
+      "SI-55.2"
+    ],
+    "2506999": [
+      "SI-55.1"
+    ],
+    "2468737": [
+      "SI-55.2",
+      "SI-56.2",
+      "SI-56.3"
+    ],
+    "2481713": [
+      "SI-55.2"
+    ],
+    "2481873": [
+      "SI-55.2"
+    ],
+    "2468819": [
+      "SI-56.2"
+    ],
+    "2468833": [
+      "SI-56.3"
+    ],
+    "3017200": [
+      "SI-56.4"
+    ],
+    "3086524": [
+      "SI-56.5"
+    ],
+    "3094714": [
+      "SI-56.5"
+    ],
+    "9999999": [
+      "SI-56.5"
+    ],
+    "3519685": [
+      "SI-56.6"
+    ],
+    "2328674": [
+      "SI-56.7"
+    ],
+    "2328639": [
+      "SI-56.8"
+    ],
+    "2226096": [
+      "SI-56.9"
+    ],
+    "2293641": [
+      "SI-56.9"
+    ],
+    "2328017": [
+      "SI-56.9"
+    ],
+    "2328419": [
+      "SI-56.9"
+    ],
+    "2328444": [
+      "SI-56.9"
+    ],
+    "2328455": [
+      "SI-56.9"
+    ],
+    "2328459": [
+      "SI-56.9"
+    ],
+    "2328538": [
+      "SI-56.9"
+    ],
+    "2328548": [
+      "SI-56.9"
+    ],
+    "2328561": [
+      "SI-56.9"
+    ],
+    "2347421": [
+      "SI-56.9"
+    ],
+    "2350150": [
+      "SI-56.9"
+    ],
+    "2396065": [
+      "SI-56.9"
+    ],
+    "2534268": [
+      "SI-56.9"
+    ],
+    "2534360": [
+      "SI-56.9"
+    ],
+    "2534442": [
+      "SI-56.9"
+    ],
+    "2534454": [
+      "SI-56.9"
+    ],
+    "2572363": [
+      "SI-56.9"
+    ],
+    "2599569": [
+      "SI-56.9"
+    ],
+    "3009925": [
+      "SI-56.9"
+    ],
+    "3027954": [
+      "SI-56.9"
+    ],
+    "3046934": [
+      "SI-56.9"
+    ],
+    "3050713": [
+      "SI-56.9"
+    ],
+    "3051698": [
+      "SI-56.9"
+    ],
+    "2477777": [
+      "SI-57.1",
+      "SI-57.2",
+      "SI-57.3"
+    ],
+    "2489544": [
+      "SI-57.2",
+      "SI-57.3"
+    ],
+    "2489567": [
+      "SI-57.3",
+      "SI-57.6"
+    ],
+    "2489643": [
+      "SI-57.3"
+    ],
+    "2491123": [
+      "SI-57.5"
+    ],
+    "2490540": [
+      "SI-57.6"
+    ],
+    "2458477": [
+      "SI-57.7"
+    ],
+    "2461340": [
+      "SI-57.7"
+    ],
+    "2491727": [
+      "SI-57.7"
+    ],
+    "2491134": [
+      "SI-57.8"
+    ],
+    "1476702": [
+      "SI-57.9"
+    ],
+    "2383036": [
+      "SI-57.9"
+    ],
+    "2491245": [
+      "SI-57.9"
+    ],
+    "2491700": [
+      "SI-57.9"
+    ],
+    "2490435": [
+      "SI-58.1"
+    ],
+    "2490467": [
+      "SI-58.2"
+    ],
+    "2226072": [
+      "SI-58.3"
+    ],
+    "2270467": [
+      "SI-58.3"
+    ],
+    "2490447": [
+      "SI-58.3"
+    ],
+    "2868358": [
+      "SI-58.3"
+    ],
+    "2339149": [
+      "SI-59.2"
+    ],
+    "3347307": [
+      "SI-59.3"
+    ],
+    "2226048": [
+      "SI-59.4"
+    ],
+    "2270413": [
+      "SI-59.4"
+    ],
+    "2225817": [
+      "SI-59.5"
+    ],
+    "2270415": [
+      "SI-59.5"
+    ],
+    "2270418": [
+      "SI-59.6"
+    ],
+    "3258666": [
+      "SI-59.6"
+    ],
+    "2226131": [
+      "SI-59.7"
+    ],
+    "2270444": [
+      "SI-59.8"
+    ],
+    "2226071": [
+      "SI-59.9"
+    ],
+    "2226122": [
+      "SI-59.9"
+    ],
+    "2226129": [
+      "SI-59.9"
+    ],
+    "2226134": [
+      "SI-59.9"
+    ],
+    "2270445": [
+      "SI-59.9"
+    ],
+    "2270449": [
+      "SI-59.9"
+    ],
+    "2270464": [
+      "SI-59.9"
+    ],
+    "2270466": [
+      "SI-59.9"
+    ],
+    "2209784": [
+      "SI-6.1"
+    ],
+    "2471287": [
+      "SI-6.1"
+    ],
+    "2371973": [
+      "SI-6.2",
+      "SI-6.3"
+    ],
+    "2659672": [
+      "SI-6.2",
+      "SI-6.3",
+      "SI-6.4",
+      "SI-6.5"
+    ],
+    "2833748": [
+      "SI-6.2",
+      "SI-6.3"
+    ],
+    "2999249": [
+      "SI-6.2",
+      "SI-6.3",
+      "SI-8.7",
+      "SI-8.9"
+    ],
+    "3205500": [
+      "SI-6.4"
+    ],
+    "1330000": [
+      "SI-6.5"
+    ],
+    "3205515": [
+      "SI-6.5"
+    ],
+    "3326805": [
+      "SI-6.6"
+    ],
+    "2371193": [
+      "SI-60.1"
+    ],
+    "2371195": [
+      "SI-60.2"
+    ],
+    "2371590": [
+      "SI-60.3"
+    ],
+    "2371559": [
+      "SI-60.4"
+    ],
+    "2371616": [
+      "SI-60.5"
+    ],
+    "2371602": [
+      "SI-60.6"
+    ],
+    "2371539": [
+      "SI-60.7"
+    ],
+    "3472264": [
+      "SI-60.7",
+      "SI-60.9"
+    ],
+    "2192984": [
+      "SI-60.8"
+    ],
+    "2215169": [
+      "SI-60.8"
+    ],
+    "2267742": [
+      "SI-60.8"
+    ],
+    "2194923": [
+      "SI-60.9"
+    ],
+    "2215220": [
+      "SI-60.9"
+    ],
+    "2267415": [
+      "SI-60.9"
+    ],
+    "2303155": [
+      "SI-60.9"
+    ],
+    "2304479": [
+      "SI-60.9"
+    ],
+    "2326511": [
+      "SI-60.9"
+    ],
+    "2331707": [
+      "SI-60.9"
+    ],
+    "2337368": [
+      "SI-60.9"
+    ],
+    "2339008": [
+      "SI-60.9"
+    ],
+    "2339010": [
+      "SI-60.9"
+    ],
+    "2339317": [
+      "SI-60.9"
+    ],
+    "2340247": [
+      "SI-60.9"
+    ],
+    "2340264": [
+      "SI-60.9"
+    ],
+    "2342914": [
+      "SI-60.9"
+    ],
+    "2350650": [
+      "SI-60.9"
+    ],
+    "2365503": [
+      "SI-60.9"
+    ],
+    "2368655": [
+      "SI-60.9"
+    ],
+    "2368680": [
+      "SI-60.9"
+    ],
+    "2368683": [
+      "SI-60.9"
+    ],
+    "2368716": [
+      "SI-60.9"
+    ],
+    "2368736": [
+      "SI-60.9"
+    ],
+    "2368739": [
+      "SI-60.9"
+    ],
+    "2368741": [
+      "SI-60.9"
+    ],
+    "2368747": [
+      "SI-60.9"
+    ],
+    "2368785": [
+      "SI-60.9"
+    ],
+    "2368803": [
+      "SI-60.9"
+    ],
+    "2368835": [
+      "SI-60.9"
+    ],
+    "2368870": [
+      "SI-60.9"
+    ],
+    "2368913": [
+      "SI-60.9"
+    ],
+    "2370106": [
+      "SI-60.9"
+    ],
+    "2370131": [
+      "SI-60.9"
+    ],
+    "2370133": [
+      "SI-60.9"
+    ],
+    "2370138": [
+      "SI-60.9"
+    ],
+    "2370146": [
+      "SI-60.9"
+    ],
+    "2370148": [
+      "SI-60.9"
+    ],
+    "2370151": [
+      "SI-60.9"
+    ],
+    "2370164": [
+      "SI-60.9"
+    ],
+    "2370183": [
+      "SI-60.9"
+    ],
+    "2370655": [
+      "SI-60.9"
+    ],
+    "2371149": [
+      "SI-60.9"
+    ],
+    "2371161": [
+      "SI-60.9"
+    ],
+    "2371631": [
+      "SI-60.9"
+    ],
+    "2377767": [
+      "SI-60.9"
+    ],
+    "2377780": [
+      "SI-60.9"
+    ],
+    "2377816": [
+      "SI-60.9"
+    ],
+    "2465556": [
+      "SI-60.9"
+    ],
+    "2467506": [
+      "SI-60.9"
+    ],
+    "2468952": [
+      "SI-60.9"
+    ],
+    "2516743": [
+      "SI-60.9"
+    ],
+    "2522971": [
+      "SI-60.9"
+    ],
+    "2535093": [
+      "SI-60.9"
+    ],
+    "2536676": [
+      "SI-60.9"
+    ],
+    "2627238": [
+      "SI-60.9"
+    ],
+    "2629241": [
+      "SI-60.9"
+    ],
+    "2637163": [
+      "SI-60.9"
+    ],
+    "2640859": [
+      "SI-60.9"
+    ],
+    "2652842": [
+      "SI-60.9"
+    ],
+    "2655797": [
+      "SI-60.9"
+    ],
+    "2712569": [
+      "SI-60.9"
+    ],
+    "2772474": [
+      "SI-60.9"
+    ],
+    "2843173": [
+      "SI-60.9"
+    ],
+    "2885547": [
+      "SI-60.9"
+    ],
+    "3035561": [
+      "SI-60.9"
+    ],
+    "3043856": [
+      "SI-60.9"
+    ],
+    "3421323": [
+      "SI-60.9"
+    ],
+    "2270468": [
+      "SI-61.1"
+    ],
+    "2273101": [
+      "SI-61.2"
+    ],
+    "1830886": [
+      "SI-62.1"
+    ],
+    "2202282": [
+      "SI-62.1"
+    ],
+    "2344100": [
+      "SI-62.1"
+    ],
+    "2354282": [
+      "SI-62.1"
+    ],
+    "2456502": [
+      "SI-62.1"
+    ],
+    "2329190": [
+      "SI-62.2"
+    ],
+    "2352104": [
+      "SI-62.2"
+    ],
+    "2437332": [
+      "SI-62.3"
+    ],
+    "2574483": [
+      "SI-62.4"
+    ],
+    "3245321": [
+      "SI-62.5"
+    ],
+    "2681020": [
+      "SI-62.6"
+    ],
+    "2694441": [
+      "SI-62.7"
+    ],
+    "2843756": [
+      "SI-62.8"
+    ],
+    "1014997": [
+      "SI-62.9"
+    ],
+    "1527380": [
+      "SI-62.9"
+    ],
+    "1541831": [
+      "SI-62.9"
+    ],
+    "2267412": [
+      "SI-62.9",
+      "SI-7.3"
+    ],
+    "2270502": [
+      "SI-62.9"
+    ],
+    "2270504": [
+      "SI-62.9"
+    ],
+    "2270507": [
+      "SI-62.9"
+    ],
+    "2270509": [
+      "SI-62.9"
+    ],
+    "2270510": [
+      "SI-62.9"
+    ],
+    "2270511": [
+      "SI-62.9"
+    ],
+    "2270513": [
+      "SI-62.9"
+    ],
+    "2314696": [
+      "SI-62.9"
+    ],
+    "2338097": [
+      "SI-62.9"
+    ],
+    "2495833": [
+      "SI-62.9"
+    ],
+    "2631182": [
+      "SI-62.9"
+    ],
+    "3014556": [
+      "SI-62.9"
+    ],
+    "3279875": [
+      "SI-62.9"
+    ],
+    "3322223": [
+      "SI-62.9"
+    ],
+    "3326146": [
+      "SI-62.9"
+    ],
+    "3345830": [
+      "SI-62.9"
+    ],
+    "3375865": [
+      "SI-62.9"
+    ],
+    "3422783": [
+      "SI-62.9"
+    ],
+    "3480987": [
+      "SI-62.9"
+    ],
+    "3521524": [
+      "SI-62.9"
+    ],
+    "2400737": [
+      "SI-63.1"
+    ],
+    "2402191": [
+      "SI-63.1"
+    ],
+    "2962632": [
+      "SI-7.1"
+    ],
+    "2271201": [
+      "SI-7.2"
+    ],
+    "2229726": [
+      "SI-7.3"
+    ],
+    "3435447": [
+      "SI-8.1"
+    ],
+    "3515844": [
+      "SI-8.1"
+    ],
+    "2873915": [
+      "SI-8.10"
+    ],
+    "3003364": [
+      "SI-8.10"
+    ],
+    "1976487": [
+      "SI-8.2"
+    ],
+    "2119188": [
+      "SI-8.3"
+    ],
+    "2474069": [
+      "SI-8.3",
+      "SI-8.5"
+    ],
+    "2726778": [
+      "SI-8.3"
+    ],
+    "2742613": [
+      "SI-8.3"
+    ],
+    "2719018": [
+      "SI-8.4"
+    ],
+    "2892303": [
+      "SI-8.4"
+    ],
+    "3260453": [
+      "SI-8.4"
+    ],
+    "3296253": [
+      "SI-8.4"
+    ],
+    "1009299": [
+      "SI-8.5"
+    ],
+    "2226649": [
+      "SI-8.5"
+    ],
+    "2227515": [
+      "SI-8.5"
+    ],
+    "2346854": [
+      "SI-8.5"
+    ],
+    "2403964": [
+      "SI-8.5"
+    ],
+    "2924568": [
+      "SI-8.5"
+    ],
+    "3042755": [
+      "SI-8.6"
+    ],
+    "3006586": [
+      "SI-8.7",
+      "SI-8.8",
+      "SI-8.9"
+    ],
+    "3015013": [
+      "SI-8.7"
+    ],
+    "2680760": [
+      "SI-8.8"
+    ],
+    "2997574": [
+      "SI-8.9"
+    ],
+    "2270384": [
+      "SI-9.1"
+    ],
+    "3505741": [
+      "SI-9.1"
+    ],
+    "2270386": [
+      "SI-9.2"
+    ]
+  },
+  "object_to_items": {
+    "MATNR": {
+      "note_used": "2267140",
+      "note_verified": true,
+      "items": [
+        "SI-3.22",
+        "SI-49.9"
+      ],
+      "weak_matches": [
+        "SI-3.22",
+        "SI-30.6",
+        "SI-48.5",
+        "SI-6.1",
+        "SI-60.8"
+      ]
+    },
+    "KONV": {
+      "note_used": "2220005",
+      "note_verified": true,
+      "items": [
+        "SI-38.9",
+        "SI-39.9"
+      ],
+      "weak_matches": [
+        "SI-39.9"
+      ]
+    },
+    "VBUK": {
+      "note_used": "2198647",
+      "note_verified": true,
+      "items": [
+        "SI-39.8"
+      ],
+      "weak_matches": [
+        "SI-33.2",
+        "SI-39.8"
+      ]
+    },
+    "VBUP": {
+      "note_used": "2198647",
+      "note_verified": true,
+      "items": [
+        "SI-39.8"
+      ],
+      "weak_matches": [
+        "SI-33.2",
+        "SI-39.8"
+      ]
+    },
+    "GBSTK": {
+      "note_used": "2198647",
+      "note_verified": true,
+      "items": [
+        "SI-39.8"
+      ],
+      "weak_matches": []
+    },
+    "GBSTA": {
+      "note_used": "2198647",
+      "note_verified": true,
+      "items": [
+        "SI-39.8"
+      ],
+      "weak_matches": []
+    },
+    "FKSTK": {
+      "note_used": "2267306",
+      "note_verified": true,
+      "items": [
+        "SI-2.35",
+        "SI-39.8",
+        "SI-39.9"
+      ],
+      "weak_matches": []
+    },
+    "FKSTA": {
+      "note_used": "2267306",
+      "note_verified": true,
+      "items": [
+        "SI-2.35",
+        "SI-39.8",
+        "SI-39.9"
+      ],
+      "weak_matches": []
+    },
+    "VBTYP": {
+      "note_used": "2267306",
+      "note_verified": true,
+      "items": [
+        "SI-2.35",
+        "SI-39.8",
+        "SI-39.9"
+      ],
+      "weak_matches": [
+        "SI-39.8",
+        "SI-60.9"
+      ]
+    },
+    "KNA1": {
+      "note_used": "2265093",
+      "note_verified": true,
+      "items": [
+        "SI-3.19",
+        "SI-3.7",
+        "SI-50.4",
+        "SI-59.7",
+        "SI-62.1"
+      ],
+      "weak_matches": [
+        "SI-3.13"
+      ]
+    },
+    "LFA1": {
+      "note_used": "2265093",
+      "note_verified": true,
+      "items": [
+        "SI-3.19",
+        "SI-3.7",
+        "SI-50.4",
+        "SI-59.7",
+        "SI-62.1"
+      ],
+      "weak_matches": [
+        "SI-3.13"
+      ]
+    },
+    "KNKK": {
+      "note_used": "2270544",
+      "note_verified": true,
+      "items": [
+        "SI-18.1",
+        "SI-39.8",
+        "SI-39.9"
+      ],
+      "weak_matches": []
+    },
+    "KNKA": {
+      "note_used": "2270544",
+      "note_verified": true,
+      "items": [
+        "SI-18.1",
+        "SI-39.8",
+        "SI-39.9"
+      ],
+      "weak_matches": []
+    },
+    "BSEG": {
+      "note_used": "2270333",
+      "note_verified": true,
+      "items": [
+        "SI-2.35",
+        "SI-8.2"
+      ],
+      "weak_matches": [
+        "SI-10.1",
+        "SI-10.2",
+        "SI-15.2",
+        "SI-15.5",
+        "SI-2.17",
+        "SI-2.33"
+      ]
+    },
+    "BUKRS": {
+      "note_used": "2270333",
+      "note_verified": true,
+      "items": [
+        "SI-2.35",
+        "SI-8.2"
+      ],
+      "weak_matches": []
+    },
+    "HKONT": {
+      "note_used": "2270333",
+      "note_verified": true,
+      "items": [
+        "SI-2.35",
+        "SI-8.2"
+      ],
+      "weak_matches": []
+    },
+    "BUZEI": {
+      "note_used": "2270333",
+      "note_verified": true,
+      "items": [
+        "SI-2.35",
+        "SI-8.2"
+      ],
+      "weak_matches": []
+    },
+    "MKPF": {
+      "note_used": "2206980",
+      "note_verified": true,
+      "items": [
+        "SI-2.35",
+        "SI-27.5"
+      ],
+      "weak_matches": [
+        "SI-27.5",
+        "SI-33.2",
+        "SI-56.9"
+      ]
+    },
+    "MSEG": {
+      "note_used": "2206980",
+      "note_verified": true,
+      "items": [
+        "SI-2.35",
+        "SI-27.5"
+      ],
+      "weak_matches": [
+        "SI-27.2",
+        "SI-27.3",
+        "SI-27.5",
+        "SI-33.2",
+        "SI-56.9"
+      ]
+    },
+    "RFBLG": {
+      "note_used": "2270333",
+      "note_verified": true,
+      "items": [
+        "SI-2.35",
+        "SI-8.2"
+      ],
+      "weak_matches": [
+        "SI-2.17"
+      ]
+    },
+    "S001": {
+      "note_used": "2267463",
+      "note_verified": true,
+      "items": [
+        "SI-29.4"
+      ],
+      "weak_matches": []
+    },
+    "S061": {
+      "note_used": "2267463",
+      "note_verified": true,
+      "items": [
+        "SI-29.4"
+      ],
+      "weak_matches": [
+        "SI-29.4"
+      ]
+    },
+    "PCL2": {
+      "note_used": null,
+      "note_verified": false,
+      "items": [],
+      "weak_matches": []
+    },
+    "CDPOS": {
+      "note_used": null,
+      "note_verified": false,
+      "items": [],
+      "weak_matches": [
+        "SI-2.17"
+      ]
+    },
+    "CDHDR": {
+      "note_used": null,
+      "note_verified": false,
+      "items": [],
+      "weak_matches": []
+    },
+    "MARA": {
+      "note_used": null,
+      "note_verified": false,
+      "items": [],
+      "weak_matches": [
+        "SI-2.33",
+        "SI-27.9",
+        "SI-48.5",
+        "SI-55.2",
+        "SI-60.9"
+      ]
+    },
+    "MAKT": {
+      "note_used": null,
+      "note_verified": false,
+      "items": [],
+      "weak_matches": []
+    },
+    "VBAK": {
+      "note_used": null,
+      "note_verified": false,
+      "items": [],
+      "weak_matches": [
+        "SI-2.33",
+        "SI-33.2",
+        "SI-39.8",
+        "SI-39.9",
+        "SI-49.6",
+        "SI-60.9"
+      ]
+    },
+    "VBAP": {
+      "note_used": null,
+      "note_verified": false,
+      "items": [],
+      "weak_matches": [
+        "SI-33.2",
+        "SI-39.8",
+        "SI-39.9"
+      ]
+    },
+    "BKPF": {
+      "note_used": null,
+      "note_verified": false,
+      "items": [],
+      "weak_matches": [
+        "SI-10.1"
+      ]
+    },
+    "T001": {
+      "note_used": null,
+      "note_verified": false,
+      "items": [],
+      "weak_matches": []
+    },
+    "SKAT": {
+      "note_used": null,
+      "note_verified": false,
+      "items": [],
+      "weak_matches": []
+    },
+    "BAPI_SALESORDER_CREATEFROMDAT2": {
+      "note_used": null,
+      "note_verified": false,
+      "items": [],
+      "weak_matches": []
+    },
+    "BAPI_SALESORDER_CHANGE": {
+      "note_used": null,
+      "note_verified": false,
+      "items": [],
+      "weak_matches": []
+    },
+    "BAPI_MATERIAL_GET_DETAIL": {
+      "note_used": null,
+      "note_verified": false,
+      "items": [],
+      "weak_matches": []
+    },
+    "BAPI_TRANSACTION_COMMIT": {
+      "note_used": null,
+      "note_verified": false,
+      "items": [],
+      "weak_matches": []
+    },
+    "BAPI_TRANSACTION_ROLLBACK": {
+      "note_used": null,
+      "note_verified": false,
+      "items": [],
+      "weak_matches": []
+    },
+    "BAPI_CUSTOMER_GETCREDITACCOUNT": {
+      "note_used": null,
+      "note_verified": false,
+      "items": [],
+      "weak_matches": []
+    },
+    "WS_DELIVERY_UPDATE": {
+      "note_used": null,
+      "note_verified": false,
+      "items": [],
+      "weak_matches": []
+    }
+  },
+  "object_name_scan": {
+    "BKPF": [
+      "SI-10.1"
+    ],
+    "BSEG": [
+      "SI-10.1",
+      "SI-10.2",
+      "SI-15.2",
+      "SI-15.5",
+      "SI-2.17",
+      "SI-2.33"
+    ],
+    "CDPOS": [
+      "SI-2.17"
+    ],
+    "RFBLG": [
+      "SI-2.17"
+    ],
+    "MARA": [
+      "SI-2.33",
+      "SI-27.9",
+      "SI-48.5",
+      "SI-55.2",
+      "SI-60.9"
+    ],
+    "VBAK": [
+      "SI-2.33",
+      "SI-33.2",
+      "SI-39.8",
+      "SI-39.9",
+      "SI-49.6",
+      "SI-60.9"
+    ],
+    "MSEG": [
+      "SI-27.2",
+      "SI-27.3",
+      "SI-27.5",
+      "SI-33.2",
+      "SI-56.9"
+    ],
+    "MKPF": [
+      "SI-27.5",
+      "SI-33.2",
+      "SI-56.9"
+    ],
+    "S061": [
+      "SI-29.4"
+    ],
+    "KNA1": [
+      "SI-3.13"
+    ],
+    "LFA1": [
+      "SI-3.13"
+    ],
+    "MATNR": [
+      "SI-3.22",
+      "SI-30.6",
+      "SI-48.5",
+      "SI-6.1",
+      "SI-60.8"
+    ],
+    "VBAP": [
+      "SI-33.2",
+      "SI-39.8",
+      "SI-39.9"
+    ],
+    "VBUK": [
+      "SI-33.2",
+      "SI-39.8"
+    ],
+    "VBUP": [
+      "SI-33.2",
+      "SI-39.8"
+    ],
+    "VBTYP": [
+      "SI-39.8",
+      "SI-60.9"
+    ],
+    "KONV": [
+      "SI-39.9"
+    ]
+  },
+  "catalog": {
+    "MATNR": {
+      "type": "field",
+      "status": "CHANGED",
+      "sap_note": "2267140",
+      "note_verified": true,
+      "s4_replacement": "MATNR",
+      "world": "A",
+      "baseline_tier": "T1"
+    },
+    "KONV": {
+      "type": "table",
+      "status": "ABOLISHED",
+      "sap_note": "2220005",
+      "note_verified": true,
+      "s4_replacement": "PRCD_ELEMENTS",
+      "world": "A",
+      "baseline_tier": "T1"
+    },
+    "VBUK": {
+      "type": "table",
+      "status": "ABOLISHED",
+      "sap_note": "2198647",
+      "note_verified": true,
+      "s4_replacement": "VBAK",
+      "world": "A",
+      "baseline_tier": "T2"
+    },
+    "VBUP": {
+      "type": "table",
+      "status": "ABOLISHED",
+      "sap_note": "2198647",
+      "note_verified": true,
+      "s4_replacement": "VBAP",
+      "world": "A",
+      "baseline_tier": "T2"
+    },
+    "GBSTK": {
+      "type": "field",
+      "status": "RENAMED",
+      "sap_note": "2198647",
+      "note_verified": true,
+      "s4_replacement": "VBAK-GBSTK",
+      "world": "A",
+      "baseline_tier": "T2"
+    },
+    "GBSTA": {
+      "type": "field",
+      "status": "RENAMED",
+      "sap_note": "2198647",
+      "note_verified": true,
+      "s4_replacement": "VBAP-GBSTA",
+      "world": "A",
+      "baseline_tier": "T2"
+    },
+    "FKSTK": {
+      "type": "field",
+      "status": "RENAMED",
+      "sap_note": "2267306",
+      "note_verified": true,
+      "s4_replacement": "VBAK-FKSTK",
+      "world": "A",
+      "baseline_tier": "T2"
+    },
+    "FKSTA": {
+      "type": "field",
+      "status": "RENAMED",
+      "sap_note": "2267306",
+      "note_verified": true,
+      "s4_replacement": "VBAP-FKSTA",
+      "world": "A",
+      "baseline_tier": "T2"
+    },
+    "VBTYP": {
+      "type": "field",
+      "status": "CHANGED",
+      "sap_note": "2267306",
+      "note_verified": true,
+      "s4_replacement": "VBTYP",
+      "world": "A",
+      "baseline_tier": "T2"
+    },
+    "KNA1": {
+      "type": "table",
+      "status": "REDIRECT_BP",
+      "sap_note": "2265093",
+      "note_verified": true,
+      "s4_replacement": "BUT000",
+      "world": "A-verify",
+      "baseline_tier": "T2"
+    },
+    "LFA1": {
+      "type": "table",
+      "status": "REDIRECT_BP",
+      "sap_note": "2265093",
+      "note_verified": true,
+      "s4_replacement": "BUT000",
+      "world": "A-verify",
+      "baseline_tier": "T2"
+    },
+    "KNKK": {
+      "type": "table",
+      "status": "ABOLISHED",
+      "sap_note": "2270544",
+      "note_verified": true,
+      "s4_replacement": "UKMBP_CMS_SGM",
+      "world": "A",
+      "baseline_tier": "T3"
+    },
+    "KNKA": {
+      "type": "table",
+      "status": "ABOLISHED",
+      "sap_note": "2270544",
+      "note_verified": true,
+      "s4_replacement": "UKMBP_CMS",
+      "world": "A",
+      "baseline_tier": "T3"
+    },
+    "BSEG": {
+      "type": "table",
+      "status": "RESTRUCTURED",
+      "sap_note": "2270333",
+      "note_verified": true,
+      "s4_replacement": "ACDOCA",
+      "world": "A",
+      "baseline_tier": "T3"
+    },
+    "BUKRS": {
+      "type": "field",
+      "status": "RENAMED",
+      "sap_note": "2270333",
+      "note_verified": true,
+      "s4_replacement": "RBUKRS",
+      "world": "A",
+      "baseline_tier": "T3"
+    },
+    "HKONT": {
+      "type": "field",
+      "status": "RENAMED",
+      "sap_note": "2270333",
+      "note_verified": true,
+      "s4_replacement": "RACCT",
+      "world": "A",
+      "baseline_tier": "T3"
+    },
+    "BUZEI": {
+      "type": "field",
+      "status": "RENAMED",
+      "sap_note": "2270333",
+      "note_verified": true,
+      "s4_replacement": "DOCLN",
+      "world": "A",
+      "baseline_tier": "T3"
+    },
+    "MKPF": {
+      "type": "table",
+      "status": "RESTRUCTURED",
+      "sap_note": "2206980",
+      "note_verified": true,
+      "s4_replacement": "MATDOC",
+      "world": "A",
+      "baseline_tier": "T3"
+    },
+    "MSEG": {
+      "type": "table",
+      "status": "RESTRUCTURED",
+      "sap_note": "2206980",
+      "note_verified": true,
+      "s4_replacement": "MATDOC",
+      "world": "A",
+      "baseline_tier": "T3"
+    },
+    "RFBLG": {
+      "type": "table",
+      "status": "ABOLISHED",
+      "sap_note": "2270333",
+      "note_verified": true,
+      "s4_replacement": "ACDOCA",
+      "world": "A",
+      "baseline_tier": "T3"
+    },
+    "S001": {
+      "type": "table",
+      "status": "ABOLISHED",
+      "sap_note": "2267463",
+      "note_verified": true,
+      "s4_replacement": "Embedded Analytics / released CDS",
+      "world": "A",
+      "baseline_tier": "T3"
+    },
+    "S061": {
+      "type": "table",
+      "status": "ABOLISHED",
+      "sap_note": "2267463",
+      "note_verified": true,
+      "s4_replacement": "Embedded Analytics / released CDS",
+      "world": "A",
+      "baseline_tier": "T3"
+    },
+    "PCL2": {
+      "type": "table",
+      "status": "ABOLISHED",
+      "sap_note": "2409530",
+      "note_verified": false,
+      "s4_replacement": "transparent tables per cluster ID / infotype",
+      "world": "A",
+      "baseline_tier": "T3"
+    },
+    "CDPOS": {
+      "type": "table",
+      "status": "DECLUSTERED_SAME_NAME",
+      "sap_note": null,
+      "note_verified": false,
+      "s4_replacement": "CDPOS",
+      "world": "A-verify",
+      "baseline_tier": "T1"
+    },
+    "CDHDR": {
+      "type": "table",
+      "status": "DECLUSTERED_SAME_NAME",
+      "sap_note": null,
+      "note_verified": false,
+      "s4_replacement": "CDHDR",
+      "world": "A-verify",
+      "baseline_tier": "T1"
+    },
+    "MARA": {
+      "type": "table",
+      "status": "VALID",
+      "sap_note": null,
+      "note_verified": false,
+      "s4_replacement": null,
+      "world": "A",
+      "baseline_tier": null
+    },
+    "MAKT": {
+      "type": "table",
+      "status": "VALID",
+      "sap_note": null,
+      "note_verified": false,
+      "s4_replacement": null,
+      "world": "A",
+      "baseline_tier": null
+    },
+    "VBAK": {
+      "type": "table",
+      "status": "VALID",
+      "sap_note": null,
+      "note_verified": false,
+      "s4_replacement": null,
+      "world": "A",
+      "baseline_tier": null
+    },
+    "VBAP": {
+      "type": "table",
+      "status": "VALID",
+      "sap_note": null,
+      "note_verified": false,
+      "s4_replacement": null,
+      "world": "A",
+      "baseline_tier": null
+    },
+    "BKPF": {
+      "type": "table",
+      "status": "VALID",
+      "sap_note": null,
+      "note_verified": false,
+      "s4_replacement": null,
+      "world": "A",
+      "baseline_tier": null
+    },
+    "T001": {
+      "type": "table",
+      "status": "VALID",
+      "sap_note": null,
+      "note_verified": false,
+      "s4_replacement": null,
+      "world": "A",
+      "baseline_tier": null
+    },
+    "SKAT": {
+      "type": "table",
+      "status": "VALID",
+      "sap_note": null,
+      "note_verified": false,
+      "s4_replacement": null,
+      "world": "A",
+      "baseline_tier": null
+    },
+    "BAPI_SALESORDER_CREATEFROMDAT2": {
+      "type": "bapi",
+      "status": "MODERNIZATION_ONLY",
+      "sap_note": null,
+      "note_verified": false,
+      "s4_replacement": "MODIFY ENTITIES OF I_SalesOrderTP (RAP)",
+      "world": "B",
+      "baseline_tier": null
+    },
+    "BAPI_SALESORDER_CHANGE": {
+      "type": "bapi",
+      "status": "MODERNIZATION_ONLY",
+      "sap_note": null,
+      "note_verified": false,
+      "s4_replacement": "MODIFY ENTITIES OF I_SalesOrderTP (RAP)",
+      "world": "B",
+      "baseline_tier": null
+    },
+    "BAPI_MATERIAL_GET_DETAIL": {
+      "type": "bapi",
+      "status": "MODERNIZATION_ONLY",
+      "sap_note": null,
+      "note_verified": false,
+      "s4_replacement": "Released product CDS / API (I_Product family)",
+      "world": "B",
+      "baseline_tier": null
+    },
+    "BAPI_TRANSACTION_COMMIT": {
+      "type": "bapi",
+      "status": "VALID",
+      "sap_note": null,
+      "note_verified": false,
+      "s4_replacement": null,
+      "world": "B",
+      "baseline_tier": null
+    },
+    "BAPI_TRANSACTION_ROLLBACK": {
+      "type": "bapi",
+      "status": "VALID",
+      "sap_note": null,
+      "note_verified": false,
+      "s4_replacement": null,
+      "world": "B",
+      "baseline_tier": null
+    },
+    "BAPI_CUSTOMER_GETCREDITACCOUNT": {
+      "type": "bapi",
+      "status": "MODERNIZATION_ONLY",
+      "sap_note": null,
+      "note_verified": false,
+      "s4_replacement": "SAP Credit Management (FSCM/UKM) APIs",
+      "world": "B-verify",
+      "baseline_tier": null
+    },
+    "WS_DELIVERY_UPDATE": {
+      "type": "function_module",
+      "status": "MODERNIZATION_ONLY",
+      "sap_note": null,
+      "note_verified": false,
+      "s4_replacement": "BAPI_OUTB_DELIVERY_* / released delivery API",
+      "world": "B-verify",
+      "baseline_tier": null
+    }
+  }
+}

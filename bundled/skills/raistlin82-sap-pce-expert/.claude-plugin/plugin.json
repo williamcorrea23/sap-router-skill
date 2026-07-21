@@ -1,0 +1,34 @@
+{
+  "name": "sap-pce-expert",
+  "description": "SAP Private Cloud ERP (RISE with SAP) expert",
+  "version": "1.6.1",
+  "author": {
+    "name": "gabriele.rendina"
+  },
+  "license": "GPL-3.0",
+  "keywords": [
+    "rise",
+    "rise with sap",
+    "s4hana",
+    "s/4hana cloud private edition",
+    "pce",
+    "2025 fps01",
+    "agentic ai",
+    "joule",
+    "success plans",
+    "foundational success plan",
+    "private cloud",
+    "erp",
+    "migration",
+    "brownfield",
+    "greenfield",
+    "clean core",
+    "abap cloud",
+    "hana",
+    "hyperscaler",
+    "sap managed",
+    "signavio",
+    "business network",
+    "sap-pce-expert"
+  ]
+}

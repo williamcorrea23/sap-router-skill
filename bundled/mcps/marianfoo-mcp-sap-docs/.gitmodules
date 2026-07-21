@@ -1,0 +1,120 @@
+[submodule "sources/sapui5-docs"]
+	path = sources/sapui5-docs
+	url = https://github.com/SAP-docs/sapui5.git
+	branch = main
+[submodule "sources/cap-docs"]
+	path = sources/cap-docs
+	url = https://github.com/cap-js/docs.git
+	branch = main
+[submodule "sources/openui5"]
+	path = sources/openui5
+	url = https://github.com/SAP/openui5.git
+	branch = master
+[submodule "sources/wdi5"]
+	path = sources/wdi5
+	url = https://github.com/ui5-community/wdi5.git
+	branch = main
+[submodule "sources/btp-fiori-tools"]
+	path = sources/btp-fiori-tools
+	url = https://github.com/SAP-docs/btp-fiori-tools.git
+	branch = main
+[submodule "sources/fiori-tools-samples"]
+	path = sources/fiori-tools-samples
+	url = https://github.com/SAP-samples/fiori-tools-samples.git
+	branch = main
+[submodule "sources/sap-tutorials"]
+	path = sources/sap-tutorials
+	url = https://github.com/sap-tutorials/Tutorials.git
+	branch = master
+[submodule "sources/open-ux-tools"]
+	path = sources/open-ux-tools
+	url = https://github.com/SAP/open-ux-tools.git
+	branch = main
+[submodule "sources/ui5-tooling"]
+	path = sources/ui5-tooling
+	url = https://github.com/SAP/ui5-tooling.git
+	branch = main
+[submodule "sources/cloud-mta-build-tool"]
+	path = sources/cloud-mta-build-tool
+	url = https://github.com/SAP/cloud-mta-build-tool.git
+	branch = master
+[submodule "sources/ui5-webcomponents"]
+	path = sources/ui5-webcomponents
+	url = https://github.com/SAP/ui5-webcomponents.git
+	branch = main
+[submodule "sources/cloud-sdk"]
+	path = sources/cloud-sdk
+	url = https://github.com/SAP/cloud-sdk.git
+	branch = main
+[submodule "sources/cloud-sdk-ai"]
+	path = sources/cloud-sdk-ai
+	url = https://github.com/SAP/ai-sdk.git
+	branch = main
+[submodule "sources/ui5-typescript"]
+	path = sources/ui5-typescript
+	url = https://github.com/UI5/typescript.git
+	branch = gh-pages
+[submodule "sources/ui5-cc-spreadsheetimporter"]
+	path = sources/ui5-cc-spreadsheetimporter
+	url = https://github.com/spreadsheetimporter/ui5-cc-spreadsheetimporter.git
+	branch = main
+[submodule "sources/abap-cheat-sheets"]
+	path = sources/abap-cheat-sheets
+	url = https://github.com/SAP-samples/abap-cheat-sheets.git
+	branch = main
+[submodule "sources/sap-styleguides"]
+	path = sources/sap-styleguides
+	url = https://github.com/SAP/styleguides.git
+	branch = main
+[submodule "sources/dsag-abap-leitfaden"]
+	path = sources/dsag-abap-leitfaden
+	url = https://github.com/marianfoo/DSAG-ABAP-Guide.git
+	branch = main
+[submodule "sources/abap-fiori-showcase"]
+	path = sources/abap-fiori-showcase
+	url = https://github.com/SAP-samples/abap-platform-fiori-feature-showcase.git
+	branch = main
+[submodule "sources/cap-fiori-showcase"]
+	path = sources/cap-fiori-showcase
+	url = https://github.com/SAP-samples/fiori-elements-feature-showcase.git
+	branch = main
+[submodule "sources/abap-docs"]
+	path = sources/abap-docs
+	url = https://github.com/marianfoo/abap-docs.git
+	branch = main
+[submodule "sources/abap-platform-rap-opensap"]
+	path = sources/abap-platform-rap-opensap
+	url = https://github.com/SAP-samples/abap-platform-rap-opensap.git
+	branch = main
+[submodule "sources/cloud-abap-rap"]
+	path = sources/cloud-abap-rap
+	url = https://github.com/SAP-samples/cloud-abap-rap.git
+	branch = main
+[submodule "sources/abap-platform-reuse-services"]
+	path = sources/abap-platform-reuse-services
+	url = https://github.com/SAP-samples/abap-platform-reuse-services.git
+	branch = main
+[submodule "sources/btp-cloud-platform"]
+	path = sources/btp-cloud-platform
+	url = https://github.com/SAP-docs/btp-cloud-platform.git
+	branch = main
+[submodule "sources/sap-artificial-intelligence"]
+	path = sources/sap-artificial-intelligence
+	url = https://github.com/SAP-docs/sap-artificial-intelligence.git
+	branch = main
+[submodule "sources/abap-atc-cr-cv-s4hc"]
+	path = sources/abap-atc-cr-cv-s4hc
+	url = https://github.com/SAP/abap-atc-cr-cv-s4hc.git
+	branch = main
+[submodule "sources/teched2025-dt260"]
+	path = sources/teched2025-dt260
+	url = https://github.com/SAP-samples/teched2025-DT260.git
+	branch = main
+[submodule "sources/terraform-provider-btp"]
+	path = sources/terraform-provider-btp
+	url = https://github.com/SAP/terraform-provider-btp.git
+	branch = main
+[submodule "sources/architecture-center"]
+	path = sources/architecture-center
+	url = https://github.com/SAP/architecture-center.git
+	branch = dev

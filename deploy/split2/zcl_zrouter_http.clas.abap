@@ -117,13 +117,10 @@ CLASS zcl_zrouter_http IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    " CORS with origin reflection (safer than wildcard for non-browser clients)
+    " Cross-origin requests are denied by default. Enable a reviewed allowlist
+    " in a future configuration change; never reflect an arbitrary Origin.
     DATA(lv_origin) = lo_server->request->get_header_field( 'Origin' ).
-    IF lv_origin IS NOT INITIAL.
-      lo_server->response->set_header_field(
-        name  = 'Access-Control-Allow-Origin'
-        value = lv_origin ).
-    ELSE.
+    IF lv_origin IS INITIAL.
       lo_server->response->set_header_field(
         name  = 'Access-Control-Allow-Origin'
         value = '*' ).
@@ -160,18 +157,28 @@ CLASS zcl_zrouter_http IMPLEMENTATION.
 
     lv_path = io_server->request->get_header_field( '~request_uri' ).
     lv_body = io_server->request->get_cdata( ).
+    DATA(lv_content_type) = to_lower( io_server->request->get_header_field( 'Content-Type' ) ).
 
     IF lv_body IS INITIAL.
       send_error( io_server = io_server iv_status = 400 iv_message = 'Empty request body.' ).
+      RETURN.
+    ENDIF.
+    IF lv_content_type NS 'application/json'.
+      send_error( io_server = io_server iv_status = 415 iv_message = 'Content-Type must be application/json.' ).
       RETURN.
     ENDIF.
 
     " Route by path
     IF lv_path CS '/batch'.
       " Batch dispatch with size limit
-      /ui2/cl_json=>deserialize(
-        EXPORTING json = lv_body
-        CHANGING  data = ls_batch ).
+      TRY.
+          /ui2/cl_json=>deserialize(
+            EXPORTING json = lv_body
+            CHANGING  data = ls_batch ).
+        CATCH cx_root.
+          send_error( io_server = io_server iv_status = 400 iv_message = 'Invalid JSON payload.' ).
+          RETURN.
+      ENDTRY.
       IF lines( ls_batch-actions ) > co_max_batch_size.
         send_error( io_server = io_server iv_status = 413
                     iv_message = |Batch too large. Max { co_max_batch_size } actions.| ).
@@ -203,9 +210,14 @@ CLASS zcl_zrouter_http IMPLEMENTATION.
           pretty_name = /ui2/cl_json=>pretty_mode-camel_case ) ).
     ELSE.
       " Single dispatch
-      /ui2/cl_json=>deserialize(
-        EXPORTING json = lv_body
-        CHANGING  data = ls_req ).
+      TRY.
+          /ui2/cl_json=>deserialize(
+            EXPORTING json = lv_body
+            CHANGING  data = ls_req ).
+        CATCH cx_root.
+          send_error( io_server = io_server iv_status = 400 iv_message = 'Invalid JSON payload.' ).
+          RETURN.
+      ENDTRY.
       ls_res = dispatch_action(
         iv_module  = ls_req-module
         iv_action  = ls_req-action

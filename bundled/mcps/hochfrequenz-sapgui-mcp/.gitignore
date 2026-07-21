@@ -1,0 +1,119 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ad-hoc debug dumps from tool development (snapshots of live SAP screens,
+# post-login DOM captures, etc.). These are written next to the server on
+# demand and must never end up in the repository — they can contain system
+# IDs, session tokens, and internal hostnames.
+/sap_after_login*.html
+/*_debug_*.yaml
+/*_debug_*.html
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Translations
+*.mo
+*.pot
+
+# Environments
+.env
+# Written at build time by the build_with_remote_logging CI job to bundle
+# Papertrail defaults; never commit — doing so would leak the logging
+# endpoint into every build, including the public one.
+/.env.production
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+*.log
+
+.claude/
+
+src/_your_package_version.py
+
+src/_sapguimcp_version.py
+
+# Node.js (for prettier)
+node_modules/
+
+nul
+docs/sap_gui_scripting_api_reference.pdf
+docs/sap_gui_scripting_api_800/
+
+# Git worktrees
+.worktrees/

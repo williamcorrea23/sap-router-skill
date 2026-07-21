@@ -1,0 +1,4 @@
+# Placeholder. Planned templates:
+# - managed-with-draft-bo/  (CDS + BDEF + behavior pool + service + binding + MDE)
+# - unmanaged-bo/           (CDS + BDEF + saver class + service + binding)
+# - metadata-extension-only/ (MDE for extending an SAP-delivered service)

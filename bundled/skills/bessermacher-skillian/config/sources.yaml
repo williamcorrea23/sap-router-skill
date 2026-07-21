@@ -1,0 +1,55 @@
+# Data Source Configuration
+# Defines available sources for the data analyst agent
+
+sources:
+  fi_reporting:
+    description: "Financial transactions - source of truth for actuals"
+    table: fi_reporting
+    dimensions:
+      company: { column: compcode }
+      period: { column: fiscper }
+      account: { column: gl_acct }
+      segment: { column: segment }
+      profit_center: { column: prof_ctr }
+    measures:
+      amount: { column: cs_trn_lc, aggregation: sum }
+      quantity: { column: quantity, aggregation: sum }
+    defaults:
+      dimensions: [company, period]
+
+  consolidation_mart:
+    description: "Consolidated data for group reporting"
+    table: consolidation_mart
+    dimensions:
+      company: { column: compcode }
+      period: { column: fiscper }
+      version: { column: version }
+      account: { column: grpacct }
+      segment: { column: segment }
+    measures:
+      amount: { column: cs_trn_lc, aggregation: sum }
+      ytd_amount: { column: cs_ytd_lc, aggregation: sum }
+    defaults:
+      dimensions: [company, period, version]
+
+  bpc_reporting:
+    description: "Business Planning and Consolidation data"
+    table: bpc_reporting
+    dimensions:
+      company: { column: compcode }
+      period: { column: fiscper }
+      version: { column: version }
+      scope: { column: scope }
+      account: { column: grpacct }
+    measures:
+      amount: { column: cs_trn_lc, aggregation: sum }
+      amount_gc: { column: cs_trn_gc, aggregation: sum }
+    defaults:
+      dimensions: [company, period, version]
+
+comparison:
+  default_align_on: [company, period]
+  thresholds:
+    match: { absolute: 1000, percentage: 1.0 }
+    minor_diff: { absolute: 5000, percentage: 5.0 }
+  cache_ttl_seconds: 3600

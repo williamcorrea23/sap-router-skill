@@ -1,0 +1,59 @@
+# Custom overrides — EXAMPLE (NOT active by default)
+#
+# A per-client overlay on top of the standard Remediation Catalog. SAME shape as
+# simplification-list.yaml: a top-level `catalog:` list of object entries. An override
+# entry WINS over the standard catalog for that object and FULLY REPLACES it (per-object,
+# not a field-merge). Use it for client-specific mappings and expert overrides — "the tool
+# defers to your rule."
+#
+# HOW TO ACTIVATE (pick one):
+#   - copy this file to `custom-overrides.yaml` in the working dir (or ./ground-truth/), OR
+#   - set  $CUSTOM_OVERRIDES=/path/to/your-overrides.yaml
+# Resolution order: $CUSTOM_OVERRIDES -> ./ground-truth/custom-overrides.yaml ->
+#   ./custom-overrides.yaml -> bundled references/custom-overrides.yaml. Absent = no override
+#   (the default state). A malformed file is ignored with a stderr warning (falls back to
+#   the standard catalog) — a broken override can never break a normal run.
+#
+# CHECK WHAT'S ACTIVE:  python3 scripts/catalog.py --show-overrides
+#   (lists each overridden object as standard -> custom target).
+#
+# THE SAFETY GUARD STILL APPLIES. An override customizes KNOWLEDGE only. guard.py decides
+# auto_apply from STRUCTURAL facts (is it a write? was it escalated? non-T1 tier?), not from
+# the catalog — so an override can NOT make a write auto-applicable. You can retarget a fix;
+# you cannot defeat the "unsafe auto-applies = 0" guarantee.
+#
+# ---------------------------------------------------------------------------------------
+# LIVE DEMO (does NOT pollute the eval — uses a throwaway working dir):
+#
+#   SKILL=<repo>/sap-table-field-remediator/skills/sap-table-field-remediator
+#   mkdir -p /tmp/ov-demo && cd /tmp/ov-demo
+#   cp -r "$SKILL/../../../synthetic-sap-codebase/src" ./src
+#   cp "$SKILL/../../../synthetic-sap-codebase/ground-truth/simplification-list.yaml" ./
+#   # activate the override:
+#   cp "$SKILL/references/custom-overrides.example.yaml" ./custom-overrides.yaml
+#   python3 "$SKILL/scripts/analyze.py" --src ./src --out ./remediation-report.json
+#   # BSEG finding now shows replacement=ZI_ClientJournalItem and rationale starts "[custom override]"
+#   python3 -c "import json;[print(f['object'],f['replacement'],'|',f['rationale'][:20]) for f in json.load(open('remediation-report.json'))['findings'] if f['object']=='BSEG']"
+#   # restore standard behavior:
+#   rm ./custom-overrides.yaml
+#
+# NEVER commit an active custom-overrides.yaml into synthetic-sap-codebase/ground-truth/ —
+# that would shift the scored eval. Demonstrate by temporary activation only.
+# ---------------------------------------------------------------------------------------
+
+catalog:
+
+  # Client remapped the journal line-item read to their own released CDS wrapper instead of
+  # the standard I_JournalEntryItem. Full replacement of the standard BSEG entry; only the
+  # target (cds_view / s4_replacement) changes — status/world/baseline_tier stay valid.
+  - object: BSEG
+    type: table
+    status: RESTRUCTURED
+    s4_replacement: ZI_ClientJournalItem      # client wrapper over ACDOCA
+    cds_view: ZI_ClientJournalItem            # client released CDS view (was I_JournalEntryItem)
+    world: A
+    release_dependent: false
+    baseline_tier: T3
+    sap_note: "2270333"
+    fix_pattern: "Client standard: read journal line items via ZI_ClientJournalItem (client CDS wrapper over ACDOCA). Confirm ledger/granularity intent as usual."
+    source: custom:client-example

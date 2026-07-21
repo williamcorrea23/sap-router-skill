@@ -1,0 +1,473 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-21T05:55:04Z",
+  "sources": [
+    {
+      "id": "abmir-sap-azure-sre-agent-skills",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/abmir/sap-azure-sre-agent-skills",
+      "path": "bundled/skills/abmir-sap-azure-sre-agent-skills",
+      "revision": "a283ebe6e02520d19bfd858acab4a5d09810e241",
+      "branch": null,
+      "license_files": []
+    },
+    {
+      "id": "altumsisy-sapcli-skill",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/AltumSisy/sapcli-skill",
+      "path": "bundled/skills/altumsisy-sapcli-skill",
+      "revision": "885873aa8b3ed735bfbf143772a8dec8a4dd0c42",
+      "branch": null,
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "aplexio-sap-logistics-copilot",
+      "repository": "bundled",
+      "kind": "auto",
+      "origin": "https://github.com/aplexio/sap-logistics-copilot",
+      "path": "bundled/skills/aplexio-sap-logistics-copilot",
+      "revision": "f131e0460deafc9b2ba6568eb867df8d74f82a02",
+      "branch": null,
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "ashish32patel-acquiring-core-abap-skills",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/ashish32patel/acquiring-core-abap-skills",
+      "path": "bundled/skills/ashish32patel-acquiring-core-abap-skills",
+      "revision": "fb03b36b0ce6154354fd2354b9e938d63ca22e4f",
+      "branch": null,
+      "license_files": []
+    },
+    {
+      "id": "astohot-sap-report-automation-workflow",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/AsToHot/sap-report-automation-workflow",
+      "path": "bundled/skills/astohot-sap-report-automation-workflow",
+      "revision": "5d3c4ca1264dc46b10adc78b2a8bdb0602ec8c45",
+      "branch": null,
+      "license_files": []
+    },
+    {
+      "id": "bessermacher-skillian",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/bessermacher/skillian",
+      "path": "bundled/skills/bessermacher-skillian",
+      "revision": "471e33eca1f7d5da059cada5db3d76ef6ab8fcd9",
+      "branch": "main",
+      "license_files": []
+    },
+    {
+      "id": "blazerinho-sap-gui-scripting-claude-skill",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/Blazerinho/sap-gui-scripting-claude-skill",
+      "path": "bundled/skills/blazerinho-sap-gui-scripting-claude-skill",
+      "revision": "b3afdf46f877d492f81da645b7d0015018d83f07",
+      "branch": "main",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "boxlogodev-sapstack",
+      "repository": "bundled",
+      "kind": "auto",
+      "origin": "https://github.com/BoxLogoDev/sapstack",
+      "path": "bundled/skills/boxlogodev-sapstack",
+      "revision": "5f9c5bae3c54eb885e2351ea41341de1f40924d8",
+      "branch": null,
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "clementringot-rosa",
+      "repository": "bundled",
+      "kind": "mcp",
+      "origin": "https://github.com/ClementRingot/ROSA",
+      "path": "bundled/mcps/clementringot-rosa",
+      "revision": "73fecc7e3285379dc3e89c555774652f1f1646d3",
+      "branch": "main",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "codeyogi911-sap-skills",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/codeyogi911/sap-skills",
+      "path": "bundled/skills/codeyogi911-sap-skills",
+      "revision": "fe6711fb4777326480b2131f257a0de21515a210",
+      "branch": null,
+      "license_files": []
+    },
+    {
+      "id": "context-mode",
+      "repository": "bundled",
+      "kind": "mcp",
+      "trust": "reviewed",
+      "status": "enabled",
+      "path": "bundled/tools/context-mode",
+      "revision": "d31941ec6b31c5c4f1ad45de32f76d67c2225209",
+      "branch": null,
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "eljoujat-sapcc-skill",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/eljoujat/sapcc-skill",
+      "path": "bundled/skills/eljoujat-sapcc-skill",
+      "revision": "b2cc9a451d5f4c49f7f75adea3a9250a4096d173",
+      "branch": null,
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "fab2295-sap-skills",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/Fab2295/sap-skills",
+      "path": "bundled/skills/fab2295-sap-skills",
+      "revision": "438cf190c29689a70d34b33d9a0857be5a362575",
+      "branch": null,
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "gavdilabs-cap-mcp-plugin",
+      "repository": "bundled",
+      "kind": "mcp",
+      "origin": "https://github.com/gavdilabs/cap-mcp-plugin",
+      "path": "bundled/mcps/gavdilabs-cap-mcp-plugin",
+      "revision": "1f3a97e1c0733d97c0cabea53d6d31767508daed",
+      "branch": "main",
+      "license_files": [
+        "LICENSE.md"
+      ]
+    },
+    {
+      "id": "gixsy95-abap-wiki",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/Gixsy95/abap_wiki",
+      "path": "bundled/skills/gixsy95-abap-wiki",
+      "revision": "5bebf9f86ed0a3e290e01dc8559ffde41470cb20",
+      "branch": "main",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "harsharao85-btp-skillpilot-successfactors",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/harsharao85/BTP_SkillPilot_Successfactors",
+      "path": "bundled/skills/harsharao85-btp-skillpilot-successfactors",
+      "revision": "6aa9bb17ac7e7d6b313fb80813e2564a54feaa01",
+      "branch": null,
+      "license_files": []
+    },
+    {
+      "id": "hochfrequenz-sapgui-mcp",
+      "repository": "bundled",
+      "kind": "mcp",
+      "origin": "https://github.com/Hochfrequenz/sapgui.mcp",
+      "path": "bundled/mcps/hochfrequenz-sapgui-mcp",
+      "revision": "d68ac969f94f9ec69d56c0be569c1adf9ea8fba6",
+      "branch": "main",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "ilia-inovaflow-s4hana-create-record-skills",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/ilia-inovaflow/s4hana-create-record-skills",
+      "path": "bundled/skills/ilia-inovaflow-s4hana-create-record-skills",
+      "revision": "c0ee1d7c94bea935576e80fd2753a7c57801d53d",
+      "branch": "main",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "jfilak-sapcli",
+      "repository": "bundled",
+      "kind": "mcp",
+      "origin": "https://github.com/jfilak/sapcli",
+      "path": "bundled/mcps/jfilak-sapcli",
+      "revision": "ab245ccea54ced8ad23e78aa992d01668722d3eb",
+      "branch": "master",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "kts982-mcp-sap-gui",
+      "repository": "bundled",
+      "kind": "mcp",
+      "origin": "https://github.com/kts982/mcp-sap-gui",
+      "path": "bundled/mcps/kts982-mcp-sap-gui",
+      "revision": "4eca873220418523318771f6fbb383a2e24a79e1",
+      "branch": "master",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "lemaiwo-btp-sap-odata-to-mcp-server",
+      "repository": "bundled",
+      "kind": "mcp",
+      "origin": "https://github.com/lemaiwo/btp-sap-odata-to-mcp-server",
+      "path": "bundled/mcps/lemaiwo-btp-sap-odata-to-mcp-server",
+      "revision": "9ae49cf17866aff84a83b4cd4e6beb7785983638",
+      "branch": "main",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "leotrinh-agent-skills-for-sap",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/leotrinh/agent-skills-for-sap",
+      "path": "bundled/skills/leotrinh-agent-skills-for-sap",
+      "revision": "b3bed8b093dcd1cfb07e3f24bf33920981d51513",
+      "branch": null,
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "likweitan-abap-skills",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/likweitan/abap-skills",
+      "path": "bundled/skills/likweitan-abap-skills",
+      "revision": "5c0652f1be087554567057f40574becd2097b580",
+      "branch": "main",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "linglong06-sf-workbook-updater",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/linglong06/sf-workbook-updater",
+      "path": "bundled/skills/linglong06-sf-workbook-updater",
+      "revision": "551dfe8d59ef6305bcf4ce7294e180e2978ed9e8",
+      "branch": "main",
+      "license_files": []
+    },
+    {
+      "id": "lokeshpanthangi-sf-skills",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/lokeshpanthangi/sf-skills",
+      "path": "bundled/skills/lokeshpanthangi-sf-skills",
+      "revision": "3eeccc746e9aeda061c2b4e50b87400ac8d13577",
+      "branch": null,
+      "license_files": []
+    },
+    {
+      "id": "lucasdomit-sap-skills",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/lucasdomit/Sap-Skills",
+      "path": "bundled/skills/lucasdomit-sap-skills",
+      "revision": "3c9f292484eb3353102f54c2697bc29ad9ac65ee",
+      "branch": null,
+      "license_files": []
+    },
+    {
+      "id": "marianfoo-mcp-sap-docs",
+      "repository": "bundled",
+      "kind": "mcp",
+      "origin": "https://github.com/marianfoo/mcp-sap-docs",
+      "path": "bundled/mcps/marianfoo-mcp-sap-docs",
+      "revision": "1c7c39d9e16c378f799299e9fedb9ce9d5c53265",
+      "branch": "main",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "mario-andreschak-mcp-sap-gui",
+      "repository": "bundled",
+      "kind": "mcp",
+      "origin": "https://github.com/mario-andreschak/mcp-sap-gui",
+      "path": "bundled/mcps/mario-andreschak-mcp-sap-gui",
+      "revision": "1bff66dbea315271e2dd874016a5aef085db3478",
+      "branch": "main",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "mariodefelipe-sap-bdc-plugin",
+      "repository": "bundled",
+      "kind": "auto",
+      "origin": "https://github.com/MarioDeFelipe/sap-bdc-plugin",
+      "path": "bundled/skills/mariodefelipe-sap-bdc-plugin",
+      "revision": "a7740a14da5435e52b905ae5e99054bdcbeb866b",
+      "branch": null,
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "nickels-sap-btp-docs-mcp",
+      "repository": "bundled",
+      "kind": "mcp",
+      "origin": "https://github.com/nickels/sap-btp-docs-mcp",
+      "path": "bundled/mcps/nickels-sap-btp-docs-mcp",
+      "revision": "353b0fecaa5d94f764c99f35a4cb1cc96562d3b1",
+      "branch": "main",
+      "license_files": []
+    },
+    {
+      "id": "ninadtrivedi-sap-s4hana-fico-implementation",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/ninadtrivedi-finance/sap-s4hana-fico-implementation",
+      "path": "bundled/skills/ninadtrivedi-sap-s4hana-fico-implementation",
+      "revision": "0cbb9d36010d72f872802c3dd4b4d7740516d60c",
+      "branch": "main",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "pambhar-sap-table-field-remediator",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/pambhar-deepkumar/sap-table-field-remediator",
+      "path": "bundled/skills/pambhar-sap-table-field-remediator",
+      "revision": "9be8cf119328838ef33405db78a2801f439cfdfb",
+      "branch": "main",
+      "license_files": []
+    },
+    {
+      "id": "raistlin82-sap-pce-expert",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/Raistlin82/sap-pce-expert",
+      "path": "bundled/skills/raistlin82-sap-pce-expert",
+      "revision": "8ade2fc7dc8a11a768854456095eac413d8703fb",
+      "branch": null,
+      "license_files": []
+    },
+    {
+      "id": "rtk-token-optimizer",
+      "repository": "bundled",
+      "kind": "tool",
+      "trust": "reviewed",
+      "status": "enabled",
+      "path": "bundled/tools/rtk",
+      "revision": "5d32d0736f686b69d1e8b9dc45c007d4eb77a0a2",
+      "branch": null,
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "sap-automation-pilot-agent-skills",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/SAP/automation-pilot-agent-skills",
+      "path": "bundled/skills/sap-automation-pilot-agent-skills",
+      "revision": "f95d57bbdb8bb8916374fe6637b13594e092704c",
+      "branch": null,
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "sap-samples-cap-agentic-engineered",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/SAP-samples/cap-agentic-engineered",
+      "path": "bundled/skills/sap-samples-cap-agentic-engineered",
+      "revision": "a70fd5f6bb66ffb878b0db805aca2c94a7435a32",
+      "branch": null,
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "shrek-abaper-sap-functional-skill",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/shrek-abaper/sap-functional-skill",
+      "path": "bundled/skills/shrek-abaper-sap-functional-skill",
+      "revision": "b1de074a0c8c7a238eaea56426feee8c54af20c1",
+      "branch": "main",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "shrek-abaper-sap-integration-wiki",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/shrek-abaper/sap-integration-wiki",
+      "path": "bundled/skills/shrek-abaper-sap-integration-wiki",
+      "revision": "b33eb82d28557189d993f0bbe236c14d0ccceae9",
+      "branch": null,
+      "license_files": []
+    },
+    {
+      "id": "shrek-abaper-sap-transport-gate",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/shrek-abaper/sap-transport-gate",
+      "path": "bundled/skills/shrek-abaper-sap-transport-gate",
+      "revision": "5e4615a52d40238916e3a1b997871a21b5cc0c0c",
+      "branch": null,
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "vivy-yi-finance-skills",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/vivy-yi/finance-skills",
+      "path": "bundled/skills/vivy-yi-finance-skills",
+      "revision": "758577117bfe3ce5fb019027602f371b32e1ed15",
+      "branch": null,
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "yin-wen-bin-sapskillhub",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/yin-wen-bin/SAPSkillhub",
+      "path": "bundled/skills/yin-wen-bin-sapskillhub",
+      "revision": "06b04be88efbdc20640593d0b9dd22675454000f",
+      "branch": null,
+      "license_files": []
+    }
+  ],
+  "failures": []
+}

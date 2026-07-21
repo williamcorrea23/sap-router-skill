@@ -1,0 +1,10 @@
+{
+  "name": "sap-table-field-remediator",
+  "version": "0.3.0",
+  "description": "Scan custom ECC ABAP for data access on tables/fields that change in an S/4HANA brownfield conversion, classify each finding by remediation complexity (T1/T2/T3), route it with a deterministic safety guard, and emit remediation-report.json. Ships a page-cited Simplification-List knowledge base over MCP for fix derivation.",
+  "keywords": ["sap", "abap", "s4hana", "migration", "atc", "remediation"],
+  "author": {
+    "name": "TUM x Deloitte - AI Coding Skill 3"
+  },
+  "mcpServers": "./.mcp.json"
+}

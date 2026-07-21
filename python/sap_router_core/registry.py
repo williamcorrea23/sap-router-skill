@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import json
 import os
+import queue
 import shutil
 import subprocess
 import sys
+import threading
+import time
 import uuid
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -148,7 +151,7 @@ def _resolve_command(command: str) -> str:
     return command
 
 
-def _run_jsonrpc_stdio(command: str, args: list[str], timeout: int) -> dict[str, Any]:
+def _run_jsonrpc_stdio(command: str, args: list[str], timeout: int, env: dict[str, str] | None = None) -> dict[str, Any]:
     requests = [
         {
             "jsonrpc": "2.0",
@@ -171,22 +174,55 @@ def _run_jsonrpc_stdio(command: str, args: list[str], timeout: int) -> dict[str,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,
+        env=env,
     )
-    try:
-        stdout, stderr = proc.communicate(input=payload, timeout=timeout)
-    except subprocess.TimeoutExpired:
-        proc.kill()
-        stdout, stderr = proc.communicate()
-        return {"initialize": "NOT_PROVED", "tools_list": "NOT_PROVED", "error": "MCP stdio probe timed out"}
-
     responses: dict[int, dict[str, Any]] = {}
-    for line in stdout.splitlines():
+    output: list[str] = []
+    errors: list[str] = []
+    lines: queue.Queue[str | None] = queue.Queue()
+
+    def read_stream(stream: Any, destination: list[str], publish: bool = False) -> None:
+        for line in iter(stream.readline, ""):
+            destination.append(line)
+            if publish:
+                lines.put(line)
+        if publish:
+            lines.put(None)
+
+    stdout_thread = threading.Thread(target=read_stream, args=(proc.stdout, output, True), daemon=True)
+    stderr_thread = threading.Thread(target=read_stream, args=(proc.stderr, errors), daemon=True)
+    stdout_thread.start()
+    stderr_thread.start()
+    assert proc.stdin is not None
+    proc.stdin.write(payload)
+    proc.stdin.flush()
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline and not (1 in responses and 2 in responses):
+        try:
+            line = lines.get(timeout=min(0.2, max(0.01, deadline - time.monotonic())))
+        except queue.Empty:
+            if proc.poll() is not None:
+                break
+            continue
+        if line is None:
+            break
         try:
             message = json.loads(line)
         except json.JSONDecodeError:
             continue
         if isinstance(message.get("id"), int):
             responses[message["id"]] = message
+    if proc.poll() is None:
+        proc.terminate()
+        try:
+            proc.wait(timeout=2)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+            proc.wait(timeout=2)
+    stdout_thread.join(timeout=1)
+    stderr_thread.join(timeout=1)
+    stdout = "".join(output)
+    stderr = "".join(errors)
     init_ok = 1 in responses and "result" in responses[1]
     tools_ok = 2 in responses and isinstance(responses[2].get("result", {}).get("tools"), list)
     error = None
@@ -294,9 +330,11 @@ def probe_server(server_id: str, execute: bool = False, timeout: int = 10) -> di
     error = None
     if execute and command:
         try:
+            runtime_env = os.environ.copy()
+            runtime_env.update({key: str(value) for key, value in runtime.get("env", {}).items()})
             probe_name = server.get("probes", {}).get("domain_probe")
             if transport == "stdio" and server.get("probes", {}).get("initialize") and server.get("probes", {}).get("tools_list"):
-                stdio = _run_jsonrpc_stdio(command, args, timeout)
+                stdio = _run_jsonrpc_stdio(command, args, timeout, runtime_env)
                 binary_status = "AVAILABLE" if stdio["initialize"] == "PASS" or stdio["tools_list"] == "PASS" else "ERROR"
                 initialize_status = stdio["initialize"]
                 tools_list_status = stdio["tools_list"]
@@ -399,6 +437,26 @@ def validate_catalog() -> dict[str, Any]:
         skill_count = len(list(skills_dir.glob("*/SKILL.md")))
         if skill_count != int(skill_target):
             errors.append(f"skills: {skill_count} present, target is {skill_target}")
+    bundled_sources = load_json(REGISTRIES / "bundled-sources.json") if (REGISTRIES / "bundled-sources.json").exists() else {"sources": []}
+    bundled_lock = load_json(REGISTRIES / "bundled-sources.lock.json") if (REGISTRIES / "bundled-sources.lock.json").exists() else {"sources": []}
+    declared_ids = {item["id"] for item in bundled_sources.get("sources", [])}
+    locked_ids = {item["id"] for item in bundled_lock.get("sources", [])}
+    if declared_ids != locked_ids:
+        errors.append(f"bundled sources: declared/locked mismatch missing={sorted(declared_ids - locked_ids)} extra={sorted(locked_ids - declared_ids)}")
+    for item in bundled_lock.get("sources", []):
+        path = ROOT / item.get("path", "")
+        if not path.is_dir():
+            errors.append(f"bundled source {item.get('id')}: missing path {item.get('path')}")
+        elif any(candidate.name == ".git" for candidate in path.rglob(".git")):
+            errors.append(f"bundled source {item.get('id')}: nested Git metadata is forbidden")
+    mcp_config_path = ROOT / ".mcp.json"
+    candidates_path = REGISTRIES / "mcp-candidates.json"
+    if mcp_config_path.exists() and candidates_path.exists():
+        configured_ids = set(load_json(mcp_config_path).get("mcpServers", {}))
+        candidate_ids = {item["id"] for item in load_json(candidates_path).get("candidates", [])}
+        unmanaged = configured_ids - set(servers) - candidate_ids
+        if unmanaged:
+            errors.append(f"MCP config has unmanaged servers: {sorted(unmanaged)}")
     return {
         "status": "PASS" if not errors else "FAIL",
         "checked_at": now_iso(),
@@ -410,6 +468,7 @@ def validate_catalog() -> dict[str, Any]:
             "caveman_workers": len(crew.get("workers", [])),
             "profile_target": profile_target,
             "skill_target": skill_target,
+            "bundled_sources": len(locked_ids),
         },
         "errors": errors,
     }

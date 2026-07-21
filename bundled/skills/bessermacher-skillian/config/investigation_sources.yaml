@@ -1,0 +1,95 @@
+# Investigation Source Configuration
+# Defines Datasphere tables and their structure for data investigation
+
+schema: "BW2AI"
+
+reports:
+  consolidation_management:
+    description: "Consolidated Management PnL report - group financial consolidation"
+    versions:
+      - code: "001"
+        name: "Actual"
+        table: "CV_ZBC_AA61"
+      - code: "002"
+        name: "Actuals at last year budget rate"
+        table: "CV_ZBC_AA61"
+      - code: "003"
+        name: "Actuals at budget rate"
+        table: "CV_ZBC_AA61"
+      - code: "004"
+        name: "Actuals at next year budget rate"
+        table: "CV_ZBC_AA61"
+      - code: "021"
+        name: "Forecast"
+        table: "CV_ZBC_AA62"
+    measures:
+      - column: "CS_TRN_LC"
+        aggregation: sum
+      - column: "CS_TRN_GC"
+        aggregation: sum
+    check_dimensions:
+      - column: "ZCOMPCODE"
+        aliases: ["company_code", "cocd", "company"]
+      - column: "ZVERSION"
+        aliases: ["version", "zversion"]
+      - column: "FISCPER"
+        aliases: ["fiscal_period", "period", "month", "0fiscper"]
+      - column: "ZSCOPE"
+        aliases: ["scope", "consolidation_scope", "zscope"]
+      - column: "CURKEY_LC"
+        aliases: ["local_currency", "currency_lc"]
+      - column: "CURKEY_GC"
+        aliases: ["group_currency", "currency_gc"]
+    default_group_by:
+      - "ZCOMPCODE"
+      - "ZVERSION"
+      - "FISCPER"
+      - "ZSCOPE"
+      - "CURKEY_LC"
+      - "CURKEY_GC"
+    default_filters:
+      ZVERSION: "001"
+      ZGRPACCT: "0000031100"
+
+tables:
+  bpc_mart:
+    description: "BPC mart data (pre-reporting) — source for CV_ZBC_AA61. Does not have ZSCOPE or ZVERSION fields."
+    table: "CV_ZFI_AA01"
+    measures:
+      - column: "CS_TRN_LC"
+        aggregation: sum
+    check_dimensions:
+      - column: "ZCOMPCODE"
+        aliases: ["company_code", "cocd", "company"]
+      - column: "FISCPER"
+        aliases: ["fiscal_period", "period", "month"]
+      - column: "CURKEY_LC"
+        aliases: ["local_currency", "currency_lc"]
+    default_group_by:
+      - "ZCOMPCODE"
+      - "FISCPER"
+      - "CURKEY_LC"
+
+  ownership:
+    description: "Company code ownership/scope membership table"
+    table: "CV_ZBC_AA08Z"
+    check_dimensions:
+      - column: "ZCOMPCODE"
+        aliases: ["company_code", "cocd", "company"]
+      - column: "FISCPER"
+        aliases: ["fiscal_period", "period", "month"]
+      - column: "ZSCOPE"
+        aliases: ["scope", "consolidation_scope", "zscope"]
+      - column: "ZVERSION"
+        aliases: ["version", "zversion"]
+    default_group_by:
+      - "ZCOMPCODE"
+      - "FISCPER"
+      - "ZSCOPE"
+      - "ZVERSION"
+
+scope_values:
+  S_NONE: "No consolidation scope - currency conversion only"
+  S_LEGAL: "Legal consolidation scope"
+  S_LEGAL_DKK: "Legal consolidation scope (DKK)"
+  S_LEGAL_SPECIAL: "Special legal consolidation scope"

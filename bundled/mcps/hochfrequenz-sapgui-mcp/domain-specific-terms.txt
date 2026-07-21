@@ -1,0 +1,84 @@
+# Domain-specific terms to ignore in spell checking
+# SAP terms
+tcode
+tcodes
+mandant
+okcode
+webgui
+sapgui
+
+# German terms (common in SAP documentation/examples)
+aktive
+programms
+offener
+feld
+intervall
+tage
+temperatur
+attributen
+temporaere
+attribut
+produkts
+ans
+branche
+beginn
+ende
+periode
+anmeld
+einstellung
+adresse
+ist
+als
+oder
+alle
+sie
+offen
+variante
+abstrakt
+paket
+programm
+methode
+methoden
+objekt
+definit
+lief
+ressource
+manuell
+prozess
+referenz
+vor
+retriev
+archiv
+hierarchie
+dokument
+abl
+defin
+signatur
+produkt
+selektion
+lokal
+lokale
+funktion
+applikation
+
+# SAP technical terms
+repid
+SHTTP
+TABL
+DUM
+
+# Typos in SAP data (from SAP system, cannot be fixed)
+payed
+maxium
+managment
+
+# SAP GUI Scripting COM method names (PascalCase, flagged by codespell)
+DoubleClick
+PressEnter
+
+# Technical terms
+stdin
+stdout
+stderr
+asyncio
+pydantic

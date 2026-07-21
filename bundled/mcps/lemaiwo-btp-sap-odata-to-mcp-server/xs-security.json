@@ -1,0 +1,65 @@
+{
+  "xsappname": "btp-sap-odata-to-mcp-server-development",
+  "tenant-mode": "dedicated",
+  "description": "BTP SAP OData MCP Server Security Configuration",
+  "scopes": [
+    {
+      "name": "$XSAPPNAME.claudeai",
+      "description": "Read access to SAP OData services"
+    },
+    {
+      "name": "claudeai",
+      "description": "Read access to SAP OData services"
+    },
+    {
+      "name": "$XSAPPNAME.read",
+      "description": "Read access to SAP OData services"
+    },
+    {
+      "name": "$XSAPPNAME.write",
+      "description": "Write access to SAP OData services"
+    },
+    {
+      "name": "$XSAPPNAME.admin",
+      "description": "Admin access to MCP server configuration"
+    }
+  ],
+  "role-templates": [
+    {
+      "name": "MCPViewer",
+      "description": "View SAP OData services through MCP",
+      "scope-references": [
+        "$XSAPPNAME.read"
+      ]
+    },
+    {
+      "name": "MCPEditor",
+      "description": "Edit SAP OData services through MCP",
+      "scope-references": [
+        "$XSAPPNAME.read",
+        "$XSAPPNAME.write"
+      ]
+    },
+    {
+      "name": "MCPAdmin",
+      "description": "Administer MCP server",
+      "scope-references": [
+        "$XSAPPNAME.read",
+        "$XSAPPNAME.write",
+        "$XSAPPNAME.admin"
+      ]
+    }
+  ],
+  "authorities":["$XSAPPNAME.claudeai"],
+  "oauth2-configuration": {
+    "redirect-uris": [
+      "https://*.cfapps.*.hana.ondemand.com/**",
+      "https://claude.ai/api/mcp/auth_callback",
+      "http://localhost:3000/oauth/callback",
+      "http://localhost:6274/**",
+      "cursor://anysphere.cursor-retrieval/oauth/user-test-mcp-server-local/callback"
+    ],
+    "token-validity": 3600,
+    "refresh-token-validity": 86400
+  }
+}

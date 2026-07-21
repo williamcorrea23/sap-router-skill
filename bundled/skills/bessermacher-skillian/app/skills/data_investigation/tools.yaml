@@ -1,0 +1,86 @@
+tools:
+  - name: start_investigation
+    description: |
+      Start a new data investigation by recording the problem description.
+
+      Creates a new investigation context to track findings as you work
+      through the diagnostic steps. Call this first when the user reports
+      a data issue.
+
+      Returns an investigation ID and confirms the investigation is started.
+    parameters:
+      - name: problem_description
+        type: string
+        required: true
+        description: >
+          Description of the data issue being investigated
+          (e.g. "No actual data for CoCd 1110 in Dec 2024 in CM report")
+      - name: report_name
+        type: string
+        required: false
+        description: >
+          Name of the report with the issue (e.g. "Consolidated Management PnL")
+      - name: company_code
+        type: string
+        required: false
+        description: Company code being investigated (e.g. "1110")
+      - name: fiscal_period
+        type: string
+        required: false
+        description: "Fiscal period in YYYYMMM format (e.g. '2024012' for Dec 2024, '2024001' for Jan 2024)"
+      - name: version
+        type: string
+        required: false
+        description: >
+          Version code (e.g. '001' for Actuals, '021' for Forecast).
+          Defaults to '001' if not specified.
+    implementation: app.skills.data_investigation.tools:start_investigation
+
+  - name: record_finding
+    description: |
+      Record a finding from an investigation step.
+
+      After each investigation step (data check, ownership check, etc.),
+      use this tool to record what was found and your conclusion.
+      This builds up the investigation trail for the final summary.
+    parameters:
+      - name: step_name
+        type: string
+        required: true
+        description: >
+          Name of the investigation step (e.g. "Check reporting table",
+          "Check BPC engine", "Check ownership")
+      - name: result_summary
+        type: string
+        required: true
+        description: >
+          Brief summary of the result (e.g. "No data found in CV_ZBC_AA61
+          for CoCd 1110 in period 2024012")
+      - name: conclusion
+        type: string
+        required: true
+        description: >
+          Your interpretation of the finding and what it means
+          (e.g. "Data is missing from reporting table. Need to check BPC engine next.")
+      - name: tool_used
+        type: string
+        required: false
+        description: Name of the tool that was called for this step
+      - name: status
+        type: string
+        required: false
+        description: >
+          Status of this finding: "issue_found", "normal", or "needs_further_check".
+          Defaults to "needs_further_check".
+    implementation: app.skills.data_investigation.tools:record_finding
+
+  - name: get_investigation_summary
+    description: |
+      Get a complete summary of the current investigation.
+
+      Returns all recorded findings in order, the investigation status,
+      and a structured trail of the investigation. Use this at the end
+      of an investigation to present results to the user, or mid-investigation
+      to review progress.
+    parameters: []
+    implementation: app.skills.data_investigation.tools:get_investigation_summary

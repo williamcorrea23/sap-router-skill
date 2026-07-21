@@ -1,0 +1,11 @@
+applications:
+  - name: skillpilot
+    memory: 256M
+    instances: 1
+    buildpacks:
+      - nodejs_buildpack
+    command: node srv/rag-service.js
+    env:
+      NODE_ENV: production
+    routes:
+      - route: skillpilot-hr.cfapps.us10-001.hana.ondemand.com

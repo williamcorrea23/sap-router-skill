@@ -1,0 +1,523 @@
+# KB Index Catalog — join-key source for the MCP knowledge-base BUILD (read by mcp/build/build_index.py).
+#
+# ROLE: this copy exists only to stitch the narrative chunks (common/items/*.md) to their SAP notes when
+# building the KB index. It is NOT the skill's runtime classification catalog — that lives at
+# skills/sap-table-field-remediator/references/simplification-list.yaml and is loaded by catalog.py.
+# The two are independent copies of the same underlying facts; edits here do not affect classification,
+# and edits to the skill catalog do not appear here unless copied over (they have drifted before, e.g. MARD).
+#
+# Phase 1 deliverable. This is the curated, corrected catalog the skill is allowed to read
+# (the production analogue of the SAP Simplification DB + the Deloitte KB). It was originally
+# derived from an internal Deloitte KB and SAP S/4HANA "what's new" (S4TWL) notes, now folded
+# directly into this file; those source files are not shipped in the repo.
+#
+# IMPORTANT corrections applied vs the raw KB (do NOT regress these):
+#   - CDPOS/CDHDR: KB said CDPOS -> CDPOS_STR/CDPOS_UID. THOSE TABLES DO NOT EXIST. Reality: the
+#     CDCLS cluster is declustered on HANA, so CDPOS/CDHDR become transparent tables of the SAME
+#     NAME. A plain SELECT keeps working. Catalogued here as DECLUSTERED_SAME_NAME / low impact so a
+#     well-behaved skill does NOT flag a read as a must-fix. Used as the over-claim distractor.
+#   - VBUK/VBUP: still physically present in S/4 but NOT populated for new docs (silent empty joins).
+#   - KNA1/LFA1: still exist and stay populated via CVI; a plain read often still works -> verify-leaning.
+#   - BSEG/MKPF/MSEG: still exist (compat views); the *correct* target is the RELEASED CDS view
+#     (I_JournalEntryItem / I_MaterialDocument*) — ACDOCA/MATDOC are the underlying compat store.
+#
+# Field semantics:
+#   object            ECC table or field name
+#   type              table | field | bapi | function_module
+#   status            VALID | CHANGED | RENAMED | ABOLISHED | RESTRUCTURED |
+#                     DECLUSTERED_SAME_NAME | REDIRECT_BP | MODERNIZATION_ONLY
+#   s4_replacement    where/what to read in S/4 (or "<same>" / null)
+#   cds_view          released CDS view, or null
+#   world             A | A-verify | B | B-verify        (must-I-fix axis)
+#   release_dependent bool (bites only on certain target releases / settings)
+#   baseline_tier     T1 | T2 | T3 | null   (the catalog's *default* judgment cost; a specific
+#                     usage can escalate above this — see findings.yaml must_escalate)
+#   sap_note          verified S4TWL note, or null
+#   fix_pattern       one-line remediation summary
+#   source            sap-s4twl | deloitte-kb | corrected:<reason>
+
+catalog:
+
+  # ----------------------------------------------------------------------------
+  # World A — genuine S/4 readiness findings (custom code must be remediated)
+  # ----------------------------------------------------------------------------
+
+  - object: MATNR
+    type: field
+    status: CHANGED                       # length extended 18 -> 40
+    s4_replacement: MATNR                  # same field, now length 40
+    cds_view: I_Product
+    world: A
+    release_dependent: true               # extended length off by default after conversion
+    baseline_tier: T1                      # mechanical IF only read/moved/displayed; T3 if offset-parsed
+    sap_note: "2267140"
+    fix_pattern: "Ensure no hardcoded CHAR18 target / fixed-length WRITE. Offset/substring access -> escalate (see findings must_escalate)."
+    source: sap-s4twl
+
+  - object: KONV
+    type: table
+    status: ABOLISHED                      # cluster table removed
+    s4_replacement: PRCD_ELEMENTS          # transparent, same field names (1909+)
+    cds_view: V_KONV                       # compatibility view; SAP prefers pricing API
+    world: A
+    release_dependent: false
+    baseline_tier: T1                      # 1:1 rename for a pure READ SELECT
+    sap_note: "2220005"                    # cookbook 2267308
+    fix_pattern: "Read: swap KONV -> PRCD_ELEMENTS (identical fields). WRITE (INSERT/UPDATE/DELETE) is FORBIDDEN in S/4 -> escalate to T3 (use pricing API)."
+    source: sap-s4twl
+
+  - object: VBUK
+    type: table
+    status: ABOLISHED                      # data model eliminated; table present-but-unpopulated
+    s4_replacement: VBAK                    # header status folded into header table(s)
+    cds_view: I_SalesOrder
+    world: A
+    release_dependent: false
+    baseline_tier: T2
+    sap_note: "2198647"                    # S4TWL 2267306
+    fix_pattern: "Drop VBUK join; re-point header status (GBSTK etc.) onto VBAK/LIKP/VBRK by doc category. Silent empty join if left as-is."
+    source: sap-s4twl
+
+  - object: VBUP
+    type: table
+    status: ABOLISHED
+    s4_replacement: VBAP                    # item status folded into item table(s)
+    cds_view: I_SalesOrderItem
+    world: A
+    release_dependent: false
+    baseline_tier: T2
+    sap_note: "2198647"
+    fix_pattern: "Drop VBUP join; re-point item status (GBSTA etc.) onto VBAP/LIPS by doc category."
+    source: sap-s4twl
+
+  - object: GBSTK
+    type: field
+    status: RENAMED                        # i.e. relocated, same name
+    s4_replacement: VBAK-GBSTK             # was VBUK-GBSTK
+    cds_view: I_SalesOrder
+    world: A
+    release_dependent: false
+    baseline_tier: T2
+    sap_note: "2198647"
+    fix_pattern: "Overall header status now read from VBAK (or LIKP/VBRK by category), not VBUK."
+    source: deloitte-kb
+
+  - object: GBSTA
+    type: field
+    status: RENAMED
+    s4_replacement: VBAP-GBSTA             # was VBUP-GBSTA
+    cds_view: I_SalesOrderItem
+    world: A
+    release_dependent: false
+    baseline_tier: T2
+    sap_note: "2198647"
+    fix_pattern: "Overall item status now read from VBAP (or LIPS by category), not VBUP."
+    source: deloitte-kb
+
+  - object: FKSTK
+    type: field
+    status: RENAMED                        # relocated, same name (former VBUK-FKSTK)
+    s4_replacement: VBAK-FKSTK             # header billing status; LIKP-FKSTK (deliveries) / VBRK (billing) by doc category
+    cds_view: I_SalesOrder
+    world: A
+    release_dependent: false
+    baseline_tier: T2
+    sap_note: "2267306"
+    fix_pattern: "Overall billing status now read from the header table by doc category, not VBUK: VBAK (sales), LIKP (deliveries), VBRK (billing). Target depends on which document the code reads."
+    source: deloitte-kb
+
+  - object: FKSTA
+    type: field
+    status: RENAMED                        # relocated, same name (former VBUP-FKSTA)
+    s4_replacement: VBAP-FKSTA             # item billing status; LIPS-FKSTA (deliveries) by doc category
+    cds_view: I_SalesOrderItem
+    world: A
+    release_dependent: false
+    baseline_tier: T2
+    sap_note: "2267306"
+    fix_pattern: "Item billing status now read from the item table by doc category, not VBUP: VBAP (sales), LIPS (deliveries). Target depends on which document the code reads."
+    source: deloitte-kb
+
+  - object: VBTYP
+    type: field
+    status: CHANGED                        # data element widened CHAR1 -> CHAR4 (field/column name unchanged)
+    s4_replacement: VBTYP                  # SAME field VBAK-VBTYP; its data element changed VBTYP(CHAR1) -> VBTYPL(CHAR4). There is NO field VBAK-VBTYPL.
+    cds_view: I_SalesOrder
+    world: A
+    release_dependent: true
+    baseline_tier: T2                       # value-domain widening; comparisons/IFs/constants must be revisited
+    sap_note: "2267306"                     # S4TWL - SD Simplified Data Models (data element VBTYP -> VBTYPL)
+    fix_pattern: "Field stays VBAK-VBTYP; its data element widened CHAR1(VBTYP) -> CHAR4(VBTYPL). Do NOT rename the field/column. Widen local vars + constants, fix CHAR1 literal comparisons, use IF_SD_DOC_CATEGORY constants. VBTYP_EXT(CHAR4) removed."
+    source: "corrected:vbtypl-is-a-data-element-not-a-field"
+
+  - object: KNA1
+    type: table
+    status: REDIRECT_BP                     # still exists + CVI-populated; documented redirect
+    s4_replacement: BUT000                  # + BUT020 addresses, BP roles; CVI links BP<->KNA1
+    cds_view: I_Customer
+    world: A-verify                         # plain read often still works -> judgment
+    release_dependent: false
+    baseline_tier: T2
+    sap_note: "2265093"
+    fix_pattern: "Read may still work via CVI. Modernize to BUT000/I_Customer; address/role data spread across BUT0xx."
+    source: sap-s4twl
+
+  - object: LFA1
+    type: table
+    status: REDIRECT_BP
+    s4_replacement: BUT000
+    cds_view: I_Supplier
+    world: A-verify
+    release_dependent: false
+    baseline_tier: T2
+    sap_note: "2265093"
+    fix_pattern: "Read may still work via CVI. Modernize to BUT000/I_Supplier."
+    source: sap-s4twl
+
+  - object: KNKK
+    type: table
+    status: ABOLISHED                       # classic credit mgmt removed; replaced by SAP Credit Management (FSCM/UKM)
+    s4_replacement: UKMBP_CMS_SGM           # FSCM credit segment data; master credit fields move to BP + UKM (no 1:1 table)
+    cds_view: null
+    world: A
+    release_dependent: true                 # bites when FSCM Credit Management is active on target
+    baseline_tier: T3                       # not a rename; fields spread across BP/UKM structures -> redesign
+    sap_note: "2270544"                     # S4TWL - Credit Management (field-level replacement detail: KBA 2706489)
+    fix_pattern: "Classic credit tables (KNKK/KNKA) obsolete under FSCM Credit Management. No 1:1 table swap; credit master fields relocate to BP + UKM (UKMBP_CMS*, BUT000). Redesign the read against the FSCM model / released API. Escalate."
+    source: sap-s4twl
+
+  - object: KNKA
+    type: table
+    status: ABOLISHED
+    s4_replacement: UKMBP_CMS               # FSCM central credit data; see KNKK
+    cds_view: null
+    world: A
+    release_dependent: true
+    baseline_tier: T3
+    sap_note: "2270544"
+    fix_pattern: "Central credit master (KNKA) obsolete under FSCM Credit Management; fields relocate to BP + UKM. No 1:1 table. Redesign / escalate (see KNKK)."
+    source: sap-s4twl
+
+  - object: BSEG
+    type: table
+    status: RESTRUCTURED                    # still exists; analytic/line-item reads -> ACDOCA
+    s4_replacement: ACDOCA                  # Universal Journal
+    cds_view: I_JournalEntryItem
+    world: A
+    release_dependent: false
+    baseline_tier: T3                       # granularity/ledger/intent ambiguity
+    sap_note: "2270333"
+    fix_pattern: "Read line items from ACDOCA; renames BUKRS->RBUKRS, HKONT->RACCT, BUZEI->DOCLN; add RLDNR='0L'. Choice BSEG-vs-ACDOCA needs report intent."
+    source: sap-s4twl
+
+  - object: BUKRS
+    type: field
+    status: RENAMED
+    s4_replacement: RBUKRS                  # in ACDOCA
+    cds_view: I_JournalEntryItem
+    world: A
+    release_dependent: false
+    baseline_tier: T3
+    sap_note: "2270333"
+    fix_pattern: "BSEG-BUKRS -> ACDOCA-RBUKRS when reading from Universal Journal."
+    source: deloitte-kb
+
+  - object: HKONT
+    type: field
+    status: RENAMED
+    s4_replacement: RACCT                   # in ACDOCA
+    cds_view: I_JournalEntryItem
+    world: A
+    release_dependent: false
+    baseline_tier: T3
+    sap_note: "2270333"
+    fix_pattern: "BSEG-HKONT -> ACDOCA-RACCT (G/L account)."
+    source: deloitte-kb
+
+  - object: BUZEI
+    type: field
+    status: RENAMED
+    s4_replacement: DOCLN                   # in ACDOCA (6-digit line)
+    cds_view: I_JournalEntryItem
+    world: A
+    release_dependent: false
+    baseline_tier: T3
+    sap_note: "2270333"
+    fix_pattern: "BSEG-BUZEI (3-char) -> ACDOCA-DOCLN (6-char); watch the length difference."
+    source: deloitte-kb
+
+  - object: MKPF
+    type: table
+    status: RESTRUCTURED                    # compat view over MATDOC
+    s4_replacement: MATDOC
+    cds_view: I_MaterialDocumentHeader
+    world: A
+    release_dependent: false
+    baseline_tier: T3                       # stock-on-the-fly semantics; moved append fields
+    sap_note: "2206980"
+    fix_pattern: "Header data now in single MATDOC table; read via I_MaterialDocumentHeader. Compat view parses but append/process logic must move."
+    source: sap-s4twl
+
+  - object: MSEG
+    type: table
+    status: RESTRUCTURED
+    s4_replacement: MATDOC
+    cds_view: I_MaterialDocumentItem
+    world: A
+    release_dependent: false
+    baseline_tier: T3
+    sap_note: "2206980"
+    fix_pattern: "Item/goods-movement data now in MATDOC; read via I_MaterialDocumentItem. Stock calculated on the fly."
+    source: sap-s4twl
+
+  - object: RFBLG
+    type: table
+    status: ABOLISHED                       # physical FI cluster container for BSEG
+    s4_replacement: ACDOCA
+    cds_view: I_JournalEntryItem
+    world: A
+    release_dependent: false
+    baseline_tier: T3                       # direct cluster access impossible -> redesign
+    sap_note: "2270333"
+    fix_pattern: "Cluster gone; data in ACDOCA. Direct IMPORT/EXPORT against RFBLG impossible -> redesign read."
+    source: sap-s4twl
+
+  - object: S001
+    type: table
+    status: ABOLISHED                       # LIS info structure (Sales)
+    s4_replacement: "Embedded Analytics / released CDS"
+    cds_view: null                          # no 1:1; stand up an analytic view
+    world: A
+    release_dependent: false
+    baseline_tier: T3
+    sap_note: "2267463"
+    fix_pattern: "LIS abolished; no mechanical target. Redesign to Embedded Analytics / a released CDS analytic view."
+    source: sap-s4twl
+
+  - object: S061
+    type: table
+    status: ABOLISHED                       # LIS info structure (Purchasing / EAM)
+    s4_replacement: "Embedded Analytics / released CDS"
+    cds_view: null
+    world: A
+    release_dependent: false
+    baseline_tier: T3
+    sap_note: "2267463"                     # verified: S4TWL - LIS in EAM, covers S061-S065
+    fix_pattern: "LIS abolished; redesign to Embedded Analytics / released CDS analytic view."
+    source: sap-s4twl
+
+  - object: PCL2
+    type: table
+    status: ABOLISHED                       # HR payroll cluster
+    s4_replacement: "transparent tables per cluster ID / infotype"
+    cds_view: null
+    world: A
+    release_dependent: true
+    baseline_tier: T3                       # infotype-dependent redesign, no flat mapping
+    sap_note: "2409530"                     # NOTE NUMBER UNVERIFIED — concept confirmed, number not corroborated
+    fix_pattern: "HR cluster declustered to transparent tables; target depends on cluster ID/infotype. Redesign."
+    source: deloitte-kb
+
+  # ----------------------------------------------------------------------------
+  # Distractors / over-claim traps (changed-but-read-still-works; must NOT be a must-fix)
+  # ----------------------------------------------------------------------------
+
+  - object: CDPOS
+    type: table
+    status: DECLUSTERED_SAME_NAME           # CORRECTED vs KB (KB's CDPOS_STR/_UID do not exist)
+    s4_replacement: CDPOS                    # same name, now transparent
+    cds_view: null
+    world: A-verify
+    release_dependent: true
+    baseline_tier: T1                        # low impact; only direct cluster IMPORT/EXPORT breaks
+    sap_note: null
+    fix_pattern: "CDCLS declustered -> CDPOS is now a transparent table of the SAME name. Plain SELECT FROM CDPOS is UNAFFECTED. Do NOT flag a read as must-fix-rename."
+    source: corrected:cdcls-declustering
+
+  - object: CDHDR
+    type: table
+    status: DECLUSTERED_SAME_NAME
+    s4_replacement: CDHDR
+    cds_view: null
+    world: A-verify
+    release_dependent: true
+    baseline_tier: T1
+    sap_note: null
+    fix_pattern: "Same as CDPOS: declustered, same name, read unaffected. Verify field set on target if needed."
+    source: corrected:cdcls-declustering
+
+  # ----------------------------------------------------------------------------
+  # Still-valid tables — negative controls (flagged VALID so over-claiming is detectable)
+  # ----------------------------------------------------------------------------
+
+  - object: MARA
+    type: table
+    status: VALID
+    s4_replacement: null
+    cds_view: I_Product
+    world: A
+    release_dependent: false
+    baseline_tier: null
+    sap_note: null
+    fix_pattern: "Material master header still valid. Reads need no remediation (MATNR length aside)."
+    source: sap-s4twl
+
+  - object: MAKT
+    type: table
+    status: VALID
+    s4_replacement: null
+    cds_view: I_ProductDescription
+    world: A
+    release_dependent: false
+    baseline_tier: null
+    sap_note: null
+    fix_pattern: "Material descriptions still valid. No remediation."
+    source: sap-s4twl
+
+  - object: VBAK
+    type: table
+    status: VALID                            # RESTRUCTURED but reads valid; status fields folded IN
+    s4_replacement: null
+    cds_view: I_SalesOrder
+    world: A
+    release_dependent: false
+    baseline_tier: null
+    sap_note: null
+    fix_pattern: "Sales order header still valid; absorbs former VBUK status. A plain read is not a finding."
+    source: deloitte-kb
+
+  - object: VBAP
+    type: table
+    status: VALID
+    s4_replacement: null
+    cds_view: I_SalesOrderItem
+    world: A
+    release_dependent: false
+    baseline_tier: null
+    sap_note: null
+    fix_pattern: "Sales order item still valid; absorbs former VBUP status. Plain read is not a finding."
+    source: deloitte-kb
+
+  - object: BKPF
+    type: table
+    status: VALID
+    s4_replacement: null
+    cds_view: I_JournalEntry
+    world: A
+    release_dependent: false
+    baseline_tier: null
+    sap_note: null
+    fix_pattern: "Accounting document header still valid. No remediation."
+    source: sap-s4twl
+
+  - object: T001
+    type: table
+    status: VALID
+    s4_replacement: null
+    cds_view: I_CompanyCode
+    world: A
+    release_dependent: false
+    baseline_tier: null
+    sap_note: null
+    fix_pattern: "Company codes still valid. No remediation."
+    source: sap-s4twl
+
+  - object: SKAT
+    type: table
+    status: VALID
+    s4_replacement: null
+    cds_view: I_GLAccountText
+    world: A
+    release_dependent: false
+    baseline_tier: null
+    sap_note: null
+    fix_pattern: "G/L account texts still valid. No remediation."
+    source: sap-s4twl
+
+  # ----------------------------------------------------------------------------
+  # World B — clean-core modernization only; NOT ATC-forced; must NOT be flagged must-fix
+  # ----------------------------------------------------------------------------
+
+  - object: BAPI_SALESORDER_CREATEFROMDAT2
+    type: bapi
+    status: MODERNIZATION_ONLY
+    s4_replacement: "MODIFY ENTITIES OF I_SalesOrderTP (RAP)"
+    cds_view: null
+    world: B
+    release_dependent: false
+    baseline_tier: null
+    sap_note: null
+    fix_pattern: "Working released BAPI. EML rewrite is key-only modernization, not ATC-forced. Do NOT flag."
+    source: deloitte-kb
+
+  - object: BAPI_SALESORDER_CHANGE
+    type: bapi
+    status: MODERNIZATION_ONLY
+    s4_replacement: "MODIFY ENTITIES OF I_SalesOrderTP (RAP)"
+    cds_view: null
+    world: B
+    release_dependent: false
+    baseline_tier: null
+    sap_note: null
+    fix_pattern: "Working released change BAPI. Not an ATC finding. Do NOT flag."
+    source: deloitte-kb
+
+  - object: BAPI_MATERIAL_GET_DETAIL
+    type: bapi
+    status: MODERNIZATION_ONLY
+    s4_replacement: "Released product CDS / API (I_Product family)"
+    cds_view: I_Product
+    world: B
+    release_dependent: false
+    baseline_tier: null
+    sap_note: null
+    fix_pattern: "Working read BAPI. Modernize only if clean-core mandated. Do NOT flag as must-fix."
+    source: deloitte-kb
+
+  - object: BAPI_TRANSACTION_COMMIT
+    type: bapi
+    status: VALID
+    s4_replacement: null
+    cds_view: null
+    world: B
+    release_dependent: false
+    baseline_tier: null
+    sap_note: null
+    fix_pattern: "Still valid in S/4. Counter-example against over-flagging. Do NOT flag."
+    source: deloitte-kb
+
+  - object: BAPI_TRANSACTION_ROLLBACK
+    type: bapi
+    status: VALID
+    s4_replacement: null
+    cds_view: null
+    world: B
+    release_dependent: false
+    baseline_tier: null
+    sap_note: null
+    fix_pattern: "Still valid in S/4. Do NOT flag."
+    source: deloitte-kb
+
+  - object: BAPI_CUSTOMER_GETCREDITACCOUNT
+    type: bapi
+    status: MODERNIZATION_ONLY
+    s4_replacement: "SAP Credit Management (FSCM/UKM) APIs"
+    cds_view: null
+    world: B-verify                         # tied to classic credit (KNKK, removed); may be real
+    release_dependent: true
+    baseline_tier: null
+    sap_note: null
+    fix_pattern: "Classic credit removed. MAY be a real finding -> verify in SYCM on target release; not an automatic must-fix."
+    source: deloitte-kb
+
+  - object: WS_DELIVERY_UPDATE
+    type: function_module
+    status: MODERNIZATION_ONLY
+    s4_replacement: "BAPI_OUTB_DELIVERY_* / released delivery API"
+    cds_view: null
+    world: B-verify
+    release_dependent: true
+    baseline_tier: null
+    sap_note: null
+    fix_pattern: "Older delivery update FM. Possibly obsolete -> verify in SYCM, release-dependent."
+    source: deloitte-kb

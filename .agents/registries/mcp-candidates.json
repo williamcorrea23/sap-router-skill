@@ -1,0 +1,707 @@
+{
+  "schema_version": 1,
+  "policy": "fail_closed",
+  "candidates": [
+    {
+      "id": "abap-mcp",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "node",
+        "args": [
+          "packages/ABAP-MCP/dist/index.js"
+        ]
+      },
+      "env_refs": [
+        "ALLOW_DELETE",
+        "ALLOW_EXECUTE",
+        "ALLOW_WRITE",
+        "BLOCKED_PACKAGES",
+        "DEFAULT_TRANSPORT",
+        "DEFER_TOOLS",
+        "SAP_ABAP_VERSION",
+        "SAP_ALLOW_UNAUTHORIZED",
+        "SAP_CLIENT",
+        "SAP_LANGUAGE",
+        "SAP_PASSWORD",
+        "SAP_ROLE",
+        "SAP_URL",
+        "SAP_USER",
+        "SYNTAX_CHECK_BEFORE_ACTIVATE",
+        "TAVILY_API_KEY"
+      ],
+      "description": "DimiDR/ABAP-MCP \u2014 Standalone MCP Server for agentic ABAP development (68 tools, method surgery, DDIC validation, Clean ABAP workflow). Credentials hardcoded \u2014 ${SAP_URL} resolution fixed."
+    },
+    {
+      "id": "abap-mcp-adt-powerup",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "node",
+        "args": [
+          "packages/abap-mcp-adt-powerup/bin/mcp-abap-adt.js"
+        ]
+      },
+      "env_refs": [
+        "SAP_CLIENT",
+        "SAP_PASSWORD",
+        "SAP_URL",
+        "SAP_USER"
+      ],
+      "description": "ABAP MCP ADT PowerUp (babamba2/abap-mcp-adt-powerup) \u2014 Extended ADT MCP with advanced ABAP tools. Node.js."
+    },
+    {
+      "id": "azure-ai-search",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "node",
+        "args": [
+          "dist/index.js"
+        ]
+      },
+      "env_refs": [
+        "AZURE_SEARCH_ENDPOINT",
+        "AZURE_SEARCH_INDEX",
+        "AZURE_SEARCH_KEY"
+      ],
+      "description": "Azure AI Search RAG connector. Enterprise semantic search. Ready for production."
+    },
+    {
+      "id": "btp-mcp",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "node",
+        "args": [
+          "dist/index.js"
+        ]
+      },
+      "env_refs": [],
+      "description": "SAP BTP MCP \u2014 7 entity sets: GlobalAccount, Subaccounts, Directories, Assignments, AllowedDataCenters, EnvironmentInstances, AvailableEnvironments. OData-based via btp-admin-api-config.json. Built on odata-mcp-proxy."
+    },
+    {
+      "id": "btp-sap-odata-to-mcp",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "node",
+        "args": [
+          "dist/index.js"
+        ]
+      },
+      "env_refs": [],
+      "description": "BTP OData MCP \u2014 3 progressive-discovery tools (discover-sap-data, get-entity-metadata, execute-sap-operation) instead of 200+ entity tools. S/4HANA/ECC via BTP Destination + Principal Propagation. Token-optimized."
+    },
+    {
+      "id": "bw-modeling-mcp",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "node",
+        "args": [
+          "dist/index.js"
+        ]
+      },
+      "env_refs": [
+        "BW_HOST",
+        "BW_PASSWORD",
+        "BW_USER"
+      ],
+      "description": "BW Modeling MCP (dnic-dev/bw-modeling-mcp) - BW/4HANA modeling. DSO, InfoCube, DTP, transformation management. Use for BW data modeling and ETL pipeline operations."
+    },
+    {
+      "id": "cap-mcp-plugin",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "plugin"
+      },
+      "env_refs": [],
+      "description": "SAP CAP MCP plugin fallback for CAP model search/build guidance."
+    },
+    {
+      "id": "cf-cli-mcp",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "node",
+        "args": [
+          "dist/index.js"
+        ]
+      },
+      "env_refs": [
+        "CF_API",
+        "CF_PASSWORD",
+        "CF_USER"
+      ],
+      "description": "Cloud Foundry MCP \u2014 cf push/deploy, org/space management, service marketplace, logs, SSH. BTP Cloud Foundry runtime operations."
+    },
+    {
+      "id": "ci-mcp-server",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "node",
+        "args": [
+          "packages/ci-mcp-server/node_modules/odata-mcp-proxy/dist/index.js",
+          "--config",
+          "packages/ci-mcp-server/ci-api-config.json"
+        ]
+      },
+      "env_refs": [
+        "CPI_DESTINATION_BASE_URL",
+        "CPI_DESTINATION_CLIENT_ID",
+        "CPI_DESTINATION_CLIENT_SECRET",
+        "CPI_DESTINATION_TOKEN_URL"
+      ],
+      "description": "lemaiwo/ci-mcp-server \u2014 configuration-driven SAP Cloud Integration (CPI) OData V2 API proxy. Exposes 32 entity sets (packages, logs, security material, Partner Directory)."
+    },
+    {
+      "id": "cloud-alm-itsm",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "node",
+        "args": [
+          "dist/index.js"
+        ]
+      },
+      "env_refs": [
+        "ALM_HOST",
+        "ALM_PASSWORD",
+        "ALM_USER"
+      ],
+      "description": "Cloud ALM ITSM MCP (gregorwolf/cloud-alm-itsm-mcp) - SAP Cloud ALM IT Service Management. Incident, problem, change management via ALM APIs. Use for ALM operations and ITSM workflows."
+    },
+    {
+      "id": "datasphere-mcp",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "node",
+        "args": [
+          "dist/index.js"
+        ]
+      },
+      "env_refs": [
+        "DSPHERE_HOST",
+        "DSPHERE_PASSWORD",
+        "DSPHERE_USER"
+      ],
+      "description": "SAP Datasphere MCP (MarioDeFelipe/sap-datasphere-mcp) - Datasphere data modeling, spaces, views, remote tables. Use for Datasphere analytics and data federation operations."
+    },
+    {
+      "id": "erpl-adt",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "node",
+        "args": [
+          "dist/index.js"
+        ]
+      },
+      "env_refs": [
+        "ERPL_PASSWORD",
+        "ERPL_URL",
+        "ERPL_USER"
+      ],
+      "description": "ERPL ADT MCP (DataZooDE/erpl-adt) - enterprise resource planning language ADT bridge. Specialized ERPL development operations."
+    },
+    {
+      "id": "erpl-adt-mcp",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "erpl-adt",
+        "args": [
+          "mcp"
+        ]
+      },
+      "env_refs": [
+        "ERPL_CLIENT",
+        "ERPL_PASSWORD",
+        "ERPL_URL",
+        "ERPL_USER"
+      ],
+      "description": "erpl-adt MCP \u2014 single-binary ADT CLI, zero-dependency, Go-based. Transport CRUD, ABAP source CRUD, ABAP Unit, ATC checks, object search. Latest release v2026.06.27."
+    },
+    {
+      "id": "guniweb-sap-mcp",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "npx",
+        "args": [
+          "-y",
+          "guniweb-sap-mcp"
+        ]
+      },
+      "env_refs": [
+        "SAP_CLIENT",
+        "SAP_PASSWORD",
+        "SAP_URL",
+        "SAP_USER"
+      ],
+      "description": "guniweb-sap-mcp \u2014 multi-protocol MCP for OData V2/V4, IDocs, and RFC/BAPI. 22 tools across 4 tiers. 918 unit tests. 7 auth types. n8n-compatible."
+    },
+    {
+      "id": "mcp-abap-adt",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "node",
+        "args": [
+          "dist/index.js"
+        ]
+      },
+      "env_refs": [
+        "SAP_CLIENT",
+        "SAP_PASSWORD",
+        "SAP_URL",
+        "SAP_USERNAME"
+      ],
+      "description": "TypeScript SAP ADT MCP \u2014 13 tools: GetProgram, GetClass, GetFunctionGroup, GetFunction, GetStructure, GetTable, GetTableContents, GetPackage, GetTypeInfo, GetInclude, SearchObject, GetInterface, GetTransaction. MIT license."
+    },
+    {
+      "id": "mcp-calm-server",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "node",
+        "args": [
+          "packages/mcp-calm-server/dist/bin/stdio.js"
+        ]
+      },
+      "env_refs": [
+        "CALM_API_KEY",
+        "CALM_BASE_URL",
+        "CALM_MODE",
+        "CALM_UAA_CLIENT_ID",
+        "CALM_UAA_CLIENT_SECRET",
+        "CALM_UAA_URL"
+      ],
+      "description": "fr0ster/mcp-calm-server \u2014 SAP Cloud ALM MCP server. Exposes 54 tools covering all 9 Cloud ALM services."
+    },
+    {
+      "id": "mcp-integration-suite",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "node",
+        "args": [
+          "packages/mcp-integration-suite/dist/index.js"
+        ]
+      },
+      "env_refs": [
+        "API_BASE_URL",
+        "API_OAUTH_CLIENT_ID",
+        "API_OAUTH_CLIENT_SECRET",
+        "API_OAUTH_TOKEN_URL",
+        "API_PASS",
+        "API_USER",
+        "CPI_BASE_URL",
+        "CPI_OAUTH_CLIENT_ID",
+        "CPI_OAUTH_CLIENT_SECRET",
+        "CPI_OAUTH_TOKEN_URL"
+      ],
+      "description": "1nbuc/mcp-integration-suite \u2014 SAP Integration Suite API management (iFlow, package, message mapping, testing, monitoring). Requires S-User credentials or OAuth2 service key."
+    },
+    {
+      "id": "mcp-sap-gui-kts",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "python",
+        "args": [
+          "-m",
+          "mcp_sap_gui"
+        ]
+      },
+      "env_refs": [
+        "SAP_CONNECTION"
+      ],
+      "description": "SAP GUI MCP (kts982/mcp-sap-gui v0.1.3) \u2014 Python. Installed editable from packages/mcp-sap-gui-kts-code."
+    },
+    {
+      "id": "mcp-sap-notes",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "node",
+        "args": [
+          "dist/index.js"
+        ]
+      },
+      "env_refs": [
+        "SAP_NOTES_PASSWORD",
+        "SAP_NOTES_USERNAME"
+      ],
+      "description": "SAP Notes MCP \u2014 search and fetch SAP Notes from me.sap.com. Supports enriched metadata, correction details, ABAP object references. Archived repo \u2014 moved to marianfoo/sap-mcp-servers."
+    },
+    {
+      "id": "odata-mcp-go",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "odata-mcp-go",
+        "args": []
+      },
+      "env_refs": [],
+      "description": "OData MCP in Go (oisee/odata_mcp_go) - lightweight Go-based OData bridge. Low-latency alternative to Node.js OData MCPs. Use for high-throughput OData query scenarios."
+    },
+    {
+      "id": "odata-mcp-proxy",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "node",
+        "args": [
+          "dist/index.js"
+        ]
+      },
+      "env_refs": [],
+      "description": "SAP Cloud Integration OData MCP \u2014 32 entity sets: IntegrationPackages, IntegrationDesigntimeArtifacts, MessageProcessingLogs, DataStoreEntries, KeystoreEntries, UserCredentials, OAuth2ClientCredentials, Partners, etc. npm package. Config-driven OData\u2192MCP bridge. MIT license."
+    },
+    {
+      "id": "pinecone-rag",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "node",
+        "args": [
+          "dist/index.js"
+        ]
+      },
+      "env_refs": [
+        "PINECONE_API_KEY",
+        "PINECONE_ENVIRONMENT",
+        "PINECONE_INDEX"
+      ],
+      "description": "Pinecone Vector DB RAG connector. Pre-configured, ready by uncommenting .env vars."
+    },
+    {
+      "id": "plugin:cds-mcp:cds-mcp",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "plugin"
+      },
+      "env_refs": [],
+      "description": "SAP CAP CDS model search, documentation, code snippets"
+    },
+    {
+      "id": "plugin:mdk-mcp:mdk-mcp",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "plugin"
+      },
+      "env_refs": [],
+      "description": "SAP MDK (Mobile Development Kit) project creation, page/action/i18n generation, build/deploy"
+    },
+    {
+      "id": "plugin:sap-fiori-mcp-server:fiori-mcp",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "plugin"
+      },
+      "env_refs": [],
+      "description": "SAP Fiori app generation (CAP/RAP), OData metadata download, app modification, documentation search"
+    },
+    {
+      "id": "plugin:ui5:ui5-mcp-server",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "plugin"
+      },
+      "env_refs": [],
+      "description": "UI5/SAPUI5/OpenUI5 app creation, API reference, linter, manifest validation, TypeScript conversion"
+    },
+    {
+      "id": "sap-api-management",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "node",
+        "args": [
+          "dist/index.js"
+        ]
+      },
+      "env_refs": [
+        "APIM_HOST",
+        "APIM_PASSWORD",
+        "APIM_USER"
+      ],
+      "description": "SAP API Management MCP \u2014 API proxy lifecycle, policy deployment, security/traffic config, OpenAPI import, API Business Hub publication. Pre-configured for sap-api-policy skill."
+    },
+    {
+      "id": "sap-cpi",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "node",
+        "args": [
+          "dist/index.js"
+        ]
+      },
+      "env_refs": [
+        "CPI_HOST",
+        "CPI_PASSWORD",
+        "CPI_USER"
+      ],
+      "description": "SAP Cloud Integration (CPI) MCP \u2014 iFlow deploy/undeploy, message processing logs, trace logs, keystore, credentials, system status. Direct CPI tenant connection."
+    },
+    {
+      "id": "sap-gui-library-mcp",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "python",
+        "args": [
+          "-m",
+          "sap_gui_library_mcp"
+        ]
+      },
+      "env_refs": [
+        "SAPGUI_CLIENT",
+        "SAPGUI_HOST",
+        "SAPGUI_PASSWORD",
+        "SAPGUI_USER"
+      ],
+      "description": "sap-gui-library MCP \u2014 Python abstraction over SAP GUI Scripting COM API. pip install sap-gui-library. Requires SAP GUI 770+ with Accessibility Mode."
+    },
+    {
+      "id": "sap-gui-mcp-jduncan",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "python",
+        "args": [
+          "-m",
+          "sap_gui_mcp.server"
+        ]
+      },
+      "env_refs": [
+        "SAPGUI_CLIENT",
+        "SAPGUI_HOST",
+        "SAPGUI_PASSWORD",
+        "SAPGUI_USER"
+      ],
+      "description": "SAP GUI MCP (jduncan8142/sap_gui_mcp v0.1.0) \u2014 FastMCP-based, Python. Installed editable from packages/sap_gui_mcp."
+    },
+    {
+      "id": "sap-pi-mcp",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "node",
+        "args": [
+          "dist/index.js"
+        ]
+      },
+      "env_refs": [
+        "PI_HOST",
+        "PI_PASSWORD",
+        "PI_USER"
+      ],
+      "description": "SAP PI/PO MCP (lopezmas/sap-pi-mcp-server) - legacy PI/PO integration. Message monitoring, channel management, adapter engine. Use for PI/PO migrations to CPI or dual-stack landscapes."
+    },
+    {
+      "id": "sap-rfc-mcp-server",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "python",
+        "args": [
+          "-m",
+          "sap_rfc_mcp"
+        ]
+      },
+      "env_refs": [
+        "SAP_RFC_CLIENT",
+        "SAP_RFC_HOST",
+        "SAP_RFC_PASSWORD",
+        "SAP_RFC_USER"
+      ],
+      "description": "SAP RFC MCP server \u2014 ZROUTER dispatch via RFC. Default route for BAPI-based batch operations (MM, SD, FI, QM, PP, WM, CO, HCM, BASIS)."
+    },
+    {
+      "id": "sap-transport-mcp",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "node",
+        "args": [
+          "packages/sap-transport-mcp/dist/src/index.js"
+        ]
+      },
+      "env_refs": [
+        "AUTH_METHOD",
+        "DRY_RUN",
+        "LOG_LEVEL",
+        "SAP_CLIENT",
+        "SAP_HOSTNAME",
+        "SAP_LANGUAGE",
+        "SAP_PASSWORD",
+        "SAP_SYSNR",
+        "SAP_SYSTEM_ID",
+        "SAP_USERNAME"
+      ],
+      "description": "Nidhideep/sap-transport-mcp \u2014 CTS Transport Request management (list, inspect, release, delete) via SAP ADT REST API."
+    },
+    {
+      "id": "sapgui-mcp-go",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "sapgui-mcp",
+        "args": []
+      },
+      "env_refs": [
+        "SAPGUI_CLIENT",
+        "SAPGUI_HOST",
+        "SAPGUI_PASSWORD",
+        "SAPGUI_USER"
+      ],
+      "description": "SAP GUI MCP in Go (Hochfrequenz/sapgui.mcp v0.13.3) \u2014 TERTIARY fallback. Requires: go install github.com/Hochfrequenz/sapgui.mcp/cmd/sapgui-mcp@latest (when fixed upstream)."
+    },
+    {
+      "id": "sapgui-mcp-webgui",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "python",
+        "args": [
+          "-m",
+          "sapguimcp.server"
+        ]
+      },
+      "env_refs": [
+        "SAPGUI_MCP_CONFIG_PATH",
+        "SAP_SYSTEM"
+      ],
+      "description": "SAP GUI MCP WebGUI (Hochfrequenz/sapgui.mcp v0.13.4) \u2014 Chrome/Playwright browser automation for SAP Web GUI. Linux/Mac/Windows."
+    },
+    {
+      "id": "sapient-mcp",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "node",
+        "args": [
+          "dist/index.js"
+        ]
+      },
+      "env_refs": [
+        "SAPIENT_HOST",
+        "SAPIENT_KEY"
+      ],
+      "description": "Sapient MCP (toni-ramchandani/sapient-mcp) - SAP-focused AI agent with knowledge graph for faster lookups. Alternative orchestration path when speed priority over depth. Use when latency-critical: self-learn selects between sapient and zrouter paths based on MCP response times."
+    },
+    {
+      "id": "sapient-mcp-py",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "python",
+        "args": [
+          "-m",
+          "sapient_mcp"
+        ]
+      },
+      "env_refs": [
+        "SAPIENT_HOST",
+        "SAPIENT_KEY"
+      ],
+      "description": "Sapient MCP (toni-ramchandani/sapient-mcp v1.0.0) \u2014 Intelligent SAP GUI automation, RoboSAPiens-powered. Python."
+    },
+    {
+      "id": "sf-mcp",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "node",
+        "args": [
+          "dist/index.js"
+        ]
+      },
+      "env_refs": [
+        "SF_PASSWORD",
+        "SF_URL",
+        "SF_USERNAME"
+      ],
+      "description": "SuccessFactors OData MCP \u2014 HCM cloud operations: Employee data, org structure, compensation, time off. Route prefix: sf_* actions."
+    },
+    {
+      "id": "supabase-rag",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "node",
+        "args": [
+          "dist/index.js"
+        ]
+      },
+      "env_refs": [
+        "SUPABASE_SERVICE_KEY",
+        "SUPABASE_URL"
+      ],
+      "description": "Supabase pgvector RAG connector. Alternative to Pinecone. Pre-configured."
+    },
+    {
+      "id": "vibing-steampunk",
+      "status": "disabled_candidate",
+      "reason": "Retained fallback; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": "npx",
+        "args": [
+          "-y",
+          "@vibing/steampunk-mcp"
+        ]
+      },
+      "env_refs": [
+        "SAP_SYSTEMS",
+        "STEAMPUNK_MODE"
+      ],
+      "description": "vibing-steampunk MCP \u2014 ADT-to-MCP bridge in Go, 257+ stars, 147 MCP tools, hyperfocused single-tool mode (~200 tokens). Covers debug/deploy/analyze ABAP, package health, dead code detection, ABAP LSP, WebSocket RFC handler."
+    }
+  ]
+}

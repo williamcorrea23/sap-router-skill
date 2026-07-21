@@ -1,0 +1,610 @@
+#!/usr/bin/env python3
+
+import unittest
+from unittest.mock import Mock, patch
+from requests.exceptions import ConnectionError, ReadTimeout
+
+import sap.adt
+import sap.adt.errors
+import sap.http
+import sap.rest.errors
+
+from mock import Request, Response, Connection
+
+from fixtures_adt import ERROR_XML_PACKAGE_ALREADY_EXISTS, DISCOVERY_ADT_XML
+
+
+class TestADTErrorHandler(unittest.TestCase):
+
+    def test_without_content_type(self):
+        client = Mock()
+        req = Mock()
+
+        res = Mock()
+        res.status_code = 500
+        res.headers = {}
+        res.text = 'arbitrary crash'
+
+        # shall not raise
+        sap.adt.core._adt_http_error_handler(client, req, res)
+        self.assertTrue(True)
+
+    def test_without_content_type_xml(self):
+        client = Mock()
+        req = Mock()
+
+        res = Mock()
+        res.status_code = 500
+        res.headers = {'content-type': 'application/json'}
+        res.text = 'arbitrary crash'
+
+        # shall not raise
+        sap.adt.core._adt_http_error_handler(client, req, res)
+        self.assertTrue(True)
+
+    @patch('sap.adt.core.new_adt_error_from_xml')
+    def test_with_content_type(self, fake_new_adt_error_from_xml):
+        client = Mock()
+        req = Mock()
+
+        res = Mock()
+        res.status_code = 500
+        res.headers = {'content-type': 'application/xml'}
+        res.text = 'standard ADT error'
+
+        expected_error = sap.adt.errors.ADTError('com.sap.adt', 'ADHOC', 'Parsed ADT error')
+        fake_new_adt_error_from_xml.return_value = expected_error
+
+        with self.assertRaises(sap.adt.errors.ADTError) as cm:
+            sap.adt.core._adt_http_error_handler(client, req, res)
+
+        self.assertTrue(fake_new_adt_error_from_xml.called)
+        self.assertIs(cm.exception, expected_error)
+
+    @patch('sap.adt.core.new_adt_error_from_xml')
+    def test_with_content_type_and_charset(self, fake_new_adt_error_from_xml):
+        client = Mock()
+        req = Mock()
+
+        res = Mock()
+        res.status_code = 500
+        res.headers = {'content-type': 'application/xml; charset=utf-8'}
+        res.text = 'standard ADT error'
+
+        expected_error = sap.adt.errors.ADTError('com.sap.adt', 'ADHOC', 'Parsed ADT error')
+        fake_new_adt_error_from_xml.return_value = expected_error
+
+        with self.assertRaises(sap.adt.errors.ADTError) as cm:
+            sap.adt.core._adt_http_error_handler(client, req, res)
+
+        self.assertTrue(fake_new_adt_error_from_xml.called)
+        self.assertIs(cm.exception, expected_error)
+
+
+class TestADTConnection(unittest.TestCase):
+    """Connection(host, client, user, password, port=None, ssl=True)"""
+
+    def setUp(self):
+        self.connection = sap.adt.Connection('example.host.org', '123', 'SAP*', 'PASS')
+
+    def test_adt_connection_init_default(self):
+        connection = sap.adt.Connection('localhost', '357', 'anzeiger', 'password')
+
+        self.assertEqual(connection.user, 'anzeiger')
+        self.assertEqual(connection.uri, 'sap/bc/adt')
+        self.assertEqual(connection._http_client.host, 'localhost')
+        self.assertEqual(connection._http_client.port, '443')
+        self.assertEqual(connection._http_client.ssl, True)
+        self.assertEqual(connection._http_client.client, '357')
+
+    def test_adt_connection_init_no_ssl(self):
+        connection = sap.adt.Connection('localhost', '357', 'anzeiger', 'password', ssl=False)
+
+        self.assertEqual(connection._http_client.host, 'localhost')
+        self.assertEqual(connection._http_client.port, '80')
+        self.assertEqual(connection._http_client.ssl, False)
+
+    def test_adt_connection_init_ssl_own_port(self):
+        connection = sap.adt.Connection('localhost', '357', 'anzeiger', 'password', port=44300)
+
+        self.assertEqual(connection._http_client.host, 'localhost')
+        self.assertEqual(connection._http_client.port, 44300)
+        self.assertEqual(connection._http_client.ssl, True)
+
+    def test_adt_connection_init_no_ssl_own_port(self):
+        connection = sap.adt.Connection('localhost', '357', 'anzeiger', 'password', ssl=False, port=8000)
+
+        self.assertEqual(connection._http_client.host, 'localhost')
+        self.assertEqual(connection._http_client.port, 8000)
+        self.assertEqual(connection._http_client.ssl, False)
+
+    def test_handle_http_error_adt_exception(self):
+        req = Mock()
+
+        res = Mock()
+        res.status_code = 500
+        res.headers = {'content-type': 'application/xml'}
+        res.text = ERROR_XML_PACKAGE_ALREADY_EXISTS
+
+        with self.assertRaises(sap.adt.errors.ADTError):
+            self.connection._http_client.handle_http_error(req, res)
+
+    def test_handle_http_error_random_xml(self):
+        req = Mock()
+
+        res = Mock()
+        res.status_code = 500
+        res.headers = {'content-type': 'application/xml'}
+        res.text = '<?xml version="1.0" encoding="utf-8"><error>random failure</error>'
+
+        with self.assertRaises(sap.http.HTTPRequestError):
+            self.connection._http_client.handle_http_error(req, res)
+
+    def test_handle_http_error_plain_text(self):
+        req = Mock()
+
+        res = Mock()
+        res.status_code = 500
+        res.headers = {'content-type': 'plain/text'}
+        res.text = 'arbitrary crash'
+
+        with self.assertRaises(sap.http.HTTPRequestError):
+            self.connection._http_client.handle_http_error(req, res)
+
+    def test_handle_http_error_unauthorized(self):
+        req = Mock()
+
+        res = Mock()
+        res.status_code = 401
+        res.headers = {'content-type': 'plain/text'}
+        res.text = 'arbitrary crash'
+
+        with self.assertRaises(sap.http.UnauthorizedError):
+            self.connection._http_client.handle_http_error(req, res)
+
+    @patch('sap.adt.core.Connection._build_adt_url', return_value='url')
+    @patch('sap.adt.core.Connection._get_session', return_value='session')
+    @patch('sap.http.HTTPClient.execute_with_session')
+    def test_execute_content_type_no_headers(self, mock_exec, mock_session, mock_adt_url):
+        self.connection.execute('GET', 'url', content_type='application/xml')
+
+        mock_exec.assert_called_once_with('session', 'GET', 'url',
+                                          params=None,
+                                          headers={'Content-Type': 'application/xml'},
+                                          body=None)
+
+    @patch('sap.adt.core.Connection._build_adt_url', return_value='url')
+    @patch('sap.adt.core.Connection._get_session', return_value='session')
+    @patch('sap.http.HTTPClient.execute_with_session')
+    def test_execute_content_type_with_headers(self, mock_exec, mock_session, mock_adt_url):
+        self.connection.execute('GET', 'example',
+                                headers={'Content-Type': 'text/plain'},
+                                content_type='application/xml')
+
+        mock_exec.assert_called_once_with('session', 'GET', 'url',
+                                          params=None,
+                                          headers={'Content-Type': 'application/xml'},
+                                          body=None)
+
+    @patch('sap.adt.core.Connection._build_adt_url', return_value='url')
+    @patch('sap.adt.core.Connection._get_session', return_value='session')
+    @patch('sap.http.HTTPClient.execute_with_session')
+    def test_execute_accept_no_headers(self, mock_exec, mock_session, mock_adt_url):
+        mock_exec.return_value = Mock()
+        mock_exec.return_value.headers = {'Content-Type': 'application/xml'}
+
+        self.connection.execute('GET', 'example',
+                                accept='application/xml')
+
+        mock_exec.assert_called_once_with('session', 'GET', 'url',
+                                          params=None,
+                                          headers={'Accept': 'application/xml'},
+                                          body=None)
+
+    @patch('sap.adt.core.Connection._build_adt_url', return_value='url')
+    @patch('sap.adt.core.Connection._get_session', return_value='session')
+    @patch('sap.http.HTTPClient.execute_with_session')
+    def test_execute_accept_with_headers(self, mock_exec, mock_session, mock_adt_url):
+        mock_exec.return_value = Mock()
+        mock_exec.return_value.headers = {'Content-Type': 'application/xml'}
+
+        self.connection.execute('GET', 'example',
+                                headers={'Accept': 'text/plain'},
+                                accept='application/xml')
+
+        mock_exec.assert_called_once_with('session', 'GET', 'url',
+                                          params=None,
+                                          headers={'Accept': 'application/xml'},
+                                          body=None)
+
+    @patch('sap.adt.core.Connection._build_adt_url', return_value='url')
+    @patch('sap.adt.core.Connection._get_session', return_value='session')
+    @patch('sap.http.HTTPClient.execute_with_session')
+    def test_execute_content_type_and_accept(self, mock_exec, mock_session, mock_adt_url):
+        mock_exec.return_value = Mock()
+        mock_exec.return_value.headers = {'Content-Type': 'application/xml'}
+
+        self.connection.execute('GET', 'example',
+                                content_type='application/json',
+                                accept='application/xml')
+
+        mock_exec.assert_called_once_with('session', 'GET', 'url',
+                                          params=None,
+                                          headers={'Accept': 'application/xml',
+                                                   'Content-Type': 'application/json'},
+                                          body=None)
+
+    @patch('sap.adt.core.Connection._build_adt_url', return_value='url')
+    @patch('sap.adt.core.Connection._get_session', return_value='session')
+    @patch('sap.http.HTTPClient.execute_with_session')
+    def test_execute_content_type_and_accept_with_headers(self, mock_exec, mock_session, mock_adt_url):
+        mock_exec.return_value = Mock()
+        mock_exec.return_value.headers = {'Content-Type': 'application/xml'}
+
+        self.connection.execute('GET', 'example',
+                                headers={'Accept': 'text/plain',
+                                         'Content-Type': 'text/plain'},
+                                content_type='application/json',
+                                accept='application/xml')
+
+        mock_exec.assert_called_once_with('session', 'GET', 'url',
+                                          params=None,
+                                          headers={'Accept': 'application/xml',
+                                                   'Content-Type': 'application/json'},
+                                          body=None)
+
+    @patch('sap.adt.core.Connection._build_adt_url', return_value='url')
+    @patch('sap.adt.core.Connection._get_session', return_value='session')
+    @patch('sap.http.HTTPClient.execute_with_session')
+    def test_execute_accept_list(self, mock_exec, mock_session, mock_adt_url):
+        mock_exec.return_value = Mock()
+        mock_exec.return_value.headers = {'Content-Type': 'application/json'}
+
+        self.connection.execute('GET', 'example',
+                                accept=['application/xml', 'application/json'])
+
+        mock_exec.assert_called_once_with('session', 'GET', 'url',
+                                          params=None,
+                                          headers={'Accept': 'application/xml, application/json'},
+                                          body=None)
+
+    @patch('sap.adt.core.Connection._build_adt_url', return_value='url')
+    @patch('sap.adt.core.Connection._get_session', return_value='session')
+    @patch('sap.http.HTTPClient.execute_with_session')
+    def test_execute_accept_unmatched_string(self, mock_exec, mock_session, mock_adt_url):
+        mock_exec.return_value = Mock()
+        mock_exec.return_value.headers = {'Content-Type': 'application/json'}
+        mock_exec.return_value.text = 'mock'
+
+        with self.assertRaises(sap.http.UnexpectedResponseContent) as caught:
+            self.connection.execute('GET', 'example',
+                                    accept='application/xml')
+
+        self.assertEqual(str(caught.exception),
+                         'Unexpected Content-Type: application/json with: mock')
+
+    @patch('sap.adt.core.Connection._build_adt_url', return_value='url')
+    @patch('sap.adt.core.Connection._get_session', return_value='session')
+    @patch('sap.http.HTTPClient.execute_with_session')
+    def test_execute_accept_unmatched_list(self, mock_exec, mock_session, mock_adt_url):
+        mock_exec.return_value = Mock()
+        mock_exec.return_value.headers = {'Content-Type': 'text/plain'}
+        mock_exec.return_value.text = 'mock'
+
+        with self.assertRaises(sap.http.UnexpectedResponseContent) as caught:
+            self.connection.execute('GET', 'example',
+                                    accept=['application/xml', 'application/json'])
+
+        self.assertEqual(str(caught.exception),
+                         'Unexpected Content-Type: text/plain with: mock')
+
+
+    @patch('sap.adt.core.Connection.execute')
+    def test_property_collection_init(self, mock_exec):
+        mock_exec.return_value = Mock()
+        mock_exec.return_value.headers = {'Content-Type': 'application/xml'}
+        mock_exec.return_value.text = DISCOVERY_ADT_XML
+
+        self.assertIsNone(self.connection._collection_types)
+
+        collection_types = self.connection.collection_types
+
+        self.assertIsNotNone(collection_types)
+        self.assertIsNotNone(self.connection._collection_types)
+
+        self.assertEqual(list(self.connection.collection_types.keys()), [
+              '/sap/bc/adt/bopf/businessobjects',
+              '/sap/bc/adt/packages',
+              '/sap/bc/adt/functions/groups/{groupname}/fmodules',
+              '/sap/bc/adt/functions/groups/{groupname}/includes',
+              '/sap/bc/adt/functions/groups',
+              '/sap/bc/adt/ddic/ddl/formatter/identifiers',
+              '/sap/bc/adt/sadl/gw/mde',
+              '/sap/bc/adt/quickfixes/evaluation',
+              '/sap/bc/adt/wdy/views',
+              '/sap/bc/adt/stub/test_accept',
+        ])
+
+        mime_stub_empty = self.connection.collection_types.get('/sap/bc/adt/stub/test_empty')
+        self.assertIsNone(mime_stub_empty)
+
+        mime_stub_accept = self.connection.collection_types.get('/sap/bc/adt/stub/test_accept')
+        self.assertEqual(mime_stub_accept, ['application/sapcli.test'])
+
+    def test_property_collection_cache(self):
+        fake_value = Mock()
+        self.connection._collection_types = fake_value
+        collection_types = self.connection.collection_types
+        self.assertEqual(collection_types, fake_value)
+
+    def test_new_session_clears_existing_session(self):
+        """new_session() drops the cached HTTP session so the next request
+        forces a fresh handshake (login + CSRF token)."""
+        self.connection._session = Mock()
+
+        self.connection.new_session()
+
+        self.assertIsNone(self.connection._session)
+
+    def test_new_session_when_no_session_is_noop(self):
+        """new_session() is safe to call even when no session was built yet."""
+        self.assertIsNone(self.connection._session)
+
+        self.connection.new_session()
+
+        self.assertIsNone(self.connection._session)
+
+    @patch('sap.adt.core._get_collection_accepts')
+    @patch('sap.http.HTTPClient.retrieve')
+    def test_new_session_forces_new_session_on_next_execute(self, fake_retrieve, fake_accepts):
+        """After new_session() the next execute must build a brand new session."""
+        dummy_conn = Connection(responses=[
+            Response(status_code=200, headers={'x-csrf-token': 'first'}),
+            Response(status_code=200, headers={'x-csrf-token': 'second'}),
+            Response(status_code=200, text='first-call'),
+            Response(status_code=200, headers={'x-csrf-token': 'third'}),
+            Response(status_code=200, headers={'x-csrf-token': 'fourth'}),
+            Response(status_code=200, text='second-call'),
+        ])
+
+        fake_retrieve.side_effect = dummy_conn._retrieve
+
+        first = self.connection.execute('GET', 'test')
+        session_after_first = self.connection._session
+        self.assertIsNotNone(session_after_first)
+        self.assertEqual(first.text, 'first-call')
+
+        self.connection.new_session()
+        self.assertIsNone(self.connection._session)
+
+        second = self.connection.execute('GET', 'test')
+        self.assertEqual(second.text, 'second-call')
+        # A new session object was constructed.
+        self.assertIsNotNone(self.connection._session)
+        self.assertIsNot(self.connection._session, session_after_first)
+
+
+    @patch('sap.adt.core.Connection.execute')
+    def test_parse_collection_accept(self, mock_exec):
+        mock_exec.return_value = Mock()
+        mock_exec.return_value.headers = {'Content-Type': 'application/xml'}
+        mock_exec.return_value.text = DISCOVERY_ADT_XML
+
+        results = {
+            'bopf/businessobjects': ['application/vnd.sap.ap.adt.bopf.businessobjects.v4+xml',
+                                     'application/vnd.sap.ap.adt.bopf.businessobjects.v2+xml',
+                                     'application/vnd.sap.ap.adt.bopf.businessobjects.v3+xml'],
+            'bopf/businessobjects/$validation': ['foo/mock+bopf/businessobjects/$validation'],
+            'packages': ['application/vnd.sap.adt.packages.v1+xml'],
+            'functions/groups': ['application/vnd.sap.adt.functions.groups.v2+xml'],
+            'functions/groups/{groupname}/fmodules': ['application/vnd.sap.adt.functions.fmodules.v3+xml'],
+            'functions/groups/{groupname}/includes': ['application/vnd.sap.adt.functions.fincludes.v2+xml'],
+            'ddic/ddl/formatter/identifiers': ['text/plain'],
+            'sadl/gw/mde': ['application/xml'],
+            'quickfixes/evaluation': ['application/vnd.sap.adt.quickfixes.evaluation+xml;version=1.0.0'],
+            'wdy/views': ['application/vnd.sap.adt.wdy.view+xml',
+                          'application/vnd.sap.adt.wdy.view.v1+xml']
+        }
+
+        for basepath, exp_mimetypes in results.items():
+            mimetype = f'foo/mock+{basepath}'
+
+            act_types = self.connection.get_collection_types(basepath, mimetype)
+            self.assertEqual(act_types, exp_mimetypes)
+
+    @patch('sap.adt.core._get_collection_accepts')
+    @patch('sap.http.HTTPClient.retrieve')
+    def test_execute_session_new(self, fake_retrieve, fake_accepts):
+        dummy_conn = Connection(responses=[
+            Response(status_code=200, headers={'x-csrf-token': 'first'}),
+            Response(status_code=200, headers={'x-csrf-token': 'second'}),
+            Response(status_code=200, text='success')
+        ])
+
+        fake_retrieve.side_effect = dummy_conn._retrieve
+
+        resp = self.connection.execute('GET', 'test')
+
+        self.assertEqual(resp.text, 'success')
+
+    @patch('sap.adt.core._get_collection_accepts')
+    @patch('sap.http.HTTPClient.retrieve')
+    def test_execute_session_new_forbidden(self, fake_retrieve, fake_accepts):
+        dummy_conn = Connection(responses=[
+            Response(text='''<?xml version="1.0" encoding="utf-8"?><mock type=test/>''',
+                     status_code=403,
+                     content_type='application/xml')
+        ])
+
+        fake_retrieve.side_effect = dummy_conn._retrieve
+
+        with self.assertRaises(sap.http.HTTPRequestError):
+            self.connection.execute('GET', 'test')
+
+    @patch('sap.adt.core._get_collection_accepts')
+    @patch('sap.http.HTTPClient.retrieve')
+    def test_execute_session_refetch_csfr(self, fake_retrieve, fake_accepts):
+        dummy_conn = Connection(responses=[
+            Response(status_code=200, headers={'x-csrf-token': 'first'}),
+            Response(status_code=200, headers={'x-csrf-token': 'second'}),
+            Response(text='''<?xml version="1.0" encoding="utf-8"?><mock type=test/>''',
+                     status_code=403,
+                     content_type='application/xml'),
+            Response(status_code=200, headers={'x-csrf-token': 'third'}),
+            Response(status_code=200, text='success')
+        ])
+
+        fake_retrieve.side_effect = dummy_conn._retrieve
+
+        resp = self.connection.execute('GET', 'test')
+        self.assertEqual(resp.text, 'success')
+
+    @patch('sap.adt.core._get_collection_accepts')
+    @patch('sap.http.HTTPClient.retrieve')
+    def test_execute_session_refetch_csfr_headers(self, fake_retrieve, fake_accepts):
+        dummy_conn = Connection(responses=[
+            Response(status_code=200, headers={'x-csrf-token': 'first'}),
+            Response(status_code=200, headers={'x-csrf-token': 'second'}),
+            Response(text='''<?xml version="1.0" encoding="utf-8"?><mock type=test/>''',
+                     status_code=403,
+                     content_type='application/xml'),
+            Response(status_code=200, headers={'x-csrf-token': 'third'}),
+            Response(status_code=200, text='success')
+        ])
+
+        fake_retrieve.side_effect = dummy_conn._retrieve
+
+        resp = self.connection.execute('GET', 'test', headers={'awesome': 'fabulous'})
+        self.assertEqual(resp.text, 'success')
+
+    @patch('sap.http.requests.Request')
+    def test_protocol_error(self, _):
+        session = Mock()
+        session.send.side_effect = ConnectionError('Remote end closed connection without response')
+
+        with self.assertRaises(sap.adt.errors.ADTConnectionError) as cm:
+            self.connection._http_client.retrieve(session, 'method', 'url')
+
+        self.assertEqual(str(cm.exception),
+                         f'ADT Connection error: [HOST:"{self.connection._http_client.host}", '
+                         f'PORT:"{self.connection._http_client.port}", '
+                         f'SSL:"{self.connection._http_client.ssl}"] Error: '
+                         f'Remote end closed connection without response')
+
+    @patch('sap.http.requests.Request')
+    def test_dns_error(self, _):
+        session = Mock()
+        session.send.side_effect = ConnectionError('[Errno -5] Dummy name resolution error.')
+
+        with self.assertRaises(sap.adt.errors.ADTConnectionError) as cm:
+            self.connection._http_client.retrieve(session, 'method', 'url')
+
+        self.assertEqual(str(cm.exception),
+                         f'ADT Connection error: [HOST:"{self.connection._http_client.host}", '
+                         f'PORT:"{self.connection._http_client.port}", '
+                         f'SSL:"{self.connection._http_client.ssl}"] Error: '
+                         f'Name resolution error. Check the HOST configuration.')
+
+    @patch('sap.http.requests.Request')
+    def test_connection_error(self, _):
+        session = Mock()
+        session.send.side_effect = ConnectionError('[Errno 111] Dummy connection error.')
+
+        with self.assertRaises(sap.adt.errors.ADTConnectionError) as cm:
+            self.connection._http_client.retrieve(session, 'method', 'url')
+
+        self.assertEqual(str(cm.exception),
+                         f'ADT Connection error: [HOST:"{self.connection._http_client.host}", '
+                         f'PORT:"{self.connection._http_client.port}", '
+                         f'SSL:"{self.connection._http_client.ssl}"] Error: '
+                         f'Cannot connect to the system. Check the HOST and PORT configuration.')
+
+    @patch('sap.http.requests.Request')
+    def test_read_timeout(self, _):
+        session = Mock()
+        session.send.side_effect = ReadTimeout('HTTPSConnectionPool read timed out')
+
+        with self.assertRaises(sap.http.TimedOutRequestError) as cm:
+            self.connection._http_client.retrieve(session, 'method', 'url')
+
+        self.assertIn('took more than', str(cm.exception))
+
+
+class TestADTConnectionGetText(unittest.TestCase):
+
+    def test_get_text_default_accept_is_text_plain(self):
+        connection = Connection([Response(status_code=200, text='source code')])
+
+        result = connection.get_text('some/uri')
+
+        self.assertEqual(result, 'source code')
+        self.assertEqual(connection.execs[0].headers['Accept'], 'text/plain')
+
+    def test_get_text_custom_accept(self):
+        connection = Connection([Response(status_code=200, text='{"key":"value"}')])
+
+        result = connection.get_text('some/uri', accept='application/json')
+
+        self.assertEqual(result, '{"key":"value"}')
+        self.assertEqual(connection.execs[0].headers['Accept'], 'application/json')
+
+
+class TestADTConnectionSSLServerCert(unittest.TestCase):
+    """Test ssl_server_cert parameter wiring in ADT Connection."""
+
+    def test_ssl_server_cert_default_none(self):
+        connection = sap.adt.Connection('localhost', '357', 'user', 'pass')
+        self.assertIsNone(connection._http_client.ssl_server_cert)
+
+    def test_ssl_server_cert_stored(self):
+        connection = sap.adt.Connection('localhost', '357', 'user', 'pass',
+                                        ssl_server_cert='/path/to/ca.pem')
+        self.assertEqual(connection._http_client.ssl_server_cert, '/path/to/ca.pem')
+
+    @patch('sap.adt.core.Connection._build_adt_url', return_value='url')
+    @patch('sap.http.HTTPClient.execute_with_session')
+    def test_ssl_server_cert_sets_session_verify(self, mock_exec, mock_url):
+        """When ssl_server_cert is set, session.verify is the cert path."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.headers = {'x-csrf-token': 'token123'}
+        mock_response.text = DISCOVERY_ADT_XML
+        mock_exec.return_value = mock_response
+
+        connection = sap.adt.Connection('localhost', '357', 'user', 'pass',
+                                        ssl_server_cert='/path/to/ca.pem')
+        session = connection._get_session()
+        self.assertEqual(session.verify, '/path/to/ca.pem')
+
+    @patch('sap.adt.core.Connection._build_adt_url', return_value='url')
+    @patch('sap.http.HTTPClient.execute_with_session')
+    def test_ssl_server_cert_none_verify_true(self, mock_exec, mock_url):
+        """Without ssl_server_cert, session.verify defaults to True."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.headers = {'x-csrf-token': 'token123'}
+        mock_response.text = DISCOVERY_ADT_XML
+        mock_exec.return_value = mock_response
+
+        connection = sap.adt.Connection('localhost', '357', 'user', 'pass')
+        session = connection._get_session()
+        self.assertTrue(session.verify)
+
+    @patch('sap.adt.core.Connection._build_adt_url', return_value='url')
+    @patch('sap.http.HTTPClient.execute_with_session')
+    def test_ssl_server_cert_takes_precedence_over_verify_false(self, mock_exec, mock_url):
+        """ssl_server_cert takes precedence over verify=False."""
+        mock_response = Mock()
+        mock_response.status_code = 200
+        mock_response.headers = {'x-csrf-token': 'token123'}
+        mock_response.text = DISCOVERY_ADT_XML
+        mock_exec.return_value = mock_response
+
+        connection = sap.adt.Connection('localhost', '357', 'user', 'pass',
+                                        verify=False, ssl_server_cert='/path/to/ca.pem')
+        session = connection._get_session()
+        self.assertEqual(session.verify, '/path/to/ca.pem')
+
+
+if __name__ == '__main__':
+    unittest.main()

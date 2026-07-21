@@ -1,0 +1,90 @@
+import { getVariantConfig } from "./variant.js";
+
+const variant = getVariantConfig();
+
+// Central configuration for search system
+export const CONFIG = {
+  // Default number of results to return (50 is optimal for comprehensive coverage)
+  RETURN_K: Number(process.env.RETURN_K || 50),
+  
+  // Database paths
+  DB_PATH: "dist/data/docs.sqlite",
+  METADATA_PATH: process.env.METADATA_PATH || variant.metadataPath || "src/metadata.json",
+  
+  // Search behavior
+  USE_OR_LOGIC: true, // Use OR logic for better recall in BM25-only mode
+  
+  // Excerpt lengths for different search types
+  EXCERPT_LENGTH_MAIN: 400,    // Main search results excerpt length
+  EXCERPT_LENGTH_COMMUNITY: 1000, // Community search results excerpt length
+  
+  // Maximum content length for SAP Help and Community full content retrieval
+  // Limits help prevent token overflow and keep responses manageable (~18,750 tokens)
+  MAX_CONTENT_LENGTH: 75000,  // 75,000 characters
+
+  // ---------------------------------------------------------------------------
+  // Software Heroes API Configuration
+  // ---------------------------------------------------------------------------
+  
+  // Client identifier sent in headers (User-Agent and X-Client)
+  SOFTWARE_HEROES_CLIENT: process.env.SOFTWARE_HEROES_CLIENT || "ABAPMCPSERVER",
+  
+  // Request timeout in milliseconds (default: 10 seconds)
+  SOFTWARE_HEROES_TIMEOUT_MS: Number(process.env.SOFTWARE_HEROES_TIMEOUT_MS || 10000),
+  
+  // Cache TTL in milliseconds (default: 24 hours = 86400000ms)
+  // Cache is in-server (process-local) and resets on restart/deploy
+  SOFTWARE_HEROES_CACHE_TTL_MS: Number(process.env.SOFTWARE_HEROES_CACHE_TTL_MS || 86400000),
+
+  // Disk cache path for the ABAP Feature Matrix (survives server restarts)
+  SOFTWARE_HEROES_AFM_CACHE_PATH: process.env.SOFTWARE_HEROES_AFM_CACHE_PATH || "dist/data/abap-feature-matrix.json",
+
+  // ---------------------------------------------------------------------------
+  // SAP Released Objects Configuration
+  // ---------------------------------------------------------------------------
+
+  // In-memory cache TTL in milliseconds (default: 24 hours)
+  SAP_RELEASED_OBJECTS_CACHE_TTL_MS: Number(process.env.SAP_RELEASED_OBJECTS_CACHE_TTL_MS || 86400000),
+
+  // ---------------------------------------------------------------------------
+  // SAP Discovery Center Configuration
+  // ---------------------------------------------------------------------------
+
+  // Request timeout in milliseconds (default: 15 seconds)
+  DISCOVERY_CENTER_TIMEOUT_MS: Number(process.env.DISCOVERY_CENTER_TIMEOUT_MS || 15000),
+
+  // Cache TTL in milliseconds (default: 1 hour)
+  DISCOVERY_CENTER_CACHE_TTL_MS: Number(process.env.DISCOVERY_CENTER_CACHE_TTL_MS || 3600000),
+
+  // ---------------------------------------------------------------------------
+  // Hybrid Search (BM25 + Embeddings) Configuration
+  // ---------------------------------------------------------------------------
+
+  // RRF weight for semantic (embedding) results (default: 0.7)
+  // Lower than offline BM25 weight (1.0) so BM25 precision is preserved
+  EMBEDDING_WEIGHT: Number(process.env.EMBEDDING_WEIGHT || 0.7),
+
+  // Directory where the embedding model is cached (gitignored, in-project)
+  MODELS_DIR: process.env.MODELS_DIR || "dist/models",
+
+  // Preload the embedding model at startup. Disable this for FTS-only builds
+  // where dist/data/docs.sqlite intentionally has no embeddings table.
+  PRELOAD_EMBEDDINGS: process.env.MCP_PRELOAD_EMBEDDINGS !== "false",
+
+  // ---------------------------------------------------------------------------
+  // UI5 Lib Diff Configuration
+  // ---------------------------------------------------------------------------
+
+  // Cache TTL in milliseconds (default: 24 hours)
+  UI5_LIB_DIFF_CACHE_TTL_MS: Number(process.env.UI5_LIB_DIFF_CACHE_TTL_MS || 86400000),
+
+  // Local all-changes bundle consumed by ui5_version_diff at runtime.
+  UI5_LIB_DIFF_BUNDLE_PATH: process.env.UI5_LIB_DIFF_BUNDLE_PATH || "dist/data/ui5-lib-diff/all-changes.json",
+
+  // Setup-time source URL for downloading the local all-changes bundle.
+  // The runtime tool does not fetch this URL; it only reads UI5_LIB_DIFF_BUNDLE_PATH.
+  UI5_LIB_DIFF_DOWNLOAD_URL: process.env.UI5_LIB_DIFF_DOWNLOAD_URL || "https://ui5-lib-diff.marianzeis.de/api/v1/all-changes.json",
+
+  // Human-facing UI route returned in tool metadata for inspection.
+  UI5_LIB_DIFF_APP_BASE_URL: process.env.UI5_LIB_DIFF_APP_BASE_URL || "https://ui5-lib-diff.marianzeis.de",
+};

@@ -1,0 +1,322 @@
+{
+  "name": "sapstack-vscode",
+  "displayName": "sapstack for VS Code",
+  "description": "SAP operations advisory — Evidence Loop session manager + 14 modules, 9 agents, 10+ commands",
+  "version": "2.4.0",
+  "publisher": "BoxLogoDev",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BoxLogoDev/sapstack",
+    "directory": "extension"
+  },
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Other",
+    "Education",
+    "Machine Learning",
+    "Notebooks"
+  ],
+  "keywords": [
+    "sap",
+    "abap",
+    "s4hana",
+    "claude",
+    "copilot",
+    "korean",
+    "evidence-loop",
+    "session-manager",
+    "operator-workflow"
+  ],
+  "activationEvents": [
+    "onLanguage:abap",
+    "workspaceContains:.sapstack/config.yaml",
+    "workspaceContains:.sapstack/sessions/**/state.yaml",
+    "workspaceContains:plugins/sap-*/skills/**/SKILL.md",
+    "onCommand:sapstack.session.start",
+    "onCommand:sapstack.session.resume"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "sapstack.session.start",
+        "title": "sapstack: Start new Evidence Loop session",
+        "category": "sapstack",
+        "icon": "$(play)"
+      },
+      {
+        "command": "sapstack.session.resume",
+        "title": "sapstack: Resume existing session",
+        "category": "sapstack",
+        "icon": "$(debug-continue)"
+      },
+      {
+        "command": "sapstack.session.viewEvidence",
+        "title": "sapstack: View session evidence bundle",
+        "category": "sapstack",
+        "icon": "$(file-binary)"
+      },
+      {
+        "command": "sapstack.session.addEvidence",
+        "title": "sapstack: Add evidence to current session",
+        "category": "sapstack",
+        "icon": "$(add)"
+      },
+      {
+        "command": "sapstack.session.nextTurn",
+        "title": "sapstack: Run next turn (Hypothesis / Verify)",
+        "category": "sapstack",
+        "icon": "$(arrow-right)"
+      },
+      {
+        "command": "sapstack.session.showFollowup",
+        "title": "sapstack: Show pending Follow-up Request as checklist",
+        "category": "sapstack",
+        "icon": "$(checklist)"
+      },
+      {
+        "command": "sapstack.session.showVerdict",
+        "title": "sapstack: Show latest Verdict with Fix/Rollback",
+        "category": "sapstack",
+        "icon": "$(verified)"
+      },
+      {
+        "command": "sapstack.session.handoff",
+        "title": "sapstack: Handoff session to another surface",
+        "category": "sapstack",
+        "icon": "$(arrow-swap)"
+      },
+      {
+        "command": "sapstack.session.exportBundle",
+        "title": "sapstack: Export session for sharing",
+        "category": "sapstack",
+        "icon": "$(package)"
+      },
+      {
+        "command": "sapstack.session.openInWeb",
+        "title": "sapstack: Open current session in web viewer",
+        "category": "sapstack",
+        "icon": "$(globe)"
+      },
+      {
+        "command": "sapstack.resolveNote",
+        "title": "sapstack: Resolve SAP Note by keyword",
+        "category": "sapstack"
+      },
+      {
+        "command": "sapstack.checkTcode",
+        "title": "sapstack: Verify T-code",
+        "category": "sapstack"
+      },
+      {
+        "command": "sapstack.listPlugins",
+        "title": "sapstack: List all plugin modules",
+        "category": "sapstack"
+      },
+      {
+        "command": "sapstack.runQualityGates",
+        "title": "sapstack: Run quality gates",
+        "category": "sapstack"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "sapstack",
+          "title": "sapstack",
+          "icon": "$(tools)"
+        }
+      ]
+    },
+    "views": {
+      "sapstack": [
+        {
+          "id": "sapstack.sessions",
+          "name": "Active Sessions",
+          "icon": "$(notebook)",
+          "contextualTitle": "sapstack Sessions"
+        },
+        {
+          "id": "sapstack.followups",
+          "name": "Pending Follow-ups",
+          "icon": "$(checklist)",
+          "contextualTitle": "sapstack Follow-up Requests"
+        },
+        {
+          "id": "sapstack.plugins",
+          "name": "Installed Plugins",
+          "icon": "$(extensions)",
+          "contextualTitle": "sapstack Plugins"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "sapstack.session.start",
+          "when": "view == sapstack.sessions",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "sapstack.session.resume",
+          "when": "view == sapstack.sessions && viewItem == sessionItem",
+          "group": "inline"
+        },
+        {
+          "command": "sapstack.session.openInWeb",
+          "when": "view == sapstack.sessions && viewItem == sessionItem",
+          "group": "inline"
+        },
+        {
+          "command": "sapstack.session.exportBundle",
+          "when": "view == sapstack.sessions && viewItem == sessionItem"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "sapstack",
+      "properties": {
+        "sapstack.sapstackPath": {
+          "type": "string",
+          "default": "sapstack",
+          "description": "Path to sapstack directory (relative to workspace or absolute)"
+        },
+        "sapstack.language": {
+          "type": "string",
+          "enum": [
+            "ko",
+            "en",
+            "de",
+            "ja",
+            "auto"
+          ],
+          "default": "auto",
+          "description": "Default response language for sapstack prompts"
+        },
+        "sapstack.country": {
+          "type": "string",
+          "enum": [
+            "kr",
+            "de",
+            "us",
+            "jp",
+            "none"
+          ],
+          "default": "kr",
+          "description": "Default country for localization routing (sets sap_context.country_iso)"
+        },
+        "sapstack.sessionsRoot": {
+          "type": "string",
+          "default": ".sapstack/sessions",
+          "description": "Relative path to Evidence Loop session directory"
+        },
+        "sapstack.defaultRelease": {
+          "type": "string",
+          "enum": [
+            "ECC6_EhP7",
+            "ECC6_EhP8",
+            "S4_2020",
+            "S4_2021",
+            "S4_2022",
+            "S4_2023",
+            "S4_2024",
+            "RISE",
+            "PublicCloud",
+            "Unknown"
+          ],
+          "default": "Unknown",
+          "description": "Default SAP release when starting sessions"
+        },
+        "sapstack.showInStatusBar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show current session id in the status bar"
+        },
+        "sapstack.autoOpenFollowup": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically open Follow-up Request as checklist after Turn 2"
+        },
+        "sapstack.piiScanEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Scan evidence files for PII patterns before upload"
+        },
+        "sapstack.webViewerUrl": {
+          "type": "string",
+          "default": "https://boxlogodev.github.io/sapstack/session.html",
+          "description": "Web viewer URL for session sharing (openInWeb command)"
+        }
+      }
+    },
+    "snippets": [
+      {
+        "language": "abap",
+        "path": "./snippets/abap.code-snippets"
+      },
+      {
+        "language": "yaml",
+        "path": "./snippets/sapstack-schemas.code-snippets"
+      }
+    ],
+    "yamlValidation": [
+      {
+        "fileMatch": ".sapstack/sessions/*/state.yaml",
+        "url": "https://boxlogodev.github.io/sapstack/schemas/session-state.schema.yaml"
+      },
+      {
+        "fileMatch": ".sapstack/sessions/*/bundles/evb-*.yaml",
+        "url": "https://boxlogodev.github.io/sapstack/schemas/evidence-bundle.schema.yaml"
+      },
+      {
+        "fileMatch": ".sapstack/sessions/*/hypotheses/h-*.yaml",
+        "url": "https://boxlogodev.github.io/sapstack/schemas/hypothesis.schema.yaml"
+      },
+      {
+        "fileMatch": ".sapstack/sessions/*/requests/flr-*.yaml",
+        "url": "https://boxlogodev.github.io/sapstack/schemas/followup-request.schema.yaml"
+      },
+      {
+        "fileMatch": ".sapstack/sessions/*/verdicts/vdc-*.yaml",
+        "url": "https://boxlogodev.github.io/sapstack/schemas/verdict.schema.yaml"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "NODE_ENV=production node esbuild.config.js",
+    "compile": "tsc --noEmit && node esbuild.config.js",
+    "watch": "tsc -w",
+    "build": "node esbuild.config.js",
+    "package": "vsce package --no-dependencies",
+    "publish": "vsce publish --no-dependencies",
+    "test": "echo 'tests pending'"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.80.0",
+    "@vscode/vsce": "^2.24.0",
+    "esbuild": "^0.19.0",
+    "typescript": "^5.2.0"
+  },
+  "dependencies": {
+    "ajv": "^8.12.0",
+    "js-yaml": "^4.1.0"
+  },
+  "sapstack": {
+    "stage": "beta-v0.1",
+    "implementedIn": "v2.2.0",
+    "contractVersion": "1.0.0",
+    "notes": [
+      "v0.1 beta — extension implemented: 3 TreeView providers + 14 commands + esbuild bundle.",
+      "Sessions are persisted on disk (YAML files) so the extension only needs to",
+      "read/write files — no backend service. YAML validation via yamlValidation",
+      "contributions points all schemas at GitHub Pages for IntelliSense."
+    ]
+  }
+}

@@ -1,0 +1,205 @@
+name: Deploy MCP stack
+
+on:
+  release:
+    types: [ published ]
+
+  # Allow manual triggering
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-22.04
+    # 👇 must match the environment where you stored the secrets
+    environment:
+      name: remove server
+
+    steps:
+      - name: Check out repo (for action context only)
+        uses: actions/checkout@v4
+        with:
+          # Fetch more than just the triggering commit to handle workflow reruns
+          fetch-depth: 10
+          
+      - name: Ensure we have the latest main branch
+        run: |
+          git fetch origin main
+          git checkout main
+          git reset --hard origin/main
+          echo "Current HEAD: $(git rev-parse HEAD)"
+          echo "Latest main: $(git rev-parse origin/main)"
+
+      - name: Read version from package.json
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "Deploying version: $VERSION"
+          echo "NEW_VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Preflight verify required secrets are present
+        run: |
+          set -euo pipefail
+          for s in SERVER_IP SERVER_USERNAME SSH_PRIVATE_KEY; do
+            [ -n "${!s}" ] || { echo "Missing $s"; exit 1; }
+          done
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Deploy to server via SSH
+        uses: appleboy/ssh-action@v1.2.5
+        env:
+          NEW_VERSION: ${{ env.NEW_VERSION }}
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: NEW_VERSION
+          # Submodule clones + full build can take 20-30 min on a cold server
+          command_timeout: 45m
+          script: |
+            set -Eeuo pipefail
+
+            # Serialize concurrent deploys so two simultaneous workflow runs never race on shared
+            # server resources (git operations, pm2, etc.). Both the abap and sap-docs workflows
+            # use the same lock file, so they queue behind each other too.
+            exec 9>/tmp/mcp-sap-deploy.lock
+            flock -w 1800 9 || { echo "❌ Could not acquire deploy lock after 30 min"; exit 1; }
+            echo "==> Deploy lock acquired (PID $$)"
+
+            echo "==> Database Health Pre-Check"
+            cd /opt/mcp-sap/mcp-sap-docs || { echo "Directory not found, will be created"; }
+            
+            # Function to check SQLite database integrity
+            check_db_integrity() {
+              local db_path="$1"
+              if [ -f "$db_path" ]; then
+                echo "🔍 Checking database integrity: $db_path"
+                if sqlite3 "$db_path" "PRAGMA integrity_check;" 2>/dev/null | grep -q "ok"; then
+                  echo "✅ Database integrity OK"
+                  return 0
+                else
+                  echo "❌ Database corruption detected"
+                  return 1
+                fi
+              else
+                echo "ℹ️  Database file does not exist: $db_path"
+                return 1
+              fi
+            }
+            
+            # Check existing database and create backup
+            DB_PATH="/opt/mcp-sap/mcp-sap-docs/dist/data/docs.sqlite"
+            if [ -f "$DB_PATH" ]; then
+              if ! check_db_integrity "$DB_PATH"; then
+                echo "==> Database corruption detected - will rebuild"
+                rm -f "$DB_PATH"
+              else
+                echo "==> Creating database backup before deployment"
+                BACKUP_PATH="/opt/mcp-sap/backups/deploy-backup-$(date +%Y%m%d-%H%M%S).sqlite"
+                mkdir -p /opt/mcp-sap/backups
+                cp "$DB_PATH" "$BACKUP_PATH"
+                echo "✅ Database backed up to $BACKUP_PATH"
+                
+                # Keep only last 5 backups
+                ls -t /opt/mcp-sap/backups/deploy-backup-*.sqlite 2>/dev/null | tail -n +6 | xargs -r rm --
+              fi
+            fi
+
+            echo "==> Ensure base path exists and owned by user"
+            sudo mkdir -p /opt/mcp-sap
+            sudo chown -R "$USER":"$USER" /opt/mcp-sap
+
+            echo "==> Clone or update repo (with submodules)"
+
+            # Redirect SSH URLs to HTTPS via environment variables rather than writing to
+            # ~/.gitconfig. This avoids stale-entry accumulation and config-file lock races.
+            # GIT_CONFIG_COUNT/KEY/VALUE are supported since Git 2.31 (Ubuntu 22.04 ships 2.34).
+            export GIT_CONFIG_COUNT=1
+            export GIT_CONFIG_KEY_0="url.https://github.com/.insteadOf"
+            export GIT_CONFIG_VALUE_0="git@github.com:"
+
+            if [ -d /opt/mcp-sap/mcp-sap-docs/.git ]; then
+              cd /opt/mcp-sap/mcp-sap-docs
+              git fetch --prune
+              git reset --hard origin/main
+            else
+              cd /opt/mcp-sap
+              git clone https://github.com/marianfoo/mcp-sap-docs.git
+              cd mcp-sap-docs
+            fi
+            
+            echo "==> Deploying version: $NEW_VERSION"
+
+            echo "==> Configure BM25 search environment"
+            # Ensure metadata file exists for centralized configuration
+            [ -f /opt/mcp-sap/mcp-sap-docs/data/metadata.json ] || echo "Metadata file will be created during build"
+            
+            echo "==> Check system resources before build"
+            AVAILABLE_MB=$(df /opt/mcp-sap --output=avail -m | tail -n1)
+            if [ "$AVAILABLE_MB" -lt 1000 ]; then
+              echo "❌ ERROR: Insufficient disk space. Available: ${AVAILABLE_MB}MB, Required: 1000MB"
+              exit 1
+            fi
+            echo "✅ Disk space OK: ${AVAILABLE_MB}MB available"
+            
+            AVAILABLE_KB=$(awk '/MemAvailable/ { print $2 }' /proc/meminfo)
+            AVAILABLE_MB_MEM=$((AVAILABLE_KB / 1024))
+            if [ "$AVAILABLE_MB_MEM" -lt 512 ]; then
+              echo "❌ ERROR: Insufficient memory. Available: ${AVAILABLE_MB_MEM}MB, Required: 512MB"
+              exit 1
+            fi
+            echo "✅ Memory OK: ${AVAILABLE_MB_MEM}MB available"
+
+            echo "==> Stop MCP services gracefully before build"
+            pm2 stop --silent mcp-sap-http mcp-sap-streamable || true
+            sleep 3
+            
+            echo "==> Run setup (shallow, single-branch submodules + build)"
+            SKIP_NESTED_SUBMODULES=1 bash setup.sh
+
+            echo "==> Verify database integrity after build"
+            if ! check_db_integrity "$DB_PATH"; then
+              echo "❌ ERROR: Database corruption after build - deployment failed"
+              exit 1
+            fi
+            echo "✅ Database integrity verified after build"
+
+            echo "==> Create logs directory with proper permissions"
+            mkdir -p /opt/mcp-sap/logs
+            chown -R "$USER":"$USER" /opt/mcp-sap/logs
+
+            echo "==> (Re)start MCP services with BM25 search support"
+            # HTTP status on 127.0.0.1:3001; Streamable HTTP on 127.0.0.1:3122
+            pm2 start --silent /opt/mcp-sap/mcp-sap-docs/ecosystem.config.cjs --only mcp-sap-http       || pm2 restart --silent mcp-sap-http
+            pm2 start --silent /opt/mcp-sap/mcp-sap-docs/ecosystem.config.cjs --only mcp-sap-streamable || pm2 restart --silent mcp-sap-streamable
+            pm2 save --silent
+
+            echo "==> Enhanced health checks with database verification"
+            sleep 5
+            
+            for i in $(seq 1 30); do curl -fsS http://127.0.0.1:3001/status  >/dev/null && break || sleep 2; done
+            curl -fsS http://127.0.0.1:3001/status
+            # Streamable HTTP server health on 127.0.0.1:3122
+            for i in $(seq 1 30); do curl -fsS http://127.0.0.1:3122/health  >/dev/null && break || sleep 2; done
+            curl -fsS http://127.0.0.1:3122/health
+
+            # Test actual search functionality to ensure no SQLite corruption
+            echo "==> Testing search functionality"
+            SEARCH_TEST=$(curl -s -X POST http://127.0.0.1:3001/mcp -H "Content-Type: application/json" -d '{"role": "user", "content": "test search"}')
+            if echo "$SEARCH_TEST" | grep -q "SqliteError\|SQLITE_CORRUPT\|Tool execution failed"; then
+              echo "❌ ERROR: Search test failed - possible database corruption"
+              echo "Response: $SEARCH_TEST"
+              exit 1
+            fi
+            echo "✅ Search functionality verified - no corruption detected"
+
+            echo "==> Final database integrity check"
+            if ! check_db_integrity "$DB_PATH"; then
+              echo "❌ WARNING: Database corruption detected after deployment"
+              # Don't fail deployment, but alert
+            else
+              echo "✅ Final database integrity check passed"
+            fi
+
+            echo "✅ Deployment completed successfully - Version: $NEW_VERSION"

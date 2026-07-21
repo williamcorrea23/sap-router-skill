@@ -1,0 +1,188 @@
+# SAP Docs MCP Tool Usage Guide (Rule)
+
+**Complete guide for understanding when to use which MCP tool in the SAP docs system.**
+
+## Tool Overview (5 Tools Available)
+
+The SAP docs MCP provides 5 specialized tools for different types of SAP documentation and content:
+
+### **General Documentation Tools**
+1. **`search`** - Multi-source documentation search (alias: `sap_docs_search`)
+2. **`fetch`** - Retrieve specific documentation (alias: `sap_docs_get`)
+
+### **Community & Help Tools**  
+3. **`sap_community_search`** - SAP Community blog posts and discussions
+4. **`sap_help_search`** - SAP Help Portal product documentation
+5. **`sap_help_get`** - Retrieve SAP Help content
+
+## When to Use Which Tool
+
+### **`search` - Unified SAP Development Search**
+**Use for:**
+- **UI5 controls and components** (Button, Table, Wizard)
+- **CAP framework concepts** (entities, services, annotations)
+- **ABAP documentation** (Standard + Cloud variants)
+- **Development frameworks** (wdi5 testing, UI5 Tooling)
+- **Best practices and examples** (ABAP cheat sheets, Clean ABAP)
+- **Fiori Elements showcases and patterns**
+- **TypeScript integration and setup**
+- **Cloud SDK and deployment topics**
+
+**Examples:**
+```
+search: "button properties"                # UI5 Button documentation
+search: "fiori elements annotations"       # Fiori Elements patterns  
+search: "wdi5 testing"                     # Testing framework
+search: "clean abap practices"             # Style guidelines
+search: "inline declarations"              # ABAP Standard (default)
+search: "inline declarations cloud"        # ABAP Cloud variant
+```
+
+**ABAP Integration:**
+- ABAP docs are fully integrated (no separate tools needed)
+- Standard ABAP shown by default for general queries
+- Variant selection from query (e.g., "LOOP cloud" searches ABAP Cloud)
+- ABAP Standard + Cloud keyword documentation (on-premise + BTP)
+
+### **Tool Selection Matrix**
+
+| Query Type | Use This Tool | Reasoning |
+|------------|---------------|-----------|
+| "How do I create a Button?" | `search` | UI5 control examples and guides |
+| "SELECT statement syntax" | `search` | ABAP integrated - add "cloud" if needed |
+| "Fiori Elements annotations" | `search` | Cross-platform examples and showcases |
+| "TRY CATCH in ABAP Cloud" | `search` | ABAP with variant selection |
+| "Clean ABAP practices" | `search` | Style guides and best practices |
+| "LOOP AT internal table" | `search` | ABAP Standard (or add "cloud") |
+| "wdi5 testing setup" | `search` | Testing framework documentation |
+| "CDS view annotations" | `search` | CAP and examples unified |
+| "Community discussions on errors" | `sap_community_search` | Real-world solutions and discussions |
+| "S/4HANA configuration" | `sap_help_search` | Official product documentation |
+
+## Content Sources by Tool
+
+### **`search` Sources (27 total, including ABAP Standard + Cloud)**
+- **ABAP**: Standard + Cloud keyword docs, cheat sheets, style guides, Fiori showcase
+- **UI5**: SAPUI5, OpenUI5 API/Samples, TypeScript, Custom Controls, Tooling, Web Components
+- **CAP**: Framework docs, Fiori Elements showcase  
+- **Testing**: wdi5 framework and examples
+- **Cloud**: Cloud SDK (JS/Java), AI SDK, Cloud MTA Build Tool
+- **Guidelines**: SAP style guides, community best practices
+
+### **Version Management (ABAP)**
+- **Standard by default**: General ABAP queries show the Standard variant
+- **Variant selection**: "LOOP cloud" filters to ABAP Cloud
+- **Smart filtering**: Prevents duplicate results across variants
+- **Context boosting**: Requested variant gets a score boost
+
+## Advanced Usage Patterns
+
+### **Progressive Discovery**
+1. **Start broad**: Use `search` for general concepts (all sources)
+2. **Get specific**: Add "cloud" for the ABAP Cloud variant
+3. **Cross-reference**: Use `sap_community_search` for real-world examples
+4. **Deep dive**: Use `sap_help_search` for product documentation
+
+### **ABAP Variant-Specific Queries**
+```
+search: "NEW operator"              # ABAP Standard (default)
+search: "NEW operator cloud"        # ABAP Cloud variant
+```
+
+### **Comprehensive Multi-Source Coverage**
+```
+# For Fiori Elements development:
+search: "fiori elements annotations"          # Official docs + showcases
+sap_community_search: "fiori elements tips"   # Community insights
+sap_help_search: "Fiori Elements setup"       # Product guides
+
+# For ABAP development:
+search: "SELECT statements"                   # ABAP Standard + best practices
+search: "SELECT statements cloud"             # ABAP Cloud syntax
+sap_community_search: "ABAP SELECT performance" # Real-world tips
+```
+
+## Tool Response Formats
+
+### **Search Tools** (`search`, `sap_community_search`, `sap_help_search`)
+**Standard Output:**
+```
+Found X results for 'query':
+
+⭐️ **document-id** (Score: X.XX)
+   Title and description
+   Use in fetch
+```
+
+**ChatGPT/JSON Format:**
+```json
+{
+  "results": [
+    {
+      "id": "/cap/guides/domain-modeling",
+      "title": "Domain Modeling in CAP",
+      "url": "https://cap.cloud.sap/docs/guides/domain-modeling",
+      "snippet": "Learn about domain modeling...",
+      "score": 95.42
+    }
+  ]
+}
+```
+
+### **Get Tools** (`fetch`, `sap_help_get`)
+**Standard Output:**
+```
+**Source:** Documentation Type
+**Content:** Full formatted documentation content
+```
+
+**ChatGPT/JSON Format:**
+```json
+{
+  "id": "/cap/guides/domain-modeling",
+  "title": "Domain Modeling",
+  "text": "Full content here...",
+  "url": "https://cap.cloud.sap/docs/guides/domain-modeling"
+}
+```
+
+## Error Handling and Fallbacks
+
+### **No Results Found**
+- Each tool provides specific guidance on alternative search terms
+- `sap_docs_search`: Suggests UI5 controls, concepts, testing topics
+- `abap_search`: Suggests ABAP language constructs and statements
+
+### **Invalid IDs**
+- Get tools validate IDs and provide guidance on using search tools first
+- Version mismatches handled gracefully with defaults
+
+### **System Errors**
+- Graceful degradation with informative error messages
+- Logging for debugging and monitoring
+
+## Best Practices for LLMs
+
+### **Tool Selection Strategy**
+1. **Identify domain**: UI5/CAP/Testing → `sap_docs_search`, ABAP syntax → `abap_search`
+2. **Check scope**: Examples/guides → `sap_docs_search`, Official syntax → `abap_search`
+3. **Consider audience**: Developers → both tools, Language reference → `abap_search`
+
+### **Query Optimization**
+- **Specific terms**: Use exact control names, statement keywords
+- **Conceptual queries**: Use broader terms for discovery
+- **Multi-tool approach**: Use multiple tools for comprehensive coverage
+
+### **Response Enhancement**
+- **Cross-reference**: Suggest related tools when appropriate
+- **Variant awareness**: Mention Standard vs Cloud relevance for syntax queries
+- **Context building**: Use multiple tools to build complete picture
+
+@file src/lib/BaseServerHandler.ts
+@file src/server.ts  
+@file src/streamable-http-server.ts
+@file src/lib/localDocs.ts
+@file docs/ABAP-INTEGRATION-SUMMARY.md
+@file docs/ABAP-USAGE-GUIDE.md
+@file docs/ARCHITECTURE.md
+@file docs/DEV.md

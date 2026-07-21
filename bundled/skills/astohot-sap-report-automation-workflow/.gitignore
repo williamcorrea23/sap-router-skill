@@ -1,0 +1,14 @@
+_dist/
+*.zip
+*.log
+.env
+.env.data
+.env.test
+.env.prd
+.env.300
+.locks/
+
+spec/*
+!spec/.gitkeep
+output/*
+!output/.gitkeep

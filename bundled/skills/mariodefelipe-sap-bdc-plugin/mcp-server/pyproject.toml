@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sap-bdc-mcp-server"
+version = "0.5.0"
+description = "MCP server for SAP Business Data Cloud integration with 17 tools: provisioning, validation, Delta Sharing management, SAP-Note-driven diagnostics, ORD metadata validation, and Databricks privilege pre-flight (v0.5.0)"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [
+    {name = "Mario DeFelipe", email = "mario.defelipe@gmail.com"}
+]
+dependencies = [
+    "mcp>=1.0.0",
+    "sap-bdc-connect-sdk>=1.0.9",
+    "python-dotenv>=1.0.0",
+    "databricks-sdk>=0.20.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+]
+
+[project.scripts]
+sap-bdc-mcp = "sap_bdc_mcp.server:run"

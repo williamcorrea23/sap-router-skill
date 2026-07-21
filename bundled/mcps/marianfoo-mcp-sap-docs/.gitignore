@@ -1,0 +1,15 @@
+.DS_Store
+node_modules
+dist
+data
+sources
+.cache
+src_context.txt
+test_context.txt
+.mcpregistry_github_token
+.mcpregistry_registry_token
+mta_archives/
+mta-op-*/
+mta-overrides.mtaext
+mta-*.mtaext
+!mta-overrides.mtaext.example

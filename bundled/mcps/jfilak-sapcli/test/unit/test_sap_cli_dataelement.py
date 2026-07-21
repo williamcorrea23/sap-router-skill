@@ -1,0 +1,710 @@
+#!/usr/bin/env python3
+
+import json
+import unittest
+from unittest.mock import call, patch, Mock
+from sap.adt.errors import ExceptionResourceAlreadyExists
+
+import sap.cli.dataelement
+from sap.errors import SAPCliError
+
+from mock import (
+    Connection,
+    Response,
+    Request,
+    patch,
+)
+from io import StringIO
+
+from infra import generate_parse_args
+from fixtures_adt_dataelement import (
+    DATA_ELEMENT_NAME,
+    CREATE_DATA_ELEMENT_ADT_XML,
+    READ_DATA_ELEMENT_BODY,
+    FAKE_LOCK_HANDLE,
+    ACTIVATE_DATA_ELEMENT_BODY,
+    DATA_ELEMENT_DEFINITION_ADT_XML,
+    DEFINE_DATA_ELEMENT_W_DOMAIN_BODY,
+    DEFINE_DATA_ELEMENT_W_PREDEFINED_ABAP_TYPE_BODY,
+    ERROR_XML_DATA_ELEMENT_ALREADY_EXISTS,
+    DOMAIN_ABC_ADT_GET_RESPONSE_XML
+)
+from fixtures_adt_wb import RESPONSE_ACTIVATION_OK
+
+parse_args = generate_parse_args(sap.cli.dataelement.CommandGroup())
+
+
+class TestDataElementCreate(unittest.TestCase):
+
+    def data_element_create_cmd(self, *args, **kwargs):
+        return parse_args('create', *args, **kwargs)
+
+    def test_create(self):
+        connection = Connection()
+
+        the_cmd = self.data_element_create_cmd(DATA_ELEMENT_NAME, 'Test data element', 'package')
+        the_cmd.execute(connection, the_cmd)
+
+        expected_request = Request(
+            adt_uri='/sap/bc/adt/ddic/dataelements',
+            method='POST',
+            headers={'Content-Type': 'application/vnd.sap.adt.dataelements.v2+xml; charset=utf-8'},
+            body=bytes(CREATE_DATA_ELEMENT_ADT_XML, 'utf-8'),
+            params=None
+        )
+
+        expected_request.assertEqual(connection.execs[0], self)
+
+
+class TestDataElementActivate(unittest.TestCase):
+
+    def data_element_activate_cmd(self, *args, **kwargs):
+        return parse_args('activate', *args, **kwargs)
+
+    def test_activate(self):
+        connection = Connection([
+            RESPONSE_ACTIVATION_OK,
+            Response(text=DATA_ELEMENT_DEFINITION_ADT_XML, status_code=200, headers={})
+        ])
+
+        the_cmd = self.data_element_activate_cmd(DATA_ELEMENT_NAME)
+        the_cmd.execute(connection, the_cmd)
+
+        expected_request = Request(
+            adt_uri='/sap/bc/adt/activation',
+            method='POST',
+            headers={'Accept': 'application/xml', 'Content-Type': 'application/xml'},
+            body=ACTIVATE_DATA_ELEMENT_BODY,
+            params={'method': 'activate', 'preauditRequested': 'true'}
+        )
+
+        self.assertEqual(connection.execs[0], expected_request)
+
+
+class TestDataElementDefine(unittest.TestCase):
+
+    def data_element_define_cmd(self, *args, **kwargs):
+        return parse_args('define', *args, **kwargs)
+
+    @patch('sap.cli.core.PrintConsole.printerr')
+    @patch('sap.adt.objects.ADTObject.unlock')
+    @patch('sap.adt.objects.ADTObject.lock', return_value=FAKE_LOCK_HANDLE)
+    def test_define_w_domain(self, fake_lock, fake_unlock, fake_console_print_err):
+        connection = Connection([
+            Response(
+                text='',
+                status_code=200,
+                headers={}
+            ),
+            Response(
+                text=READ_DATA_ELEMENT_BODY,
+                status_code=200,
+                headers={}
+            ),
+            Response(
+                text='',
+                status_code=200,
+                headers={}
+            ),
+            RESPONSE_ACTIVATION_OK,
+            Response(text=DATA_ELEMENT_DEFINITION_ADT_XML, status_code=200, headers={})
+        ], asserter=self)
+
+        the_cmd = self.data_element_define_cmd(DATA_ELEMENT_NAME, 'Test data element', 'package', '--activate', '--type=domain', '--domain_name=ABC', '--label_short=Tst DTEL', '--label_medium=Test Label Medium', '--label_long=Test Label Long', '--label_heading=Test Label Heading')
+        with patch('sys.stdin', StringIO(DATA_ELEMENT_DEFINITION_ADT_XML)):
+            the_cmd.execute(connection, the_cmd)
+
+        fake_lock.assert_called_once()
+        fake_unlock.assert_called_once()
+        fake_console_print_err.assert_not_called()
+
+        self.assertEqual(len(connection.execs), 5)
+
+        exptected_request_create = Request(
+            adt_uri='/sap/bc/adt/ddic/dataelements',
+            method='POST',
+            headers={'Content-Type': 'application/vnd.sap.adt.dataelements.v2+xml; charset=utf-8'},
+            body=bytes(CREATE_DATA_ELEMENT_ADT_XML, 'utf-8'),
+            params=None
+        )
+
+        self.assertEqual(connection.execs[0], exptected_request_create)
+
+        expected_request_fetch = Request(
+            adt_uri=f'/sap/bc/adt/ddic/dataelements/{DATA_ELEMENT_NAME.lower()}',
+            method='GET',
+            headers=None,
+            body=None,
+            params=None
+        )
+
+        self.assertEqual(connection.execs[1], expected_request_fetch)
+
+        expected_request_push = Request(
+            adt_uri=f'/sap/bc/adt/ddic/dataelements/{DATA_ELEMENT_NAME.lower()}',
+            method='PUT',
+            headers={'Content-Type': 'application/vnd.sap.adt.dataelements.v2+xml; charset=utf-8'},
+            body=bytes(DEFINE_DATA_ELEMENT_W_DOMAIN_BODY, 'utf-8'),
+            params={'lockHandle': FAKE_LOCK_HANDLE}
+        )
+
+        expected_request_push.assertEqual(connection.execs[2], self)
+
+        expected_request_activate = Request(
+            adt_uri='/sap/bc/adt/activation',
+            method='POST',
+            headers={'Accept': 'application/xml', 'Content-Type': 'application/xml'},
+            body=ACTIVATE_DATA_ELEMENT_BODY,
+            params={'method': 'activate', 'preauditRequested': 'true'}
+        )
+
+        self.assertEqual(connection.execs[3], expected_request_activate)
+
+        expected_request_fetch = Request(
+            adt_uri=f'/sap/bc/adt/ddic/dataelements/{DATA_ELEMENT_NAME.lower()}',
+            method='GET',
+            headers=None,
+            body=None,
+            params=None
+        )
+
+        self.assertEqual(connection.execs[4], expected_request_fetch)
+
+    @patch('sap.cli.core.PrintConsole.printerr')
+    @patch('sap.adt.objects.ADTObject.unlock')
+    @patch('sap.adt.objects.ADTObject.lock', return_value=FAKE_LOCK_HANDLE)
+    def test_define_w_predefined_abap_type(self, fake_lock, fake_unlock, fake_console_print_err):
+        connection = Connection([
+            Response(
+                text='',
+                status_code=200,
+                headers={}
+            ),
+            Response(
+                text=READ_DATA_ELEMENT_BODY,
+                status_code=200,
+                headers={}
+            ),
+            Response(
+                text='',
+                status_code=200,
+                headers={}
+            ),
+            RESPONSE_ACTIVATION_OK,
+            Response(text=DATA_ELEMENT_DEFINITION_ADT_XML, status_code=200, headers={})
+        ], asserter=self)
+
+        the_cmd = self.data_element_define_cmd(DATA_ELEMENT_NAME, 'Test data element', 'package', '--activate', '--type=predefinedAbapType', '--data_type=STRING', '--data_type_length=200', '--label_short=Tst DTEL', '--label_medium=Test Label Medium', '--label_long=Test Label Long', '--label_heading=Test Label Heading')
+        with patch('sys.stdin', StringIO(DATA_ELEMENT_DEFINITION_ADT_XML)):
+            the_cmd.execute(connection, the_cmd)
+
+        fake_lock.assert_called_once()
+        fake_unlock.assert_called_once()
+        fake_console_print_err.assert_not_called()
+
+        self.assertEqual(len(connection.execs), 5)
+
+        exptected_request_create = Request(
+            adt_uri='/sap/bc/adt/ddic/dataelements',
+            method='POST',
+            headers={'Content-Type': 'application/vnd.sap.adt.dataelements.v2+xml; charset=utf-8'},
+            body=bytes(CREATE_DATA_ELEMENT_ADT_XML, 'utf-8'),
+            params=None
+        )
+
+        self.assertEqual(connection.execs[0], exptected_request_create)
+
+        expected_request_fetch = Request(
+            adt_uri=f'/sap/bc/adt/ddic/dataelements/{DATA_ELEMENT_NAME.lower()}',
+            method='GET',
+            headers=None,
+            body=None,
+            params=None
+        )
+
+        self.assertEqual(connection.execs[1], expected_request_fetch)
+
+        expected_request_push = Request(
+            adt_uri=f'/sap/bc/adt/ddic/dataelements/{DATA_ELEMENT_NAME.lower()}',
+            method='PUT',
+            headers={'Content-Type': 'application/vnd.sap.adt.dataelements.v2+xml; charset=utf-8'},
+            body=bytes(DEFINE_DATA_ELEMENT_W_PREDEFINED_ABAP_TYPE_BODY, 'utf-8'),
+            params={'lockHandle': FAKE_LOCK_HANDLE}
+        )
+
+        self.assertEqual(connection.execs[2], expected_request_push)
+
+        expected_request_activate = Request(
+            adt_uri='/sap/bc/adt/activation',
+            method='POST',
+            headers={'Accept': 'application/xml', 'Content-Type': 'application/xml'},
+            body=ACTIVATE_DATA_ELEMENT_BODY,
+            params={'method': 'activate', 'preauditRequested': 'true'}
+        )
+
+        self.assertEqual(connection.execs[3], expected_request_activate)
+
+        expected_request_fetch = Request(
+            adt_uri=f'/sap/bc/adt/ddic/dataelements/{DATA_ELEMENT_NAME.lower()}',
+            method='GET',
+            headers=None,
+            body=None,
+            params=None
+        )
+
+        self.assertEqual(connection.execs[4], expected_request_fetch)
+
+    @patch('sap.cli.core.PrintConsole.printerr')
+    @patch('sap.adt.objects.ADTObject.unlock')
+    @patch('sap.adt.objects.ADTObject.lock', return_value=FAKE_LOCK_HANDLE)
+    def test_define_domain_not_provided(self, fake_lock, fake_unlock, fake_console_print_err):
+        connection = Connection([
+            Response(
+                text='',
+                status_code=200,
+                headers={}
+            ),
+            Response(
+                text=READ_DATA_ELEMENT_BODY,
+                status_code=200,
+                headers={}
+            ),
+            Response(
+                text='',
+                status_code=200,
+                headers={}
+            ),
+            RESPONSE_ACTIVATION_OK,
+            Response(text=DATA_ELEMENT_DEFINITION_ADT_XML, status_code=200, headers={})
+        ], asserter=self)
+
+        # --domain_name argument is missing
+        the_cmd = self.data_element_define_cmd(DATA_ELEMENT_NAME, 'Test data element', 'package', '--activate', '--type=domain', '--data_type=STRING', '--label_short=Tst DTEL', '--label_medium=Test Label Medium', '--label_long=Test Label Long', '--label_heading=Test Label Heading')
+        with patch('sys.stdin', StringIO(DATA_ELEMENT_DEFINITION_ADT_XML)):
+            the_cmd.execute(connection, the_cmd)
+
+        fake_lock.assert_not_called()
+        fake_unlock.assert_not_called()
+        fake_console_print_err.assert_called_once_with('Domain name must be provided (--domain_name) if the type (--type) is "domain"')
+
+        self.assertEqual(len(connection.execs), 2)
+
+        exptected_request_create = Request(
+            adt_uri='/sap/bc/adt/ddic/dataelements',
+            method='POST',
+            headers={'Content-Type': 'application/vnd.sap.adt.dataelements.v2+xml; charset=utf-8'},
+            body=bytes(CREATE_DATA_ELEMENT_ADT_XML, 'utf-8'),
+            params=None
+        )
+
+        self.assertEqual(connection.execs[0], exptected_request_create)
+
+        expected_request_fetch = Request(
+            adt_uri=f'/sap/bc/adt/ddic/dataelements/{DATA_ELEMENT_NAME.lower()}',
+            method='GET',
+            headers=None,
+            body=None,
+            params=None
+        )
+
+        self.assertEqual(connection.execs[1], expected_request_fetch)
+
+    @patch('sap.cli.core.PrintConsole.printerr')
+    @patch('sap.adt.objects.ADTObject.unlock')
+    @patch('sap.adt.objects.ADTObject.lock', return_value=FAKE_LOCK_HANDLE)
+    def test_define_predefined_abap_type_not_provided(self, fake_lock, fake_unlock, fake_console_print_err):
+        connection = Connection([
+            Response(
+                text='',
+                status_code=200,
+                headers={}
+            ),
+            Response(
+                text=READ_DATA_ELEMENT_BODY,
+                status_code=200,
+                headers={}
+            ),
+            Response(
+                text='',
+                status_code=200,
+                headers={}
+            ),
+            RESPONSE_ACTIVATION_OK,
+            Response(text=DATA_ELEMENT_DEFINITION_ADT_XML, status_code=200, headers={})
+        ], asserter=self)
+
+        # --data_type argument is missing
+        the_cmd = self.data_element_define_cmd(DATA_ELEMENT_NAME, 'Test data element', 'package', '--activate', '--type=predefinedAbapType', '--domain_name=ABC', '--label_short=Tst DTEL', '--label_medium=Test Label Medium', '--label_long=Test Label Long', '--label_heading=Test Label Heading')
+        with patch('sys.stdin', StringIO(DATA_ELEMENT_DEFINITION_ADT_XML)):
+            the_cmd.execute(connection, the_cmd)
+
+        fake_lock.assert_not_called()
+        fake_unlock.assert_not_called()
+        fake_console_print_err.assert_called_once_with('Data type name must be provided (--data_type) if the type (--type) is "predefinedAbapType"')
+
+        self.assertEqual(len(connection.execs), 2)
+
+        exptected_request_create = Request(
+            adt_uri='/sap/bc/adt/ddic/dataelements',
+            method='POST',
+            headers={'Content-Type': 'application/vnd.sap.adt.dataelements.v2+xml; charset=utf-8'},
+            body=bytes(CREATE_DATA_ELEMENT_ADT_XML, 'utf-8'),
+            params=None
+        )
+
+        self.assertEqual(connection.execs[0], exptected_request_create)
+
+        expected_request_fetch = Request(
+            adt_uri=f'/sap/bc/adt/ddic/dataelements/{DATA_ELEMENT_NAME.lower()}',
+            method='GET',
+            headers=None,
+            body=None,
+            params=None
+        )
+
+        self.assertEqual(connection.execs[1], expected_request_fetch)
+
+    @patch('sap.cli.core.PrintConsole.printerr')
+    @patch('sap.adt.objects.ADTObject.unlock')
+    @patch('sap.adt.objects.ADTObject.lock', return_value=FAKE_LOCK_HANDLE)
+    def test_define_data_element_already_exists(self, fake_lock, fake_unlock, fake_console_print_err):
+        connection = Connection([
+            Response(
+                text=ERROR_XML_DATA_ELEMENT_ALREADY_EXISTS,
+                status_code=500,
+                headers={'content-type': 'application/xml'}
+            ),
+            Response(
+                text=READ_DATA_ELEMENT_BODY,
+                status_code=200,
+                headers={}
+            ),
+            Response(
+                text='',
+                status_code=200,
+                headers={}
+            ),
+            RESPONSE_ACTIVATION_OK,
+            Response(text=DATA_ELEMENT_DEFINITION_ADT_XML, status_code=200, headers={})
+        ], asserter=self)
+
+        the_cmd = self.data_element_define_cmd(DATA_ELEMENT_NAME, 'Test data element', 'package', '--activate', '--type=domain', '--domain_name=ABC', '--label_short=Tst DTEL', '--label_medium=Test Label Medium', '--label_long=Test Label Long', '--label_heading=Test Label Heading')
+        with patch('sys.stdin', StringIO(DATA_ELEMENT_DEFINITION_ADT_XML)):
+            try:
+                the_cmd.execute(connection, the_cmd)
+
+                self.fail('Exception should be raised but it has not been')
+            except ExceptionResourceAlreadyExists as e:
+                self.assertEqual('Resource Data Element TEST_DATA_ELEMENT does already exist.', str(e))
+
+        fake_lock.assert_not_called()
+        fake_unlock.assert_not_called()
+        fake_console_print_err.assert_not_called()
+
+        self.assertEqual(len(connection.execs), 1)
+
+        exptected_request_create = Request(
+            adt_uri='/sap/bc/adt/ddic/dataelements',
+            method='POST',
+            headers={'Content-Type': 'application/vnd.sap.adt.dataelements.v2+xml; charset=utf-8'},
+            body=bytes(CREATE_DATA_ELEMENT_ADT_XML, 'utf-8'),
+            params=None
+        )
+
+        self.assertEqual(connection.execs[0], exptected_request_create)
+
+    @patch('sap.cli.core.PrintConsole.printerr')
+    @patch('sap.adt.objects.ADTObject.unlock')
+    @patch('sap.adt.objects.ADTObject.lock', return_value=FAKE_LOCK_HANDLE)
+    def test_define_data_element_already_exists_but_skipped(self, fake_lock, fake_unlock, fake_console_print_err):
+        connection = Connection([
+            Response(
+                text=ERROR_XML_DATA_ELEMENT_ALREADY_EXISTS,
+                status_code=500,
+                headers={'content-type': 'application/xml'}
+            ),
+            Response(
+                text=READ_DATA_ELEMENT_BODY,
+                status_code=200,
+                headers={}
+            ),
+            Response(
+                text='',
+                status_code=200,
+                headers={}
+            ),
+            RESPONSE_ACTIVATION_OK,
+            Response(text=DATA_ELEMENT_DEFINITION_ADT_XML, status_code=200, headers={})
+        ], asserter=self)
+
+        the_cmd = self.data_element_define_cmd(DATA_ELEMENT_NAME, 'Test data element', 'package', '--activate', '--no-error-existing', '--type=domain', '--domain_name=ABC', '--label_short=Tst DTEL', '--label_medium=Test Label Medium', '--label_long=Test Label Long', '--label_heading=Test Label Heading')
+        with patch('sys.stdin', StringIO(DATA_ELEMENT_DEFINITION_ADT_XML)):
+            the_cmd.execute(connection, the_cmd)
+
+        fake_lock.assert_called_once()
+        fake_unlock.assert_called_once()
+        fake_console_print_err.assert_not_called()
+
+        self.assertEqual(len(connection.execs), 5)
+
+        exptected_request_create = Request(
+            adt_uri='/sap/bc/adt/ddic/dataelements',
+            method='POST',
+            headers={'Content-Type': 'application/vnd.sap.adt.dataelements.v2+xml; charset=utf-8'},
+            body=bytes(CREATE_DATA_ELEMENT_ADT_XML, 'utf-8'),
+            params=None
+        )
+
+        self.assertEqual(connection.execs[0], exptected_request_create)
+
+        expected_request_fetch = Request(
+            adt_uri=f'/sap/bc/adt/ddic/dataelements/{DATA_ELEMENT_NAME.lower()}',
+            method='GET',
+            headers=None,
+            body=None,
+            params=None
+        )
+
+        self.assertEqual(connection.execs[1], expected_request_fetch)
+
+        expected_request_push = Request(
+            adt_uri=f'/sap/bc/adt/ddic/dataelements/{DATA_ELEMENT_NAME.lower()}',
+            method='PUT',
+            headers={'Content-Type': 'application/vnd.sap.adt.dataelements.v2+xml; charset=utf-8'},
+            body=bytes(DEFINE_DATA_ELEMENT_W_DOMAIN_BODY, 'utf-8'),
+            params={'lockHandle': FAKE_LOCK_HANDLE}
+        )
+
+        self.assertEqual(connection.execs[2], expected_request_push)
+
+        expected_request_activate = Request(
+            adt_uri='/sap/bc/adt/activation',
+            method='POST',
+            headers={'Accept': 'application/xml', 'Content-Type': 'application/xml'},
+            body=ACTIVATE_DATA_ELEMENT_BODY,
+            params={'method': 'activate', 'preauditRequested': 'true'}
+        )
+
+        self.assertEqual(connection.execs[3], expected_request_activate)
+
+        expected_request_fetch = Request(
+            adt_uri=f'/sap/bc/adt/ddic/dataelements/{DATA_ELEMENT_NAME.lower()}',
+            method='GET',
+            headers=None,
+            body=None,
+            params=None
+        )
+
+        self.assertEqual(connection.execs[4], expected_request_fetch)
+
+    @patch('sap.adt.DataElement')
+    def test_define_element_forgotten_issue(self, mock_data_element):
+        mock_data_element.return_value.validate.return_value = 9999
+
+        the_cmd = self.data_element_define_cmd(DATA_ELEMENT_NAME, 'Test data element', 'package', '--activate', '--no-error-existing', '--type=domain', '--domain_name=ABC', '--label_short=Tst DTEL', '--label_medium=Test Label Medium', '--label_long=Test Label Long', '--label_heading=Test Label Heading')
+
+        with self.assertRaises(SAPCliError) as caught:
+            the_cmd.execute(Mock(), the_cmd)
+
+        self.assertEqual(
+            'BUG: please report a forgotten case DataElementValidationIssues(9999)',
+            str(caught.exception))
+
+
+class TestDataElementRead(unittest.TestCase):
+
+    def data_element_read_cmd(self, *args, **kwargs):
+        # Lazy initialization to avoid module-level CommandGroup instantiation
+        parser = generate_parse_args(sap.cli.dataelement.CommandGroup())
+        return parser('read', *args, **kwargs)
+
+    def test_read_human_format(self):
+        """Test reading data element in HUMAN format"""
+        connection = Connection([
+            Response(text=DATA_ELEMENT_DEFINITION_ADT_XML, status_code=200, headers={})
+        ])
+
+        from mock import BufferConsole
+        console = BufferConsole()
+        the_cmd = self.data_element_read_cmd(DATA_ELEMENT_NAME, '--format=HUMAN')
+        the_cmd.console_factory = lambda: console
+        the_cmd.execute(connection, the_cmd)
+
+        output = console.capout
+
+        # Verify the human-readable output contains expected information
+        self.assertIn('Data Element: TEST_DATA_ELEMENT', output)
+        self.assertIn('Description: Test data element', output)
+        self.assertIn('Package: PACKAGE', output)
+        # Check for new nested structure
+        self.assertIn('Definition:', output)
+        self.assertIn('Type', output)
+        self.assertIn('Kind: predefinedAbapType', output)
+        self.assertIn('Name: STRING', output)
+
+    def test_read_uppercase_name(self):
+        """Test that lowercase input is converted to uppercase"""
+        connection = Connection([
+            Response(text=DATA_ELEMENT_DEFINITION_ADT_XML, status_code=200, headers={})
+        ])
+
+        from mock import BufferConsole
+        console = BufferConsole()
+        the_cmd = self.data_element_read_cmd('test_data_element')  # lowercase
+        the_cmd.console_factory = lambda: console
+        the_cmd.execute(connection, the_cmd)
+
+        # Should work and show uppercase name in output
+        self.assertIn('Data Element: TEST_DATA_ELEMENT', console.capout)
+
+    def test_read_abap_format_not_implemented(self):
+        """Test that ABAP format works"""
+        connection = Connection([
+            Response(text=DATA_ELEMENT_DEFINITION_ADT_XML, status_code=200, headers={})
+        ])
+
+        from mock import BufferConsole
+        console = BufferConsole()
+        the_cmd = self.data_element_read_cmd(DATA_ELEMENT_NAME, '--format=ABAP')
+        the_cmd.console_factory = lambda: console
+
+        the_cmd.execute(connection, the_cmd)
+
+        # Parse the JSON output
+        output = json.loads(console.capout)
+        self.assertEqual(output['formatVersion'], '1')
+        self.assertEqual(output['header']['description'], 'Test data element')
+        self.assertEqual(output['definition']['typeKind'], 'predefinedAbapType')
+        self.assertEqual(output['definition']['dataType'], 'STRING')
+
+
+class TestDataElementReadWithExpand(unittest.TestCase):
+
+    def data_element_read_cmd(self, *args, **kwargs):
+        # Lazy initialization to avoid module-level CommandGroup instantiation
+        parser = generate_parse_args(sap.cli.dataelement.CommandGroup())
+        return parser('read', *args, **kwargs)
+
+    def test_read_human_domain_based_shows_domain_details(self):
+        """Test domain-based data element always shows domain details in HUMAN format"""
+
+        connection = Connection([
+            Response(text=DEFINE_DATA_ELEMENT_W_DOMAIN_BODY, status_code=200, headers={}),  # dataelement fetch
+            Response(text=DOMAIN_ABC_ADT_GET_RESPONSE_XML, status_code=200, headers={})  # domain fetch
+        ])
+
+        from mock import BufferConsole
+        console = BufferConsole()
+        the_cmd = self.data_element_read_cmd(DATA_ELEMENT_NAME)
+        the_cmd.console_factory = lambda: console
+        the_cmd.execute(connection, the_cmd)
+
+        output = console.capout
+
+        # Verify dataelement info is present
+        self.assertIn('Data Element: TEST_DATA_ELEMENT', output)
+        self.assertIn('Definition:', output)
+        self.assertIn('Type', output)
+        self.assertIn('Kind: domain', output)
+        self.assertIn('Name: ABC', output)
+
+        # Verify domain details are shown inline under Type
+        self.assertIn('Description:', output)
+        self.assertIn('Type Information:', output)
+        self.assertIn('Datatype:', output)
+
+    def test_read_human_domain_fetch_failure(self):
+        """Test reading domain-based data element when domain fetch fails"""
+        connection = Connection([
+            Response(text=DEFINE_DATA_ELEMENT_W_DOMAIN_BODY, status_code=200, headers={}),  # dataelement fetch
+            Response(text='Domain not found', status_code=404, headers={})  # domain fetch fails
+        ])
+
+        from mock import BufferConsole
+        console = BufferConsole()
+        the_cmd = self.data_element_read_cmd(DATA_ELEMENT_NAME)
+        the_cmd.console_factory = lambda: console
+
+        # Should not raise exception, but print warning
+        the_cmd.execute(connection, the_cmd)
+
+        output = console.capout
+        # Verify dataelement info is still present
+        self.assertIn('Data Element: TEST_DATA_ELEMENT', output)
+        self.assertIn('Kind: domain', output)
+
+        # Check stderr for warning
+        self.assertIn('Warning:', console.caperr)
+
+    def test_read_human_predefined_type_no_domain_details(self):
+        """Test predefined ABAP type data element doesn't show domain details"""
+        connection = Connection([
+            Response(text=DATA_ELEMENT_DEFINITION_ADT_XML, status_code=200, headers={})
+        ])
+
+        from mock import BufferConsole
+        console = BufferConsole()
+        the_cmd = self.data_element_read_cmd(DATA_ELEMENT_NAME)
+        the_cmd.console_factory = lambda: console
+        the_cmd.execute(connection, the_cmd)
+
+        output = console.capout
+
+        # Verify dataelement info is present
+        self.assertIn('Data Element: TEST_DATA_ELEMENT', output)
+        self.assertIn('Kind: predefinedAbapType', output)
+
+        # Domain description/details should NOT be present
+        self.assertNotIn('Domain:', output)
+        self.assertNotIn('Test Domain ABC', output)
+
+    def test_read_abap_format_no_domain_details(self):
+        """Test ABAP format does not include domain details"""
+
+        connection = Connection([
+            Response(text=DEFINE_DATA_ELEMENT_W_DOMAIN_BODY, status_code=200, headers={}),  # dataelement fetch
+            # No domain fetch - ABAP format should not trigger domain fetch
+        ])
+
+        from mock import BufferConsole
+        console = BufferConsole()
+        the_cmd = self.data_element_read_cmd(DATA_ELEMENT_NAME, '--format=ABAP')
+        the_cmd.console_factory = lambda: console
+        the_cmd.execute(connection, the_cmd)
+
+        # Parse JSON output
+        output = json.loads(console.capout)
+
+        # Verify basic structure
+        self.assertEqual(output['formatVersion'], '1')
+        self.assertEqual(output['definition']['typeKind'], 'domain')
+        self.assertEqual(output['definition']['domainName'], 'ABC')
+
+        # Domain details should NOT be embedded
+        self.assertNotIn('domainDetails', output)
+
+    def test_read_abap_format_predefined_type(self):
+        """Test ABAP format for predefined ABAP type"""
+        connection = Connection([
+            Response(text=DATA_ELEMENT_DEFINITION_ADT_XML, status_code=200, headers={})
+        ])
+
+        from mock import BufferConsole
+        console = BufferConsole()
+        the_cmd = self.data_element_read_cmd(DATA_ELEMENT_NAME, '--format=ABAP')
+        the_cmd.console_factory = lambda: console
+        the_cmd.execute(connection, the_cmd)
+
+        # Parse JSON output
+        output = json.loads(console.capout)
+
+        # Verify basic structure
+        self.assertEqual(output['formatVersion'], '1')
+        self.assertEqual(output['definition']['typeKind'], 'predefinedAbapType')
+        self.assertIn('dataType', output['definition'])
+        self.assertIn('length', output['definition'])
+        self.assertIn('decimals', output['definition'])
+
+
+if __name__ == '__main__':
+    unittest.main()

@@ -24,8 +24,7 @@ triggers:
 
 ## Local Reference
 ```
-C:\Users\William Correa\tools\rtk\
-sap-router-skill\references\rtk\
+sap-router-skill\bundled\tools\rtk\
 ```
 
 ## What RTK Does
@@ -141,5 +140,5 @@ cargo uninstall rtk
 ## References
 - Full guide: https://www.rtk-ai.app/guide
 - Supported agents: https://www.rtk-ai.app/guide/getting-started/supported-agents
-- Architecture: `references/rtk/docs/contributing/ARCHITECTURE.md`
-- Hooks source: `references/rtk/hooks/`
+- Architecture: `bundled/tools/rtk/docs/contributing/ARCHITECTURE.md`
+- Hooks source: `bundled/tools/rtk/hooks/`

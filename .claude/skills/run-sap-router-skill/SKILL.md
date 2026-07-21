@@ -18,7 +18,8 @@ trigger:
 > Codex → this file. Antigravity → `.gemini/skills/run-sap-router-skill/SKILL.md`.
 > Codex → `AGENTS.md` at unit root. All point to the same driver.
 
-Five standalone Python 3 CLIs under `scripts/`. **No live SAP system, network,
+The repository now contains 40 Python operational scripts under `scripts/`.
+The core smoke gate remains self-contained: **no live SAP system, network,
 or credentials needed** — routing is a static lookup table, `memory_manager`
 is local file I/O, `xls_to_bapi` parses CSV/XLSX. Everything runs offline.
 
@@ -32,6 +33,19 @@ is local file I/O, `xls_to_bapi` parses CSV/XLSX. Everything runs offline.
 
 The agent path is the smoke driver: it launches every CLI surface against a
 throwaway workspace and asserts exit codes + output.
+
+## Repository-owned skill/MCP discovery
+
+For ambiguous SAP tasks, search the unified local catalog before choosing a
+skill or MCP:
+
+```bash
+python scripts/source_catalog.py search "task description"
+python scripts/mcp_launcher.py search --query "task description"
+```
+
+Bundled MCP snapshots are fail-closed (`disabled_candidate`) until reviewed and
+promoted in `.agents/registries/mcps.json`. No runtime GitHub lookup is allowed.
 
 All paths below are relative to the unit root (`sap-router-skill/`).
 

@@ -1,0 +1,93 @@
+name: sapstack Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  release:
+    name: Build & Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Extract version from tag
+        id: version
+        run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Verify tag matches package versions
+        run: |
+          chmod +x scripts/bump-version.sh
+          bash scripts/bump-version.sh --check
+          PKG_VERSION=$(sed -nE 's/.*"version"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/p' package.json | head -1)
+          if [ "$PKG_VERSION" != "${{ steps.version.outputs.version }}" ]; then
+            echo "❌ Tag (${{ steps.version.outputs.version }}) does not match package.json ($PKG_VERSION)"
+            echo "    Run: bash scripts/bump-version.sh ${{ steps.version.outputs.version }} && commit before tagging"
+            exit 1
+          fi
+          echo "✅ Tag and package.json both at $PKG_VERSION"
+
+      - name: Install MCP dependencies
+        run: cd mcp && npm ci
+
+      - name: Build MCP package
+        run: cd mcp && npm run build
+
+      - name: Run MCP tests
+        run: cd mcp && npm test || echo "tests optional for now"
+
+      - name: Pack MCP tarball
+        # mcp/boxlogodev-sapstack-mcp-<version>.tgz 를 working dir 에 생성
+        # → 이후 'Create GitHub Release' step 의 files: mcp/*.tgz 패턴이 매치
+        # publish 가 NPM_TOKEN 미설정으로 fail 해도 tarball 은 보존됨
+        run: cd mcp && npm pack
+
+      - name: Publish MCP to npm
+        run: cd mcp && npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        # NPM_TOKEN secret 미설정 시 401 가능 — release 의 나머지 (Extension build,
+        # GitHub Release 생성) 가 차단되지 않도록 fail 허용. publish 자체는
+        # 별도로 npm 인증 후 'npm publish' 수동 실행 가능.
+        continue-on-error: true
+
+      - name: Install VS Code Extension dependencies
+        run: cd extension && npm ci
+        continue-on-error: true
+
+      - name: Build VS Code Extension
+        run: cd extension && npm run compile && npm run package
+        continue-on-error: true
+
+      - name: Generate release notes
+        id: notes
+        run: |
+          bash scripts/generate-release-notes.sh "${{ steps.version.outputs.version }}" > RELEASE_NOTES.md
+          echo "notes_file=RELEASE_NOTES.md" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "${{ github.ref_name }} — sapstack"
+          body_path: RELEASE_NOTES.md
+          draft: false
+          prerelease: false
+          files: |
+            mcp/*.tgz
+            extension/*.vsix

@@ -1,0 +1,90 @@
+{
+  "name": "@rosa-mcp/server",
+  "version": "1.14.0",
+  "description": "ROSA — Released Objects Search Assistant. MCP server and REST API for the SAP Cloudification Repository: search released objects, classic APIs, and successors with Clean Core Level filtering (A/B/C/D).",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "rosa": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "sap_abbreviation_dictionary.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "start:http": "node dist/index.js --http",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "dev": "tsc --watch",
+    "sync-version": "node scripts/sync-version.js",
+    "prepack": "npm run build",
+    "bundle": "npm run build && esbuild dist/index.js --bundle --platform=node --target=node20 --format=cjs --outfile=bundle/index.cjs && node -e \"require('fs').copyFileSync('sap_abbreviation_dictionary.json','bundle/sap_abbreviation_dictionary.json')\"",
+    "pkg:win": "npm run bundle && pkg bundle/index.cjs --targets node20-win-x64 --output bin/rosa-win.exe",
+    "pkg:linux": "npm run bundle && pkg bundle/index.cjs --targets node20-linux-x64 --output bin/rosa-linux",
+    "pkg:macos": "npm run bundle && pkg bundle/index.cjs --targets node20-macos-x64 --output bin/rosa-macos",
+    "pkg:all": "npm run bundle && pkg bundle/index.cjs --targets node20-win-x64 --output bin/rosa-win.exe && pkg bundle/index.cjs --targets node20-linux-x64 --output bin/rosa-linux && pkg bundle/index.cjs --targets node20-macos-x64 --output bin/rosa-macos",
+    "version": "node scripts/sync-version.js && git add mta.yaml README.md"
+  },
+  "pkg": {
+    "assets": [
+      "sap_abbreviation_dictionary.json"
+    ]
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "sap",
+    "abap",
+    "abap-cloud",
+    "clean-core",
+    "cloudification-repository",
+    "released-apis",
+    "released-objects",
+    "rap",
+    "rest-api"
+  ],
+  "author": "Clément Ringot",
+  "license": "MIT",
+  "homepage": "https://github.com/ClementRingot/ROSA#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ClementRingot/ROSA.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ClementRingot/ROSA/issues"
+  },
+  "dependencies": {
+    "@arc-mcp/xsuaa-auth": "^0.1.4",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.5.2",
+    "helmet": "^8.2.0",
+    "jose": "^6.2.3",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.0.0",
+    "@yao-pkg/pkg": "^6.14.1",
+    "esbuild": "^0.27.3",
+    "typescript": "^5.7.0",
+    "vitest": "^3.2.4"
+  },
+  "overrides": {
+    "@yao-pkg/pkg": {
+      "into-stream": "6.0.0"
+    }
+  }
+}

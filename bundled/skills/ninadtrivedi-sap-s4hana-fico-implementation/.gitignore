@@ -1,0 +1,33 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Workspace directories
+*-workspace/
+
+# Python
+__pycache__/
+*.pyc
+.env
+
+# Node
+node_modules/
+npm-debug.log
+
+# Generated outputs
+outputs/
+*.docx
+*.pdf
+*.xlsx
+*.pptx
+
+# Secrets
+.env
+*.key
+*.pem

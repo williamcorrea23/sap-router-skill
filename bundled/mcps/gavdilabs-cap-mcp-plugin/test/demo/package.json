@@ -1,0 +1,44 @@
+{
+  "name": "demo",
+  "version": "1.0.0",
+  "description": "A simple CAP project.",
+  "repository": "<Add your repository here>",
+  "license": "UNLICENSED",
+  "private": true,
+  "dependencies": {
+    "@sap/cds": ">=9",
+    "express": "^4",
+    "@gavdi/cap-mcp": "../../."
+  },
+  "devDependencies": {
+    "@cap-js/sqlite": "^2",
+    "@cap-js/cds-types": "^0.18.0"
+  },
+  "scripts": {
+    "start": "cds-serve",
+    "watch": "cds w  --port 4015"
+  },
+  "cds": {
+    "requires": {
+      "auth": "xsuaa"
+    },
+    "mcp": {
+      "name": "mock-service",
+      "version": "0.0.1",
+      "auth": "none",
+      "instructions": {
+        "file": "mcp-instructions.md"
+      },
+      "wrap_entities_to_actions": true,
+      "wrap_entity_modes": [
+        "query",
+        "get"
+      ]
+    },
+    "log": {
+      "levels": {
+        "mcp": "debug"
+      }
+    }
+  }
+}

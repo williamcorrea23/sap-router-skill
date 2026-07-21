@@ -1,6 +1,6 @@
 # SAP Router Skill — Multi-IDE Agent Instructions
 
-> **87 skills mirrored across 4 IDEs — same SKILL.md content in each.**
+> **89 skills mirrored across 4 IDEs — same SKILL.md content in each.**
 >
 > All skills auto-trigger by file context and keyword. See SKILL.md for master dispatch.
 
@@ -25,6 +25,21 @@ python scripts/mcp_launcher.py list --capability sap.cpi.message.read
 python scripts/mcp_launcher.py list --capability sap.apim.proxy.read
 ```
 
+## Dynamic local asset discovery
+
+Before selecting an SAP skill or MCP for a task that is not an exact static
+route, query the repository-owned catalog. The search ranks canonical skills,
+reviewed MCPs, and bundled snapshots together:
+
+```bash
+python scripts/source_catalog.py search "task description"
+python scripts/mcp_launcher.py search --query "task description"
+```
+
+Use the highest relevant enabled/reviewed result. A bundled MCP with status
+`disabled_candidate` is evidence for review, never authorization to execute it.
+All bundled code lives under `bundled/`; routing does not fetch GitHub at runtime.
+
 CPI/APIM/Fiori/UI5/CAP now route through API/CLI/plugin MCPs first and use Web UI MCP
 fallbacks (`integration-suite-ui-mcp`, `apim-ui-mcp`) only when background access is blocked.
 The Web UI bridge uses the logged-in browser session and does not accept credential values.
@@ -37,7 +52,7 @@ python scripts/approval_broker.py plan --capability sap.apim.proxy.deploy --targ
 
 ## What this project is
 
-15 standalone Python 3 CLIs + one Node.js review gate — no live SAP system required
+40 Python operational scripts plus Node.js review gates — no live SAP system required
 credentials required. Everything runs offline.
 
 ## Routing rules (v4.2.0 — ADT-first, GUI-fallback, caveman-optimized)

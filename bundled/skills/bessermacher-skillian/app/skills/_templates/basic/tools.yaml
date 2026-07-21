@@ -1,0 +1,15 @@
+tools:
+  - name: example_tool
+    description: |
+      Example tool description.
+      Explain what this tool does.
+    parameters:
+      - name: param1
+        type: string
+        required: true
+        description: First parameter
+      - name: param2
+        type: integer
+        required: false
+        description: Optional second parameter
+    implementation: app.skills.skill-name.tools:example_tool

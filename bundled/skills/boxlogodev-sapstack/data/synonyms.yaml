@@ -1,0 +1,1182 @@
+# data/synonyms.yaml
+# sapstack Korean Field Language Synonym Sheet
+#
+# 목적:
+#   "원가센터 vs 코스트 센터 vs KOSTL"처럼 동일 개념이 여러 형태로 표기되는
+#   한국 SAP 현장의 용어 괴리를 흡수하는 synonym layer.
+#
+#   매칭 엔진(web/triage.js, mcp/server.ts), 문서 작성자(references/), AI가
+#   응답을 생성할 때 모두 이 파일을 진실의 원천으로 삼는다.
+#
+# 사용 흐름:
+#   1. 사용자가 자유 텍스트로 입력 ("코스트센터 바뀐거 있어?")
+#   2. 매칭 엔진이 variants에서 canonical(cost_center) 확인
+#   3. symptom-index와 매칭 시 canonical 기준으로 확장된 토큰으로 비교
+#   4. AI 응답 시 "코스트 센터 (원가센터, KOSTL)" 형태로 이중 병기 첫 등장
+#
+# 이중 병기 원칙 (korean-field-language.md 참조):
+#   - 문서 첫 등장: "코스트 센터 (원가센터, KOSTL)"
+#   - 이후 반복: "코스트 센터"만
+#   - 대화 출력: "코스트 센터"만 (병기 불필요)
+#   - 스키마·테이블 참조: canonical 또는 field form 사용
+#
+# 기여 가이드: docs/i18n/symptom-index.md + 이 파일 상단 주석
+
+schema_version: "1.0.0"
+generated: 2026-04-12
+license: MIT
+source: |
+  Primary — BoxLogoDev authors (한국 SAP 현장 감각 기반)
+  Secondary — SAP Help Portal 공식 번역 대조
+  Community — PRs welcome (docs/i18n/symptom-index.md 참조)
+
+# ═══════════════════════════════════════════════════════════════
+# FI — Financial Accounting (20)
+# ═══════════════════════════════════════════════════════════════
+terms:
+  - canonical: general_ledger
+    module: FI
+    field_forms: [BSEG, BKPF, FAGLFLEXA, SKAT, SKB1]
+    en: General Ledger
+    ko:
+      primary: "지엘"
+      variants: ["GL", "총계정원장", "일반원장", "General Ledger", "지-엘"]
+    de: { primary: "Hauptbuch" }
+    ja: { primary: "総勘定元帳", variants: ["GL"] }
+    zh: { primary: "总账", variants: ["总分类账", "GL"] }
+    vi: { primary: "Sổ cái chung", variants: ["GL", "Sổ tổng"] }
+    related_tcodes: [FB01, FBL3N, FAGLB03, S_ALR_87012277]
+
+  - canonical: cost_center
+    module: CO
+    field_forms: [KOSTL, CSKS, CSKT]
+    en: Cost Center
+    ko:
+      primary: "코스트 센터"
+      variants: ["코스트센터", "원가센터", "원가 센터", "CC", "씨씨", "KOSTL", "코스트센타"]
+    de: { primary: "Kostenstelle" }
+    ja: { primary: "原価センタ", variants: ["コストセンタ", "CC"] }
+    zh: { primary: "成本中心", variants: ["原价中心", "CC"] }
+    vi: { primary: "Trung tâm chi phí", variants: ["Tâm chi phí", "CC"] }
+    related_tcodes: [KS01, KS02, KS03, KSH1, KSB1]
+
+  - canonical: profit_center
+    module: CO
+    field_forms: [PRCTR, CEPC, CEPCT]
+    en: Profit Center
+    ko:
+      primary: "프로핏 센터"
+      variants: ["프라핏센터", "프로핏센터", "이익센터", "이익 센터", "PC", "피씨", "PRCTR"]
+    de: { primary: "Profitcenter" }
+    ja: { primary: "利益センタ", variants: ["プロフィットセンタ", "PC"] }
+    zh: { primary: "利润中心", variants: ["收益中心", "PC"] }
+    vi: { primary: "Trung tâm lợi nhuận", variants: ["Tâm lợi nhuận", "PC"] }
+    related_tcodes: [KE51, KE52, KE53, KE5Z]
+
+  - canonical: company_code
+    module: FI
+    field_forms: [BUKRS, T001]
+    en: Company Code
+    ko:
+      primary: "회사코드"
+      variants: ["컴파니 코드", "컴파니코드", "회사 코드", "BUKRS", "법인코드", "법인 코드"]
+    de: { primary: "Buchungskreis" }
+    ja: { primary: "会社コード", variants: ["カンパニーコード"] }
+    zh: { primary: "公司代码", variants: ["公司编码", "BUKRS"] }
+    vi: { primary: "Mã công ty", variants: ["Mã công ty", "BUKRS"] }
+    related_tcodes: [OBY6, OX02]
+
+  - canonical: document
+    module: FI
+    field_forms: [BKPF, BSEG, BELNR, BUZEI]
+    en: Accounting Document
+    ko:
+      primary: "전표"
+      variants: ["도큐먼트", "document", "Belnr", "도큐", "전표번호"]
+    de: { primary: "Beleg", variants: ["Buchungsbeleg"] }
+    ja: { primary: "伝票", variants: ["ドキュメント"] }
+    zh: { primary: "凭证", variants: ["会计凭证", "单据"] }
+    vi: { primary: "Chứng từ", variants: ["Chứng từ kế toán"] }
+    related_tcodes: [FB03, FB02, FBRA]
+
+  - canonical: posting
+    module: FI
+    field_forms: [BUDAT, BLDAT, BSTAT]
+    en: Posting
+    ko:
+      primary: "포스팅"
+      variants: ["계상", "기표", "전기", "posting", "전표계상", "입력"]
+    de: { primary: "Buchung" }
+    ja: { primary: "計上", variants: ["ポスティング", "転記"] }
+    zh: { primary: "过账", variants: ["记账", "登记"] }
+    vi: { primary: "Ghi sổ", variants: ["Ghi chép", "Hạch toán"] }
+    related_tcodes: [FB01, FB50]
+    notes: |
+      "계상"은 한국 회계 전통 용어, "포스팅"은 SAP 현장 실용어.
+      대화에서는 "포스팅" > "계상" > "기표" > "전기" 순으로 자주 쓰임.
+
+  - canonical: posting_period
+    module: FI
+    field_forms: [MONAT, GJAHR, PERIV]
+    en: Posting Period
+    ko:
+      primary: "포스팅 피리어드"
+      variants: ["피리어드", "기간", "회계기간", "period", "PERIO", "포스팅피리어드"]
+    de: { primary: "Buchungsperiode" }
+    ja: { primary: "転記期間", variants: ["ピリオド"] }
+    zh: { primary: "过账期间", variants: ["记账期间", "会计期间"] }
+    vi: { primary: "Kỳ ghi sổ", variants: ["Kỳ kế toán", "Khoảng thời gian"] }
+    related_tcodes: [OB52, OBBP, S_ALR_87003642]
+
+  - canonical: vendor
+    module: FI
+    field_forms: [LIFNR, LFA1, LFB1, LFM1]
+    en: Vendor / Supplier
+    ko:
+      primary: "벤더"
+      variants: ["벤더마스터", "거래처", "supplier", "공급처", "공급자", "LIFNR", "업체", "매입처"]
+    de: { primary: "Lieferant", variants: ["Kreditor"] }
+    ja: { primary: "仕入先", variants: ["ベンダー", "サプライヤー"] }
+    zh: { primary: "供应商", variants: ["卖方", "供应者"] }
+    vi: { primary: "Nhà cung cấp", variants: ["Bên bán", "Nhà cung"] }
+    related_tcodes: [XK01, XK02, XK03, BP, FK03]
+    notes: |
+      S/4HANA에서는 Business Partner(BP)로 통합. 현장은 여전히 "벤더"가 압도적.
+
+  - canonical: customer
+    module: SD
+    field_forms: [KUNNR, KNA1, KNB1, KNVV]
+    en: Customer
+    ko:
+      primary: "커스터머"
+      variants: ["고객", "거래처", "매출처", "customer", "KUNNR", "고객마스터"]
+    de: { primary: "Debitor", variants: ["Kunde"] }
+    ja: { primary: "得意先", variants: ["カスタマ", "顧客"] }
+    related_tcodes: [XD01, XD02, XD03, BP, FD03]
+    notes: |
+      한국 현장은 "거래처"가 벤더/고객 구분 없이 쓰이기도 함 — 문맥 확인 필요.
+    zh: { primary: "客户", variants: ['用户', '购货方', 'KUNNR'] }
+    vi: { primary: "Khách hàng", variants: ['Khách', 'Bên mua', 'KUNNR'] }
+
+  - canonical: payment_method
+    module: FI
+    field_forms: [ZWELS, LFB1-ZWELS, ZLSCH, BSIK-ZLSCH]
+    en: Payment Method
+    ko:
+      primary: "페이먼트 메소드"
+      variants: ["지급방법", "지급 방법", "페이먼트메소드", "지급수단", "ZWELS", "즈웰스"]
+    de: { primary: "Zahlungsmethode", variants: ["Zahlweg"] }
+    ja: { primary: "支払方法", variants: ["ペイメントメソッド"] }
+    related_tcodes: [FBZP, XK02, F110]
+    zh: { primary: "支付方式", variants: ['付款方式', '支付方法', 'ZWELS'] }
+
+  - canonical: payment_block
+    module: FI
+    field_forms: [ZAHLS, LFB1-ZAHLS, BSIK-ZLSPR]
+    en: Payment Block
+    ko:
+      primary: "페이먼트 블록"
+      variants: ["지급 블록", "지급블락", "payment block", "ZAHLS", "블록"]
+    de: { primary: "Zahlsperre" }
+    ja: { primary: "支払ブロック" }
+    related_tcodes: [FB02, MRBR, F110]
+    vi: { primary: "Khóa thanh toán", variants: ['Cấm thanh toán', 'ZAHLS'] }
+
+  - canonical: payment_run
+    module: FI
+    field_forms: [REGUH, REGUP, LAUFD, LAUFI]
+    en: Payment Run
+    ko:
+      primary: "페이먼트런"
+      variants: ["지급실행", "지급 실행", "F110", "에프백십", "Payment Run", "페이런"]
+    de: { primary: "Zahlungslauf" }
+    ja: { primary: "支払実行", variants: ["ペイメントラン"] }
+    related_tcodes: [F110, F110S, REGUH]
+    zh: { primary: "支付运行", variants: ['批量支付', '支付处理', 'F110'] }
+
+  - canonical: accounts_payable
+    module: FI
+    field_forms: [BSIK, BSAK, LFB1]
+    en: Accounts Payable
+    ko:
+      primary: "에이피"
+      variants: ["AP", "매입채무", "외상매입금", "accounts payable", "에-피", "AP잔액"]
+    de: { primary: "Kreditorenbuchhaltung" }
+    ja: { primary: "買掛金", variants: ["AP"] }
+    related_tcodes: [FBL1N, FK10N, F-53]
+    vi: { primary: "Công nợ phải trả", variants: ['Nợ phải trả', 'BSIK'] }
+
+  - canonical: accounts_receivable
+    module: FI
+    field_forms: [BSID, BSAD, KNB1]
+    en: Accounts Receivable
+    ko:
+      primary: "에이알"
+      variants: ["AR", "매출채권", "외상매출금", "accounts receivable", "에-알", "AR잔액"]
+    de: { primary: "Debitorenbuchhaltung" }
+    ja: { primary: "売掛金", variants: ["AR"] }
+    related_tcodes: [FBL5N, FD10N, F-28]
+    zh: { primary: "应收账款", variants: ['应收', '债务人', 'BSID'] }
+
+  - canonical: special_gl
+    module: FI
+    field_forms: [UMSKZ, UMSKS, BSEG-UMSKZ]
+    en: Special G/L Indicator
+    ko:
+      primary: "스페셜 지엘"
+      variants: ["특수원장", "Special GL", "SGL", "스페셜 GL", "UMSKZ", "에스지엘"]
+    de: { primary: "Sonderhauptbuch" }
+    ja: { primary: "特別仕訳帳", variants: ["特殊G/L"] }
+    related_tcodes: [OBXR, OBXT, FBL1N]
+    vi: { primary: "Sổ cái đặc biệt", variants: ['GL đặc biệt', 'UMSKZ'] }
+
+  - canonical: withholding_tax
+    module: FI
+    field_forms: [WITHT, WT_QSCOD, WITH_ITEM, LFBW]
+    en: Withholding Tax
+    ko:
+      primary: "원천세"
+      variants: ["위타홀딩", "위타홀딩 택스", "WHT", "원천", "원천징수", "원천징수세", "withholding"]
+    de: { primary: "Quellensteuer" }
+    ja: { primary: "源泉徴収税", variants: ["源泉税", "ウィズホールディング"] }
+    related_tcodes: [FB60, J1INCERT, S_P00_07000134]
+    notes: |
+      한국 원천세는 3.3%(사업소득), 8.8%(기타소득) 등 구분. 연말정산과 직결.
+    zh: { primary: "代扣税", variants: ['所得税代扣', '代扣', 'WHT'] }
+
+  - canonical: tax_code
+    module: FI
+    field_forms: [MWSKZ, T007A, BSEG-MWSKZ]
+    en: Tax Code
+    ko:
+      primary: "택스 코드"
+      variants: ["세금코드", "세금 코드", "tax code", "MWSKZ", "VAT코드", "부가세 코드"]
+    de: { primary: "Steuerkennzeichen" }
+    ja: { primary: "税コード", variants: ["タックスコード"] }
+    related_tcodes: [FTXP, FB60, MIRO]
+    vi: { primary: "Mã thuế", variants: ['Mã loại thuế', 'MWSKZ'] }
+
+  - canonical: house_bank
+    module: FI
+    field_forms: [HBKID, T012, T012K]
+    en: House Bank
+    ko:
+      primary: "하우스뱅크"
+      variants: ["하우스 뱅크", "house bank", "HBKID", "회사 은행", "자사은행"]
+    de: { primary: "Hausbank" }
+    ja: { primary: "ハウスバンク", variants: ["自社銀行"] }
+    related_tcodes: [FI12, FBZP, NWBC_BAM]
+    zh: { primary: "公司银行", variants: ['自有银行', '内部银行', 'HBKID'] }
+
+  - canonical: period_close
+    module: FI
+    field_forms: [T001B, OB52]
+    en: Period-End Close
+    ko:
+      primary: "월마감"
+      variants: ["period close", "기간마감", "결산", "피어리드 클로즈", "마감", "클로징"]
+    de: { primary: "Periodenabschluss", variants: ["Monatsabschluss"] }
+    ja: { primary: "月次決算", variants: ["期末クローズ", "締め"] }
+    related_tcodes: [OB52, F.05, F.19, FAGLGVTR]
+    notes: |
+      한국 기업 월마감은 보통 D+3~D+5 (익월 3~5영업일). 분기마감·연마감·가결산 구분.
+    vi: { primary: "Đóng kỳ", variants: ['Đóng tháng', 'Kết thúc kỳ', 'D+3'] }
+
+  - canonical: foreign_currency_valuation
+    module: FI
+    field_forms: [BKPF-WAERS, FAGL_FCV]
+    en: Foreign Currency Valuation
+    ko:
+      primary: "외화평가"
+      variants: ["환평가", "FCV", "foreign currency valuation", "에프씨브이", "외환평가"]
+    de: { primary: "Fremdwährungsbewertung" }
+    ja: { primary: "外貨評価", variants: ["FCV"] }
+    related_tcodes: [F.05, FAGL_FC_VAL, OB08]
+
+# ═══════════════════════════════════════════════════════════════
+# CO — Controlling (8)
+# ═══════════════════════════════════════════════════════════════
+    zh: { primary: "外币估值", variants: ['外汇估值', '外币重估', 'FCV'] }
+
+  - canonical: cost_element
+    module: CO
+    field_forms: [KSTAR, CSKA, CSKB]
+    en: Cost Element
+    ko:
+      primary: "코스트 엘리먼트"
+      variants: ["원가요소", "원가 요소", "cost element", "KSTAR", "CE", "씨이"]
+    de: { primary: "Kostenart" }
+    ja: { primary: "原価要素", variants: ["コスト要素"] }
+    related_tcodes: [KA01, KA02, KA03, KAH1]
+    notes: |
+      S/4HANA에서는 GL 계정과 통합(Unified Ledger). 현장은 여전히 "코스트 엘리먼트" 사용.
+    vi: { primary: "Yếu tố chi phí", variants: ['Loại chi phí', 'KSTAR'] }
+
+  - canonical: internal_order
+    module: CO
+    field_forms: [AUFNR, AUFK]
+    en: Internal Order
+    ko:
+      primary: "인터널 오더"
+      variants: ["내부오더", "내부 오더", "IO", "아이오", "internal order", "AUFNR", "오더"]
+    de: { primary: "Innenauftrag" }
+    ja: { primary: "内部指図", variants: ["インターナルオーダ", "IO"] }
+    related_tcodes: [KO01, KO02, KO03, KOB1]
+    zh: { primary: "内部订单", variants: ['内部指令', '内部命令', 'IO'] }
+
+  - canonical: wbs_element
+    module: CO
+    field_forms: [PRPS, POSID, PSPNR]
+    en: WBS Element
+    ko:
+      primary: "WBS"
+      variants: ["와비스", "더블유비에스", "WBS element", "WBS 엘리먼트", "프로젝트 WBS", "PRPS"]
+    de: { primary: "PSP-Element" }
+    ja: { primary: "WBS要素", variants: ["WBS"] }
+    related_tcodes: [CJ20N, CJ03, CN41N]
+
+  - canonical: activity_type
+    module: CO
+    field_forms: [LSTAR, CSLA, CSLT]
+    en: Activity Type
+    ko:
+      primary: "액티비티 타입"
+      variants: ["작업유형", "액티비티 종류", "activity type", "LSTAR"]
+    de: { primary: "Leistungsart" }
+    ja: { primary: "活動タイプ", variants: ["アクティビティタイプ"] }
+    related_tcodes: [KL01, KL02, KP26]
+    vi: { primary: "Loại hoạt động", variants: ['Hình thức hoạt động', 'LSTAR'] }
+
+  - canonical: assessment
+    module: CO
+    field_forms: [RKEB, CCSSBA]
+    en: Assessment
+    ko:
+      primary: "어세스먼트"
+      variants: ["배부", "배분", "assessment", "어쎄스먼트", "원가배부"]
+    de: { primary: "Umlage" }
+    ja: { primary: "配賦", variants: ["アセスメント"] }
+    related_tcodes: [KSU1, KSU5, KSUB]
+    zh: { primary: "分摊", variants: ['评估', '费用分摊', 'RKEB'] }
+
+  - canonical: distribution
+    module: CO
+    field_forms: [T811, RKE]
+    en: Distribution (CO)
+    ko:
+      primary: "디스트리뷰션"
+      variants: ["분배", "distribution", "원가분배"]
+    de: { primary: "Verteilung" }
+    ja: { primary: "配分", variants: ["ディストリビューション"] }
+    related_tcodes: [KSV1, KSV5]
+
+  - canonical: settlement
+    module: CO
+    field_forms: [COBL, AUFK, T838A]
+    en: Settlement
+    ko:
+      primary: "세틀먼트"
+      variants: ["정산", "settlement", "청산", "결제"]
+    de: { primary: "Abrechnung" }
+    ja: { primary: "決済", variants: ["セトルメント"] }
+    related_tcodes: [KO88, KO8G, CJ88]
+    vi: { primary: "Quyết toán", variants: ['Thanh toán', 'COBL'] }
+
+  - canonical: co_pa
+    module: CO
+    field_forms: [CE1XXXX, CE2XXXX, CE4XXXX]
+    en: Profitability Analysis (CO-PA)
+    ko:
+      primary: "씨오피에이"
+      variants: ["CO-PA", "COPA", "수익성분석", "수익성 분석", "코파", "씨오피-에이"]
+    de: { primary: "Ergebnisrechnung", variants: ["CO-PA"] }
+    ja: { primary: "収益性分析", variants: ["CO-PA", "コパ"] }
+    related_tcodes: [KE30, KE24, KEPM]
+
+# ═══════════════════════════════════════════════════════════════
+# MM — Materials Management (12)
+# ═══════════════════════════════════════════════════════════════
+    zh: { primary: "利润分析", variants: ['收益分析', 'CO-PA', '盈利能力分析'] }
+
+  - canonical: material
+    module: MM
+    field_forms: [MATNR, MARA, MARC, MARD]
+    en: Material
+    ko:
+      primary: "머티리얼"
+      variants: ["자재", "자재코드", "품목", "material", "MATNR", "머테리얼"]
+    de: { primary: "Material" }
+    ja: { primary: "品目", variants: ["マテリアル", "資材"] }
+    related_tcodes: [MM01, MM02, MM03, MM60]
+
+  - canonical: plant
+    module: MM
+    field_forms: [WERKS, T001W]
+    en: Plant
+    ko:
+      primary: "플랜트"
+      variants: ["공장", "plant", "WERKS", "사업장"]
+    de: { primary: "Werk" }
+    ja: { primary: "プラント", variants: ["工場"] }
+    related_tcodes: [OX10, OMSJ]
+    vi: { primary: "Nhà máy", variants: ['Cơ sở sản xuất', 'WERKS'] }
+
+  - canonical: storage_location
+    module: MM
+    field_forms: [LGORT, T001L, MARD]
+    en: Storage Location
+    ko:
+      primary: "스토락"
+      variants: ["저장위치", "저장 위치", "storage loc", "storage location", "LGORT", "스토리지 로케이션", "창고"]
+    de: { primary: "Lagerort" }
+    ja: { primary: "保管場所", variants: ["ストレージロケーション"] }
+    related_tcodes: [OX09, MMSC]
+
+  - canonical: movement_type
+    module: MM
+    field_forms: [BWART, T156, MSEG-BWART]
+    en: Movement Type
+    ko:
+      primary: "무브먼트 타입"
+      variants: ["이동유형", "이동 유형", "movement type", "BWART", "엠티", "MT"]
+    de: { primary: "Bewegungsart" }
+    ja: { primary: "移動タイプ", variants: ["ムーブメントタイプ"] }
+    related_tcodes: [OMJJ, MB51, MIGO]
+    notes: |
+      101=수령, 102=취소, 201=출고(cost center), 261=출고(order), 601=판매출고 등
+      현장은 번호로만 소통하는 경우가 많음: "101로 들어왔어요", "102 쳤어요".
+
+  - canonical: goods_receipt
+    module: MM
+    field_forms: [MSEG, MKPF, MBLNR]
+    en: Goods Receipt
+    ko:
+      primary: "지알"
+      variants: ["GR", "입고", "goods receipt", "지-알", "입고처리", "수령"]
+    de: { primary: "Wareneingang" }
+    ja: { primary: "入庫", variants: ["GR", "グッズレシート"] }
+    related_tcodes: [MIGO, MB01, MB31]
+    zh: { primary: "收货", variants: ['货物收据', '入库', 'MIGO'] }
+    vi: { primary: "Biên lai nhận hàng", variants: ['Nhận hàng', 'Biên bản nhận', 'MIGO'] }
+
+  - canonical: goods_issue
+    module: MM
+    field_forms: [MSEG, MKPF]
+    en: Goods Issue
+    ko:
+      primary: "지아이"
+      variants: ["GI", "출고", "goods issue", "지-아이", "불출"]
+    de: { primary: "Warenausgang" }
+    ja: { primary: "出庫", variants: ["GI"] }
+    related_tcodes: [MIGO, MB1A, MB1C]
+
+  - canonical: purchase_order
+    module: MM
+    field_forms: [EBELN, EKKO, EKPO]
+    en: Purchase Order
+    ko:
+      primary: "피오"
+      variants: ["PO", "구매발주", "발주서", "purchase order", "피-오", "오더", "구매오더"]
+    de: { primary: "Bestellung" }
+    ja: { primary: "購買発注", variants: ["PO", "発注"] }
+    related_tcodes: [ME21N, ME22N, ME23N, ME2L]
+
+  - canonical: purchase_requisition
+    module: MM
+    field_forms: [BANFN, EBAN]
+    en: Purchase Requisition
+    ko:
+      primary: "피알"
+      variants: ["PR", "구매요청", "구매의뢰", "purchase requisition", "피-알", "의뢰"]
+    de: { primary: "Banfanforderung", variants: ["Bestellanforderung"] }
+    ja: { primary: "購買依頼", variants: ["PR"] }
+    related_tcodes: [ME51N, ME52N, ME53N]
+    zh: { primary: "采购申请", variants: ['采购需求', '采购请求', 'EBAN'] }
+    vi: { primary: "Yêu cầu mua hàng", variants: ['Yêu cầu đặt hàng', 'EBAN'] }
+
+  - canonical: gr_ir
+    module: MM
+    field_forms: [WRX, MSEG-WRX, EKBE]
+    en: GR/IR Clearing
+    ko:
+      primary: "지알 아이알"
+      variants: ["GR/IR", "GR IR", "미결제", "미청구 입고", "지알아이알", "W R X", "gr-ir"]
+    de: { primary: "WE/RE-Verrechnungskonto", variants: ["GR/IR"] }
+    ja: { primary: "GR/IR勘定", variants: ["GRIR"] }
+    related_tcodes: [MR11, F.13, MRBR]
+    notes: |
+      월마감의 대표적 문제 영역. "지알 따로 아이알 따로"라는 현장 표현도 있음.
+
+  - canonical: invoice_verification
+    module: MM
+    field_forms: [RBKP, RSEG]
+    en: Invoice Verification
+    ko:
+      primary: "송장검증"
+      variants: ["인보이스 버리피케이션", "송장 검증", "invoice verification", "미로", "MIRO", "송검"]
+    de: { primary: "Rechnungsprüfung" }
+    ja: { primary: "請求書検証", variants: ["インボイス検証"] }
+    related_tcodes: [MIRO, MIR4, MIR6, MR8M]
+
+  - canonical: stock
+    module: MM
+    field_forms: [MARD, MCHB, MSKU, MSKA]
+    en: Stock
+    ko:
+      primary: "스탁"
+      variants: ["재고", "stock", "재고량", "수량", "재고수량"]
+    de: { primary: "Bestand" }
+    ja: { primary: "在庫" }
+    related_tcodes: [MMBE, MB52, MB51, MB5B]
+    zh: { primary: "库存", variants: ['存货', '库存量', 'MENGE'] }
+    vi: { primary: "Tồn kho", variants: ['Hàng tồn', 'MENGE'] }
+
+  - canonical: batch
+    module: MM
+    field_forms: [CHARG, MCHB, MCHA]
+    en: Batch
+    ko:
+      primary: "배치"
+      variants: ["로트", "batch", "LOT", "뱃치", "배치번호", "로트번호"]
+    de: { primary: "Charge" }
+    ja: { primary: "バッチ", variants: ["ロット"] }
+    related_tcodes: [MSC1N, MSC3N, MB56]
+
+# ═══════════════════════════════════════════════════════════════
+# SD — Sales & Distribution (10)
+# ═══════════════════════════════════════════════════════════════
+
+  - canonical: sales_order
+    module: SD
+    field_forms: [VBELN, VBAK, VBAP]
+    en: Sales Order
+    ko:
+      primary: "에스오"
+      variants: ["SO", "판매주문", "판매오더", "sales order", "에스-오", "수주", "주문"]
+    de: { primary: "Kundenauftrag" }
+    ja: { primary: "販売オーダ", variants: ["SO", "受注"] }
+    related_tcodes: [VA01, VA02, VA03, VA05]
+
+  - canonical: delivery
+    module: SD
+    field_forms: [VBELN, LIKP, LIPS]
+    en: Outbound Delivery
+    ko:
+      primary: "딜리버리"
+      variants: ["납품", "출하", "delivery", "delivery note", "D/N", "납품서"]
+    de: { primary: "Lieferung" }
+    ja: { primary: "出荷", variants: ["デリバリ"] }
+    related_tcodes: [VL01N, VL02N, VL03N, VL06O]
+    zh: { primary: "交货", variants: ['发货', '配送', 'LIKP'] }
+    vi: { primary: "Giao hàng", variants: ['Chuyên chở', 'LIKP'] }
+
+  - canonical: billing
+    module: SD
+    field_forms: [VBELN, VBRK, VBRP]
+    en: Billing Document
+    ko:
+      primary: "빌링"
+      variants: ["청구", "청구서", "billing", "invoice", "인보이스", "세금계산서"]
+    de: { primary: "Faktura" }
+    ja: { primary: "請求", variants: ["ビリング"] }
+    related_tcodes: [VF01, VF02, VF03, VF04]
+
+  - canonical: pricing
+    module: SD
+    field_forms: [KONV, KONP, A004]
+    en: Pricing / Condition
+    ko:
+      primary: "프라이싱"
+      variants: ["가격결정", "가격 결정", "pricing", "컨디션", "condition", "가결정"]
+    de: { primary: "Preisfindung", variants: ["Konditionen"] }
+    ja: { primary: "価格決定", variants: ["プライシング"] }
+    related_tcodes: [VK11, VK12, VK13, V/08]
+
+  - canonical: credit_check
+    module: SD
+    field_forms: [KNKK, S066, S067, UKMBP_CMS]
+    en: Credit Check
+    ko:
+      primary: "크레딧 체크"
+      variants: ["신용체크", "신용 체크", "credit check", "여신체크", "여신심사"]
+    de: { primary: "Kreditprüfung" }
+    ja: { primary: "信用照会", variants: ["クレジットチェック"] }
+    related_tcodes: [FD32, VKM1, UKM_CASE]
+
+  - canonical: customer_master
+    module: SD
+    field_forms: [KNA1, KNB1, KNVV]
+    en: Customer Master
+    ko:
+      primary: "커스터머 마스터"
+      variants: ["고객마스터", "고객 마스터", "customer master", "거래처 마스터", "BP", "비피"]
+    de: { primary: "Debitorenstamm", variants: ["Geschäftspartner"] }
+    ja: { primary: "得意先マスタ", variants: ["カスタママスタ", "BP"] }
+    related_tcodes: [XD01, XD02, XD03, BP]
+
+  - canonical: sales_area
+    module: SD
+    field_forms: [VKORG, VTWEG, SPART, TVKO, TVTW, TSPA]
+    en: Sales Area
+    ko:
+      primary: "세일즈 에어리어"
+      variants: ["영업영역", "영업 영역", "sales area", "VKORG", "판매영역", "판매조직"]
+    de: { primary: "Vertriebsbereich" }
+    ja: { primary: "販売エリア", variants: ["セールスエリア"] }
+    related_tcodes: [OVX6, OVXG]
+
+  - canonical: material_determination
+    module: SD
+    field_forms: [KONH, T683S]
+    en: Material Determination
+    ko:
+      primary: "머티리얼 디터미네이션"
+      variants: ["자재결정", "자재 결정", "material determination", "자재대체"]
+    de: { primary: "Materialfindung" }
+    ja: { primary: "品目決定" }
+    related_tcodes: [VB11, VB12, VB13]
+
+  - canonical: incoterms
+    module: SD
+    field_forms: [INCO1, INCO2, KNVV-INCO1]
+    en: Incoterms
+    ko:
+      primary: "인코텀즈"
+      variants: ["거래조건", "incoterms", "인코텀", "인코텀스", "가격조건"]
+    de: { primary: "Incoterms" }
+    ja: { primary: "インコタームズ" }
+    related_tcodes: [OVSG]
+
+  - canonical: route
+    module: SD
+    field_forms: [ROUTE, TVRO]
+    en: Route
+    ko:
+      primary: "루트"
+      variants: ["경로", "배송경로", "route", "배송 루트"]
+    de: { primary: "Route" }
+    ja: { primary: "ルート", variants: ["経路"] }
+    related_tcodes: [OVTC]
+
+# ═══════════════════════════════════════════════════════════════
+# Basis / ABAP (8)
+# ═══════════════════════════════════════════════════════════════
+
+  - canonical: transport_request
+    module: BASIS
+    field_forms: [E070, E071, TRKORR]
+    en: Transport Request
+    ko:
+      primary: "트포"
+      variants: ["TR", "트랜스포트", "transport request", "트랜스포트 리퀘스트", "티알", "티-알", "운송요청"]
+    de: { primary: "Transportauftrag" }
+    ja: { primary: "移送", variants: ["TR", "トランスポート"] }
+    related_tcodes: [SE09, SE10, STMS, SE03]
+    notes: |
+      "트포"는 한국 현장 압도적 우선 용어. 정식 용어는 "Transport Request".
+      동사로도 쓰임: "트포 땄어요" (= 전송 요청 생성함).
+
+  - canonical: client
+    module: BASIS
+    field_forms: [MANDT, T000]
+    en: Client
+    ko:
+      primary: "클라이언트"
+      variants: ["클라", "client", "MANDT", "만트", "클라우드 클라이언트 아님"]
+    de: { primary: "Mandant" }
+    ja: { primary: "クライアント" }
+    related_tcodes: [SCC4, SCC1, SCCL]
+
+  - canonical: role
+    module: BASIS
+    field_forms: [AGR_1251, AGR_TCODES, AGR_USERS]
+    en: Role / Authorization Role
+    ko:
+      primary: "롤"
+      variants: ["role", "역할", "권한 롤", "권한 role", "PFCG 롤", "AGR"]
+    de: { primary: "Rolle" }
+    ja: { primary: "ロール", variants: ["役割"] }
+    related_tcodes: [PFCG, SU01, SUIM, SU53]
+
+  - canonical: runtime_dump
+    module: BASIS
+    field_forms: [SNAP_ID, ST22]
+    en: ABAP Runtime Dump
+    ko:
+      primary: "덤프"
+      variants: ["런타임 에러", "dump", "short dump", "ABAP dump", "런타임덤프", "덤푸"]
+    de: { primary: "Laufzeitfehler", variants: ["Kurzdump"] }
+    ja: { primary: "ダンプ", variants: ["ランタイムエラー"] }
+    related_tcodes: [ST22, SNAP, SLG1]
+
+  - canonical: work_process
+    module: BASIS
+    field_forms: [SM50, WP_STATUS]
+    en: Work Process
+    ko:
+      primary: "워크 프로세스"
+      variants: ["WP", "더블유피", "work process", "워크프로세스", "프로세스"]
+    de: { primary: "Workprozess", variants: ["Arbeitsprozess"] }
+    ja: { primary: "ワークプロセス", variants: ["WP"] }
+    related_tcodes: [SM50, SM66, SM51]
+
+  - canonical: system_log
+    module: BASIS
+    field_forms: [SLOG, SM21]
+    en: System Log
+    ko:
+      primary: "시스템 로그"
+      variants: ["SM21", "시스템로그", "system log", "에스엠이십일", "syslog"]
+    de: { primary: "Systemprotokoll" }
+    ja: { primary: "システムログ", variants: ["SM21"] }
+    related_tcodes: [SM21, SLG1, RSLG0003]
+
+  - canonical: rfc_destination
+    module: BASIS
+    field_forms: [RFCDES, SM59]
+    en: RFC Destination
+    ko:
+      primary: "알에프씨"
+      variants: ["RFC", "RFC Destination", "알에프씨 데스티네이션", "알-에프-씨", "리모트 펑션"]
+    de: { primary: "RFC-Verbindung" }
+    ja: { primary: "RFC接続", variants: ["RFC"] }
+    related_tcodes: [SM59, SE37]
+
+  - canonical: idoc
+    module: BASIS
+    field_forms: [EDIDC, EDIDD, EDIDS]
+    en: IDoc
+    ko:
+      primary: "아이독"
+      variants: ["IDoc", "i-doc", "아이-독", "EDI Document", "아이닥"]
+    de: { primary: "IDoc" }
+    ja: { primary: "IDoc", variants: ["アイドック"] }
+    related_tcodes: [WE02, WE05, WE19, BD87]
+
+# ═══════════════════════════════════════════════════════════════
+# PM — Plant Maintenance (10)
+# ═══════════════════════════════════════════════════════════════
+
+  - canonical: maintenance_order
+    module: PM
+    field_forms: [AUFNR, AUFK]
+    en: Maintenance Order
+    ko:
+      primary: "보전오더"
+      variants: ["보전 오더", "작업지시서", "보전작업", "maintenance order", "MO", "정기점검"]
+    related_tcodes: [IW31, IW32, IW33, IW52]
+    notes: |
+      PM 오더는 CO의 Internal Order(AUFNR)를 상속. IW31(새 생성) vs KO01(비용 오더).
+    zh: { primary: "维护订单", variants: ['维保单', '保养单', 'AUFNR'] }
+    vi: { primary: "Lệnh bảo trì", variants: ['Đơn bảo dưỡng', 'AUFNR'] }
+
+  - canonical: inspection_lot
+    module: QM
+    field_forms: [LSING, QALS, QAMR]
+    en: Inspection Lot
+    ko:
+      primary: "검사로트"
+      variants: ["검사 로트", "IL", "아이엘", "검수 로트", "inspection lot", "검사 배치"]
+    related_tcodes: [QA01, QA03, QA11, QA25]
+
+  - canonical: usage_decision
+    module: QM
+    field_forms: [QAMR-ELOSNR, QAMR-ELOSLS]
+    en: Usage Decision
+    ko:
+      primary: "사용결정"
+      variants: ["사용 결정", "UD", "유유디", "usage decision", "판별", "검사 판정"]
+    related_tcodes: [QA11, QA25, QA32]
+    notes: |
+      QM의 최종 결과. Accept(A), Reject(R), Conditional(C), Scrap(S) 등.
+
+  - canonical: picking
+    module: WM/EWM
+    field_forms: [LTAP-LGPBE, "/SCWM/PICK"]
+    en: Picking
+    ko:
+      primary: "피킹"
+      variants: ["집품", "picking", "집하", "주문 피킹"]
+    related_tcodes: [LT0G, "/SCWM/WAVE", "/SCWM/PICK"]
+    notes: |
+      창고에서 고객 주문에 따라 물품을 모으는 작업.
+    ja: { primary: "ピッキング", variants: ['摘み取り'] }
+    de: { primary: "Kommissionierung" }
+
+  - canonical: putaway
+    module: WM/EWM
+    field_forms: [LTAP-LGPBE, "/SCWM/PUTAWAY"]
+    en: Putaway
+    ko:
+      primary: "적치"
+      variants: ["입고적치", "적치작업", "putaway", "보관 위치 할당"]
+    related_tcodes: [LT01, "/SCWM/PUTAWAY"]
+    notes: |
+      입고된 물품을 창고 빈에 배치하는 작업.
+    zh: { primary: "上架", variants: ['入库放置', '入库作业'] }
+    vi: { primary: "Lưu trữ hàng", variants: ['Đặt vào kho', 'Phục vụ'] }
+
+  - canonical: wave
+    module: EWM
+    field_forms: ["/SCWM/WAVE"]
+    en: Wave
+    ko:
+      primary: "파도"
+      variants: ["웨이브", "wave", "파동"]
+    related_tcodes: ["/SCWM/WAVE", "/SCWM/MON"]
+    notes: |
+      EWM에서 여러 주문을 묶어 처리하는 배치 단위.
+
+  - canonical: packing
+    module: EWM
+    field_forms: ["/SCWM/PACK"]
+    en: Packing
+    ko:
+      primary: "패킹"
+      variants: ["포장", "packing", "상자 포장"]
+    related_tcodes: ["/SCWM/PACK", "/SCWM/MON"]
+
+  - canonical: equipment
+    module: PM
+    field_forms: [EQUI, EQKT, IE02]
+    en: Equipment
+    ko:
+      primary: "장비"
+      variants: ["설비", "equipment", "기계", "제조 설비"]
+    related_tcodes: [IE01, IE02, IE03, IE04]
+    notes: |
+      PM 자산 마스터. 기능위치(FuncLoc)와 구분.
+    ja: { primary: "設備", variants: ['機器'] }
+    de: { primary: "Ausrüstung" }
+
+  - canonical: func_loc
+    module: PM
+    field_forms: [ILOA, IFLO, IL01]
+    en: Functional Location
+    ko:
+      primary: "기능위치"
+      variants: ["기능 위치", "FuncLoc", "FL", "펑셔널 로케이션", "작업장"]
+    related_tcodes: [IL01, IL02, IL03, ICWB]
+    notes: |
+      PM의 조직 계층. 공장 → 부서 → 작업장 구조.
+
+# ═══════════════════════════════════════════════════════════════
+# Quality & Metrics (5)
+# ═══════════════════════════════════════════════════════════════
+
+  - canonical: mtbf
+    module: PM
+    field_forms: []
+    en: Mean Time Between Failures
+    ko:
+      primary: "엠티비에프"
+      variants: ["MTBF", "평균고장간격", "평균 고장 간격"]
+    notes: |
+      설비 신뢰성 지표. 높을수록 설비가 안정적.
+    zh: { primary: "平均故障间隔", variants: ['MTBF', '无故障工作时间'] }
+    vi: { primary: "Thời gian trung bình giữa các lỗi", variants: ['MTBF'] }
+
+  - canonical: mttr
+    module: PM
+    field_forms: []
+    en: Mean Time To Repair
+    ko:
+      primary: "엠티티알"
+      variants: ["MTTR", "평균수리시간", "평균 수리 시간"]
+    notes: |
+      설비 유지보수 효율 지표. 낮을수록 빠른 복구.
+
+  - canonical: oee
+    module: PM
+    field_forms: []
+    en: Overall Equipment Effectiveness
+    ko:
+      primary: "오이이"
+      variants: ["OEE", "종합설비효율", "종합 설비 효율"]
+    notes: |
+      설비 생산성 종합 지표 = Availability × Performance × Quality.
+    ja: { primary: "総合設備効率", variants: ['OEE'] }
+    de: { primary: "OEE" }
+
+  - canonical: damage_code
+    module: PM/QM
+    field_forms: []
+    en: Damage Code / Failure Code
+    ko:
+      primary: "고장코드"
+      variants: ["고장 코드", "failure code", "결함코드", "오류코드"]
+    related_tcodes: [IW21, IW23]
+
+  - canonical: mic
+    module: QM
+    field_forms: [QPLA, QPLS, QC21]
+    en: Master Inspection Characteristic
+    ko:
+      primary: "엠아이씨"
+      variants: ["MIC", "검사특성", "검사 특성", "마스터 특성"]
+    related_tcodes: [QS21, QM02, QC21]
+    notes: |
+      QM에서 검사 항목 정의. 물리·화학·시각 특성 등.
+
+# ═══════════════════════════════════════════════════════════════
+# Warehouse Management (5)
+# ═══════════════════════════════════════════════════════════════
+
+  - canonical: handhold_terminal
+    module: WM/EWM
+    field_forms: ["/SCWM/RF"]
+    en: Hand-held Terminal / RF Scanner
+    ko:
+      primary: "핸드헬드"
+      variants: ["RF", "알에프", "핸드헬드 터미널", "스캔기", "핸드스캔"]
+    related_tcodes: ["/SCWM/RF", "LT06"]
+    notes: |
+      창고 내 이동식 단말기. RF 스캔으로 재고 추적.
+    zh: { primary: "手持终端", variants: ['移动终端', '手持设备'] }
+    vi: { primary: "Thiết bị cầm tay", variants: ['Máy móc cầm tay', 'Thiết bị di động'] }
+
+  - canonical: transfer_order
+    module: WM
+    field_forms: [LTAP, LTAK]
+    en: Transfer Order
+    ko:
+      primary: "이관오더"
+      variants: ["TO", "티오", "transfer order", "이동 지시"]
+    related_tcodes: [LT01, LT06, LTAK]
+    notes: |
+      창고 내 위치 간 물품 이동 지시.
+
+  - canonical: transfer_requirement
+    module: MM
+    field_forms: [LBKP, LBPOS]
+    en: Transfer Requirement
+    ko:
+      primary: "이관요청"
+      variants: ["TR", "티알", "transfer requirement", "이동요청"]
+    related_tcodes: [LB01, LB02, LB03]
+    notes: |
+      공장 간/스토락 간 재고 이동 요청.
+    ja: { primary: "移動要求", variants: ['転送要求'] }
+    de: { primary: "Umlagerungsanforderung" }
+
+  - canonical: warehouse_order
+    module: EWM
+    field_forms: ["/SCWM/ORDH", "/SCWM/ORDL"]
+    en: Warehouse Order
+    ko:
+      primary: "창고오더"
+      variants: ["WO", "더블유오", "warehouse order", "창고 주문"]
+    related_tcodes: ["/SCWM/MON", "/SCWM/WAVE"]
+
+  - canonical: handling_unit
+    module: EWM
+    field_forms: ["/SCWM/HUME", "/SCWM/HUMO"]
+    en: Handling Unit
+    ko:
+      primary: "핸들링유닛"
+      variants: ["HU", "에이치유", "handling unit", "단위물건"]
+    related_tcodes: ["/SCWM/HU", "/SCWM/MON"]
+    notes: |
+      EWM에서 물품 추적의 최소 단위. 팰릿·박스 등.
+
+# ═══════════════════════════════════════════════════════════════
+# Quality & Certification (3)
+# ═══════════════════════════════════════════════════════════════
+
+  - canonical: certificate_of_analysis
+    module: QM
+    field_forms: [QCMA, QCALC]
+    en: Certificate of Analysis / CoA
+    ko:
+      primary: "인증서"
+      variants: ["CoA", "씨오에이", "시험성적서", "certificate of analysis", "검사성적서"]
+    related_tcodes: [QC21, QC22, QM01]
+    notes: |
+      제품 품질 테스트 증명서. 고객·규제 기관 제출용.
+    zh: { primary: "分析证书", variants: ['检验报告', 'CoA'] }
+    vi: { primary: "Chứng chỉ phân tích", variants: ['CoA', 'Báo cáo phân tích'] }
+
+  - canonical: preventive_maintenance
+    module: PM
+    field_forms: [IVPLAN, IP01, IP10]
+    en: Preventive Maintenance
+    ko:
+      primary: "예방보전"
+      variants: ["PM", "피엠", "정기점검", "예방정비", "preventive maintenance"]
+    related_tcodes: [IP01, IP10, IP30]
+    notes: |
+      설비 고장 사전 예방을 위한 정기적 점검·정비.
+
+  - canonical: gmp
+    module: QM
+    field_forms: []
+    en: Good Manufacturing Practice
+    ko:
+      primary: "지엠피"
+      variants: ["GMP", "우수제조관리기준", "우수 제조 관리 기준"]
+    notes: |
+      제약·식품 산업 품질 표준. QM 모듈 활용 범위 확대 분야.
+
+# ═══════════════════════════════════════════════════════════════
+# 약어 (Abbreviations) — 10
+# 현장에서 풀네임 없이 바로 쓰이는 약어
+# ═══════════════════════════════════════════════════════════════
+
+abbreviations:
+  - short: TR
+    expands: [transport_request]
+    ko_pronunciation: "티알 / 트포"
+  - short: TP
+    expands: [transport_request]
+    ko_pronunciation: "티피"
+    notes: "TP는 'Transport (route)'로도 쓰임 — 문맥 확인"
+  - short: PO
+    expands: [purchase_order]
+    ko_pronunciation: "피오"
+  - short: SO
+    expands: [sales_order]
+    ko_pronunciation: "에스오"
+  - short: PR
+    expands: [purchase_requisition]
+    ko_pronunciation: "피알"
+  - short: IO
+    expands: [internal_order]
+    ko_pronunciation: "아이오"
+  - short: WBS
+    expands: [wbs_element]
+    ko_pronunciation: "와비스 / 더블유비에스"
+  - short: GR
+    expands: [goods_receipt]
+    ko_pronunciation: "지알"
+  - short: GI
+    expands: [goods_issue]
+    ko_pronunciation: "지아이"
+  - short: BP
+    expands: [customer, vendor]
+    ko_pronunciation: "비피"
+    notes: "S/4HANA에서 Customer/Vendor를 Business Partner로 통합"
+
+# ═══════════════════════════════════════════════════════════════
+# 한국 업무 시점 표기 (Business Time Expressions) — 15
+# ═══════════════════════════════════════════════════════════════
+
+business_time_expressions:
+    ja: { primary: "GMP", variants: ['医薬品等の製造管理及び品質管理の基準'] }
+    de: { primary: "GMP" }
+
+  - canonical: d_minus_1
+    ko: "D-1"
+    ko_variants: ["디마이너스원", "디 마이너스 원", "전일", "하루 전", "one day before"]
+    meaning: "Reference day minus one. 마감 기준일 하루 전"
+    notes: "월마감 D-1 = 마감일 하루 전 = 최종 점검일"
+    zh: { primary: "D-1", variants: ['前一天', 'D-1工作日'] }
+    vi: { primary: "D-1", variants: ['Hôm trước', 'Ngày D-1'] }
+
+  - canonical: d_day
+    ko: "D-Day"
+    ko_variants: ["디데이", "D-0", "기준일", "당일"]
+    meaning: "Target execution day"
+
+  - canonical: beginning_of_month
+    ko: "월초"
+    ko_variants: ["월 초", "BOM", "beginning of month", "월초반"]
+    meaning: "First few business days of a month"
+
+  - canonical: end_of_month
+    ko: "월말"
+    ko_variants: ["월 말", "EOM", "end of month", "월말경"]
+    meaning: "Last few business days of a month"
+
+  - canonical: monthly_close
+    ko: "월마감"
+    ko_variants: ["월 마감", "monthly close", "월결산", "월결"]
+    meaning: "Monthly closing process (보통 익월 D+3~D+5 영업일)"
+
+  - canonical: quarterly_close
+    ko: "분기마감"
+    ko_variants: ["분기 마감", "Q마감", "quarterly close", "분기결산"]
+    meaning: "End-of-quarter close — 감사 대상"
+
+  - canonical: year_end_close
+    ko: "연마감"
+    ko_variants: ["연 마감", "연말결산", "year-end close", "결산", "확정결산"]
+    meaning: "Year-end close — K-IFRS + 세법 + 외부감사 대응"
+
+  - canonical: semi_annual
+    ko: "반기"
+    ko_variants: ["반기결산", "H1", "H2", "상반기", "하반기", "semi-annual"]
+    meaning: "Half-year reporting period (H1=1-6월, H2=7-12월)"
+
+  - canonical: preliminary_close
+    ko: "가결산"
+    ko_variants: ["가 결산", "가결", "preliminary close", "잠정결산", "임시결산"]
+    meaning: "Preliminary close before final numbers"
+
+  - canonical: final_close
+    ko: "확정결산"
+    ko_variants: ["확정 결산", "final close", "정식 결산"]
+    meaning: "Final, audited close"
+
+  - canonical: business_day
+    ko: "영업일"
+    ko_variants: ["영업 일", "근무일", "business day", "평일"]
+    meaning: "Business working day (주말·공휴일 제외)"
+    ja: { primary: "営業日", variants: ['業務日'] }
+    de: { primary: "Geschäftstag" }
+
+  - canonical: d_day_plus_n
+    ko: "D+N"
+    ko_variants: ["디플러스엔", "익일", "익월", "D+1", "D+3", "D+5"]
+    meaning: "N days after reference day"
+    notes: |
+      월마감 D+3 = 익월 3영업일째 마감 완료. 한국 대기업 평균.
+    zh: { primary: "D+n", variants: ['D日后n天', 'D+N'] }
+    vi: { primary: "D+n", variants: ['Ngày D cộng n', 'D+N'] }
+
+  - canonical: provisional
+    ko: "잠정치"
+    ko_variants: ["잠정 치", "prelim", "잠정값", "임시값"]
+    meaning: "Provisional / not-yet-finalized value"
+
+  - canonical: finalized
+    ko: "확정치"
+    ko_variants: ["확정 치", "final", "확정값"]
+    meaning: "Finalized / audit-ready value"
+
+  - canonical: monthly_recurring
+    ko: "월정"
+    ko_variants: ["월 정", "monthly recurring", "월마다"]
+    meaning: "Monthly recurring process"
+
+# ═══════════════════════════════════════════════════════════════
+# Meta
+# ═══════════════════════════════════════════════════════════════
+
+meta:
+  total:
+    terms: 80
+    abbreviations: 10
+    business_time: 15
+  coverage:
+    FI: 20
+    CO: 8
+    MM: 13
+    SD: 10
+    BASIS: 9
+    PM: 10
+    QM: 6
+    WM: 2
+    EWM: 2
+  language_coverage:
+    ko: { primary: 58, variants_per_term_avg: 5 }
+    en: 58
+    de: 58
+    ja: 58
+  notes: |
+    v1.5.0 시드. 한국 SAP 현장에서 실제로 쓰이는 외래어/음차/번역체를 통합 수용.
+    이 파일의 목적은 "매칭 재현율 향상"이지 "번역 표준화"가 아닙니다.
+    공식 번역은 primary 또는 variants 첫 번째 항목에 반드시 포함되어 있어야
+    감사/제안서 대응 시 참조 가능합니다.
+
+    용어 추가 PR 환영: docs/i18n/symptom-index.md 가이드 참조.
+    실제 현장에서 들은 새 variant가 있으면 해당 term의 variants 배열에 추가.

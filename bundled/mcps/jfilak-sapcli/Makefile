@@ -1,0 +1,124 @@
+PYTHON_MODULE_DIR=./
+PYTHON_MODULE=sap
+PYTHON_BINARIES=bin/sapcli
+PYTHON_MODULE_FILES=$(shell find $(PYTHON_MODULE) -type f -name '*.py')
+
+TESTS_DIR=test
+TESTS_UNIT_DIR=$(TESTS_DIR)/unit
+TESTS_UNIT_FILES=$(shell find $(TESTS_UNIT_DIR) -type f -name '*.py')
+
+PYTHON_BIN=python3
+
+COVERAGE_BIN=coverage
+COVERAGE_CMD_RUN=$(COVERAGE_BIN) run
+COVERAGE_CMD_REPORT=$(COVERAGE_BIN) report
+COVERAGE_REPORT_ARGS=--skip-covered
+COVERAGE_CMD_HTML=$(COVERAGE_BIN) html
+COVERAGE_HTML_DIR=.htmlcov
+COVERAGE_HTML_ARGS=$(COVERAGE_REPORT_ARGS) -d $(COVERAGE_HTML_DIR)
+COVERAGE_REPORT_FILES=$(PYTHON_BINARIES) $(PYTHON_MODULE_FILES)
+
+PYTEST_MODULE=unittest
+PYTEST_PARAMS=discover -b -s $(TESTS_UNIT_DIR)
+
+PYLINT_BIN ?= pylint
+PYLINT_RC_FILE=.pylintrc
+PYLINT_PARAMS=--output-format=parseable --reports=no
+
+FLAKE8_BIN ?= flake8
+FLAKE8_CONFIG_FILE=.flake8
+FLAKE8_PARAMS=
+
+MYPY_BIN ?= mypy
+MYPY_CONFIG_FILE=mypy.ini
+MYPY_PARAMS=
+
+VERSION_ENTRY=sap/cli/_entry.py
+
+CURRENT_VERSION := $(shell python3 -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+NEXT_MAJOR_VERSION := $(shell python3 -c "v='$(CURRENT_VERSION)'.split('.'); v[0]=str(int(v[0])+1); v[1]='0'; v[2]='0'; print('.'.join(v))")
+NEXT_MINOR_VERSION := $(shell python3 -c "v='$(CURRENT_VERSION)'.split('.'); v[1]=str(int(v[1])+1); v[2]='0'; print('.'.join(v))")
+NEXT_FIX_VERSION := $(shell python3 -c "v='$(CURRENT_VERSION)'.split('.'); v[2]=str(int(v[2])+1); print('.'.join(v))")
+
+all: _version
+
+.PHONY: _toml_version
+_toml_version:
+	if [ -z "$(NEW_VERSION)" ]; then echo "Missing NEW_VERSION"; exit 1; fi
+	sed -i 's/^version = ".*"/version = "$(NEW_VERSION)"/' pyproject.toml
+
+.PHONY: _version
+_version:
+	sed -i "s/^_FALLBACK_VERSION = .*$$/_FALLBACK_VERSION = '$$(./get_version.sh)'/" $(VERSION_ENTRY)
+
+.PHONY: run_pylint
+run_pylint:
+	$(PYLINT_BIN) --rcfile=$(PYLINT_RC_FILE) $(PYLINT_PARAMS) $(PYTHON_MODULE)
+	PYTHONPATH=$(PYTHON_MODULE_DIR):$$PYTHONPATH $(PYLINT_BIN) --rcfile=$(PYLINT_RC_FILE) $(PYLINT_PARAMS) $(PYTHON_BINARIES)
+
+.PHONY: run_flake8
+run_flake8:
+	$(FLAKE8_BIN) --config=$(FLAKE8_CONFIG_FILE) $(FLAKE8_PARAMS) $(PYTHON_MODULE)
+	PYTHONPATH=$(PYTHON_MODULE_DIR):$$PYTHONPATH $(FLAKE8_BIN) --config=$(FLAKE8_CONFIG_FILE) $(FLAKE8_PARAMS) $(PYTHON_BINARIES)
+
+.PHONY: run_mypy
+run_mypy:
+	PYTHONPATH=$(PYTHON_MODULE_DIR):$$PYTHONPATH $(MYPY_BIN) --config-file=$(MYPY_CONFIG_FILE) $(MYPY_PARAMS) $(PYTHON_BINARIES) $(PYTHON_MODULE_FILES)
+
+.PHONY: lint
+lint: run_pylint run_flake8 run_mypy
+	@ echo "*** Linters done ***"
+
+.PHONY: test
+test:
+	$(PYTHON_BIN) -m $(PYTEST_MODULE) $(PYTEST_PARAMS)
+
+.coverage: $(COVERAGE_REPORT_FILES) $(TESTS_UNIT_FILES)
+	$(MAKE) test PYTHON_BIN="$(COVERAGE_CMD_RUN)"
+
+.PHONY: report-coverage
+report-coverage: .coverage
+	@ $(COVERAGE_CMD_REPORT) $(COVERAGE_REPORT_ARGS) $(COVERAGE_REPORT_FILES)
+
+.PHONY: report-coverage-html
+report-coverage-html: .coverage
+	@ echo "Generating HTML code coverage report ..."
+	@ $(COVERAGE_CMD_HTML) $(COVERAGE_HTML_ARGS) $(COVERAGE_REPORT_FILES)
+	@ echo "Report: file://$$(pwd)/$(COVERAGE_HTML_DIR)/index.html"
+
+.PHONY: system-test
+system-test:
+	export PATH=$$(pwd):$$PATH; cd test/system && ./run.sh
+
+.PHONY: check
+check: lint test report-coverage
+
+.PHONY: release
+release: _toml_version _version
+	$(MAKE) check
+	git add pyproject.toml $(VERSION_ENTRY)
+	git commit -m "release: version $(NEW_VERSION)"
+	git tag $(NEW_VERSION)
+
+.PHONY: release-major
+release-major: NEW_VERSION := $(NEXT_MAJOR_VERSION)
+release-major: release
+
+.PHONY: release-minor
+release-minor: NEW_VERSION := $(NEXT_MINOR_VERSION)
+release-minor: release
+
+.PHONY: release-fix
+release-fix: NEW_VERSION := $(NEXT_FIX_VERSION)
+release-fix: release
+
+.PHONY: clean
+clean:
+	rm -rf .coverage $(COVERAGE_HTML_DIR)
+
+.PHONY: dist
+dist:
+	COMMIT_COUNT=$$(git rev-list --count HEAD); \
+	COMMIT_HASH=$$(git rev-parse --short HEAD); \
+	sed -i "s/^version = .*/version = \"1.0.dev$${COMMIT_COUNT}+$${COMMIT_HASH}\"/" pyproject.toml
+	$(PYTHON_BIN) -m build --wheel

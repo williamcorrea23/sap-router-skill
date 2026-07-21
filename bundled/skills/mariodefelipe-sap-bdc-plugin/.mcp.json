@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "sap-bdc": {
+      "command": "python",
+      "args": [
+        "-m",
+        "sap_bdc_mcp.server"
+      ],
+      "env": {
+        "PYTHONPATH": "${CLAUDE_PLUGIN_ROOT}/mcp-server/src",
+        "DATABRICKS_HOST": "${DATABRICKS_HOST}",
+        "DATABRICKS_TOKEN": "${DATABRICKS_TOKEN}",
+        "DATABRICKS_RECIPIENT_NAME": "${DATABRICKS_RECIPIENT_NAME}",
+        "DATABRICKS_WAREHOUSE_ID": "${DATABRICKS_WAREHOUSE_ID}",
+        "LOG_LEVEL": "INFO"
+      }
+    }
+  }
+}
