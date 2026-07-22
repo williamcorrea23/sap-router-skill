@@ -42,6 +42,9 @@
     {"id":"hochfrequenz-sapgui-mcp","repository":"https://github.com/Hochfrequenz/sapgui.mcp","kind":"mcp"},
     {"id":"mario-andreschak-mcp-sap-gui","repository":"https://github.com/mario-andreschak/mcp-sap-gui","kind":"mcp"},
     {"id":"gixsy95-abap-wiki","repository":"https://github.com/Gixsy95/abap_wiki","kind":"skills"},
+    {"id":"jonathanbernsteiner-sap-code-agents","repository":"https://github.com/jonathanbernsteiner/sap-code-agents","kind":"skills"},
+    {"id":"eduardocopat-abap-docs","repository":"https://github.com/eduardocopat/abap-docs","kind":"skills"},
+    {"id":"mario-andreschak-abap-documentation-prompts","repository":"https://github.com/mario-andreschak/docs-sap-abap-automated-documentation-prompts","kind":"skills"},
     {"id":"context-mode","repository":"bundled","kind":"mcp","trust":"reviewed","status":"enabled"},
     {"id":"rtk-token-optimizer","repository":"bundled","kind":"tool","trust":"reviewed","status":"enabled"}
   ]

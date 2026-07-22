@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-21T05:55:04Z",
+  "generated_at": "2026-07-21T15:24:34Z",
   "sources": [
     {
       "id": "abmir-sap-azure-sre-agent-skills",
@@ -126,6 +126,18 @@
       ]
     },
     {
+      "id": "eduardocopat-abap-docs",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/eduardocopat/abap-docs",
+      "path": "bundled/skills/eduardocopat-abap-docs",
+      "revision": "7aa69e5487cbed8f4176e959575a9be09d42543b",
+      "branch": "master",
+      "license_files": [
+        "LICENSE.md"
+      ]
+    },
+    {
       "id": "eljoujat-sapcc-skill",
       "repository": "bundled",
       "kind": "skills",
@@ -220,6 +232,18 @@
       ]
     },
     {
+      "id": "jonathanbernsteiner-sap-code-agents",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/jonathanbernsteiner/sap-code-agents",
+      "path": "bundled/skills/jonathanbernsteiner-sap-code-agents",
+      "revision": "810c8c30667139e8ecf772f5d01e0209b8da1cfe",
+      "branch": "main",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
       "id": "kts982-mcp-sap-gui",
       "repository": "bundled",
       "kind": "mcp",
@@ -304,6 +328,18 @@
       "origin": "https://github.com/marianfoo/mcp-sap-docs",
       "path": "bundled/mcps/marianfoo-mcp-sap-docs",
       "revision": "1c7c39d9e16c378f799299e9fedb9ce9d5c53265",
+      "branch": "main",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "mario-andreschak-abap-documentation-prompts",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/mario-andreschak/docs-sap-abap-automated-documentation-prompts",
+      "path": "bundled/skills/mario-andreschak-abap-documentation-prompts",
+      "revision": "faf938c13419ec67f08291fe0eb1533a4e7300b0",
       "branch": "main",
       "license_files": [
         "LICENSE"

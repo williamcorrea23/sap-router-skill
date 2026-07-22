@@ -86,6 +86,33 @@
       "primary": "plugin:cds-mcp:cds-mcp",
       "fallbacks": ["cap-mcp-plugin"],
       "mutation": false
+    },
+    "sap.smartform.analyze": {
+      "primary": "smartform-ai-generator",
+      "fallbacks": [],
+      "mutation": false
+    },
+    "sap.smartform.spec": {
+      "primary": "smartform-ai-generator",
+      "fallbacks": [],
+      "mutation": false
+    },
+    "sap.smartform.package": {
+      "primary": "smartform-ai-generator",
+      "fallbacks": [],
+      "mutation": false
+    },
+    "sap.smartform.deploy": {
+      "primary": "smartform-ai-generator",
+      "fallbacks": ["mcp-abap-adt", "arc-1"],
+      "mutation": true,
+      "requires_approval": true,
+      "plan_then_commit": true
+    },
+    "sap.smartform.compare": {
+      "primary": "smartform-ai-generator",
+      "fallbacks": [],
+      "mutation": false
     }
   },
   "profiles": {

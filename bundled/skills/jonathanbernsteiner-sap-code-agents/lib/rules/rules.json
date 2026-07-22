@@ -1,0 +1,395 @@
+{
+  "note": "S/4HANA incompatibility rules. Every rule cites a real SAP Note / simplification item. source_status/verified_at record a web-verification pass: note-number-to-topic associations checked against SAP's Simplification List PDF, note copies and SAP Community sources. Reports render note numbers only for verified rules. Detection is fully deterministic (Tier-1-eligible). source_excerpt fields quote the public Simplification List for SAP S/4HANA 2023 FPS3 (help.sap.com, no login) verbatim, with excerpt_source_url page anchors; remediation_effort/effort_rationale are deterministic seeded effort bands; verified_release records the documentation set checked against. Source-link policy: the canonical citation per rule is the SAP Note (me.sap.com) plus the Simplification List page anchor (excerpt_source_url); source_url is optional further reading and is kept only for SAP-authored public pages (community.sap.com blog-posts-by-sap, help.sap.com, userapps.support.sap.com KBAs) — third-party sites, member blogs and community Q&A threads are excluded.",
+  "rules": [
+    {
+      "id": "konv-prcd-elements",
+      "title": "Pricing conditions: KONV replaced by PRCD_ELEMENTS",
+      "description": "In S/4HANA the pricing result table KONV is replaced by PRCD_ELEMENTS (with changed key/field semantics, e.g. KBETR/KWERT lengths); existing KONV content is migrated during conversion. Custom code that selects from or writes to KONV no longer sees or updates live pricing data and must be adapted per the cookbooks in SAP Note 2220005.",
+      "sap_note": "2220005",
+      "simplification_item": "S4TWL - Pricing Data Model Simplification",
+      "source_url": "https://community.sap.com/t5/enterprise-resource-planning-blog-posts-by-sap/simplification-item-simplified-data-model-in-pricing-and-condition/ba-p/13204475",
+      "detection": {
+        "type": "table_access",
+        "tables": [
+          "KONV"
+        ],
+        "ops": [
+          "select",
+          "insert",
+          "update",
+          "modify",
+          "delete"
+        ]
+      },
+      "replacement": "PRCD_ELEMENTS via released CDS view V_KONV; use SD pricing APIs instead of direct table access",
+      "tier1_eligible": true,
+      "severity": "medium",
+      "source_status": "verified",
+      "verified_at": "2026-07-19T16:30:00Z",
+      "source_excerpt": "In SAP S/4HANA, table KONV has been replaced in its data persistency role by the new table PRCD_ELEMENTS. However, KONV is and can still be used for data declaration purposes. It still defines the structure of the pricing result within the application code. The content of KONV is transferred to PRCD_ELEMENTS by the automatic data migration when moving to SAP S/4HANA.",
+      "excerpt_source_url": "https://help.sap.com/doc/c34b5ef72430484cb4d8895d5edd12af/2023/en-US/SIMPL_OP2023.pdf#page=998",
+      "remediation_effort": "low",
+      "effort_rationale": "Reads redirect to V_KONV / pricing API and content is auto-migrated \u2014 mostly mechanical SELECT rewrites.",
+      "verified_release": "2023"
+    },
+    {
+      "id": "mkpf-mseg-matdoc",
+      "title": "Material documents: MKPF/MSEG replaced by MATDOC",
+      "description": "Material document header/item tables MKPF and MSEG are replaced by the denormalized table MATDOC; MKPF/MSEG become proxy compatibility views and aggregate stock quantities are computed on the fly. SELECTs still return data via the compatibility views but with materially different performance (flagged by SAP's own S/4HANA checks); direct INSERT/UPDATE/MODIFY/DELETE on them breaks and must go through BAPI_GOODSMVT_CREATE / standard postings.",
+      "sap_note": "2206980",
+      "simplification_item": "S4TWL - Data Model in Inventory Management (MM-IM)",
+      "source_url": "https://community.sap.com/t5/enterprise-resource-planning-blog-posts-by-sap/sap-s-4hana-inventory-management-tables-new-simplified-data-model-nsdm/ba-p/13497469",
+      "detection": {
+        "type": "table_access",
+        "tables": [
+          "MKPF",
+          "MSEG"
+        ],
+        "ops": [
+          "select",
+          "insert",
+          "update",
+          "modify",
+          "delete"
+        ]
+      },
+      "replacement": "MATDOC (writes only via BAPI_GOODSMVT_CREATE / BAPI_GOODSMVT_CANCEL); reads via compatibility views or NSDM CDS views",
+      "tier1_eligible": true,
+      "severity": "medium",
+      "source_status": "verified",
+      "verified_at": "2026-07-19T16:30:00Z",
+      "source_excerpt": "The new de-normalized table MATDOC is introduced which contains the former header and item data of a material document as well as a lot of further attributes. Material document data will be stored in MATDOC only and not anymore in MKPF and MSEG.",
+      "excerpt_source_url": "https://help.sap.com/doc/c34b5ef72430484cb4d8895d5edd12af/2023/en-US/SIMPL_OP2023.pdf#page=1290",
+      "remediation_effort": "medium",
+      "effort_rationale": "Reads keep working via compatibility views (performance review needed); writes must be reworked onto BAPI postings.",
+      "verified_release": "2023"
+    },
+    {
+      "id": "fi-index-aggregate-acdoca",
+      "title": "FI index/aggregate tables replaced by Universal Journal ACDOCA",
+      "description": "The FI open/cleared-item index tables (BSIS/BSAS/BSID/BSAD/BSIK/BSAK) and G/L totals tables (GLT0, FAGLFLEXT/FAGLFLEXA) are no longer updated in S/4HANA; they are replaced by compatibility views over the Universal Journal ACDOCA. Reads still work via the views but are redundant and slower, and any direct write to these tables breaks; SAP's own custom-code checks (Notes 2270333/2431747) flag all such accesses.",
+      "sap_note": "2270333",
+      "simplification_item": "S4TWL - Data Model Changes in FIN",
+      "detection": {
+        "type": "table_access",
+        "tables": [
+          "BSIS",
+          "BSAS",
+          "BSID",
+          "BSAD",
+          "BSIK",
+          "BSAK",
+          "GLT0",
+          "FAGLFLEXT",
+          "FAGLFLEXA"
+        ],
+        "ops": [
+          "select",
+          "insert",
+          "update",
+          "modify",
+          "delete"
+        ]
+      },
+      "replacement": "ACDOCA (Universal Journal) and released CDS views; BSEG/BKPF remain for document data",
+      "tier1_eligible": true,
+      "severity": "medium",
+      "source_status": "verified",
+      "verified_at": "2026-07-19T16:30:00Z",
+      "source_excerpt": "The compatibility views ensure database SELECTs work as before. However, write access (INSERT, UPDATE, DELETE, MODIFY) was removed from SAP standard, or has to be removed from custom code \u2013 refer to SAP note 1976487.",
+      "excerpt_source_url": "https://help.sap.com/doc/c34b5ef72430484cb4d8895d5edd12af/2023/en-US/SIMPL_OP2023.pdf#page=240",
+      "remediation_effort": "low",
+      "effort_rationale": "Compatibility views keep SELECTs working; redirect reads to ACDOCA/CDS over time, remove any writes.",
+      "verified_release": "2023"
+    },
+    {
+      "id": "mb-transactions-migo",
+      "title": "Classic MB* goods movement transactions removed",
+      "description": "The classic inventory transactions MB01, MB02, MB03, MB04, MB05, MB0A, MB11, MB1A, MB1B, MB1C, MB31, MBNL, MBRL, MBSF, MBSL, MBST, MBSU and MBBM are obsolete in S/4HANA and raise an error when called; they also use the old lock concept incompatible with the enhanced MIGO/BAPI locking introduced in 1610. CALL TRANSACTION / BDC against these codes in custom code breaks.",
+      "sap_note": "2210569",
+      "simplification_item": "S4TWL - Availability of Transactions in MM-IM",
+      "source_url": "https://userapps.support.sap.com/sap/support/knowledge/en/2706897",
+      "detection": {
+        "type": "call_transaction",
+        "transactions": [
+          "MB01",
+          "MB02",
+          "MB03",
+          "MB04",
+          "MB05",
+          "MB0A",
+          "MB11",
+          "MB1A",
+          "MB1B",
+          "MB1C",
+          "MB31",
+          "MBNL",
+          "MBRL",
+          "MBSF",
+          "MBSL",
+          "MBST",
+          "MBSU",
+          "MBBM"
+        ]
+      },
+      "replacement": "Transaction MIGO in dialog; BAPI_GOODSMVT_CREATE / BAPI_GOODSMVT_CANCEL in code",
+      "tier1_eligible": true,
+      "severity": "high",
+      "source_status": "verified",
+      "verified_at": "2026-07-19T16:30:00Z",
+      "source_excerpt": "These transaction codes shall not be used in customer coding especially with S/4HANA OP1610 and higher because with this release a new enhanced and improved lock concept has been introduced for transaction MIGO and the BAPI BAPI_GOODSMVT_CREATE but the above listed obsolete transactions still using the old lock concept (see note 2319579).",
+      "excerpt_source_url": "https://help.sap.com/doc/c34b5ef72430484cb4d8895d5edd12af/2023/en-US/SIMPL_OP2023.pdf#page=645",
+      "remediation_effort": "high",
+      "effort_rationale": "BDC / CALL TRANSACTION flows must be redesigned against BAPI_GOODSMVT_CREATE \u2014 screen-based logic has no 1:1 replacement.",
+      "verified_release": "2023"
+    },
+    {
+      "id": "customer-vendor-business-partner",
+      "title": "Customer/vendor master transactions replaced by Business Partner",
+      "description": "In S/4HANA the Business Partner (transaction BP) with Customer/Vendor Integration is mandatory; the classic customer/vendor master transactions (XD01/XD02/XD03, VD01/VD02/VD03, XK01/XK02/XK03, MK01/MK02/MK03, FK01/FK02/FK03, XD06/XD07, XK06/XK07) are not available in dialog and are redirected to BP. Custom code driving these transactions via CALL TRANSACTION or BDC is unsupported and must move to BP APIs/CVI.",
+      "sap_note": "2265093",
+      "simplification_item": "S4TWL - Business Partner Approach",
+      "source_url": "https://community.sap.com/t5/enterprise-resource-planning-blog-posts-by-sap/business-partner-approach-in-sap-s-4hana/ba-p/13386445",
+      "detection": {
+        "type": "call_transaction",
+        "transactions": [
+          "XD01",
+          "XD02",
+          "XD03",
+          "XD06",
+          "XD07",
+          "VD01",
+          "VD02",
+          "VD03",
+          "XK01",
+          "XK02",
+          "XK03",
+          "XK06",
+          "XK07",
+          "MK01",
+          "MK02",
+          "MK03",
+          "FK01",
+          "FK02",
+          "FK03"
+        ]
+      },
+      "replacement": "Transaction BP with Customer/Vendor Integration (CVI); Business Partner SOAP/OData APIs instead of DEBMAS/CREMAS-style batch input",
+      "tier1_eligible": true,
+      "severity": "high",
+      "source_status": "verified",
+      "verified_at": "2026-07-19T16:30:00Z",
+      "source_excerpt": "In SAP S/4HANA, Business Partner is the leading object and single entry point to maintain Business Partner, Customer and Supplier (formerly known as Vendor) master data. This is to ensure ease of maintenance of the above master data and to achieve harmonization between them.",
+      "excerpt_source_url": "https://help.sap.com/doc/c34b5ef72430484cb4d8895d5edd12af/2023/en-US/SIMPL_OP2023.pdf#page=154",
+      "remediation_effort": "high",
+      "effort_rationale": "Master-data maintenance flows must move to BP/CVI APIs \u2014 a process and data-model change, not a code swap.",
+      "verified_release": "2023"
+    },
+    {
+      "id": "vbuk-vbup-status-tables",
+      "title": "SD status tables VBUK/VBUP eliminated",
+      "description": "The SD status tables VBUK and VBUP are eliminated in S/4HANA; status fields moved into the document tables themselves (VBAK/VBAP, LIKP/LIPS, VBRK) and VBUK/VBUP are no longer filled for new documents. SELECTs on them silently return no data for documents created in S/4HANA, and writes are meaningless, so all access must be redirected.",
+      "sap_note": "2267306",
+      "simplification_item": "S4TWL - Data Model Changes in SD",
+      "detection": {
+        "type": "table_access",
+        "tables": [
+          "VBUK",
+          "VBUP"
+        ],
+        "ops": [
+          "select",
+          "insert",
+          "update",
+          "modify",
+          "delete"
+        ]
+      },
+      "replacement": "Status fields on VBAK/VBAP, LIKP/LIPS, VBRK; helper FMs SD_VBUK_READ_FROM_DOC / SD_VBUP_READ_FROM_DOC",
+      "tier1_eligible": true,
+      "severity": "medium",
+      "source_status": "verified",
+      "verified_at": "2026-07-19T16:30:00Z",
+      "source_excerpt": "Elimination of status tables VBUK, VBUP: Status fields have been moved to the corresponding header and item tables - VBAK and VBAP for sales documents, LIKP and LIPS for deliveries, VBRK for billing documents.",
+      "excerpt_source_url": "https://help.sap.com/doc/c34b5ef72430484cb4d8895d5edd12af/2023/en-US/SIMPL_OP2023.pdf#page=992",
+      "remediation_effort": "medium",
+      "effort_rationale": "SELECTs must be redirected to the document tables or helper FMs; joins and append fields need rework.",
+      "verified_release": "2023"
+    },
+    {
+      "id": "sd-rebates-vbox",
+      "title": "SD rebate processing and VBOX replaced by Settlement Management",
+      "description": "Classic SD rebate processing is replaced by Settlement Management (condition contracts) in S/4HANA, and the rebate index table VBOX is no longer built or used because business volume is read in real time from billing documents. Custom code reading or maintaining VBOX (e.g. rebuilding the rebate index) is dead code and must be reworked against condition contract settlement. (SAP Note 2226380 is the simplification item's custom-code note; the item note itself is 2267377.)",
+      "sap_note": "2226380",
+      "simplification_item": "S4TWL - SD Rebate Processing replaced by Settlement Management",
+      "detection": {
+        "type": "table_access",
+        "tables": [
+          "VBOX"
+        ],
+        "ops": [
+          "select",
+          "insert",
+          "update",
+          "modify",
+          "delete"
+        ]
+      },
+      "replacement": "Settlement Management / Condition Contract Management (WCOCO); business volume read directly from VBRK/VBRP",
+      "tier1_eligible": true,
+      "severity": "high",
+      "source_status": "verified",
+      "verified_at": "2026-07-19T16:30:00Z",
+      "source_excerpt": "In general, SD Rebate Processing is not available within SAP S/4HANA. The functional equivalent of SD Rebate Processing in SAP S/4HANA is Settlement Management.",
+      "excerpt_source_url": "https://help.sap.com/doc/c34b5ef72430484cb4d8895d5edd12af/2023/en-US/SIMPL_OP2023.pdf#page=988",
+      "remediation_effort": "high",
+      "effort_rationale": "The process is replaced by Settlement Management condition contracts \u2014 custom rebate logic needs redesign, not adaptation.",
+      "verified_release": "2023"
+    },
+    {
+      "id": "credit-management-fscm",
+      "title": "Classic FI-AR credit management replaced by FSCM Credit Management",
+      "description": "Classic credit management (FI-AR-CR) is not available in S/4HANA; it is replaced by SAP Credit Management (FIN-FSCM-CR), and credit master maintenance transactions FD32/FD33 are replaced by UKM_BP on the Business Partner. Custom code that calls the old transactions (e.g. via BDC to maintain credit limits) breaks and must use the UKM APIs/Business Partner instead.",
+      "sap_note": "2270544",
+      "simplification_item": "S4TWL - Credit Management",
+      "source_url": "https://community.sap.com/t5/supply-chain-management-blog-posts-by-sap/conversion-of-credit-management-to-sap-s-4hana/ba-p/13439084",
+      "detection": {
+        "type": "call_transaction",
+        "transactions": [
+          "FD32",
+          "FD33"
+        ]
+      },
+      "replacement": "Transaction UKM_BP (Business Partner role UKM000) and FSCM Credit Management (UKM_*) APIs",
+      "tier1_eligible": true,
+      "severity": "high",
+      "source_status": "verified",
+      "verified_at": "2026-07-19T16:30:00Z",
+      "source_excerpt": "Credit Management (FI-AR-CR) is not available as part of SAP S/4HANA. The functional equivalent in SAP S/4HANA is SAP Credit Management (FIN-FSCM-CR).",
+      "excerpt_source_url": "https://help.sap.com/doc/c34b5ef72430484cb4d8895d5edd12af/2023/en-US/SIMPL_OP2023.pdf#page=438",
+      "remediation_effort": "high",
+      "effort_rationale": "Credit master maintenance and checks move to FSCM (UKM_BP on the Business Partner) \u2014 a component replacement.",
+      "verified_release": "2023"
+    },
+    {
+      "id": "co-totals-acdoca",
+      "title": "CO line item and totals tables replaced by ACDOCA compatibility views",
+      "description": "In S/4HANA the CO actuals tables COEP (line items) and COSS/COSP (totals) are replaced by compatibility views of the same name that aggregate the Universal Journal ACDOCA on the fly; the physical tables are no longer updated for actuals. Reads still work through the views but with different performance, and direct writes to these tables break; SAP's S/4HANA custom-code checks flag such accesses.",
+      "sap_note": "2270404",
+      "simplification_item": "S4TWL - Technical Changes in Controlling",
+      "detection": {
+        "type": "table_access",
+        "tables": [
+          "COEP",
+          "COSS",
+          "COSP"
+        ],
+        "ops": [
+          "select",
+          "insert",
+          "update",
+          "modify",
+          "delete"
+        ]
+      },
+      "replacement": "ACDOCA (Universal Journal) and released CDS views; V_COEP/V_COSS/V_COSP compatibility views for transitional reads",
+      "tier1_eligible": true,
+      "severity": "medium",
+      "source_status": "verified",
+      "verified_at": "2026-07-19T16:30:00Z",
+      "source_excerpt": "In SAP S/4 HANA the totals records for primary and secondary costs have been removed and the universal journal includes all actual cost postings, both primary and secondary.",
+      "excerpt_source_url": "https://help.sap.com/doc/c34b5ef72430484cb4d8895d5edd12af/2023/en-US/SIMPL_OP2023.pdf#page=352",
+      "remediation_effort": "medium",
+      "effort_rationale": "Reads keep working via compatibility views; performance and any writes need rework against ACDOCA.",
+      "verified_release": "2023"
+    },
+    {
+      "id": "asset-accounting-acdoca",
+      "title": "Asset Accounting tables ANEK/ANEP/ANEA/ANLC/ANLP no longer updated",
+      "description": "With mandatory new Asset Accounting in S/4HANA, actual values move to ACDOCA (statistical values to FAAT_DOC_IT, planned values to FAAT_PLAN_VALUES) and the classic tables ANEK, ANEP, ANEA, ANLC and ANLP are no longer updated; SELECTs are auto-diverted to FAAV_* compatibility views. Reads therefore still work (more slowly for totals in ANLC/ANLP), but any direct write to these tables breaks.",
+      "sap_note": "2270387",
+      "simplification_item": "S4TWL - Data Structure Changes in Asset Accounting",
+      "detection": {
+        "type": "table_access",
+        "tables": [
+          "ANEK",
+          "ANEP",
+          "ANEA",
+          "ANLC",
+          "ANLP"
+        ],
+        "ops": [
+          "select",
+          "insert",
+          "update",
+          "modify",
+          "delete"
+        ]
+      },
+      "replacement": "ACDOCA / FAAT_DOC_IT / FAAT_PLAN_VALUES via released Asset Accounting APIs; FAAV_* compatibility views for transitional reads",
+      "tier1_eligible": true,
+      "severity": "medium",
+      "source_status": "verified",
+      "verified_at": "2026-07-19T16:30:00Z",
+      "source_excerpt": "The Asset Accounting tables ANEA, ANEP, ANEK, ANLC and ANLP are no longer updated in SAP S/4HANA. However, to be able to continue using the reports of Asset Accounting and your own developments, selections from these tables are automatically diverted to the corresponding compatibility views.",
+      "excerpt_source_url": "https://help.sap.com/doc/c34b5ef72430484cb4d8895d5edd12af/2023/en-US/SIMPL_OP2023.pdf#page=271",
+      "remediation_effort": "medium",
+      "effort_rationale": "Selections are auto-diverted to compatibility views; writes and totals-based logic need rework.",
+      "verified_release": "2023"
+    },
+    {
+      "id": "mm-im-classic-goods-movement-fm",
+      "title": "Classic goods movement function module MB_CREATE_GOODS_MOVEMENT obsolete",
+      "description": "The unreleased classic posting function module MB_CREATE_GOODS_MOVEMENT must not be used in S/4HANA: per SAP Note 2210569 customer coding has to be switched to BAPI_GOODSMVT_CREATE, because the old module relies on the legacy lock concept that conflicts with the enhanced MIGO/BAPI locking (1610+). Direct calls in custom code risk incorrect locking and are flagged by SAP's checks.",
+      "sap_note": "2210569",
+      "simplification_item": "S4TWL - Availability of Transactions in MM-IM",
+      "detection": {
+        "type": "function_call",
+        "functions": [
+          "MB_CREATE_GOODS_MOVEMENT"
+        ]
+      },
+      "replacement": "BAPI_GOODSMVT_CREATE (post) and BAPI_GOODSMVT_CANCEL (reverse)",
+      "tier1_eligible": true,
+      "severity": "high",
+      "source_status": "verified",
+      "verified_at": "2026-07-19T16:30:00Z",
+      "source_excerpt": "Replace customer coding using the transaction codes MB01, MB04, MB05, MB0A, MB11, MB1A, MB1B, MB1C, MB31, MBNL, MBRL, MBSF, MBSL and MBSU (e.g. by suing CALL TRANSACTION MBxy) by make use of function module BAPI_GOODSMVT_CREATE",
+      "excerpt_source_url": "https://help.sap.com/doc/c34b5ef72430484cb4d8895d5edd12af/2023/en-US/SIMPL_OP2023.pdf#page=645",
+      "remediation_effort": "medium",
+      "effort_rationale": "FM call is swapped for BAPI_GOODSMVT_CREATE \u2014 interface mapping needed but the change is local to the call site.",
+      "verified_release": "2023"
+    },
+    {
+      "id": "foreign-trade-eikp-eipo",
+      "title": "SD-FT/MM-FT foreign trade replaced by GTS / International Trade",
+      "description": "The classic Foreign Trade components (SD-FT, MM-FT) are not available in S/4HANA \u2014 SAP GTS or S/4HANA International Trade is the successor \u2014 and the foreign trade document tables EIKP and EIPO are no longer populated (Intrastat data is determined directly from master data and Customizing). Custom code reading or writing EIKP/EIPO gets no data for S/4HANA documents and must be redesigned.",
+      "sap_note": "2267310",
+      "simplification_item": "S4TWL - Foreign Trade",
+      "detection": {
+        "type": "table_access",
+        "tables": [
+          "EIKP",
+          "EIPO"
+        ],
+        "ops": [
+          "select",
+          "insert",
+          "update",
+          "modify",
+          "delete"
+        ]
+      },
+      "replacement": "SAP GTS (side-by-side) or SAP S/4HANA for International Trade; Intrastat via master-data-based determination",
+      "tier1_eligible": true,
+      "severity": "high",
+      "source_status": "verified",
+      "verified_at": "2026-07-19T16:30:00Z",
+      "source_excerpt": "In SAP S/4HANA, the Foreign Trade (SD-FT) functionality is not available anymore. Instead, SAP S/4HANA for international trade within SAP S/4HANA is the successor.",
+      "excerpt_source_url": "https://help.sap.com/doc/c34b5ef72430484cb4d8895d5edd12af/2023/en-US/SIMPL_OP2023.pdf#page=1002",
+      "remediation_effort": "high",
+      "effort_rationale": "The component is removed \u2014 trade processes move to GTS / International Trade, a redesign rather than a code fix.",
+      "verified_release": "2023"
+    }
+  ]
+}

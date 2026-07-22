@@ -520,6 +520,55 @@
         "fallback_group": "apim"
       },
       "owner": "sap-api-management-consultant"
+    },
+    {
+      "id": "smartform-ai-generator",
+      "display_name": "Smart Form AI Generator MCP",
+      "status": "enabled",
+      "source": {
+        "repository": "local-packages-smartform-ai-generator",
+        "license": "MIT",
+        "version": "1.0.0"
+      },
+      "runtime": {
+        "command": "python",
+        "args": [
+          "-m",
+          "smartform_ai.server"
+        ],
+        "transport": "stdio",
+        "platforms": [
+          "windows",
+          "linux",
+          "macos"
+        ]
+      },
+      "auth": {
+        "mode": "none",
+        "env_refs": []
+      },
+      "capabilities": [
+        "sap.smartform.analyze",
+        "sap.smartform.spec",
+        "sap.smartform.package",
+        "sap.smartform.deploy",
+        "sap.smartform.compare"
+      ],
+      "safety": {
+        "default_mode": "sandboxed",
+        "mutations": "plan_approve_commit",
+        "telemetry": "none"
+      },
+      "probes": {
+        "initialize": true,
+        "tools_list": true,
+        "domain_probe": "jsonrpc_tools"
+      },
+      "routing": {
+        "priority": 10,
+        "fallback_group": "smartform"
+      },
+      "owner": "sap-abap-developer"
     }
   ]
 }

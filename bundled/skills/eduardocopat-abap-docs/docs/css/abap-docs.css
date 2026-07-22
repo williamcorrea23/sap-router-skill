@@ -1,0 +1,28 @@
+.abap-docs-syntax-block {
+    white-space: nowrap;
+}
+
+ul.circlem2 {
+    margin-left: 2em;
+}
+
+/* Increases font size inside admonitions */
+.md-typeset .admonition,
+.md-typeset details {
+    font-size: .75rem;
+}
+
+/* Remove edit button */
+.md-content__button {
+    visibility: hidden;
+}
+
+
+/* hide footer */
+.md-footer-nav {
+    visibility: hidden;
+}
+
+.md-sidebar {
+    visibility: hidden;
+}

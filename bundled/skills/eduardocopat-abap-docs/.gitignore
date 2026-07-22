@@ -1,0 +1,25 @@
+#node
+node_modules/
+report.*
+
+#SAP HTML docs
+sapdocs/*
+!sapdocs/download.sh
+
+#TypeScript
+tsconfig.tsbuildinfo
+build/
+index.js
+src/**/*.js
+*.map
+
+#MkDocs builds
+mkdocs.yml
+docs/*
+!docs/index.md
+!docs/css
+!docs/javascript
+site/
+
+#vagrant
+.vagrant

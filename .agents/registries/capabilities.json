@@ -34,6 +34,11 @@
     {"id": "agent.context.execute", "effect": "read", "domain": "agent-runtime"},
     {"id": "agent.context.fetch", "effect": "read", "domain": "agent-runtime"},
     {"id": "agent.context.memory", "effect": "read", "domain": "agent-runtime"},
-    {"id": "agent.output.optimize", "effect": "read", "domain": "agent-runtime"}
+    {"id": "agent.output.optimize", "effect": "read", "domain": "agent-runtime"},
+    {"id": "sap.smartform.analyze", "effect": "read", "domain": "smartform"},
+    {"id": "sap.smartform.spec", "effect": "read", "domain": "smartform"},
+    {"id": "sap.smartform.package", "effect": "read", "domain": "smartform"},
+    {"id": "sap.smartform.deploy", "effect": "mutating", "domain": "smartform"},
+    {"id": "sap.smartform.compare", "effect": "read", "domain": "smartform"}
   ]
 }

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-21T03:31:24",
+  "timestamp": "2026-07-22T02:12:49",
   "overall_status": "DEGRADED",
   "mcp_checks": {
     "arc-1": {
@@ -1023,6 +1023,15 @@
         "missing_env": [
           "APIM_WEB_URL"
         ]
+      },
+      "smartform-ai-generator": {
+        "DECLARED": true,
+        "INSTALLED": true,
+        "CONFIGURED": true,
+        "INITIALIZED": "NOT_EXECUTED",
+        "DOMAIN_READY": false,
+        "MUTATION_READY": false,
+        "missing_env": []
       }
     }
   },

@@ -1,0 +1,95 @@
+{
+  "note": "Phase 4 acceptance benchmark. Each question runs through the real agent loop (scripts/benchmark.ts). expected_behavior is machine-checked: must_use_tools (subset of tools actually called), answer_matches (every regex must match the final answer, case-insensitive), answer_not_matches (none may match).",
+  "questions": [
+    {
+      "id": "a1-object-doc",
+      "workspace": "abapGit",
+      "question": "What does ZCL_ABAPGIT_CTS_API do?",
+      "expected_behavior": {
+        "must_use_tools": ["read_object"],
+        "answer_matches": ["transport|cts|change and transport"],
+        "answer_not_matches": []
+      }
+    },
+    {
+      "id": "a2-where-used",
+      "workspace": "abapGit",
+      "question": "Which objects reference ZCL_ABAPGIT_TADIR, and what does it call itself?",
+      "expected_behavior": {
+        "must_use_tools": ["where_used"],
+        "answer_matches": ["ZCL_ABAPGIT_\\w+"],
+        "answer_not_matches": []
+      }
+    },
+    {
+      "id": "a3-no-usage-data",
+      "workspace": "abapGit",
+      "question": "How often was ZCL_ABAPGIT_REPO executed in the last 24 months?",
+      "expected_behavior": {
+        "must_use_tools": ["get_usage_stats"],
+        "answer_matches": ["no usage data"],
+        "answer_not_matches": ["\\b\\d{2,}\\s*(calls|executions|times)"]
+      }
+    },
+    {
+      "id": "a4-table-evidence",
+      "workspace": "abapGit",
+      "question": "Does any object in this workspace read the transport request table E070? Name the object and where.",
+      "expected_behavior": {
+        "must_use_tools": [],
+        "answer_matches": ["E070", "ZCL_ABAPGIT_CTS_API"],
+        "answer_not_matches": []
+      }
+    },
+    {
+      "id": "b1-flow",
+      "workspace": "example-manufacturer",
+      "question": "Walk me through what happens when the MES system sends a weighbridge scale ticket.",
+      "expected_behavior": {
+        "must_use_tools": ["read_object"],
+        "answer_matches": ["ZCL_GM_SCALE_RFC_STUB", "ZCL_GM_MOVEMENT_SERVICE", "BAPI_GOODSMVT_CREATE"],
+        "answer_not_matches": []
+      }
+    },
+    {
+      "id": "b2-retirement",
+      "workspace": "example-manufacturer",
+      "question": "Which objects look like candidates for retirement, and how confident can we be?",
+      "expected_behavior": {
+        "must_use_tools": ["get_usage_stats"],
+        "answer_matches": ["ZGM_LEGACY_MB01_BATCH", "ZGM_LEGACY_UPLOAD", "simulat"],
+        "answer_not_matches": []
+      }
+    },
+    {
+      "id": "b3-s4-tables",
+      "workspace": "example-manufacturer",
+      "question": "Does ZGM_PRICING_MARGIN_REPORT access any tables that are problematic in S/4HANA? Cite the evidence.",
+      "expected_behavior": {
+        "must_use_tools": [],
+        "answer_matches": ["KONV", "VBUK"],
+        "answer_not_matches": []
+      }
+    },
+    {
+      "id": "b4-usage-labeled",
+      "workspace": "example-manufacturer",
+      "question": "How heavily is ZGM_DAILY_MOVEMENT_REPORT used?",
+      "expected_behavior": {
+        "must_use_tools": ["get_usage_stats"],
+        "answer_matches": ["\\b160\\b", "simulat"],
+        "answer_not_matches": []
+      }
+    },
+    {
+      "id": "b5-unresolved",
+      "workspace": "example-manufacturer",
+      "question": "What exactly does BAPI_GOODSMVT_CREATE do internally in this codebase?",
+      "expected_behavior": {
+        "must_use_tools": [],
+        "answer_matches": ["not in (this )?workspace|not part of (this|the) workspace|SAP standard|external|not ingested|cannot (see|inspect|read)|don't have|do not have|no access"],
+        "answer_not_matches": []
+      }
+    }
+  ]
+}

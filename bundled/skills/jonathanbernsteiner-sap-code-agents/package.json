@@ -1,0 +1,61 @@
+{
+  "name": "sap-code-agents",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ABAP codebase analysis: auto-docs per object, usage/retirement analysis, and evidence-tiered S/4HANA incompatibility findings.",
+  "license": "MIT",
+  "author": "Jonathan Bernsteiner",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jonathanbernsteiner/sap-code-agents.git"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "seed": "tsx --env-file=.env.local scripts/seed.ts",
+    "parse-proof": "tsx --env-file=.env.local scripts/parse-proof.ts",
+    "migrate": "tsx --env-file=.env.local scripts/migrate.ts",
+    "test": "vitest run",
+    "gen-usage": "tsx --env-file=.env.local scripts/gen-usage.ts",
+    "backfill-target-kind": "tsx --env-file=.env.local scripts/backfill-target-kind.ts",
+    "seed-rules": "tsx --env-file=.env.local scripts/seed-rules.ts",
+    "benchmark": "tsx --env-file=.env.local scripts/benchmark.ts",
+    "report": "tsx --env-file=.env.local scripts/report.ts",
+    "create-company": "tsx --env-file=.env.local scripts/create-company.ts",
+    "test-tenancy": "vitest run tests/tenancy.test.ts"
+  },
+  "dependencies": {
+    "@abaplint/core": "^2.113.0",
+    "@anthropic-ai/sdk": "^0.57.0",
+    "@supabase/ssr": "^0.12.3",
+    "@supabase/supabase-js": "^2.52.0",
+    "isomorphic-git": "^1.38.7",
+    "lucide-react": "^1.25.0",
+    "mermaid": "^11.16.0",
+    "next": "^15.4.5",
+    "pdfkit": "^0.19.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@types/node": "^24.1.0",
+    "@types/pdfkit": "^0.17.6",
+    "@types/pg": "^8.20.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "autoprefixer": "^10.5.4",
+    "eslint": "^9.32.0",
+    "eslint-config-next": "^15.4.5",
+    "pg": "^8.22.0",
+    "postcss": "^8.5.19",
+    "tailwindcss": "^3.4.19",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  }
+}

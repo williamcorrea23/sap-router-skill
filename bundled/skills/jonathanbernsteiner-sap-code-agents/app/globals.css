@@ -1,0 +1,178 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+body {
+  font-family: "DM Sans", system-ui, sans-serif;
+  background-color: #ffffff;
+  color: #1b1817;
+}
+
+/* Model-written markdown (summaries, chat answers) */
+.md-body {
+  font-size: 14px;
+  color: #1b1817;
+  line-height: 1.6;
+}
+.md-body > *:first-child {
+  margin-top: 0;
+}
+.md-body > *:last-child {
+  margin-bottom: 0;
+}
+.md-body h1,
+.md-body h2,
+.md-body h3,
+.md-body h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 14px 0 6px;
+}
+.md-body p {
+  margin: 8px 0;
+}
+.md-body ul,
+.md-body ol {
+  margin: 8px 0;
+  padding-left: 22px;
+}
+.md-body li {
+  margin: 3px 0;
+}
+.md-body code {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12.5px;
+  background-color: #faf8f5;
+  border: 1px solid #e8e2db;
+  border-radius: 4px;
+  padding: 1px 4px;
+}
+.md-body pre {
+  background-color: #faf8f5;
+  border: 1px solid #e8e2db;
+  border-radius: 8px;
+  padding: 10px 12px;
+  overflow-x: auto;
+  margin: 8px 0;
+}
+.md-body pre code {
+  border: none;
+  background: none;
+  padding: 0;
+}
+.md-body table {
+  border-collapse: collapse;
+  margin: 10px 0;
+  font-size: 13px;
+  display: block;
+  overflow-x: auto;
+}
+.md-body th,
+.md-body td {
+  border: 1px solid #e8e2db;
+  padding: 5px 10px;
+  text-align: left;
+}
+.md-body th {
+  background-color: #faf8f5;
+  font-weight: 600;
+}
+.md-body a {
+  color: #cc420b;
+}
+.md-body blockquote {
+  border-left: 3px solid #e8e2db;
+  margin: 8px 0;
+  padding-left: 12px;
+  color: #6e6660;
+}
+
+/* Print / Export PDF — the report page triggers window.print(); the app
+   chrome carries Tailwind's print:hidden, these rules undo the screen-only
+   layout (fixed offsets, bounded scroll panes) so the content paginates. */
+@media print {
+  @page {
+    margin: 12mm;
+  }
+  main {
+    margin-left: 0 !important;
+    padding-top: 0 !important;
+  }
+  [data-print-frame] {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  [data-print-pane] {
+    overflow: visible !important;
+  }
+  tr,
+  pre {
+    break-inside: avoid;
+  }
+}
+
+/* Chat: streaming activity line + example chips */
+@keyframes chat-star-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(180deg);
+  }
+}
+.chat-activity-star {
+  animation: chat-star-spin 2.4s ease-in-out infinite;
+}
+@keyframes chat-dot-blink {
+  0%,
+  80%,
+  100% {
+    opacity: 0.2;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+.chat-activity-dot {
+  animation: chat-dot-blink 1.2s ease-in-out infinite;
+}
+.chat-activity-dot:nth-of-type(2) {
+  animation-delay: 0.2s;
+}
+.chat-activity-dot:nth-of-type(3) {
+  animation-delay: 0.4s;
+}
+.chat-chip {
+  transition:
+    border-color 120ms ease,
+    box-shadow 120ms ease;
+}
+.chat-chip:hover:not(:disabled) {
+  border-color: #d6d0c9;
+  box-shadow: 0 2px 8px rgba(23, 20, 18, 0.06);
+}
+.chat-composer {
+  transition: box-shadow 150ms ease;
+}
+.chat-composer:focus-within {
+  box-shadow: 0 4px 20px rgba(23, 20, 18, 0.1);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d6d0c9;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a49c95;
+}
