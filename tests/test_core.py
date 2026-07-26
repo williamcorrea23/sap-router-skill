@@ -9,9 +9,112 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT / "python"))
 
+import sap_router
 from sap_router import SapRouter
 from sap_router_core.registry import classify_task, load_servers, validate_catalog
 from source_catalog import INDEX_FILE, load, score_asset
+
+
+class FunctionalWriteGateTest(unittest.TestCase):
+    """The gate that stops a BAPI firing outside an explicit functional context.
+
+    Every action below once slipped through because matching was on raw
+    substrings: 'LIST' is inside 'LISTING' and 'PICKLIST', 'GET' is inside
+    'BUDGET' and 'TARGET', and any action containing 'GUI' was waved past.
+    """
+
+    WRITES = [
+        "MM_CREATE_MATERIAL",
+        "CREATE_MATERIAL",
+        "CREATE_MATERIAL_LISTING",   # LIST inside LISTING
+        "CREATE_MATERIAL_GUI",       # former GUI escape hatch
+        "CREATE_PO_CHECKLIST",       # CHECK inside CHECKLIST
+        "GET_CREATE_PO",
+        "POST_BUDGET_DOCUMENT",      # GET inside BUDGET
+        "CREATE_PICKLIST",
+        "UPDATE_PRICELIST",
+        "POST_CHECK_RUN",
+        "CREATE_TARGET_PLAN",        # GET inside TARGET
+        "REVERSE_DOCUMENT",
+        "BAPI_USER_CREATE1",
+    ]
+
+    READS = [
+        "DISPLAY_MATERIAL",
+        "READ_SOURCE",
+        "MM03_GUI",
+        "SPRO_CONFIG",
+        "MMBE_STOCK_OVERVIEW",
+    ]
+
+    def test_every_write_action_is_gated(self):
+        router = SapRouter()
+        for action in self.WRITES:
+            with self.subTest(action=action):
+                self.assertTrue(
+                    router._is_functional_write(action),
+                    f"{action} slipped the functional-write gate",
+                )
+
+    def test_reads_and_navigation_stay_ungated(self):
+        router = SapRouter()
+        for action in self.READS:
+            with self.subTest(action=action):
+                self.assertFalse(
+                    router._is_functional_write(action),
+                    f"{action} is a read but was gated as a write",
+                )
+
+    def test_gated_action_is_not_dispatched_without_context(self):
+        route = SapRouter().get_route("CREATE_MATERIAL_LISTING")
+        self.assertEqual(route["strategy"], "needs-functional-context")
+
+    def test_bapi_lookup_does_not_match_across_token_boundaries(self):
+        router = SapRouter()
+        # CREATE_PO must not claim CREATE_PORTAL_USER or CREATE_POSTING.
+        self.assertIsNone(router._lookup_bapi("CREATE_PORTAL_USER"))
+        self.assertIsNone(router._lookup_bapi("CREATE_POSTING"))
+        self.assertEqual(router._lookup_bapi("CREATE_PO"), "BAPI_PO_CREATE1")
+        self.assertEqual(
+            router._lookup_bapi("MM_CREATE_MATERIAL"), "BAPI_MATERIAL_SAVEDATA"
+        )
+
+
+class SoapRfcContractTest(unittest.TestCase):
+    """_call_soap_rfc returns (body, status); callers must unpack it.
+
+    Testing the tuple itself for None always passed, so the probe reported the
+    endpoint reachable even when the POST failed, and the raw tuple reached
+    re.search inside _parse_soap_return.
+    """
+
+    def setUp(self):
+        self.router = SapRouter()
+        self._saved = sap_router._soap_rfc_available
+        sap_router._soap_rfc_available = None
+        os.environ.setdefault("ARC_SAP_URL", "https://sap.invalid")
+        os.environ.setdefault("ARC_SAP_USER", "tester")
+
+    def tearDown(self):
+        sap_router._soap_rfc_available = self._saved
+
+    def test_probe_reports_unavailable_when_the_call_fails(self):
+        self.router._call_soap_rfc = lambda *a, **k: (None, 0)
+        self.assertFalse(self.router._probe_soap_rfc())
+
+    def test_probe_reports_available_only_on_http_200(self):
+        self.router._call_soap_rfc = lambda *a, **k: ("<ok/>", 200)
+        self.assertTrue(self.router._probe_soap_rfc())
+
+    def test_non_200_response_does_not_become_a_route(self):
+        self.router._probe_soap_rfc = lambda: True
+        self.router._call_soap_rfc = lambda *a, **k: (None, 500)
+        self.assertIsNone(self.router._try_soap_rfc("CREATE_MATERIAL"))
+
+    def test_parse_soap_return_never_receives_a_tuple(self):
+        # Guards the TypeError that fired after the POST had already hit SAP.
+        with self.assertRaises(TypeError):
+            self.router._parse_soap_return(("<RETURN/>", 200), "BAPI_X")
 
 
 class RouterContractsTest(unittest.TestCase):

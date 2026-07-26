@@ -557,6 +557,71 @@ class HealthChecker:
         except Exception as e:
             return {"status": "ERROR", "reason": str(e)[:200]}
 
+    def load_mcp_declarations(self):
+        """Read .mcp.json — the file that actually launches the MCP servers.
+
+        MCP_HEALTHCHECK_SPEC is a separate hand-maintained table with no link to
+        .mcp.json, so nothing here ever looked at what the servers are really
+        configured to run.
+        """
+        cached = getattr(self, "_mcp_declarations", None)
+        if cached is not None:
+            return cached
+        try:
+            with open(SKILL_DIR / ".mcp.json", "r", encoding="utf-8") as handle:
+                cached = json.load(handle).get("mcpServers", {})
+        except Exception:
+            cached = {}
+        self._mcp_declarations = cached
+        return cached
+
+    def check_mcp_target(self, name):
+        """Does the entrypoint declared in .mcp.json actually exist on disk?
+
+        check_mcp_binary only probes whether the interpreter (node/python) is on
+        PATH, and returns SKIPPED when a spec has no probe_command — which in
+        non-strict mode counted as ready. An MCP whose args point at a
+        dist/index.js that was never built therefore reported healthy.
+        """
+        entry = self.load_mcp_declarations().get(name)
+        if entry is None:
+            return {"status": "NOT_DECLARED",
+                    "reason": "listed in MCP_HEALTHCHECK_SPEC but absent from .mcp.json"}
+
+        command = (entry.get("command") or "").strip()
+        if not command:
+            return {"status": "NO_COMMAND",
+                    "reason": "empty command — supplied by an IDE plugin, not by this repo"}
+
+        args = entry.get("args") or []
+        target = next(
+            (a for a in args if str(a).endswith((".js", ".mjs", ".py", ".json"))), None
+        )
+        if target:
+            path = SKILL_DIR / target
+            if path.exists():
+                return {"status": "PRESENT", "target": target}
+            return {"status": "MISSING_TARGET", "target": target,
+                    "reason": f"declared entrypoint does not exist: {target}"}
+
+        if "-m" in args:
+            module = args[args.index("-m") + 1] if len(args) > args.index("-m") + 1 else ""
+            pythonpath = (entry.get("env") or {}).get("PYTHONPATH", "")
+            if pythonpath:
+                root = SKILL_DIR / pythonpath
+                if not root.is_dir():
+                    return {"status": "MISSING_TARGET", "target": pythonpath,
+                            "reason": f"PYTHONPATH does not exist: {pythonpath}"}
+                top = module.split(".")[0]
+                if not ((root / top).is_dir() or (root / f"{top}.py").is_file()):
+                    return {"status": "MISSING_TARGET", "target": pythonpath,
+                            "reason": f"module {top} not found under {pythonpath}"}
+                return {"status": "PRESENT", "target": f"{pythonpath} :: {module}"}
+            return {"status": "EXTERNAL", "reason": f"module {module} expected on PYTHONPATH"}
+
+        return {"status": "EXTERNAL",
+                "reason": f"launched via '{command}' — resolved outside this repo"}
+
     def check_mcp_env_vars(self, name, spec):
         """Check if environment variables for MCP are set."""
         env_vars = spec.get("env_vars", [])
@@ -747,28 +812,55 @@ class HealthChecker:
             # Check binary
             binary_check = self.check_mcp_binary(name, spec)
 
+            # Check the entrypoint .mcp.json actually declares
+            target_check = self.check_mcp_target(name)
+
             self.results["mcp_checks"][name] = {
                 "env": env_check,
                 "binary": binary_check,
+                "target": target_check,
                 "criticality": criticality,
                 "description": spec["description"],
             }
+
+            # A missing entrypoint is fatal regardless of strict mode: the
+            # interpreter being on PATH says nothing if the file it would run
+            # was never built.
+            target_ok = target_check["status"] in ("PRESENT", "EXTERNAL")
 
             if criticality in ("HIGH", "MEDIUM"):
                 high_total += 1
                 env_ok_mcp = env_check["status"] in ("ALL_SET", "CONFIGURED", "NO_ENV_NEEDED")
                 binary_ready_states = ("AVAILABLE",) if self.strict else ("AVAILABLE", "SKIPPED")
                 binary_ok = binary_check["status"] in binary_ready_states
-                if env_ok_mcp and binary_ok:
+                if env_ok_mcp and binary_ok and target_ok:
                     high_ok += 1
 
             # Log status
             ready = (
                 env_check["status"] in ("ALL_SET", "CONFIGURED", "NO_ENV_NEEDED")
                 and binary_check["status"] in (("AVAILABLE",) if self.strict else ("AVAILABLE", "SKIPPED"))
+                and target_ok
             )
             icon = "[OK]" if ready else "[WARN]"
-            self.log(f"  {icon} {name:25s} ({criticality:8s}): env={env_check['status']:15s} binary={binary_check['status']}")
+            self.log(f"  {icon} {name:25s} ({criticality:8s}): env={env_check['status']:15s} "
+                     f"binary={binary_check['status']:13s} target={target_check['status']}")
+
+        # Coverage: the loop above walks MCP_HEALTHCHECK_SPEC, so any server
+        # configured in .mcp.json but absent from that table is never probed at
+        # all. That blind spot hid the servers that actually work.
+        declared = set(self.load_mcp_declarations())
+        specced = set(MCP_HEALTHCHECK_SPEC)
+        self.results["mcp_coverage"] = {
+            "declared_in_mcp_json": len(declared),
+            "listed_in_spec": len(specced),
+            "declared_but_never_probed": sorted(declared - specced),
+            "probed_but_not_declared": sorted(specced - declared),
+        }
+        unprobed = sorted(declared - specced)
+        if unprobed:
+            self.log(f"  [WARN] {len(unprobed)} MCP(s) in .mcp.json are not in "
+                     f"MCP_HEALTHCHECK_SPEC and were never probed: {', '.join(unprobed)}")
 
         # SOAP RFC endpoint probe
         soap_result = self.check_soap_rfc_endpoint()

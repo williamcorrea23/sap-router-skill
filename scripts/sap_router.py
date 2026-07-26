@@ -364,6 +364,49 @@ except Exception:
     get_chain = get_mcp = launcher_plan = list_mcps = None
 
 
+# === TOKEN MATCHING ===
+# Action names are matched on whole tokens, never on raw substrings. Substring
+# containment silently equates unrelated SAP objects: 'LIST' is inside 'PICKLIST'
+# and 'LISTING', 'GET' is inside 'BUDGET' and 'TARGET', and 'CREATE_PO' is inside
+# 'CREATE_PORTAL_USER'. In the functional-write gate that difference decides
+# whether a BAPI fires without an explicit functional context.
+
+def action_tokens(text):
+    """Split an action name into comparison tokens.
+
+    'CREATE_MATERIAL_LISTING' -> ['CREATE', 'MATERIAL', 'LISTING']
+    """
+    return [t for t in re.split(r"[^A-Za-z0-9]+", str(text).upper()) if t]
+
+
+def tokens_contain(haystack, needle):
+    """True if `needle` appears as a contiguous run of tokens inside `haystack`.
+
+    ['CREATE', 'PO'] is NOT contained in ['CREATE', 'PORTAL', 'USER'].
+    """
+    span = len(needle)
+    if not span or span > len(haystack):
+        return False
+    return any(haystack[i:i + span] == needle
+               for i in range(len(haystack) - span + 1))
+
+
+def longest_token_match(action_upper, mapping):
+    """Return the value whose key matches the most tokens, or None.
+
+    Longest-match keeps the result deterministic: without it, 'CREATE_MATERIAL'
+    vs 'CREATE_MATERIAL_LISTING' would be decided by dict insertion order.
+    """
+    tokens = action_tokens(action_upper)
+    best_key = best_value = None
+    for key, value in mapping.items():
+        key_tokens = action_tokens(key)
+        if tokens_contain(tokens, key_tokens):
+            if best_key is None or len(key_tokens) > len(best_key):
+                best_key, best_value = key_tokens, value
+    return best_value
+
+
 class SapRouter:
     def __init__(self, memory_file="MEMORY.md"):
         self.memory_file = os.path.abspath(memory_file)
@@ -748,24 +791,40 @@ class SapRouter:
     def _is_functional_write(self, action_upper):
         """True if the action would fire a BAPI / write transaction.
 
-        Explicit GUI requests (contain 'GUI') and pure reads are NOT gated — the
-        gate exists to stop BAPI dispatch out of functional context, not to block
-        navigation or lookups.
+        This is the gate the whole routing law rests on: a BAPI must never fire
+        outside an explicit functional context. Two rules keep it honest.
+
+        1. Match whole tokens, never substrings. 'LIST' inside 'PICKLIST' and
+           'GET' inside 'BUDGET' used to read as pure lookups and slip the gate.
+        2. A write verb always wins. 'CREATE_MATERIAL_LISTING' is a write even
+           though it also carries a read verb, so read keywords can no longer
+           veto one.
+
+        There is deliberately no 'GUI' escape. Asking for a transaction by name
+        states which screen to use, not that a write was authorised, and
+        'CREATE_MATERIAL_GUI' previously bypassed the gate entirely.
         """
-        if "GUI" in action_upper:
-            return False  # explicit GUI navigation = explicit functional intent
-        if action_upper.startswith("BAPI_"):
+        if str(action_upper).upper().startswith("BAPI_"):
             return True
-        if any(rk in action_upper for rk in FUNCTIONAL_READ_KEYWORDS):
-            return False
-        return any(wk in action_upper for wk in FUNCTIONAL_WRITE_KEYWORDS)
+
+        tokens = set(action_tokens(action_upper))
+        if tokens & {kw.upper() for kw in FUNCTIONAL_WRITE_KEYWORDS}:
+            return True
+        # No write verb: a pure read, a navigation, or an action this table does
+        # not describe. FUNCTIONAL_READ_KEYWORDS is retained for config
+        # compatibility but can no longer overrule the check above.
+        return False
 
     def _lookup_bapi(self, action_upper):
-        """Return the BAPI mapped to a functional action, or None."""
-        for key, bapi in FUNCTIONAL_BAPI_MAP.items():
-            if key in action_upper:
-                return bapi
-        if action_upper.startswith("BAPI_"):
+        """Return the BAPI mapped to a functional action, or None.
+
+        Longest contiguous token match, so 'CREATE_PO' no longer claims
+        'CREATE_PORTAL_USER' and dict order stops deciding the winner.
+        """
+        bapi = longest_token_match(action_upper, FUNCTIONAL_BAPI_MAP)
+        if bapi:
+            return bapi
+        if str(action_upper).upper().startswith("BAPI_"):
             return action_upper
         return None
 
@@ -890,8 +949,11 @@ class SapRouter:
         )
 
         try:
-            body = self._call_soap_rfc("RFC_PING", probe_xml)
-            if body is not None:
+            # _call_soap_rfc returns a (body, status) tuple. Testing the tuple
+            # itself for None always succeeded, so the probe reported the
+            # endpoint as reachable even when the POST had failed outright.
+            body, status = self._call_soap_rfc("RFC_PING", probe_xml)
+            if body is not None and status == 200:
                 _soap_rfc_available = True
                 return True
         except Exception:
@@ -1020,12 +1082,8 @@ class SapRouter:
         Returns:
             Route dict on success (HTTP 200), None to cascade to GUI fallback.
         """
-        # 1. Check if action is in BAPI map
-        bapi_info = None
-        for key, info in SOAP_RFC_BAPI_MAP.items():
-            if key in action_upper:
-                bapi_info = info
-                break
+        # 1. Check if action is in BAPI map (whole-token match, longest wins)
+        bapi_info = longest_token_match(action_upper, SOAP_RFC_BAPI_MAP)
         if bapi_info is None:
             return None
 
@@ -1038,13 +1096,17 @@ class SapRouter:
         import_params = bapi_info.get("import_params", [])
         soap_xml = self._build_soap_envelope(bapi_name, import_params, payload)
 
-        # 4. POST to /sap/bc/soap/rfc
-        response_body = self._call_soap_rfc(bapi_name, soap_xml)
-        if response_body is None:
+        # 4. POST to /sap/bc/soap/rfc — unpack the (body, status) tuple. Passing
+        # the tuple on raised TypeError inside _parse_soap_return's re.search,
+        # after the POST had already hit SAP.
+        response_body, http_status = self._call_soap_rfc(bapi_name, soap_xml)
+        if response_body is None or http_status != 200:
             return None
 
         # 5. Parse response for BAPI RETURN messages
         return_messages = self._parse_soap_return(response_body, bapi_name)
+        failed = [m for m in return_messages
+                  if str(m.get("type", "")).upper() in ("E", "A")]
 
         return {
             "destination": "SOAP RFC BAPI",
@@ -1052,13 +1114,15 @@ class SapRouter:
             "bapi": bapi_name,
             "soap_rfc_endpoint": "/sap/bc/soap/rfc?sap-client={}".format(
                 os.environ.get('ARC_SAP_CLIENT', '100')),
-            "http_status": 200,
+            "http_status": http_status,
             "return_messages": return_messages,
+            "bapi_failed": bool(failed),
             "details": (
-                "SOAP RFC call to {} via /sap/bc/soap/rfc succeeded. "
-                "Return: {} message(s). "
-                "Check return_messages[0].type: S/A = success, E = error, W = warning."
-            ).format(bapi_name, len(return_messages)),
+                "SOAP RFC call to {} via /sap/bc/soap/rfc returned HTTP {}. "
+                "Return: {} message(s), {} of them errors. "
+                "BAPIRET2 type: S=success, I/W=info/warning, E=error, A=abort. "
+                "E and A are failures — a COMMIT must not follow either."
+            ).format(bapi_name, http_status, len(return_messages), len(failed)),
         }
 
     def _parse_soap_return(self, response_body, bapi_name):
@@ -1141,20 +1205,20 @@ class SapRouter:
             payload["SOURCE"] = source_code
 
         soap_xml = self._build_soap_envelope("RFC_GENERATE_REPORT", import_params, payload)
-        response_body = self._call_soap_rfc("RFC_GENERATE_REPORT", soap_xml)
+        response_body, http_status = self._call_soap_rfc("RFC_GENERATE_REPORT", soap_xml)
 
-        if response_body is None:
+        if response_body is None or http_status != 200:
             return None
 
         return {
             "destination": "RFC_GENERATE_REPORT (SOAP RFC)",
             "strategy": "rfc-generate-report",
             "program": program_name,
-            "http_status": 200,
+            "http_status": http_status,
             "details": (
                 "ABAP program {} generated/activated via RFC_GENERATE_REPORT "
-                "over SOAP RFC."
-            ).format(program_name),
+                "over SOAP RFC (HTTP {})."
+            ).format(program_name, http_status),
         }
 
     def _check_caveman_delegation(self, action_lower):
