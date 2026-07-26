@@ -75,3 +75,6 @@ coverage/
 abap-review-report.html
 abaplint-report.json
 packages/
+
+# Derived cache for the cavecrew UserPromptSubmit hook (rebuilt from sap_router.py)
+.cavecrew_triggers.json

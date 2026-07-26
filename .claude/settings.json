@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python scripts/hooks/cavecrew_delegation_hook.py",
+            "timeout": 10,
+            "statusMessage": "Checking cavecrew delegation"
+          }
+        ]
+      }
+    ]
+  }
+}

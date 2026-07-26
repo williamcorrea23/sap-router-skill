@@ -133,6 +133,6 @@ npm run validate:all
 
 - **sap-router-skill** — master dispatch table and routing decision tree these macros expand into
 - **karpathy-guidelines** — mandatory wrapper (Think → Simplify → Surgical → Goal-Verify) around every macro
-- **caveman:cavecrew** — decision guide for the delegation shortcuts in section 2
+- **cavecrew-investigator / cavecrew-builder / cavecrew-reviewer** — the subagents the delegation shortcuts in section 2 dispatch to
 - **run-sap-router-skill** — smoke-testing the CLIs behind the macros
 - **sap-self-learn** — how `learn:mcp` / `learn:route` telemetry adapts future routing

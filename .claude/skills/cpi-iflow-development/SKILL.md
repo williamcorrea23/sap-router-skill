@@ -142,18 +142,19 @@ python scripts/cpi_iflow_packager.py validate --input iflows/my-iflow.zip
 
 ## Step 5 — Lint Before Deploy
 
-```bash
-# Lint Groovy script via Hermes MCP cpi_lint tool
-# Call: mcp__hermes-crewai__cpi_lint with the Groovy script content
-```
+Validate the packaged iFlow ZIP (structure, MANIFEST.MF, required files):
 
 ```bash
-# Validate iFlow XML via Hermes MCP cpi_lint tool
-# Call: mcp__hermes-crewai__cpi_lint with the flow.xml content
+npm run cpi:validate -- --input <iflow>.zip
 ```
 
-Key lint rules: hardcoded passwords → error, no exception subprocess → warning,
-`new File()` in Groovy → error, `println()` → info (use MessageLog).
+There is no automated Groovy linter in this repo — review the script by hand
+against these rules before packaging:
+
+- hardcoded passwords → **error**
+- no exception subprocess → **warning**
+- `new File()` in Groovy → **error**
+- `println()` → **info** (use MessageLog instead)
 
 ## Step 6 — Deploy to CPI Tenant
 
@@ -161,7 +162,7 @@ Key lint rules: hardcoded passwords → error, no exception subprocess → warni
 # List packages: call MCP tool mcp__mcp-integration-suite__packages
 # Deploy iFlow: call MCP tool mcp__mcp-integration-suite__deploy-iflow
 # Check messages: call MCP tool mcp__mcp-integration-suite__get-messages
-# Check runtime: call Hermes MCP tool mcp__hermes-crewai__cpi_mcp
+# Check runtime: call MCP tool mcp__sap-cpi-mcp__cpi_logs (message processing logs)
 ```
 
 ## Integration Patterns
