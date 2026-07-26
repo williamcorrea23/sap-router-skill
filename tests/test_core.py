@@ -24,6 +24,27 @@ class RouterContractsTest(unittest.TestCase):
         self.assertEqual(route["strategy"], "bapi-functional")
         self.assertEqual(route["bapi"], "BAPI_MATERIAL_SAVEDATA")
 
+    def test_caveman_delegation_targets_are_real_agents(self):
+        """Every cavecrew agent_type the router emits must exist as an agent file.
+
+        Regression guard: these were dangling 'caveman:cavecrew-*' references
+        pointing at a plugin that was never installed.
+        """
+        agents_dir = ROOT / ".claude" / "agents"
+        for task, expected in (
+            ("find the material master class", "cavecrew-investigator"),
+            ("fix typo in readme", "cavecrew-builder"),
+            ("review this diff", "cavecrew-reviewer"),
+        ):
+            decision = SapRouter()._check_caveman_delegation(task)
+            self.assertIsNotNone(decision, f"no delegation for {task!r}")
+            agent_type = decision["agent_type"]
+            self.assertEqual(agent_type, expected)
+            self.assertTrue(
+                (agents_dir / f"{agent_type}.md").is_file(),
+                f"{agent_type} routed but .claude/agents/{agent_type}.md is missing",
+            )
+
     def test_catalog_is_valid(self):
         result = validate_catalog()
         self.assertEqual(result["status"], "PASS")

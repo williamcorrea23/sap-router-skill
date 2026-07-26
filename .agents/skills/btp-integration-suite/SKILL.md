@@ -72,7 +72,7 @@ Deploy and monitor via MCP:
 # List deployed iFlows: call MCP tool mcp__mcp-integration-suite__get-all-iflows
 # Deploy new iFlow: call MCP tool mcp__mcp-integration-suite__deploy-iflow
 # Check failed messages: call MCP tool mcp__mcp-integration-suite__get-messages
-# Get runtime stats: call Hermes MCP tool mcp__hermes-crewai__cpi_mcp
+# Get runtime stats: call MCP tool mcp__sap-cpi-mcp__cpi_artifacts with runtime=true
 ```
 
 ## Step 3 — Set Up API Management

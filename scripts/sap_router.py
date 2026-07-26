@@ -302,20 +302,20 @@ CAVEMAN_DELEGATION = {
     'investigator': {
         'trigger_keywords': ['find', 'search', 'locate', 'where is', 'look up', 'grep', 'scan for'],
         'description': 'Read-only code location — maps definitions, callers, directory structure',
-        'agent_type': 'caveman:cavecrew-investigator',
+        'agent_type': 'cavecrew-investigator',
     },
     'builder': {
         'trigger_keywords': ['fix', 'edit', 'change', 'rename', 'remove', 'add method', 'add field',
                             'typo', 'single file', 'one file', 'small change'],
         'description': 'Surgical 1-2 file edit — typos, single-function rewrites, mechanical renames',
-        'agent_type': 'caveman:cavecrew-builder',
+        'agent_type': 'cavecrew-builder',
         'refuses': ['3+ files', 'new features', 'cross-file refactors'],
     },
     'reviewer': {
         'trigger_keywords': ['review', 'audit', 'check diff', 'review this', 'code review diff',
                             'PR review', 'merge request'],
         'description': 'Diff/branch reviewer — one finding per line, severity-tagged',
-        'agent_type': 'caveman:cavecrew-reviewer',
+        'agent_type': 'cavecrew-reviewer',
     },
 }
 
