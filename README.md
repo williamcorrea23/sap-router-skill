@@ -3,11 +3,19 @@
 > **Build SAP applications from your IDE. No SAP GUI required.**
 >
 > Talk to SAP in plain English. Read ABAP source, create materials, post documents,
-> deploy iFlows, run transports — all from VS Code. Self-learning router picks the
-> fastest path: ADT direct, SAP GUI fallback, or ZROUTER batch. Every action verified.
-> Every route learned. Every response compressed.
+> deploy iFlows, run transports — all from VS Code. The router picks a path per
+> action: ADT direct, SAP GUI fallback, SOAP RFC, or ZROUTER batch. Writes are
+> gated behind an explicit `--functional` flag, so no BAPI fires by accident.
 >
-> **85 skills | 42 MCPs | 24 CLIs | 8-stage pipeline | v4.5.0**
+> **94 skills | 8 active MCPs (+41 planned) | 40 CLIs | 8-stage pipeline | v4.5.0**
+
+> **Status, honestly.** 8 of the 49 declared MCP servers launch from a clean clone;
+> the other 41 sit under `plannedServers` in `.mcp.json` because their entrypoint is
+> not installed or they were never promoted out of `.agents/registries/mcp-candidates.json`.
+> `npm run hc` now reports that split instead of counting an unprobed server as ready.
+> Self-learning records routing telemetry only when you invoke `npm run learn:*` by
+> hand — nothing writes it automatically yet — and the fallback tiers return a
+> `tool_call` for the calling agent to execute rather than executing it themselves.
 
 ---
 <img width="2816" height="1536" alt="Gemini_Generated_Image_fenqd2fenqd2fenq" src="https://github.com/user-attachments/assets/b93bb48a-a704-44f6-b4c0-437a21712be5" />
@@ -16,13 +24,22 @@
 
 You type **"create material FERT with these fields"** in VS Code chat. The router:
 
-1. **Thinks** — surfaces assumptions, picks the best BAPI, checks authorizations
-2. **Routes** — ADT? GUI? RFC? Picks fastest available path, learns from every call
-3. **Executes** — calls the BAPI, checks BAPIRET2, commits the transaction
-4. **Verifies** — confirms in MM03, logs to BAL, runs ABAP Unit tests
-5. **Learns** — records MCP latency, adapts future routes to be faster
+1. **Thinks** — surfaces assumptions, picks the BAPI, names the authorizations needed
+2. **Gates** — a write is refused without `--functional`, so a BAPI never fires from a
+   bare action token. This is the one rule the whole design rests on
+3. **Routes** — ADT, GUI, SOAP RFC or ZROUTER, chosen per action from the routing table
+4. **Hands back a `tool_call`** — the Python CLI builds the call; the agent holding the
+   MCP session executes it. Python has no session of its own, so it cannot and does not
+   execute the call itself
+5. **Reports BAPIRET2** — `E` and `A` rows are flagged as failures so a COMMIT does not
+   follow a rejected call
 
 **No SAP GUI. No Eclipse. No SE80. No transaction codes to memorize.**
+
+Two things this does *not* yet do, despite what earlier versions of this README claimed:
+it does not verify the SAP-side side effect after the fact (`_verify_result` returns
+`PENDING`), and it does not learn on its own — routing telemetry is written only when you
+run `npm run learn:*` yourself.
 
 ---
 
@@ -88,7 +105,7 @@ python scripts/self_learn.py persist   # Preserve learned context
 ### Post-Install — Healthcheck + .env Setup
 
 ```bash
-# Run healthcheck — probes all 42 MCPs + verifies .env
+# Run healthcheck — probes the 8 active MCPs, flags the 41 planned, verifies .env
 npm run hc
 
 # If .env missing, generate interactive prompt
@@ -107,7 +124,7 @@ cp .env.template .env
 |---|---|---|
 | **Install** | `git clone ... && python scripts/healthcheck.py` | Clone + verify everything works |
 | **Update** | `git pull && npm install && npm run hc` | Pull latest + refresh deps + healthcheck |
-| **Health** | `npm run hc` | Probes 42 MCPs + .env completeness |
+| **Health** | `npm run hc` | Probes 8 active MCPs + flags 41 planned + .env completeness |
 | **Health** | `npm run hc:prompt` | Interactive setup wizard for missing vars |
 | **Route** | `npm run router -- --action MM_CREATE_MATERIAL` | Route action: ADT → GUI → RFC |
 | **Route** | `npm run router:gui -- --action SPRO_CONFIG` | Force SAP GUI fallback |
@@ -129,7 +146,7 @@ cp .env.template .env
 
 ---
 
-## Complete Skill Catalog (85 skills)
+## Complete Skill Catalog (94 skills)
 
 ### Skill Categories
 
@@ -147,7 +164,7 @@ cp .env.template .env
 
 ---
 
-## MCP Server Reference (42 servers)
+## MCP Server Reference (8 active, 41 planned)
 
 ### MCP Details
 
@@ -244,12 +261,12 @@ sap-router-skill/
 ├── SKILL.md                     ← Master dispatch (Karpathy wrapper)
 ├── COMPARISON.md                ← 72-repo cross-reference analysis
 ├── CHANGELOG.md                 ← Version history
-├── .mcp.json                    ← 42 MCP servers (3 GUI + 3 RAG)
+├── .mcp.json                    ← 8 active servers + 41 under plannedServers
 ├── .env.template                ← 40+ env vars grouped by domain
 ├── .abaplint.json               ← 60+ ABAP lint rules
 ├── package.json                 ← 63 npm scripts
 │
-├── .claude/skills/              ← 85 skills (all IDE auto-load)
+├── .claude/skills/              ← 94 skills (generated from .agents/skills)
 │   ├── karpathy-guidelines/     ← v4.0: Think→Simplify→Surgical→Verify
 │   ├── sap-gui-scripting/       ← SAP GUI automation + BDC + ALV
 │   ├── sap-gui-web-enrich/      ← Web-search fill missing nav data
@@ -259,9 +276,9 @@ sap-router-skill/
 │   ├── sap-api-policy/          ← API Management + OpenAPI specs
 │   └── ... (68 more domain skills)
 │
-├── scripts/                     ← 24 Python CLIs
+├── scripts/                     ← 40 Python CLIs
 │   ├── sap_router.py            ← Routing engine (ADT→GUI→RFC→Pipeline)
-│   ├── healthcheck.py           ← 42-MCP probe + .env guardian
+│   ├── healthcheck.py           ← MCP entrypoint + .env guardian
 │   ├── self_learn.py            ← Hermes-style context adaptation
 │   ├── memory_manager.py        ← MEMORY.md session lifecycle + ABAPLINT
 │   ├── xls_to_bapi.py           ← CSV/XLSX → BAPI JSON (29 actions)
@@ -329,7 +346,7 @@ git pull origin main
 npm install
 pip install --upgrade openpyxl  # if using XLSX features
 
-# Verify health — probes all 42 MCPs
+# Verify health — probes active MCPs, reports planned ones
 python scripts/healthcheck.py
 
 # Preserve learned context through update
@@ -385,6 +402,6 @@ Key integrations:
 ## Contributing
 
 PRs and issues welcome. See [SKILL.md](SKILL.md) for the full dispatch table and
-85-skill reference. MIT licensed — use freely.
+94-skill reference. MIT licensed — use freely.
 
 --

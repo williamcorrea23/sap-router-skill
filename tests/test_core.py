@@ -178,13 +178,54 @@ class RouterContractsTest(unittest.TestCase):
             score_asset(assets["canonical:authorization-iam"], query, "skill", None),
         )
 
-    def test_mcp_config_preserves_only_reviewed_or_fail_closed_candidates(self):
-        configured = set(json.loads((ROOT / ".mcp.json").read_text(encoding="utf-8")).get("mcpServers", {}))
-        candidates = json.loads((ROOT / ".agents" / "registries" / "mcp-candidates.json").read_text(encoding="utf-8"))
+    def test_only_reviewed_servers_are_launched(self):
+        """No unpromoted candidate may sit in mcpServers.
+
+        scripts/mcp_launcher.py refuses to run a candidate and there is a test
+        below pinning that refusal, but every candidate used to ship as a live
+        mcpServers entry -- so the client launched exactly what the fail-closed
+        policy says must not run. Candidates now live under plannedServers.
+        """
+        mcp = json.loads((ROOT / ".mcp.json").read_text(encoding="utf-8"))
+        configured = set(mcp.get("mcpServers", {}))
+        planned = set(mcp.get("plannedServers", {}))
+        candidates = json.loads(
+            (ROOT / ".agents" / "registries" / "mcp-candidates.json").read_text(encoding="utf-8")
+        )
         candidate_ids = {item["id"] for item in candidates["candidates"]}
-        self.assertTrue(configured.issubset(set(load_servers()) | candidate_ids))
-        self.assertEqual(configured - set(load_servers()), candidate_ids)
+
+        self.assertTrue(
+            configured.issubset(set(load_servers())),
+            f"unreviewed servers are live: {sorted(configured - set(load_servers()))}",
+        )
+        self.assertFalse(
+            configured & candidate_ids,
+            f"candidates must not be launched: {sorted(configured & candidate_ids)}",
+        )
+        self.assertTrue(
+            candidate_ids.issubset(planned),
+            f"candidates missing from plannedServers: {sorted(candidate_ids - planned)}",
+        )
+        self.assertFalse(configured & planned, "a server cannot be both live and planned")
         self.assertTrue(all(item["status"] == "disabled_candidate" for item in candidates["candidates"]))
+
+    def test_every_live_server_has_a_resolvable_entrypoint(self):
+        """A live mcpServers entry must point at something that exists.
+
+        18 entries shared the identical args ["dist/index.js"] against a dist/
+        directory that was never built, and the healthcheck reported them ready.
+        """
+        sys.path.insert(0, str(ROOT / "scripts"))
+        from healthcheck import HealthChecker
+
+        checker = HealthChecker()
+        mcp = json.loads((ROOT / ".mcp.json").read_text(encoding="utf-8"))
+        broken = {
+            name: checker.check_mcp_target(name)
+            for name in mcp.get("mcpServers", {})
+            if checker.check_mcp_target(name)["status"] not in ("PRESENT", "EXTERNAL")
+        }
+        self.assertEqual(broken, {}, f"live servers with a missing entrypoint: {broken}")
 
     def test_mcp_launcher_blocks_unreviewed_fallback_execution(self):
         proc = subprocess.run(
