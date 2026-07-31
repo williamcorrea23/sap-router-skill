@@ -17,6 +17,14 @@ description: >-
 **Default output: caveman compression.** Drop articles/filler/pleasantries.
 Fragments OK. Code blocks unchanged.
 
+## Runtime root
+
+Resolve `SAP_ROUTER_ROOT` before running router commands. It must point to the
+sap-router-skill repository and contain `scripts/source_catalog.py`, `package.json`,
+and `.agents/`. Change the working directory to that root before using any relative
+`python scripts/...` or `npm run ...` command below. Fail closed if the root is not
+configured or invalid; never assume the user's current project is the router repo.
+
 ---
 
 ## Principle -1 — Delegate Before You Work (RUN FIRST)

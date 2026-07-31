@@ -5,6 +5,7 @@ trigger:
   keywords: [superclaude, macro, shortcut, alias, power user, quick command, agent prompt, delegation shortcut, command expansion]
   intent: Expanding short power-user macro phrases into full orchestrator npm/CLI flows (routing, pipeline, review, fallback, caveman delegation)
 prerequisites:
+  - SAP_ROUTER_ROOT points to the sap-router-skill repository
   - Node.js + npm — all macros run from the sap-router-skill repo root
   - Python 3.10+ (scripts/ directory: sap_router.py, fallback_engine.py, healthcheck.py)
   - .env configured — run `npm run hc:prompt` once before first macro use
@@ -16,6 +17,13 @@ prerequisites:
 A **macro** is a short command phrase the user types (or Codex recognizes) that expands to a full
 orchestrator flow. Every macro below is grounded in a real npm script from `package.json`.
 Adapted from babamba2/superclaude-for-sap for this repo's router, pipeline, and fallback engine.
+
+## Runtime root
+
+Before expanding a macro, resolve `SAP_ROUTER_ROOT`, verify that `package.json` and
+`scripts/sap_router.py` exist there, and change the working directory to that
+repository. All `npm run ...` and `python scripts/...` examples below are relative to
+that root. Fail closed if the configured root is unavailable.
 
 ## 1. Macro Table
 
