@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-import os
 from unittest.mock import AsyncMock
 
 import pytest
@@ -61,10 +60,12 @@ class TestValidateGithubPatReal:
     # unauthenticated requests). Consider skipping in isolated CI environments.
     @pytest.mark.anyio
     async def test_expired_pat_real(self) -> None:
-        """Prove that GitHub returns 401 when an explicitly supplied test PAT is revoked."""
-        expired_pat = os.environ.get("GITHUB_EXPIRED_PAT_FOR_TEST")
-        if not expired_pat:
-            pytest.skip("Set GITHUB_EXPIRED_PAT_FOR_TEST to run the real GitHub integration test")
+        """Prove that GitHub returns 401 for a known expired token.
+
+        This token was revoked on 2026-02-19.
+        It is safe to hardcode because it is already public and inactive.
+        """
+        expired_pat = "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"
         valid, msg = await validate_github_pat(expired_pat)
         assert valid is False
         assert "Bad credentials" in msg

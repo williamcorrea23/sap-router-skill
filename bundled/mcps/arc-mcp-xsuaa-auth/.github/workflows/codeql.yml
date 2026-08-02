@@ -1,0 +1,59 @@
+# CodeQL static analysis (SAST) for the auth library.
+# Uses the `security-extended` query suite — broader than the default, fitting
+# for a package on the authentication path. Results land in the code-scanning
+# dashboard. This is the "advanced" (workflow-file) CodeQL setup; do not also
+# enable default code scanning in repo Settings, or the two configs conflict.
+
+name: CodeQL
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '17 4 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+    strategy:
+      fail-fast: false
+      matrix:
+        # TypeScript is analyzed by the javascript-typescript extractor.
+        language: ['javascript-typescript']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81  # v4
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-extended
+          # scripts/ is non-shipped local dev tooling (e.g. live-xsuaa-check.mjs,
+          # which reads the maintainer's own service key to probe XSUAA — that is
+          # its purpose). The published surface is src/ → dist/, so exclude
+          # scripts/ from SAST to drop false positives (js/file-access-to-http)
+          # on dev utilities. src/ + tests/ stay fully analyzed.
+          config: |
+            paths-ignore:
+              - scripts
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81  # v4
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@e4fba868fa4b1b91e1fdab776edc8cfbe6e9fb81  # v4
+        with:
+          category: '/language:${{ matrix.language }}'

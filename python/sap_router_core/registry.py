@@ -41,6 +41,13 @@ def load_servers() -> dict[str, dict[str, Any]]:
     return {item["id"]: item for item in data.get("servers", [])}
 
 
+def load_mcp_capability_specs() -> dict[str, dict[str, Any]]:
+    path = REGISTRIES / "mcp-capabilities.json"
+    if not path.exists():
+        return {}
+    return load_json(path).get("capabilities", {})
+
+
 def load_policies() -> dict[str, Any]:
     return load_json(REGISTRIES / "policies.json")
 
@@ -65,7 +72,18 @@ def resolve_servers_for_capability(capability: str) -> list[dict[str, Any]]:
         if capability in server.get("capabilities", [])
         and server.get("status") == "enabled"
     ]
-    return sorted(servers, key=lambda item: item.get("routing", {}).get("priority", 999))
+    if servers:
+        return sorted(servers, key=lambda item: item.get("routing", {}).get("priority", 999))
+    # Preserve fail-closed behavior while exposing reviewed, not-yet-promoted
+    # candidates to routing and diagnostics. They are never executable here.
+    specs = load_mcp_capability_specs().get(capability, {})
+    candidate_ids = [specs.get("primary")] + list(specs.get("fallbacks", []))
+    return [
+        {"id": server_id, "status": "candidate", "capabilities": [capability],
+         "routing": {"priority": index}, "candidate": True}
+        for index, server_id in enumerate(candidate_ids)
+        if server_id and not server_id.startswith("plugin:")
+    ]
 
 
 def classify_task(task: str) -> dict[str, Any]:
@@ -400,6 +418,7 @@ def probe_server(server_id: str, execute: bool = False, timeout: int = 10) -> di
 
 def validate_catalog() -> dict[str, Any]:
     errors: list[str] = []
+    warnings: list[str] = []
     capabilities = load_capabilities()
     servers = load_servers()
     profiles = load_profiles()
@@ -452,11 +471,35 @@ def validate_catalog() -> dict[str, Any]:
     mcp_config_path = ROOT / ".mcp.json"
     candidates_path = REGISTRIES / "mcp-candidates.json"
     if mcp_config_path.exists() and candidates_path.exists():
-        configured_ids = set(load_json(mcp_config_path).get("mcpServers", {}))
-        candidate_ids = {item["id"] for item in load_json(candidates_path).get("candidates", [])}
-        unmanaged = configured_ids - set(servers) - candidate_ids
+        mcp_config = load_json(mcp_config_path)
+        configured_ids = set(mcp_config.get("mcpServers", {}))
+        planned_ids = set(mcp_config.get("plannedServers", {}))
+        candidate_items = load_json(candidates_path).get("candidates", [])
+        candidate_ids = [item["id"] for item in candidate_items]
+        candidate_set = set(candidate_ids)
+        duplicates = sorted({item for item in candidate_ids if candidate_ids.count(item) > 1})
+        if duplicates:
+            errors.append(f"MCP candidates contain duplicate ids: {duplicates}")
+        missing_planned = sorted(candidate_set - planned_ids)
+        if missing_planned:
+            errors.append(f"MCP candidates missing from plannedServers: {missing_planned}")
+        promoted_candidates = sorted(configured_ids & candidate_set)
+        if promoted_candidates:
+            errors.append(f"MCP candidates cannot be active without promotion: {promoted_candidates}")
+        unmanaged = configured_ids - set(servers) - candidate_set
         if unmanaged:
             errors.append(f"MCP config has unmanaged servers: {sorted(unmanaged)}")
+        mcp_specs = load_mcp_capability_specs()
+        for capability, spec in mcp_specs.items():
+            if capability not in capabilities:
+                errors.append(f"MCP capability {capability}: missing from capabilities.json")
+            for server_id in [spec.get("primary")] + list(spec.get("fallbacks", [])):
+                if not server_id or server_id.startswith("plugin:"):
+                    continue
+                if server_id not in set(servers) and server_id not in candidate_set:
+                    errors.append(f"MCP capability {capability}: unknown server {server_id}")
+            if spec.get("primary") in candidate_set and spec.get("primary") not in set(servers):
+                warnings.append(f"MCP capability {capability}: primary {spec['primary']} is reviewed but not promoted")
     return {
         "status": "PASS" if not errors else "FAIL",
         "checked_at": now_iso(),
@@ -471,4 +514,5 @@ def validate_catalog() -> dict[str, Any]:
             "bundled_sources": len(locked_ids),
         },
         "errors": errors,
+        "warnings": warnings,
     }

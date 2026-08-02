@@ -1,8 +1,10 @@
 # ABAP Skills
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![skills.sh](https://skills.sh/b/likweitan/abap-skills)](https://skills.sh/likweitan/abap-skills)
 
-A collection of Claude Code skills for SAP ABAP development — covering RAP, CDS, OData, ABAP Cloud, testing, authorization, eventing, migration, and more.
+A collection of AI agent skills for SAP ABAP development — covering RAP, CDS, OData, ABAP Cloud, testing, authorization, eventing, migration, and more.
+
+These skills are designed to be small, easy to adapt, and composable. They work with any model. Hack around with them. Make them your own.
 
 ## Table of Contents
 
@@ -32,9 +34,37 @@ A collection of Claude Code skills for SAP ABAP development — covering RAP, CD
 
 ## Installation
 
-Note: Installation differs by platform.
+Two ways in, two philosophies. **[skills.sh](https://skills.sh/likweitan/abap-skills)** copies editable skill files into your project, so you can hack on them and make them your own. **Manual installation** gives you full control over placement and scope.
 
-### Claude Code
+### 1. Get the skills
+
+<details>
+<summary><strong>Skills CLI (Recommended)</strong></summary>
+
+Install with the [Skills CLI](https://skills.sh/docs/cli). The CLI discovers the available skills and lets you choose which skills and supported AI agents to configure:
+
+```bash
+npx skills add likweitan/abap-skills
+```
+
+Install a single skill directly:
+
+```bash
+npx skills add likweitan/abap-skills --skill abap
+```
+
+Add `--global` to make the selected skills available across projects:
+
+```bash
+npx skills add likweitan/abap-skills --global
+```
+
+The CLI supports GitHub Copilot, Claude Code, Cursor, Codex, OpenCode, and other compatible agents. Run `npx skills add likweitan/abap-skills --list` to preview all available skills without installing them.
+
+</details>
+
+<details>
+<summary><strong>Claude Code</strong></summary>
 
 Clone the repository and copy the skills to your Claude Code skills directory:
 
@@ -52,7 +82,10 @@ cp -r abap-skills/skills/abap ~/.claude/skills/
 
 After installation, restart Claude Code to load the new skills.
 
-### OpenCode
+</details>
+
+<details>
+<summary><strong>OpenCode</strong></summary>
 
 Tell OpenCode:
 
@@ -62,11 +95,29 @@ Fetch and follow instructions from https://raw.githubusercontent.com/likweitan/a
 
 **Detailed docs:** [docs/README.opencode.md](docs/README.opencode.md)
 
-### GitHub Copilot in VS Code
+</details>
+
+<details>
+<summary><strong>GitHub Copilot in VS Code</strong></summary>
 
 Install GitHub Copilot in VS Code, clone this repository locally, and create a reusable prompt file that points Copilot Chat to the ABAP skill references.
 
 **Detailed docs:** [docs/README.github-copilot-vscode.md](docs/README.github-copilot-vscode.md)
+
+</details>
+
+<details>
+<summary><strong>For tinkerers</strong></summary>
+
+Use the Skills CLI on any agent:
+
+```bash
+npx skills@latest add likweitan/abap-skills
+```
+
+It writes the skills into your repo as ordinary files you own and can edit. Nothing updates behind your back; pull the latest changes when you want them with `npx skills update`.
+
+</details>
 
 ## Skills
 
@@ -506,7 +557,7 @@ skills/
 │   ├── SKILL.md
 │   └── references/
 │       └── Released_ABAP_Classes.md
-└── sap-fiori-apps-reference/
+└── sap-fiori-url-generator/
     ├── SKILL.md
     ├── scripts/
     │   ├── fiori-url-generator.js
@@ -524,13 +575,13 @@ skills/
 
 ## Contributing
 
-Before submitting a skill change, validate discovery metadata and local manifest links:
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidance on proposing changes, adding or updating skills, validation, and pull request expectations.
+
+Before submitting a skill change, run:
 
 ```bash
 uv run python scripts/validate_skills.py
 ```
-
-The same check runs in GitHub Actions for changes under `skills/`.
 
 ## License
 

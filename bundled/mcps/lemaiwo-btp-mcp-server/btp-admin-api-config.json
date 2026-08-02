@@ -1,0 +1,129 @@
+{
+  "server": {
+    "name": "odata-mcp-proxy",
+    "version": "1.0.0",
+    "description": "MCP server for SAP BTP Core Services administration REST APIs"
+  },
+  "apis": [
+    {
+      "name": "cis-accounts",
+      "destination": "BTP_ACCOUNTS_SERVICE",
+      "pathPrefix": "/accounts/v1",
+      "csrfProtected": false,
+      "entitySets": [
+        {
+          "entitySet": "GlobalAccount",
+          "urlPath": "global-account",
+          "description": "BTP global account details and GUID; call once and reuse the GUID",
+          "category": "account-management",
+          "keys": [],
+          "operations": { "list": true, "get": false, "create": false, "update": false, "delete": false }
+        },
+        {
+          "entitySet": "Subaccounts",
+          "urlPath": "subaccounts",
+          "description": "BTP subaccounts under the global account; create requires displayName, subdomain, region; prefer $filter and $select on list",
+          "category": "account-management",
+          "keys": [{ "name": "subaccountGUID", "type": "string" }],
+          "operations": { "list": true, "get": true, "create": true, "update": true, "delete": true }
+        },
+        {
+          "entitySet": "Directories",
+          "urlPath": "directories",
+          "description": "BTP directories used to group subaccounts into folders",
+          "category": "account-management",
+          "keys": [{ "name": "directoryGUID", "type": "string" }],
+          "operations": { "list": true, "get": true, "create": true, "update": true, "delete": true }
+        }
+      ]
+    },
+    {
+      "name": "cis-entitlements",
+      "destination": "BTP_ENTITLEMENTS_SERVICE",
+      "pathPrefix": "/entitlements/v1",
+      "csrfProtected": false,
+      "entitySets": [
+        {
+          "entitySet": "Assignments",
+          "urlPath": "assignments",
+          "description": "service plan entitlement assignments; use update to entitle or revoke plans for a subaccount (async); scope list to one subaccount",
+          "category": "entitlements",
+          "keys": [],
+          "operations": { "list": true, "get": false, "create": false, "update": true, "delete": false }
+        },
+        {
+          "entitySet": "AllowedDataCenters",
+          "urlPath": "globalAccountAllowedDataCenters",
+          "description": "data centers available for the global account; source of valid region values for subaccount creation",
+          "category": "entitlements",
+          "keys": [],
+          "operations": { "list": true, "get": false, "create": false, "update": false, "delete": false }
+        }
+      ]
+    },
+    {
+      "name": "cis-provisioning",
+      "destination": "BTP_PROVISIONING_SERVICE",
+      "pathPrefix": "/provisioning/v1",
+      "csrfProtected": false,
+      "entitySets": [
+        {
+          "entitySet": "EnvironmentInstances",
+          "urlPath": "environmentInstances",
+          "description": "runtime environment instances (e.g. Cloud Foundry orgs) in a subaccount; create is async, poll get until state is OK",
+          "category": "provisioning",
+          "keys": [{ "name": "environmentInstanceID", "type": "string" }],
+          "operations": { "list": true, "get": true, "create": true, "update": false, "delete": true }
+        },
+        {
+          "entitySet": "AvailableEnvironments",
+          "urlPath": "availableEnvironments",
+          "description": "runtime environment types available for provisioning; check here for valid planName and landscapeLabel before creating an environment instance",
+          "category": "provisioning",
+          "keys": [],
+          "operations": { "list": true, "get": false, "create": false, "update": false, "delete": false }
+        }
+      ]
+    },
+    {
+      "name": "xsuaa-authorization",
+      "destination": "BTP_XSUAA_SERVICE",
+      "pathPrefix": "/sap/rest/authorization/v2",
+      "csrfProtected": false,
+      "entitySets": [
+        {
+          "entitySet": "Applications",
+          "urlPath": "apps",
+          "description": "XSUAA application registrations in the subaccount; source of appId values needed for roles and role templates",
+          "category": "authorization",
+          "keys": [{ "name": "appId", "type": "string" }],
+          "operations": { "list": true, "get": true, "create": false, "update": false, "delete": false }
+        },
+        {
+          "entitySet": "RoleCollections",
+          "urlPath": "rolecollections",
+          "description": "role collections grouping roles for assignment to users or groups; start here for permission tasks",
+          "category": "authorization",
+          "keys": [{ "name": "roleCollectionName", "type": "string" }],
+          "operations": { "list": true, "get": true, "create": true, "update": true, "delete": true }
+        },
+        {
+          "entitySet": "Roles",
+          "urlPath": "roles",
+          "description": "roles derived from role templates with optional attribute restrictions; keys in order: roleTemplateName, roleTemplateAppId, roleName",
+          "category": "authorization",
+          "keys": [{ "name": "roleTemplateName", "type": "string" }, { "name": "roleTemplateAppId", "type": "string" }, { "name": "roleName", "type": "string" }],
+          "operations": { "list": true, "get": true, "create": true, "update": false, "delete": true }
+        },
+        {
+          "entitySet": "RoleTemplates",
+          "urlPath": "roletemplates",
+          "description": "role templates defined by XSUAA application security descriptors",
+          "category": "authorization",
+          "keys": [{ "name": "roleTemplateAppId", "type": "string" }, { "name": "roleTemplateName", "type": "string" }],
+          "operations": { "list": true, "get": true, "create": false, "update": false, "delete": false }
+        }
+      ]
+    }
+  ]
+}

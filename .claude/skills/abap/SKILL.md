@@ -1,192 +1,148 @@
 ---
 name: abap
-description: General ABAP development reference — ABAP language syntax, data types, internal tables, field symbols, MODULE POOL, function modules, classical dynpro, selection screens, ALV, batch input, BDC, FILE handling, RFC development, ABAP memory, SAP Memory. Use for general ABAP questions, ABAP syntax help, classical ABAP patterns (non-OO), dynpro/selection screen development, or ALV report creation.
-trigger:
-  keywords: [abap, syntax, internal-tables, field-symbols, alv, function-module, dynpro, selection-screen, bdc, rfc]
-  intent: >-
-    General ABAP development reference covering syntax, classical patterns, ALV reports, dynpro, and data types.
+description: Check and improve ABAP code quality using abaplint and Clean ABAP principles. Use this skill when users ask to check, lint, validate, review, or analyze ABAP code for syntax errors, clean code compliance, code quality, best practices, or adherence to Clean ABAP guidelines. Also use when users ask to set up abaplint, configure abaplint.json, or run abaplint on their ABAP project. Triggers include requests like "check this ABAP code", "lint my ABAP", "run abaplint", "configure abaplint", "is this clean ABAP", "review my ABAP", or "analyze ABAP code quality".
 ---
 
-# ABAP Development Reference
+# ABAP
 
-General ABAP language reference covering classical and modern ABAP (NW 7.40+).
+Check and improve ABAP code quality using two complementary approaches:
 
-## ABAP Syntax Basics
+- **abaplint**: Automated static analysis via CLI, checking syntax, types, and configurable rules
+- **Clean ABAP**: Manual review against Clean ABAP style guide principles
 
-### Data Types
+## Workflow
 
-| ABAP Type | Description | Length | Default |
-|---|---|---|---|
-| C | Character | 1-65535 | ' ' |
-| N | Numeric text | 1-65535 | '0' |
-| I | Integer | 4 bytes | 0 |
-| P | Packed number | 1-16 bytes | 0 |
-| F | Floating point | 8 bytes | 0.0 |
-| D | Date (YYYYMMDD) | 8 chars | '00000000' |
-| T | Time (HHMMSS) | 6 chars | '000000' |
-| STRING | Variable-length string | Dynamic | '' |
-| XSTRING | Variable-length byte | Dynamic | '' |
+1. **Determine check type** based on user request:
+   - If the user asks to lint, run abaplint, or check syntax: use **abaplint**
+   - If the user asks for clean code review, best practices, or code quality: use **Clean ABAP review**
+   - If unclear or the user asks for a full check: use **both**
 
-### Internal Tables
+2. **For abaplint checks**:
+   - Verify `abaplint` is installed (`npx @abaplint/cli --version` or `abaplint --version`)
+   - If not installed, install with: `npm install @abaplint/cli -g`
+   - Check if `abaplint.json` exists in the project root
+   - If no config exists, help the user create one (see starter configs in `references/abaplint.md`)
+   - Run `abaplint` in the project root directory
+   - Parse and present findings to the user
 
-```abap
-" Standard table (unordered, fastest for appending)
-DATA: lt_materials TYPE STANDARD TABLE OF mara.
+3. **For Clean ABAP reviews**:
+   - Read the ABAP code provided by the user
+   - Check against Clean ABAP categories: Names, Language, Constants, Variables, Tables, Strings, Booleans, Conditions, Ifs, Classes, Methods, Error Handling, Comments, Formatting, Testing
+   - Identify violations with specific line references
+   - Provide actionable recommendations with code examples
+   - Prioritize issues by impact (critical, major, minor)
 
-" Sorted table (ordered by key, no duplicates)
-DATA: lt_materials_sorted TYPE SORTED TABLE OF mara WITH UNIQUE KEY matnr.
+## abaplint Quick Start
 
-" Hashed table (key access only, fastest for reads)
-DATA: lt_materials_hashed TYPE HASHED TABLE OF mara WITH UNIQUE KEY matnr.
+Run in project root:
 
-" Inline declaration
-DATA(lt_data) = VALUE string_table( ( 'A' ) ( 'B' ) ).
-
-" Append / Insert / Read / Modify / Delete
-APPEND ls_row TO lt_data.
-INSERT ls_row INTO TABLE lt_data.
-READ TABLE lt_data INTO DATA(ls) WITH KEY field = 'X'.
-MODIFY TABLE lt_data FROM ls.
-DELETE lt_data WHERE field = 'X'.
+```bash
+abaplint
 ```
 
-### FIELD-SYMBOLS (Pointers)
+Generate default config (all rules):
 
-```abap
-" Assign to structure
-ASSIGN COMPONENT 'MATNR' OF STRUCTURE ls_header TO FIELD-SYMBOL(<lv_matnr>).
-IF <lv_matnr> IS ASSIGNED.
-  lv_result = <lv_matnr>.
-ENDIF.
-
-" Loop with field symbol (fastest iteration)
-LOOP AT lt_data ASSIGNING FIELD-SYMBOL(<ls_row>).
-  <ls_row>-processed = 'X'.
-ENDLOOP.
+```bash
+abaplint -d > abaplint.json
 ```
 
-## Selection Screen
+For detailed abaplint configuration including starter configs for On-Premise, Steampunk/BTP, and HANA compatibility, read `references/abaplint.md`.
 
-```abap
-PARAMETERS: p_matnr TYPE matnr OBLIGATORY,
-            p_werks TYPE werks_d DEFAULT '1000'.
-SELECT-OPTIONS: s_date FOR sy-datum NO-EXTENSION.
+## Clean ABAP Check Categories
 
-" At selection-screen event
-AT SELECTION-SCREEN ON p_matnr.
-  IF p_matnr IS INITIAL.
-    MESSAGE 'Material number is required' TYPE 'E'.
-  ENDIF.
+### Names
+
+- Use descriptive names, snake*case, no Hungarian notation (iv*, lv*, lt*)
+- Nouns for classes, verbs for methods, no noise words
+
+### Language
+
+- Prefer OO over procedural, functional over imperative
+- Use modern syntax: NEW, inline declarations, table expressions
+
+### Constants
+
+- No magic numbers, use ENUM or grouped constants
+
+### Variables
+
+- Prefer inline declarations, no chained DATA
+
+### Tables
+
+- No DEFAULT KEY, use INSERT INTO TABLE, LINE_EXISTS, WHERE clauses
+
+### Strings
+
+- Backticks for literals, pipes for string templates
+
+### Booleans
+
+- Use ABAP_BOOL, ABAP_TRUE/ABAP_FALSE, XSDBOOL
+
+### Conditions
+
+- Positive conditions, IS NOT over NOT IS, predicative method calls
+
+### Ifs
+
+- No empty IF branches, CASE over ELSE IF, nesting depth <= 3
+
+### Methods
+
+- Instance over static, RETURNING over EXPORTING, <= 3 parameters, <= 20 lines
+
+### Error Handling
+
+- Exceptions over return codes, class-based exceptions, no catching CX_ROOT
+
+### Comments
+
+- Explain why not what, " over \*, no commented-out code
+
+### Formatting
+
+- One statement per line, <= 120 chars, consistent indentation
+
+### Testing
+
+- Given-when-then structure, focused assertions, dependency injection
+
+## Output Format
+
+Structure analysis results as:
+
+```
+# ABAP Check Results
+
+## abaplint Findings
+[abaplint output, grouped by severity]
+
+## Clean ABAP Review
+
+### Summary
+- Total Issues: [count]
+- Critical: [count] | Major: [count] | Minor: [count]
+
+### Critical Issues
+#### [Category] - [Issue Title]
+**Location:** Line [X] / Method [name]
+**Problem:** [description]
+**Recommendation:** [how to fix]
+
+### Major Issues
+[Same format]
+
+### Minor Issues
+[Same format]
+
+### Positive Observations
+- [Things done well]
 ```
 
-## ALV Grid (SALV)
+## References
 
-```abap
-" Simple ALV with SALV (released C1)
-DATA: lo_alv TYPE REF TO cl_salv_table,
-      lt_data TYPE TABLE OF mara.
-
-SELECT * FROM mara INTO TABLE lt_data UP TO 100 ROWS.
-
-TRY.
-    cl_salv_table=>factory(
-      IMPORTING r_salv_table = lo_alv
-      CHANGING  t_table      = lt_data ).
-    lo_alv->display( ).
-  CATCH cx_salv_msg INTO DATA(lx).
-    MESSAGE lx->get_text( ) TYPE 'E'.
-ENDTRY.
-```
-
-## Batch Input / BDC
-
-```abap
-DATA: lt_bdcdata TYPE TABLE OF bdcdata,
-      lt_messtab TYPE TABLE OF bdcmsgcoll.
-
-" Build BDC data
-APPEND VALUE bdcdata( program = 'SAPLMGMM' dynpro = '0060'
-  dynbegin = 'X' ) TO lt_bdcdata.
-APPEND VALUE bdcdata( fnam = 'RMMG1-MATNR' fval = 'MAT001' ) TO lt_bdcdata.
-
-" Execute
-CALL TRANSACTION 'MM01' USING lt_bdcdata
-  MODE 'N'          " N = no display, A = all screens
-  UPDATE 'S'        " S = synchronous
-  MESSAGES INTO lt_messtab.
-```
-
-## FILE Operations
-
-```abap
-" Upload from local file (released for ABAP Cloud via Document Service)
-" Legacy on-premise only:
-DATA: lt_file TYPE TABLE OF string.
-CALL FUNCTION 'GUI_UPLOAD'
-  EXPORTING
-    filename = 'C:\data\materials.csv'
-    filetype = 'ASC'
-  TABLES
-    data_tab = lt_file.
-
-" Direct file read (on-premise only)
-DATA lv_filename TYPE string VALUE '/tmp/data.csv'.
-OPEN DATASET lv_filename FOR INPUT IN TEXT MODE ENCODING UTF-8.
-DO.
-  READ DATASET lv_filename INTO DATA(lv_line).
-  IF sy-subrc <> 0. EXIT. ENDIF.
-  APPEND lv_line TO lt_lines.
-ENDDO.
-CLOSE DATASET lv_filename.
-```
-
-## RFC Development
-
-```abap
-" RFC function module
-FUNCTION z_rfc_get_material.
-*"----------------------------------------------------------------------
-*"*"Remote Function Module:
-*"  IMPORTING
-*"     VALUE(IV_MATNR) TYPE MATNR
-*"  EXPORTING
-*"     VALUE(ES_DATA) TYPE MARA
-*"----------------------------------------------------------------------
-  SELECT SINGLE * FROM mara INTO es_data WHERE matnr = iv_matnr.
-ENDFUNCTION.
-
-" Call RFC from another system
-CALL FUNCTION 'Z_RFC_GET_MATERIAL'
-  DESTINATION 'S4H_DEV'
-  EXPORTING
-    iv_matnr = 'MAT001'
-  IMPORTING
-    es_data  = ls_data
-  EXCEPTIONS
-    communication_failure = 1
-    system_failure        = 2
-    OTHERS                = 3.
-```
-
-## SAP Memory / ABAP Memory
-
-```abap
-" ABAP Memory (within same session, SET/GET PARAMETER)
-SET PARAMETER ID 'MAT' FIELD 'MAT001'.
-GET PARAMETER ID 'MAT' FIELD lv_matnr.
-
-" SAP Memory (across sessions, EXPORT/IMPORT to memory)
-EXPORT lv_matnr = lv_matnr TO MEMORY ID 'ZMATERIAL'.
-IMPORT lv_matnr = lv_matnr FROM MEMORY ID 'ZMATERIAL'.
-
-" Shared memory (cross-user)
-EXPORT data = lt_cache TO SHARED BUFFER zcl_cache(ind) ID 'DATA'.
-```
-
-## Gotchas
-
-- **SALV replaces ALV Grid** for new code — released C1 contract
-- **GUI_UPLOAD not in ABAP Cloud** — use Fiori file uploader
-- **OPEN DATASET not in ABAP Cloud** — use Document Management Service
-- **CALL TRANSACTION not in ABAP Cloud** — use released BAPIs or APIs
-- **BDC is legacy** — prefer BAPI for data creation, BDC for screens without APIs
+- **abaplint config & setup**: Read `references/abaplint.md` for installation, configuration options, and starter configs
+- **Complete Clean ABAP guide**: Read `references/CleanABAP.md` for full style guide with rationale and examples
+- **Quick patterns**: Read `references/quick-reference.md` for condensed good/bad code examples
+- **Review checklist**: Read `references/checklist.md` for systematic review checklist

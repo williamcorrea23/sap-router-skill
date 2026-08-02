@@ -361,6 +361,48 @@
       "_status": "planned",
       "_reason": "not promoted from mcp-candidates.json"
     },
+    "lemaiwo-btp-mcp-server": {
+      "type": "stdio",
+      "command": "npm",
+      "args": ["--prefix", "bundled/mcps/lemaiwo-btp-mcp-server", "start"],
+      "env": {},
+      "description": "SAP BTP administration OData MCP candidate; remains disabled until dependencies and credentials are reviewed.",
+      "_status": "planned",
+      "_reason": "not promoted from mcp-candidates.json"
+    },
+    "aiadiguru2025-sf-mcp": {
+      "type": "stdio",
+      "command": "python",
+      "args": ["-m", "main"],
+      "cwd": "bundled/mcps/aiadiguru2025-sf-mcp",
+      "env": {
+        "SF_BASE_URL": "${SF_BASE_URL}",
+        "SF_COMPANY_ID": "${SF_COMPANY_ID}",
+        "SF_USERNAME": "${SF_USERNAME}",
+        "SF_PASSWORD": "${SF_PASSWORD}",
+        "SF_CLIENT_ID": "${SF_CLIENT_ID}",
+        "SF_CLIENT_SECRET": "${SF_CLIENT_SECRET}"
+      },
+      "description": "SuccessFactors OData MCP candidate; remains disabled until credentials and domain probes are reviewed.",
+      "_status": "planned",
+      "_reason": "not promoted from mcp-candidates.json"
+    },
+    "hochfrequenz-sapgui-mcp": {
+      "type": "stdio",
+      "command": "sapgui_mcp",
+      "args": [],
+      "env": {},
+      "description": "Hochfrequenz SAP GUI MCP candidate; requires a reviewed local installation and SAP GUI session.",
+      "_status": "planned",
+      "_reason": "not promoted from mcp-candidates.json"
+    },
+    "arc-mcp-xsuaa-auth": {
+      "type": "library",
+      "package": "@arc-mcp/xsuaa-auth",
+      "description": "XSUAA authentication library candidate; not a standalone MCP server.",
+      "_status": "planned",
+      "_reason": "library only; not launched as an MCP server"
+    },
     "sap-rfc-mcp-server": {
       "type": "stdio",
       "command": "python",

@@ -702,6 +702,38 @@
         "STEAMPUNK_MODE"
       ],
       "description": "vibing-steampunk MCP \u2014 ADT-to-MCP bridge in Go, 257+ stars, 147 MCP tools, hyperfocused single-tool mode (~200 tokens). Covers debug/deploy/analyze ABAP, package health, dead code detection, ABAP LSP, WebSocket RFC handler."
+    },
+    {
+      "id": "lemaiwo-btp-mcp-server",
+      "status": "disabled_candidate",
+      "reason": "Bundled source reviewed; install dependencies and configure BTP destinations before promotion.",
+      "runtime": {"type": "stdio", "command": "npm", "args": ["--prefix", "bundled/mcps/lemaiwo-btp-mcp-server", "start"]},
+      "env_refs": ["VCAP_SERVICES", "DESTINATIONS"],
+      "description": "SAP BTP administration MCP using odata-mcp-proxy for account, entitlement, provisioning, and XSUAA APIs. Includes mutating operations; approval required."
+    },
+    {
+      "id": "aiadiguru2025-sf-mcp",
+      "status": "disabled_candidate",
+      "reason": "Bundled source reviewed; configure SuccessFactors OAuth credentials and run its test suite before promotion.",
+      "runtime": {"type": "stdio", "command": "python", "args": ["-m", "main"], "cwd": "bundled/mcps/aiadiguru2025-sf-mcp"},
+      "env_refs": ["SF_BASE_URL", "SF_COMPANY_ID", "SF_USERNAME", "SF_PASSWORD", "SF_CLIENT_ID", "SF_CLIENT_SECRET"],
+      "description": "SAP SuccessFactors OData MCP with HR, permissions, audit, and compliance tools. Treat reads and writes as separate capabilities."
+    },
+    {
+      "id": "hochfrequenz-sapgui-mcp",
+      "status": "disabled_candidate",
+      "reason": "Desktop/WebGUI automation requires local SAP GUI/browser setup and explicit transaction approval.",
+      "runtime": {"type": "stdio", "command": "sapgui_mcp"},
+      "env_refs": ["SAPGUI_MCP_CONFIG_PATH", "SAP_SYSTEM"],
+      "description": "Hochfrequenz SAP GUI/WebGUI MCP for Windows desktop scripting and browser-based SAP Web GUI automation."
+    },
+    {
+      "id": "arc-mcp-xsuaa-auth",
+      "status": "disabled_candidate",
+      "reason": "Library only; does not expose a standalone MCP server. Promote only as a dependency of an HTTP MCP host.",
+      "runtime": {"type": "library", "package": "@arc-mcp/xsuaa-auth"},
+      "env_refs": ["CLIENT_SECRET", "XSUAA_CREDENTIALS", "VCAP_SERVICES"],
+      "description": "Reusable XSUAA/OAuth2 and BTP principal-propagation authentication library for Express MCP servers."
     }
   ]
 }

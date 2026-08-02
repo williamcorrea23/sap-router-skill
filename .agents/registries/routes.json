@@ -8,5 +8,8 @@
     {"match": ["fiori"], "capability": "sap.fiori.app.generate", "profile": "sap-fiori-developer", "fallback_group": "fiori"},
     {"match": ["ui5", "sapui5", "openui5"], "capability": "sap.ui5.project.validate", "profile": "sap-ui5-developer", "fallback_group": "ui5"},
     {"match": ["cap", "cds"], "capability": "sap.cap.model.search", "profile": "sap-cap-developer", "fallback_group": "cap"}
+    ,{"match": ["btp", "subaccount", "entitlement", "role collection", "environment instance"], "capability": "sap.btp.account.read", "profile": "sap-btp-devops-engineer", "fallback_group": "btp"}
+    ,{"match": ["successfactors", "employee central", "sfapi", "employee data"], "capability": "sap.successfactors.data.read", "profile": "sap-hcm-consultant", "fallback_group": "successfactors"}
+    ,{"match": ["basis", "kernel", "saprouter", "housekeeping", "health triage"], "capability": "sap.documentation.search", "profile": "sap-basis-consultant", "fallback_group": "basis"}
   ]
 }

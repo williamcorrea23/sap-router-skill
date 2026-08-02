@@ -1,249 +1,226 @@
 ---
 name: odata
-description: SAP OData service development — OData V2 and V4 protocol patterns, $metadata structure, entity sets, navigation properties, function imports, $filter/$expand/$select/$top/$skip query options, deep insert, batch requests, ETag optimistic locking, OData annotations, SAP Gateway error handling, OData security (CSRF, SAML, OAuth2). Use when building OData services, consuming SAP OData APIs, troubleshooting OData errors, or designing OData-based integrations.
-trigger:
-  keywords: [odata, service, metadata, entity, navigation, gateway, v2, v4, crud, sap]
-  intent: >-
-    Use when building, consuming, troubleshooting, or designing SAP OData services (V2/V4) with Gateway, S/4HANA, or BTP.
+description: Help with OData service development in ABAP including OData V2 and V4 services via RAP service bindings, SEGW-based services, service definitions, service bindings, OData annotations, consumption of external OData services, and troubleshooting common OData errors. Use when users ask about OData, OData V2, OData V4, service binding, service definition, SEGW, OData annotations, OData consumption, OData client proxy, HTTP client, communication arrangement, external API consumption, /IWBEP/ errors, or exposing a RAP BO as OData. Triggers include "create OData service", "expose RAP BO", "service binding", "OData V4", "consume external OData", "OData annotations", "SEGW service", or "OData error".
 ---
 
-# SAP OData Development
+# OData Service Development
 
-OData V2/V4 protocol patterns for SAP Gateway, S/4HANA, and BTP.
+Guide for creating and consuming OData services in ABAP, covering both RAP-based (V4/V2) and SEGW-based (V2) approaches.
 
-## OData URL Structure
+## Workflow
 
-```
-https://<host>:<port>/sap/opu/odata/sap/<SERVICE_NAME_SRV>/<EntitySet>
-  ?$format=json
-  &$filter=MaterialType eq 'FERT'
-  &$expand=to_ProductText
-  &$select=Material,Description,Plant
-  &$orderby=CreatedAt desc
-  &$top=10
-  &$skip=20
-  &$count=true
-```
+1. **Determine the user's goal**:
+   - Exposing a RAP BO as an OData service (recommended approach)
+   - Creating a classic SEGW-based OData V2 service
+   - Consuming an external OData service from ABAP
+   - Adding OData annotations for Fiori UIs
+   - Troubleshooting OData errors
 
-## OData V2 vs V4
+2. **Identify the approach**:
+   - RAP-based service (preferred for ABAP Cloud)
+   - SEGW-based service (classic, Standard ABAP only)
+   - OData consumption (client proxy)
 
-| Feature | V2 | V4 |
-|---|---|---|
-| Metadata path | `/$metadata` | `/$metadata` |
-| Entity key access | `/Product('MAT001')` | `/Product('MAT001')` |
-| Count | `$inlinecount=allpages` | `$count=true` |
-| Batch | `/$batch` | `/$batch` |
-| Null values | Omitted by default | `null` returned |
-| Enum types | String-based | Typed enums |
-| Containment | Not supported | Navigation via containment |
+3. **Guide implementation** following SAP best practices
 
-## $filter Examples
+## RAP-Based OData Services (Recommended)
+
+### Architecture Flow
 
 ```
-# V2/V4 equality
-$filter=MaterialType eq 'FERT'
-
-# Numeric comparison
-$filter=NetPrice gt 100 and NetPrice lt 500
-
-# Date filter
-$filter=CreatedAt ge datetime'2026-01-01T00:00:00'
-
-# String functions
-$filter=startswith(Material,'MAT')
-$filter=substringof('WIDGET',Description)
-
-# Null check
-$filter=Plant eq null
-$filter=Plant ne null
-
-# Logical OR
-$filter=MaterialType eq 'FERT' or MaterialType eq 'HAWA'
+CDS View Entity → Behavior Definition → Service Definition → Service Binding
+                                                                    ↓
+                                                              OData V4/V2 Endpoint
 ```
 
-## $expand (Navigation Properties)
+### Service Definition
 
-```
-# Single-level expand
-$expand=to_ProductText
+Exposes CDS entities and their behaviors as a named service:
 
-# Multi-level expand (V4 only)
-$expand=to_Items($expand=to_Material)
-
-# Expand with filter
-$expand=to_Items($filter=Quantity gt 10;$top=5)
-```
-
-## Deep Insert (Parent + Children)
-
-```http
-POST /sap/opu/odata/sap/Z_PRODUCT_SRV/ProductSet HTTP/1.1
-Content-Type: application/json
-Accept: application/json
-
-{
-  "Material": "MAT001",
-  "MaterialType": "FERT",
-  "Description": "Test Widget",
-  "to_ProductText": [{
-    "Language": "EN",
-    "Description": "English description"
-  }, {
-    "Language": "DE",
-    "Description": "German description"
-  }]
+```cds
+@EndUserText.label: 'Travel Service'
+define service ZUI_TRAVEL_O4 {
+  expose ZC_Travel as Travel;
+  expose ZC_Booking as Booking;
+  expose I_Currency as Currency;
+  expose I_Country as Country;
 }
 ```
 
-## Batch Operations
+#### Key Rules
 
-```http
-POST /sap/opu/odata/sap/Z_PRODUCT_SRV/$batch HTTP/1.1
-Content-Type: multipart/mixed; boundary=batch_123
+- Expose projection CDS views (C\_ prefix by convention), not root views
+- Include value help CDS views (I\_\* views) the UI needs
+- Alias names become OData entity set names
+- One service definition can be bound to multiple protocols
 
---batch_123
-Content-Type: application/http
-Content-Transfer-Encoding: binary
+### Service Binding
 
-GET ProductSet('MAT001') HTTP/1.1
+Binds a service definition to a specific OData protocol and provides a URL:
 
---batch_123
-Content-Type: application/http
-Content-Transfer-Encoding: binary
+| Binding Type         | Protocol | Use Case                           |
+| -------------------- | -------- | ---------------------------------- |
+| `OData V4 - UI`      | V4       | SAP Fiori Elements apps            |
+| `OData V2 - UI`      | V2       | Legacy Fiori apps, older frontends |
+| `OData V4 - Web API` | V4       | API consumption (A2X scenarios)    |
+| `OData V2 - Web API` | V2       | API consumption (legacy)           |
+| `InA - UI`           | InA      | Analytical scenarios               |
 
-POST ProductSet HTTP/1.1
-Content-Type: application/json
+### Creating a Service Binding
 
-{"Material":"MAT002","Description":"Batch created"}
+1. In ADT: **New → Other ABAP Repository Object → Business Services → Service Binding**
+2. Select the service definition
+3. Choose binding type (e.g., OData V4 - UI)
+4. Activate
+5. Click **Publish** to register the service
+6. Click **Preview** to open the Fiori Elements preview
 
---batch_123--
+## OData V4 vs V2
+
+| Feature               | OData V4                      | OData V2                        |
+| --------------------- | ----------------------------- | ------------------------------- |
+| **Protocol**          | JSON by default               | XML (Atom) default, JSON option |
+| **Batch**             | `$batch` with JSON            | `$batch` with multipart         |
+| **Deep operations**   | Deep create/update supported  | Limited                         |
+| **Actions/Functions** | Bound and unbound             | Function imports                |
+| **Filtering**         | `$filter` with `lambda`       | `$filter` basic                 |
+| **Draft**             | Full support                  | Supported via extensions        |
+| **Aggregation**       | `$apply` transformation       | Not natively supported          |
+| **Recommendation**    | Preferred for new development | Maintain existing only          |
+
+## SEGW-Based OData V2 Services (Classic)
+
+For Standard ABAP only (not available in ABAP Cloud):
+
+### Architecture
+
+```
+SEGW Project → Data Model (Entity Types, Sets, Associations)
+             → Service Implementation (MPC/DPC classes)
+             → Register & Activate in /IWFND/MAINT_SERVICE
 ```
 
-## ETag (Optimistic Locking)
+### Steps
 
-```http
-# Server returns ETag header:
-# ETag: W/"datetime'2026-01-15T10%3A30%3A00'"
+1. **Create project** in `SEGW` transaction
+2. **Define data model**: Entity types, properties, navigation properties
+3. **Generate runtime artifacts** (MPC/DPC classes)
+4. **Implement DPC extension methods**: `GET_ENTITYSET`, `GET_ENTITY`, `CREATE_ENTITY`, etc.
+5. **Register service** in `/IWFND/MAINT_SERVICE`
+6. **Test** via `/IWFND/GW_CLIENT` or browser
 
-# Client sends If-Match for updates:
-PUT /ProductSet('MAT001') HTTP/1.1
-If-Match: W/"datetime'2026-01-15T10%3A30%3A00'"
+### DPC Method Implementation Example
 
-# Server returns 412 Precondition Failed if record changed
+```abap
+METHOD travelset_get_entityset.
+  SELECT * FROM ztravel_tab
+    INTO TABLE @DATA(lt_travel)
+    UP TO 100 ROWS.
+
+  et_entityset = CORRESPONDING #( lt_travel ).
+ENDMETHOD.
 ```
 
-## Error Handling
+## Consuming External OData Services
 
-### SAP Gateway Error Format (V2)
+### In ABAP Cloud (using HTTP Client and Communication Arrangements)
 
-```json
-{
-  "error": {
-    "code": "SY/530",
-    "message": {
-      "lang": "en",
-      "value": "Material MAT001 already exists"
-    },
-    "innererror": {
-      "application": {
-        "component_id": "MM",
-        "service_namespace": "/SAP/",
-        "service_id": "Z_PRODUCT_SRV",
-        "service_version": "0001"
-      },
-      "transactionid": "ABC123..."
-    }
-  }
+```abap
+"1. Get HTTP client via communication arrangement
+DATA(lo_dest) = cl_http_destination_provider=>create_by_comm_arrangement(
+  comm_scenario  = 'Z_MY_OUTBOUND_SCENARIO'
+  service_id     = 'Z_MY_HTTP_SERVICE' ).
+
+DATA(lo_client) = cl_web_http_client_manager=>create_by_http_destination( lo_dest ).
+
+"2. Build request
+DATA(lo_request) = lo_client->get_http_request( ).
+lo_request->set_uri_path( '/sap/opu/odata4/sap/api_business_partner/srvd_a2x/sap/api_business_partner/0001/A_BusinessPartner?$top=10' ).
+
+"3. Execute and parse response
+DATA(lo_response) = lo_client->execute( if_web_http_client=>get ).
+DATA(lv_json) = lo_response->get_text( ).
+lo_client->close( ).
+```
+
+### Using OData Client Proxy (V2/V4)
+
+```abap
+"Create OData client proxy for V4
+DATA(lo_proxy) = /iwbep/cl_cp_client_proxy_fact=>create_v4_remote_proxy(
+  iv_service_definition_name = 'Z_MY_ODATA_CDEF'
+  io_http_client             = lo_client
+  iv_relative_service_root   = '/sap/opu/odata4/sap/api_service/0001/' ).
+
+"Build and execute read request
+DATA(lo_request) = lo_proxy->create_resource_for_entity_set( 'ENTITYSETNAME' )->create_request_for_read( ).
+lo_request->set_top( 10 ).
+DATA(lo_response) = lo_request->execute( ).
+
+"Get business data
+DATA lt_data TYPE STANDARD TABLE OF z_entity_type.
+lo_response->get_business_data( IMPORTING et_business_data = lt_data ).
+```
+
+## OData Annotations for Fiori
+
+Key CDS annotations that control OData/Fiori behavior:
+
+```cds
+@UI.headerInfo: {
+  typeName: 'Travel',
+  typeNamePlural: 'Travels',
+  title: { type: #STANDARD, value: 'TravelID' },
+  description: { type: #STANDARD, value: 'Description' }
 }
+
+@UI.lineItem: [{ position: 10 }]
+@UI.selectionField: [{ position: 10 }]
+@UI.identification: [{ position: 10 }]
+TravelID;
+
+@UI.lineItem: [{ position: 20, importance: #HIGH }]
+@UI.identification: [{ position: 20 }]
+@Consumption.valueHelpDefinition: [{ entity: { name: 'I_Currency', element: 'Currency' } }]
+CurrencyCode;
 ```
 
-## CSRF Token (required for write operations)
+## Troubleshooting
 
-```http
-# Step 1: GET with X-CSRF-Token: Fetch
-GET /sap/opu/odata/sap/Z_PRODUCT_SRV/ HTTP/1.1
-X-CSRF-Token: Fetch
+| Error / Issue                  | Solution                                           |
+| ------------------------------ | -------------------------------------------------- |
+| `/IWBEP/CX_MGW_BUSI_EXCEPTION` | Check DPC implementation, validate input data      |
+| `/IWBEP/CX_MGW_TECH_EXCEPTION` | Check data model consistency, regenerate artifacts |
+| 403 Forbidden                  | Check ICF node activation, authorization           |
+| 404 Not Found                  | Verify service is registered and activated         |
+| `$metadata` returns empty      | Publish service binding, check activation          |
+| Draft not working              | Verify draft table exists, BDEF has `with draft`   |
+| Deep create fails              | Check composition in CDS and BDEF                  |
+| `CX_WEB_HTTP_CLIENT_ERROR`     | Check communication arrangement, SSL certificates  |
 
-# Response header: x-csrf-token: abc123...
+## Output Format
 
-# Step 2: POST/PUT/PATCH/DELETE with token
-POST /sap/opu/odata/sap/Z_PRODUCT_SRV/ProductSet HTTP/1.1
-x-csrf-token: abc123...
-Content-Type: application/json
+When helping with OData topics, structure responses as:
+
+```markdown
+## OData Service Guidance
+
+### Approach
+
+- Type: [RAP-based / SEGW-based / Consumption]
+- Protocol: [OData V4 / OData V2]
+
+### Implementation
+
+[Step-by-step with code examples]
+
+### Testing
+
+[How to test the service]
 ```
 
-## Consuming OData from Python
+## References
 
-```python
-import requests
-
-# SAP OData client pattern
-session = requests.Session()
-session.auth = ('USER', 'PASSWORD')
-
-# Fetch CSRF token
-headers = {'X-CSRF-Token': 'Fetch'}
-r = session.get(f'{base_url}/', headers=headers, params={'$format': 'json'})
-token = r.headers.get('x-csrf-token', '')
-
-# Query
-headers['x-csrf-token'] = token
-headers['Accept'] = 'application/json'
-r = session.get(
-    f'{base_url}/ProductSet',
-    headers=headers,
-    params={
-        '$filter': "MaterialType eq 'FERT'",
-        '$top': '50',
-        '$format': 'json'
-    }
-)
-products = r.json()['d']['results']
-```
-
-## Consuming OData from Node.js
-
-```javascript
-const axios = require('axios');
-
-async function getProducts() {
-  const client = axios.create({
-    baseURL: 'https://s4hana.company.com:443/sap/opu/odata/sap/Z_PRODUCT_SRV',
-    auth: { username: 'USER', password: 'PASSWORD' }
-  });
-
-  // Fetch CSRF
-  const tokenResp = await client.get('/', { headers: { 'X-CSRF-Token': 'Fetch' } });
-  const csrf = tokenResp.headers['x-csrf-token'];
-
-  // Query
-  const { data } = await client.get('/ProductSet', {
-    headers: { 'x-csrf-token': csrf },
-    params: { $filter: "MaterialType eq 'FERT'", $top: 50, $format: 'json' }
-  });
-  return data.d.results;
-}
-```
-
-## SAP Gateway Service Registration
-
-```bash
-# Transaction: /IWFND/MAINT_SERVICE
-# 1. Add Service
-# 2. System Alias: LOCAL
-# 3. Technical Service Name: Z_PRODUCT_SRV
-# 4. Service Version: 0001
-# 5. Click "Load Metadata" to verify
-
-# Gateway Client test: /IWFND/GW_CLIENT
-# Test URL: /sap/opu/odata/sap/Z_PRODUCT_SRV/ProductSet
-```
-
-## Gotchas
-
-- **CSRF token required** for POST/PUT/PATCH/DELETE — GET "Fetch" first
-- **$filter on Edm.Guid**: use `guid'...'` not plain string
-- **V2 batch**: Content-Transfer-Encoding MUST be `binary`
-- **V4 containment**: child resources accessed via parent navigation, not direct
-- **SAP Gateway error** common causes: wrong system alias, inactive service, missing role
-- **/IWFND/CACHE_CLEANUP** — run after service metadata changes
+- SAP OData V4 Documentation: https://help.sap.com/docs/abap-cloud/abap-rap/odata-service
+- RAP Service Binding: https://help.sap.com/docs/abap-cloud/abap-rap/service-binding
+- OData Client Proxy: https://help.sap.com/docs/abap-cloud/abap-rap/odata-client-proxy

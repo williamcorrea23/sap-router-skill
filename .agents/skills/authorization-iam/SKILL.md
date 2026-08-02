@@ -1,197 +1,332 @@
 ---
 name: authorization-iam
-description: >-
-  SAP authorization and IAM — AUTHORITY-CHECK, auth objects (SU21), roles (PFCG),
-  S/4HANA IAM business roles/catalogs, CDS DCL access control, OData auth, BTP XSUAA.
-  Use when implementing AUTHORITY-CHECK, designing roles, creating DCL sources, or
-  configuring IAM in S/4HANA or BTP.
-trigger:
-  keywords:
-    - AUTHORITY-CHECK
-    - authorization object
-    - PFCG
-    - SU01
-    - SU21
-    - SU53
-    - S_TABU_DIS
-    - auth check
-    - role design
-    - DCL access control
-    - IAM business role
-    - XSUAA
-    - pfcg_auth
-  file_patterns:
-    - "*.abap"
-    - "*.cds"
-    - "xs-security.json"
-  intent: "implement or troubleshoot SAP authorization, roles, or access control"
+description: Help with ABAP authorization and IAM (Identity and Access Management) including authorization objects, authorization checks, IAM apps, business catalogs, business roles, restriction types, CDS access control (DCL), privilege access annotations, and role-based access in ABAP Cloud and on-premise. Use when users ask about authorization, AUTHORITY-CHECK, authorization object, IAM app, business catalog, business role, restriction type, CDS access control, DCL, access control, privilege annotation, role assignment, PFCG role, S_DEVELOP, or securing ABAP applications. Triggers include "authorization check", "create authorization object", "CDS access control", "IAM app", "business catalog", "business role", "PFCG", "restrict access", or "role-based security".
 ---
 
-# SAP Authorization & IAM
+# Authorization & IAM
 
-Authorization in SAP is a chain: **user → role → profile → auth object → field values**.
-Every `AUTHORITY-CHECK` walks this chain at runtime.
+Guide for implementing authorization checks and identity/access management in ABAP Cloud and on-premise systems.
 
-## Prerequisites
+## Workflow
 
-- SAP GUI or ADT access (SU01, SU21, PFCG, SU53)
-- ABAP development rights (S_DEVELOP with ACTVT 03+)
-- For S/4HANA IAM: Fiori launchpad admin access
-- For BTP: `cf` CLI + XSUAA service instance
+1. **Determine the user's goal**:
+   - Implementing authorization checks in ABAP code
+   - Creating CDS access controls (DCL)
+   - Setting up IAM apps, business catalogs, and business roles (ABAP Cloud)
+   - Managing PFCG roles (on-premise)
+   - Defining custom authorization objects
+   - Understanding restriction types
 
-## 1. AUTHORITY-CHECK (ABAP)
+2. **Identify the platform**:
+   - ABAP Cloud (BTP or S/4HANA embedded) → IAM apps + business catalogs + `CL_ABAP_AUTHORIZATION`
+   - On-premise / Standard ABAP → PFCG roles + `AUTHORITY-CHECK`
 
-Always check `sy-subrc` immediately — no exceptions.
+3. **Guide implementation** with the appropriate authorization model
+
+## Authorization Models
+
+### ABAP Cloud (BTP / S/4HANA Cloud)
+
+```
+IAM App → Business Catalog → Business Role → Business User
+                                    ↑
+                            Restriction Type (field-level restrictions)
+```
+
+### On-Premise (Standard ABAP)
+
+```
+Authorization Object → PFCG Role → User Assignment
+       ↑
+Authorization Fields + Permitted Values
+```
+
+## Authorization Checks in Code
+
+### ABAP Cloud — `CL_ABAP_AUTHORIZATION`
 
 ```abap
-" Check before any sensitive operation
-AUTHORITY-CHECK OBJECT 'M_MATE_MAN'
-  ID 'ACTVT' FIELD '01'        " 01=Create 02=Change 03=Display 06=Delete
-  ID 'WERKS' FIELD lv_plant.
+"Check authorization using released API
+DATA(lo_auth) = cl_abap_authorization=>check_authorization(
+  EXPORTING
+    authorization_object = 'Z_MY_AUTH'
+    authorizations       = VALUE #(
+      ( field = 'ACTVT' value = '03' )    "Display
+      ( field = 'ZCARR' value = lv_carrier )
+    ) ).
 
-IF sy-subrc <> 0.
-  RAISE EXCEPTION TYPE cx_zrouter
-    EXPORTING mv_text = |No authorization for plant { lv_plant }|.
+IF lo_auth->is_authorized( ) = abap_false.
+  "User not authorized
+  RAISE EXCEPTION TYPE zcx_not_authorized.
 ENDIF.
 ```
 
-**Custom auth object** (create via SU21):
+### On-Premise — `AUTHORITY-CHECK`
 
 ```abap
-" Object: ZROUTER | Class: ZR | Fields: ACTVT, MODULE
-AUTHORITY-CHECK OBJECT 'ZROUTER'
+AUTHORITY-CHECK OBJECT 'Z_MY_AUTH'
   ID 'ACTVT' FIELD '03'
-  ID 'MODULE' FIELD 'MM'.
-IF sy-subrc = 0.
-  " User has display auth for MM module
-ENDIF.
-```
+  ID 'ZCARR' FIELD lv_carrier.
 
-## 2. S_TABU_DIS — Table-Level Authorization
-
-Controls access via SM30, SM31, SE16, SE16N.
-
-```abap
-AUTHORITY-CHECK OBJECT 'S_TABU_DIS'
-  ID 'ACTVT' FIELD '03'          " 03=Display 02=Change
-  ID 'DICBERICH' FIELD lv_group. " Authorization group (e.g. 'ZMM')
 IF sy-subrc <> 0.
-  " Denied — user cannot view tables in group lv_group
+  MESSAGE e001(z_msg) WITH lv_carrier.
+  RETURN.
 ENDIF.
 ```
 
-> Find auth group of a table: SE11 → table → Delivery/Maintenance tab → Auth. Group.
-> Tables without a group use `&NC&`.
+### Activity Values (ACTVT)
 
-## 3. Role Design (PFCG)
+| Value | Activity |
+| ----- | -------- |
+| `01`  | Create   |
+| `02`  | Change   |
+| `03`  | Display  |
+| `06`  | Delete   |
+| `16`  | Execute  |
 
-```
-Role: ZROUTER_MM_DISPLAY
-├── ZROUTER: ACTVT=03, MODULE=MM
-└── S_DEVELOP: ACTVT=03, DEVCLASS=ZROUTER*
+## Authorization Objects
 
-Role: ZROUTER_MM_FULL
-├── ZROUTER: ACTVT=*, MODULE=MM
-└── S_TABU_DIS: ACTVT=02, DICBERICH=ZMM
-```
+### Creating a Custom Authorization Object
 
-PFCG workflow: `1. SU24 → maintain default auth values → 2. PFCG → single role → add transactions → generate profile → 3. User tab → assign users → User Comparison (full) → 4. Verify: SU53 / SUIM`
-
-> **Rule**: Always run user comparison after assigning users. Uncompared roles are inactive.
-
-## 4. S/4HANA IAM (Business Roles & Catalogs)
-
-S/4HANA replaces PFCG roles with **business roles** built from **business catalogs**.
+In ADT or `SU21`:
 
 ```
-Business Role: ZBR_PURCHASER
-├── Catalog: SAP_MM_BC_PURCHASING_PC  (Restrictions: Plant=1000,2000)
-├── Catalog: SAP_FI_BC_GL_POST        (Restrictions: CompanyCode=1000)
-└── Assigned via Maintain Business Roles app
+Authorization Object: Z_MY_AUTH
+  Fields:
+    ACTVT  — Activity (standard field, linked to domain ACTIV_AUTH)
+    ZCARR  — Carrier (custom field, type S_CARR_ID)
+    ZREGN  — Region (custom field, type CHAR4)
 ```
 
-Create custom catalogs via **IAM Information System** (app `SUI`).
-> Business catalogs are SAP-delivered. Never modify standard catalogs — create overlays instead.
+#### Structure
 
-## 5. CDS Access Control (DCL)
+- **Authorization Class**: Groups related objects (e.g., `Z_TRAVEL`)
+- **Authorization Object**: Contains 1–10 authorization fields
+- **Authorization Field**: Links to a data element; defines the check dimension
 
-Row-level security at the database layer. Separate from ABAP `AUTHORITY-CHECK`.
+## CDS Access Control (DCL)
+
+CDS access controls define row-level authorization for CDS view entities.
+
+### Basic DCL
 
 ```cds
-@EndUserText.label: 'Access control for Product CDS'
+@EndUserText.label: 'Access Control for Travel'
 @MappingRole: true
-define role Z_I_PRODUCT {
-  grant select on Z_I_PRODUCT
-    where ( plant ) = aspect pfcg_auth( 'M_MATE_WRK', werks, actvt = '03' );
+define role ZI_Travel {
+  grant select on ZI_Travel
+    where ( carrier_id ) =
+      aspect pfcg_auth ( Z_MY_AUTH, ZCARR, ACTVT = '03' );
 }
 ```
 
-**CAP @restrict annotations** (Node.js/Java services):
+### Multiple Conditions
 
 ```cds
-service CatalogService @(requires: 'authenticated-user') {
-  entity Products @(restrict: [
-    { grant: 'READ' },
-    { grant: 'WRITE', to: 'Vendor' }
-  ]) { /*...*/ }
-
-  entity Orders @(restrict: [
-    { grant: '*', to: 'Customer', where: (CreatedBy = $user) }
-  ]) { /*...*/ }
+define role ZI_Travel {
+  grant select on ZI_Travel
+    where ( carrier_id ) =
+      aspect pfcg_auth ( Z_MY_AUTH, ZCARR, ACTVT = '03' )
+      and ( agency_id ) =
+      aspect pfcg_auth ( Z_AGENCY_AUTH, ZAGENCY, ACTVT = '03' );
 }
 ```
 
-## 6. OData Service Authorization
+### Unrestricted Access
+
+```cds
+define role ZI_Travel_Admin {
+  grant select on ZI_Travel
+    where _unrestrictedAccess;
+}
+```
+
+### Inherited Access Control
+
+```cds
+"Child entity inherits access control from parent
+define role ZI_Booking {
+  grant select on ZI_Booking
+    where ( carrier_id ) =
+      aspect pfcg_auth ( Z_MY_AUTH, ZCARR, ACTVT = '03' );
+}
+```
+
+### DCL and PRIVILEGED ACCESS
 
 ```abap
-METHOD products_get_entity.
-  AUTHORITY-CHECK OBJECT 'M_MATE_WRK'
-    ID 'ACTVT' FIELD '03'
-    ID 'WERKS' FIELD io_tech_request_context->get_parameter( 'WERKS' ).
-  IF sy-subrc <> 0.
-    RAISE EXCEPTION TYPE /iwbep/cx_mgw_auth.
+"Bypass DCL access control when needed (e.g., in background jobs)
+SELECT FROM zi_travel
+  FIELDS travel_id, description
+  INTO TABLE @DATA(lt_all)
+  PRIVILEGED ACCESS.
+```
+
+## IAM in ABAP Cloud
+
+### IAM App
+
+Created in ADT, links a service binding to the authorization model:
+
+```
+ADT: New → Other → IAM App
+Name: Z_TRAVEL_IAM
+Type: EXT - External App (for OData services)
+Service Binding: ZUI_TRAVEL_O4
+```
+
+Assign authorization objects to the IAM App to define which checks apply.
+
+### Business Catalog
+
+Groups IAM Apps into logical bundles:
+
+```
+ADT: New → Other → Business Catalog
+Name: Z_BC_TRAVEL_MGMT
+Description: Travel Management
+IAM Apps: Z_TRAVEL_IAM, Z_BOOKING_IAM
+```
+
+### Business Role
+
+Created in Fiori app "Maintain Business Roles":
+
+1. Create new business role (e.g., `Z_BR_TRAVEL_MANAGER`)
+2. Add business catalogs
+3. Configure restriction types (field-level access)
+4. Assign business users
+
+### Restriction Types
+
+Define field-level restrictions in business roles:
+
+| Restriction Type | Description                               |
+| ---------------- | ----------------------------------------- |
+| **Unrestricted** | Full access to all values                 |
+| **Restricted**   | Access limited to specified values        |
+| **No Access**    | No access to the associated functionality |
+
+Example: A travel manager role might restrict `ZCARR` to only `LH` and `AA`.
+
+## On-Premise: PFCG Roles
+
+### Creating a PFCG Role
+
+1. Open `PFCG` transaction
+2. Enter role name (e.g., `Z_TRAVEL_DISPLAY`)
+3. **Menu tab**: Add transaction codes, Fiori tiles, or apps
+4. **Authorizations tab**: Maintain authorization values
+   - Set authorization objects and field values
+   - Generate the authorization profile
+5. **User tab**: Assign users to the role
+
+### Composite Roles
+
+Bundle multiple single roles:
+
+```
+Z_TRAVEL_COMPOSITE (Composite Role)
+├── Z_TRAVEL_DISPLAY (Single Role — display only)
+├── Z_TRAVEL_EDIT (Single Role — create/change)
+└── Z_TRAVEL_ADMIN (Single Role — full access)
+```
+
+## RAP Authorization
+
+### Instance Authorization in RAP
+
+```abap
+"In behavior definition:
+define behavior for ZR_Travel alias Travel
+  authorization master ( instance )
+{
+  ...
+}
+```
+
+```abap
+"In behavior implementation:
+METHOD get_instance_authorizations.
+  READ ENTITIES OF zr_travel IN LOCAL MODE
+    ENTITY Travel
+    FIELDS ( carrier_id )
+    WITH CORRESPONDING #( keys )
+    RESULT DATA(lt_travels).
+
+  LOOP AT lt_travels INTO DATA(ls_travel).
+    DATA(lo_auth) = cl_abap_authorization=>check_authorization(
+      authorization_object = 'Z_MY_AUTH'
+      authorizations       = VALUE #(
+        ( field = 'ZCARR' value = ls_travel-carrier_id )
+        ( field = 'ACTVT' value = COND #(
+            WHEN requested_authorizations-%update = if_abap_behv=>mk-on
+              THEN '02'
+            WHEN requested_authorizations-%delete = if_abap_behv=>mk-on
+              THEN '06'
+            ELSE '03' ) )
+      ) ).
+
+    APPEND VALUE #(
+      %tky = ls_travel-%tky
+      %update = COND #( WHEN lo_auth->is_authorized( ) THEN if_abap_behv=>auth-allowed
+                        ELSE if_abap_behv=>auth-unauthorized )
+      %delete = COND #( WHEN lo_auth->is_authorized( ) THEN if_abap_behv=>auth-allowed
+                        ELSE if_abap_behv=>auth-unauthorized )
+    ) TO result.
+  ENDLOOP.
+ENDMETHOD.
+```
+
+### Global Authorization in RAP
+
+```abap
+"In behavior definition:
+define behavior for ZR_Travel alias Travel
+  authorization master ( global )
+{
+  ...
+}
+```
+
+```abap
+METHOD get_global_authorizations.
+  DATA(lo_auth) = cl_abap_authorization=>check_authorization(
+    authorization_object = 'Z_MY_AUTH'
+    authorizations       = VALUE #(
+      ( field = 'ACTVT' value = '01' ) ) ).  "Create
+
+  IF lo_auth->is_authorized( ).
+    result-%create = if_abap_behv=>auth-allowed.
+  ELSE.
+    result-%create = if_abap_behv=>auth-unauthorized.
   ENDIF.
 ENDMETHOD.
 ```
 
-> Also maintain `S_SERVICE` auth object for the OData service IWFND node.
+## Output Format
 
-## 7. BTP XSUAA Integration
+When helping with authorization/IAM topics, structure responses as:
 
-```json
-{
-  "scopes": [
-    { "name": "$XSAPPNAME.MM.Read",  "description": "Read MM data" },
-    { "name": "$XSAPPNAME.MM.Write", "description": "Write MM data" }
-  ],
-  "role-templates": [
-    { "name": "MM_User",  "scope-references": ["$XSAPPNAME.MM.Read"] },
-    { "name": "MM_Admin", "scope-references": ["$XSAPPNAME.MM.Read","$XSAPPNAME.MM.Write"] }
-  ]
-}
+```markdown
+## Authorization Guidance
+
+### Platform
+
+- [ABAP Cloud / On-Premise]
+- Approach: [CDS DCL / AUTHORITY-CHECK / CL_ABAP_AUTHORIZATION / IAM]
+
+### Implementation
+
+[Step-by-step with code examples]
+
+### Role Configuration
+
+[How to set up roles and assign access]
 ```
 
-Generate from CAP model: `cds add xsuaa`
+## References
 
-## Pitfalls
-
-- **sy-subrc semantics**: `0` = authorized. Non-zero = denied **or auth object not in profile**. Auth object absent from user's profile returns non-zero.
-- **Missing auth object**: If an auth object is not maintained anywhere, `AUTHORITY-CHECK` always fails. Use SU53 to diagnose.
-- **SU53 only shows LAST failed check** — instruct users to run it immediately after denial.
-- **DCL roles != ABAP auth checks**: CDS DCL filters rows at DB level; AUTHORITY-CHECK validates in ABAP. Both needed for full coverage.
-- **User comparison forgotten**: PFCG roles without comparison are inactive.
-- **SAP_ALL in production**: Never assign SAP_ALL in PRD. Use SAP_NEW only temporarily during upgrades.
-- **Wildcard `*` in ACTVT**: Grants all activities including delete. Use sparingly.
-- **SU24 defaults skipped**: Not maintaining SU24 means PFCG won't propose auth objects automatically.
-
-## Verification
-
-```bash
-# SU53  → Last failed auth check (run immediately after denial)
-# SUIM  → User → Roles → By role name
-# SU56  → Display user's authorization buffer
-# ST01  → Authorization trace (activate, reproduce, analyze)
-# PFCG  → Role → Authorizations tab → green status = generated
-# ABAP: AUTHORITY-CHECK OBJECT obj ID 'ACTVT' FIELD act → sy-subrc=0 = authorized
-# BTP:  cf security groups; cf roles --user <email>
-```
+- ABAP Authorization Cheat Sheet: https://github.com/SAP-samples/abap-cheat-sheets
+- CDS Access Control: https://help.sap.com/docs/abap-cloud/abap-development-tools-user-guide/access-controls
+- IAM Guide: https://help.sap.com/docs/btp/sap-business-technology-platform/identity-and-access-management-iam

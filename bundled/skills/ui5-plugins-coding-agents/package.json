@@ -1,0 +1,44 @@
+{
+  "name": "@ui5/plugins-for-coding-agents",
+  "version": "0.1.7",
+  "private": "true",
+  "description": "UI5 plugins for Coding Agents",
+  "author": {
+    "name": "SAP SE",
+    "email": "openui5@sap.com",
+    "url": "https://www.sap.com"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "openui5",
+    "sapui5",
+    "ui5",
+    "development",
+    "claude plugin"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UI5/plugins-coding-agents.git"
+  },
+  "bugs": {
+    "url": "https://github.com/UI5/plugins-coding-agents/issues"
+  },
+  "scripts": {
+    "check-licenses": "licensee --errors-only",
+    "knip": "knip",
+    "lint:commit": "commitlint",
+    "prepare": "node ./.husky/skip.js || husky",
+    "prettier": "prettier **/.mcp.json **/plugin.json",
+    "prettier:write": "npm run prettier -- --write",
+    "prettier:check": "npm run prettier -- --check",
+    "test": "npm run prettier:check && npm run knip && npm run check-licenses"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^21.0.2",
+    "@commitlint/config-conventional": "^21.1.0",
+    "husky": "^9.1.7",
+    "knip": "^6.29.0",
+    "licensee": "^12.0.1",
+    "prettier": "3.9.6"
+  }
+}

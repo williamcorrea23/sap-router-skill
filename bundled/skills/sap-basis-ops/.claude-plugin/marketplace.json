@@ -1,0 +1,14 @@
+{
+  "name": "sap-basis-ops",
+  "owner": {
+    "name": "adam0thman"
+  },
+  "plugins": [
+    {
+      "name": "sap-basis-ops",
+      "source": "./",
+      "description": "SAP Basis / technical-operations skills at the OS and DB layer for NetWeaver/S4 on Linux, Windows and AIX — start/stop, housekeeping, health triage, transport, kernel patch, backup/recovery, logs, security patch, and DB-specific commands (HANA/Oracle/ASE/Db2/MaxDB/SQL Server). Cited to help.sap.com.",
+      "version": "0.1.0"
+    }
+  ]
+}

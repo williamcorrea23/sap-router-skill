@@ -14,7 +14,7 @@ trigger:
 
 # Run: sap-router-skill
 
-> **Multi-IDE:** Same `driver.py` works on Codex, Antigravity, and Codex.
+> **Multi-IDE:** Same `driver.py` works on Claude, Codex, Gemini Antigravity, and Cursor.
 > Codex → this file. Antigravity → `.gemini/skills/run-sap-router-skill/SKILL.md`.
 > Codex → `AGENTS.md` at unit root. All point to the same driver.
 
@@ -61,7 +61,7 @@ All paths below are relative to the unit root (`sap-router-skill/`).
 python .Codex/skills/run-sap-router-skill/driver.py
 ```
 
-Exit `0` = all 62 checks passed; `1` = a check failed (offending line printed).
+Exit `0` = all 78 checks passed; `1` = a check failed (offending line printed).
 The driver creates and deletes its own temp workspace — it touches no project
 files (ZROUTER opt-in state is redirected to a temp file via
 `SAP_ROUTER_OPTIN_FILE`, so the smoke run never mutates the real decision).
@@ -70,7 +70,7 @@ Use it as the regression gate after editing any script in `scripts/`.
 Verified output this session:
 
 ```text
-62 passed, 0 failed
+78 passed, 0 failed
 ```
 
 ## Run (manual, individual CLIs)

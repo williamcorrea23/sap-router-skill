@@ -31,15 +31,21 @@ failed = 0
 
 
 def run(args):
-    return subprocess.run(
-        [PY] + args, capture_output=True, text=True, cwd=UNIT_ROOT
-    )
+    try:
+        return subprocess.run(
+            [PY] + args, capture_output=True, text=True, cwd=UNIT_ROOT, timeout=45
+        )
+    except subprocess.TimeoutExpired as exc:
+        return subprocess.CompletedProcess([PY] + args, 124, exc.stdout or "", "timeout after 45s")
 
 
 def run_raw(args, input_text=None):
-    return subprocess.run(
-        args, input=input_text, capture_output=True, text=True, cwd=UNIT_ROOT
-    )
+    try:
+        return subprocess.run(
+            args, input=input_text, capture_output=True, text=True, cwd=UNIT_ROOT, timeout=45
+        )
+    except subprocess.TimeoutExpired as exc:
+        return subprocess.CompletedProcess(args, 124, exc.stdout or "", "timeout after 45s")
 
 
 def check(name, cond, detail=""):

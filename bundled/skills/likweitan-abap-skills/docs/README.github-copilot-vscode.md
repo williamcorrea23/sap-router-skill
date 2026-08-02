@@ -4,13 +4,15 @@ Complete guide for using ABAP Skills with [GitHub Copilot](https://github.com/fe
 
 ## Quick Install
 
-Tell GitHub Copilot Chat in VS Code:
+With [Node.js](https://nodejs.org/) installed, run:
 
-```text
-Clone https://github.com/likweitan/abap-skills to a local folder, then use the relevant skill files under skills/ as context when answering ABAP, RAP, CDS, OData, ABAP Cloud, Clean ABAP, and SAP BTP questions.
+```bash
+npx skills add likweitan/abap-skills
 ```
 
-For reusable prompts, follow the manual setup below.
+The Skills CLI detects GitHub Copilot, lists the available ABAP skills, and installs your selection. Add `--global` to use the selected skills across projects, or `--skill abap` to install only the general ABAP skill.
+
+For installation without Node.js or for reusable prompt files, follow the manual setup below.
 
 ## Manual Installation
 
@@ -95,7 +97,7 @@ Before answering, inspect the most relevant skill file under ~/.copilot/abap-ski
 - odata/SKILL.md for OData services
 - abap-cloud/SKILL.md for ABAP Cloud and Clean Core work
 - abap-unit-testing/SKILL.md for ABAP Unit tests
-- sap-fiori-apps-reference/SKILL.md for SAP Fiori app lookup and FLP URL generation
+- sap-fiori-url-generator/SKILL.md for SAP Fiori app lookup and FLP URL generation
 
 Prefer the repository's examples and references over generic ABAP guidance.
 EOF
@@ -121,7 +123,7 @@ Before answering, inspect the most relevant skill file under ~/.copilot/abap-ski
 - odata/SKILL.md for OData services
 - abap-cloud/SKILL.md for ABAP Cloud and Clean Core work
 - abap-unit-testing/SKILL.md for ABAP Unit tests
-- sap-fiori-apps-reference/SKILL.md for SAP Fiori app lookup and FLP URL generation
+- sap-fiori-url-generator/SKILL.md for SAP Fiori app lookup and FLP URL generation
 
 Prefer the repository's examples and references over generic ABAP guidance.
 EOF
@@ -149,7 +151,7 @@ Before answering, inspect the most relevant skill file under %USERPROFILE%\.copi
 - odata/SKILL.md for OData services
 - abap-cloud/SKILL.md for ABAP Cloud and Clean Core work
 - abap-unit-testing/SKILL.md for ABAP Unit tests
-- sap-fiori-apps-reference/SKILL.md for SAP Fiori app lookup and FLP URL generation
+- sap-fiori-url-generator/SKILL.md for SAP Fiori app lookup and FLP URL generation
 
 Prefer the repository's examples and references over generic ABAP guidance.
 '@ | Set-Content -Path (Join-Path $PromptFolder "abap-skills.prompt.md") -Encoding UTF8
@@ -207,7 +209,7 @@ Useful files include:
 - `skills/cds-view-entities/SKILL.md`
 - `skills/abap-cloud/SKILL.md`
 - `skills/abap-unit-testing/SKILL.md`
-- `skills/sap-fiori-apps-reference/SKILL.md`
+- `skills/sap-fiori-url-generator/SKILL.md`
 
 ### Example Prompts
 

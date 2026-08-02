@@ -87,6 +87,30 @@
       "fallbacks": ["cap-mcp-plugin"],
       "mutation": false
     },
+    "sap.btp.account.read": {
+      "primary": "lemaiwo-btp-mcp-server",
+      "fallbacks": [],
+      "mutation": false
+    },
+    "sap.btp.account.modify": {
+      "primary": "lemaiwo-btp-mcp-server",
+      "fallbacks": [],
+      "mutation": true,
+      "requires_approval": true,
+      "plan_then_commit": true
+    },
+    "sap.successfactors.data.read": {
+      "primary": "aiadiguru2025-sf-mcp",
+      "fallbacks": ["sf-mcp"],
+      "mutation": false
+    },
+    "sap.successfactors.data.modify": {
+      "primary": "aiadiguru2025-sf-mcp",
+      "fallbacks": ["sf-mcp"],
+      "mutation": true,
+      "requires_approval": true,
+      "plan_then_commit": true
+    },
     "sap.smartform.analyze": {
       "primary": "smartform-ai-generator",
       "fallbacks": [],

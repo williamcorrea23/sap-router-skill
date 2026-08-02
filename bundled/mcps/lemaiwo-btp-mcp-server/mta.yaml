@@ -1,0 +1,48 @@
+_schema-version: "3.1"
+ID: btp-mcp-server
+version: 1.0.0
+
+parameters:
+  enable-parallel-deployments: true
+
+modules:
+  - name: btp-mcp-server
+    type: nodejs
+    path: .
+    parameters:
+      memory: 512M
+      disk-quota: 1G
+      buildpack: nodejs_buildpack
+      health-check-type: http
+      health-check-http-endpoint: /health
+      command: npm start
+    build-parameters:
+      builder: npm
+      ignore:
+        - .git/
+        - .env
+        - default-env.json
+    requires:
+      - name: btp-mcp-server-destination
+      - name: btp-mcp-server-connectivity
+      - name: btp-mcp-server-xsuaa
+
+resources:
+  - name: btp-mcp-server-destination
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: destination
+      service-plan: lite
+
+  - name: btp-mcp-server-connectivity
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: connectivity
+      service-plan: lite
+
+  - name: btp-mcp-server-xsuaa
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: xsuaa
+      service-plan: application
+      path: xs-security.json

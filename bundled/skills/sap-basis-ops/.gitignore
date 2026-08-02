@@ -1,0 +1,19 @@
+# Never commit secrets or local machine-specific tooling config
+.env
+.env.*
+*.env
+.mcp.json
+token-cache.json
+certs/
+*.pfx
+*.p12
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Node (if any tooling is added later)
+node_modules/
