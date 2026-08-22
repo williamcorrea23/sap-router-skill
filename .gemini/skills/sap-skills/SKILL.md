@@ -5,14 +5,22 @@ trigger:
   keywords: [sap skills, capability lookup, which module, which tcode, which bapi, cross-module, module map, sap reference, business capability]
   intent: Finding which SAP module, transaction, or BAPI covers a business capability and routing the question to the right module map, router action, or consultant agent
 prerequisites:
-  - Repo module maps present in references/module_maps/ (15 files, MM through BW)
-  - references/data/ populated (sap-notes.yaml, symptom-index.yaml, tcodes.yaml)
-  - Python available for scripts/rag_ingest.py, scripts/sap_router.py, scripts/fallback_engine.py
+  - SAP_ROUTER_ROOT points to the sap-router-skill repository
+  - Repo module maps present in $SAP_ROUTER_ROOT/references/module_maps/ (15 files, MM through BW)
+  - $SAP_ROUTER_ROOT/references/data/ populated (sap-notes.yaml, symptom-index.yaml, tcodes.yaml)
+  - Python available for $SAP_ROUTER_ROOT/scripts/rag_ingest.py, sap_router.py, and fallback_engine.py
 ---
 
 # SAP Skills — Cross-Module Capability Lookup
 
 Answers "which module / tcode / BAPI does X?" using local reference data, the routing engine, and module consultant agents. Lookup flow: **RAG search → module map → router map → consultant agent**.
+
+## Runtime root
+
+Before running any relative command below, resolve `SAP_ROUTER_ROOT`, verify that
+`scripts/source_catalog.py` exists there, and change the working directory to that
+repository. Fail closed with a clear configuration error if the variable is missing;
+do not assume the user's current project contains the router scripts.
 
 ## 1. RAG Search (first stop)
 

@@ -31,6 +31,16 @@ TEXT_TARGETS = {
 }
 
 
+GLOBAL_SKILLS_TARGETS = {
+    "claude": Path.home() / ".claude" / "skills",
+    "gemini": Path.home() / ".gemini" / "config" / "skills",
+    "codex": Path.home() / ".codex" / "skills",
+}
+GLOBAL_TEXT_TARGETS = {
+    "codex": Path.home() / ".codex" / "AGENTS.md",
+}
+
+
 def sha256(path: Path) -> str:
     digest = hashlib.sha256()
     digest.update(path.read_bytes())
@@ -65,6 +75,10 @@ def text_body(target: str) -> str:
         "Canonical source: `.agents/`.\n"
         "Karpathy wrapper: mandatory. Caveman compression: default.\n"
         "Do not copy or fork skill bodies here; regenerate from canonical source.\n\n"
+        "Runtime root:\n"
+        "- `SAP_ROUTER_ROOT` must point to the canonical sap-router-skill repository.\n"
+        "- change the working directory to `SAP_ROUTER_ROOT` before relative commands.\n"
+        "- fail closed if `scripts/source_catalog.py` is not present there.\n\n"
         "Dynamic local discovery:\n"
         "- search skills: `python scripts/source_catalog.py search \"task description\"`\n"
         "- search MCPs: `python scripts/mcp_launcher.py search --query \"task description\"`\n"
@@ -81,10 +95,26 @@ def text_body(target: str) -> str:
     )
 
 
+def safe_rmtree(path: Path) -> None:
+    if not path.exists():
+        return
+    import os
+    import stat
+    for item in path.rglob('*'):
+        try:
+            os.chmod(item, stat.S_IWRITE)
+        except Exception:
+            pass
+    try:
+        shutil.rmtree(path, ignore_errors=True)
+    except Exception:
+        pass
+
+
 def copy_tree(src: Path, dst: Path) -> None:
     if dst.exists():
-        shutil.rmtree(dst)
-    shutil.copytree(src, dst)
+        safe_rmtree(dst)
+    shutil.copytree(src, dst, dirs_exist_ok=True)
 
 
 def compare_dirs(left: Path, right: Path) -> list[str]:
@@ -101,7 +131,7 @@ def compare_dirs(left: Path, right: Path) -> list[str]:
     return diffs
 
 
-def generate(targets: list[str]) -> dict:
+def generate(targets: list[str], sync_global: bool = False) -> dict:
     changed = []
     for target in targets:
         if target in TARGET_SKILLS:
@@ -115,6 +145,24 @@ def generate(targets: list[str]) -> dict:
     manifest_path = ROOT / "generated-assets.json"
     manifest_path.write_text(json.dumps(manifest(), indent=2) + "\n", encoding="utf-8")
     changed.append(str(manifest_path.relative_to(ROOT)))
+
+    if sync_global:
+        global_changed = []
+        skills_dirs = [s for s in CANONICAL_SKILLS.glob("*") if s.is_dir()]
+        for target_name, g_base in GLOBAL_SKILLS_TARGETS.items():
+            g_base.mkdir(parents=True, exist_ok=True)
+            for sdir in skills_dirs:
+                dst = g_base / sdir.name
+                copy_tree(sdir, dst)
+            global_changed.append(f"{target_name} ({str(g_base)}) -> {len(skills_dirs)} skills")
+
+        for target_name, g_file in GLOBAL_TEXT_TARGETS.items():
+            g_file.parent.mkdir(parents=True, exist_ok=True)
+            g_file.write_text(text_body(target_name), encoding="utf-8")
+            global_changed.append(f"{target_name} ({str(g_file)})")
+
+        return {"status": "OK", "generated": changed, "global_generated": global_changed}
+
     return {"status": "OK", "generated": changed}
 
 
@@ -159,13 +207,14 @@ def main() -> int:
     sub = parser.add_subparsers(dest="command", required=True)
     gen = sub.add_parser("generate")
     gen.add_argument("--targets", default="all", help="Comma-separated: all,claude,gemini,codex,cursor,kiro")
+    gen.add_argument("--global", dest="sync_global", action="store_true", help="Sync skills globally to ~/.gemini, ~/.claude, ~/.codex")
     sub.add_parser("check")
     sub.add_parser("diff")
     args = parser.parse_args()
 
     if args.command == "generate":
         targets = list(TARGET_SKILLS) + list(TEXT_TARGETS) if args.targets == "all" else [t.strip() for t in args.targets.split(",")]
-        result = generate(targets)
+        result = generate(targets, sync_global=args.sync_global)
     else:
         result = check()
     print(json.dumps(result, indent=2))
