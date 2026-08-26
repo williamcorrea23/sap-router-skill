@@ -78,3 +78,7 @@ packages/
 
 # Derived cache for the cavecrew UserPromptSubmit hook (rebuilt from sap_router.py)
 .cavecrew_triggers.json
+
+# Logs de sessao do sc4sap, em qualquer nivel: a regra ancorada na raiz
+# nao pegava os que nascem em subdiretorios de trabalho.
+**/.sc4sap/logs/

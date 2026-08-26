@@ -186,6 +186,12 @@ If a tool call to the primary `mcp_server` fails (due to connection timeout, mis
 **RAG pre-ready**: Pinecone, Supabase, Azure AI Search connectors configured in .mcp.json.
 Activate by uncommenting vars in .env. No code changes needed.
 
+**CPI route**: use `sap-cpi-mcp` for API/background reads and approved mutations;
+use `integration-suite-ui-mcp` only as browser-session fallback. Keep all community
+CPI MCP candidates disabled until registry promotion. For tool contracts and source
+decisions, load `../cpi-iflow-development/references/cpi-mcp-tool-contracts.md` and
+`../cpi-iflow-development/references/cpi-tooling-catalog.md`.
+
 ---
 
 ### SAP API Endpoints (No JCo Required)

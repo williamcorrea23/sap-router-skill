@@ -101,7 +101,12 @@ def run_server(server_id: str) -> int:
             return 2
         env = os.environ.copy()
         env.update({key: str(value) for key, value in runtime.get("env", {}).items()})
-        return subprocess.call([command] + runtime.get("args", []), cwd=ROOT, env=env)
+        raw_cwd = runtime.get("cwd")
+        cwd = (ROOT / raw_cwd).resolve() if raw_cwd else ROOT
+        if ROOT not in cwd.parents and cwd != ROOT:
+            print(json.dumps({"error": "invalid-runtime-cwd", "server": server_id}), file=sys.stderr)
+            return 2
+        return subprocess.call([command] + runtime.get("args", []), cwd=cwd, env=env)
     config = load_json(MCP_CONFIG)
     ok, reason = server_ready(server_id, config)
     if not ok:
@@ -115,7 +120,12 @@ def run_server(server_id: str) -> int:
         else:
             env[key] = str(value)
     cmd = [spec["command"]] + spec.get("args", [])
-    return subprocess.call(cmd, cwd=ROOT, env=env)
+    raw_cwd = spec.get("cwd")
+    cwd = (ROOT / raw_cwd).resolve() if raw_cwd else ROOT
+    if ROOT not in cwd.parents and cwd != ROOT:
+        print(json.dumps({"error": "invalid-runtime-cwd", "server": server_id}), file=sys.stderr)
+        return 2
+    return subprocess.call(cmd, cwd=cwd, env=env)
 
 
 def main() -> int:

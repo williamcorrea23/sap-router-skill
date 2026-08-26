@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-21T15:24:34Z",
+  "generated_at": "2026-08-02T09:24:00Z",
   "sources": [
     {
       "id": "abmir-sap-azure-sre-agent-skills",
@@ -11,6 +11,18 @@
       "revision": "a283ebe6e02520d19bfd858acab4a5d09810e241",
       "branch": null,
       "license_files": []
+    },
+    {
+      "id": "aiadiguru2025-sf-mcp",
+      "repository": "bundled",
+      "kind": "mcp",
+      "origin": "https://github.com/aiadiguru2025/sf-mcp",
+      "path": "bundled/mcps/aiadiguru2025-sf-mcp",
+      "revision": "b17ada8caf81b2edc1014a15353a6522a71657b5",
+      "branch": "main",
+      "license_files": [
+        "LICENSE"
+      ]
     },
     {
       "id": "altumsisy-sapcli-skill",
@@ -32,6 +44,18 @@
       "path": "bundled/skills/aplexio-sap-logistics-copilot",
       "revision": "f131e0460deafc9b2ba6568eb867df8d74f82a02",
       "branch": null,
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "arc-mcp-xsuaa-auth",
+      "repository": "bundled",
+      "kind": "mcp",
+      "origin": "https://github.com/arc-mcp/xsuaa-auth",
+      "path": "bundled/mcps/arc-mcp-xsuaa-auth",
+      "revision": "55aa43e9f5955179434b360ce387d4bebc653d39",
+      "branch": "main",
       "license_files": [
         "LICENSE"
       ]
@@ -86,6 +110,18 @@
       "path": "bundled/skills/boxlogodev-sapstack",
       "revision": "5f9c5bae3c54eb885e2351ea41341de1f40924d8",
       "branch": null,
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "capire-skills",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/capire/skills",
+      "path": "bundled/skills/capire-skills",
+      "revision": "e83d5f27b4f6775c842637a3c07279cd15fdf499",
+      "branch": "main",
       "license_files": [
         "LICENSE"
       ]
@@ -201,7 +237,7 @@
       "kind": "mcp",
       "origin": "https://github.com/Hochfrequenz/sapgui.mcp",
       "path": "bundled/mcps/hochfrequenz-sapgui-mcp",
-      "revision": "d68ac969f94f9ec69d56c0be569c1adf9ea8fba6",
+      "revision": "83c0bb424dc9a28169630b28dfb7b01fa9226911",
       "branch": "main",
       "license_files": [
         "LICENSE"
@@ -232,6 +268,16 @@
       ]
     },
     {
+      "id": "jfilak-sapcli-claude-plugin",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/jfilak/sapcli-claude-plugin",
+      "path": "bundled/skills/jfilak-sapcli-claude-plugin",
+      "revision": "43ef3b4af2aa1973352c4c73216f3017bc3e1300",
+      "branch": "main",
+      "license_files": []
+    },
+    {
       "id": "jonathanbernsteiner-sap-code-agents",
       "repository": "bundled",
       "kind": "skills",
@@ -251,6 +297,18 @@
       "path": "bundled/mcps/kts982-mcp-sap-gui",
       "revision": "4eca873220418523318771f6fbb383a2e24a79e1",
       "branch": "master",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "lemaiwo-btp-mcp-server",
+      "repository": "bundled",
+      "kind": "mcp",
+      "origin": "https://github.com/lemaiwo/btp-mcp-server",
+      "path": "bundled/mcps/lemaiwo-btp-mcp-server",
+      "revision": "64e5e75f2ec04fd2c62644d763b09d6ca2b9034e",
+      "branch": "main",
       "license_files": [
         "LICENSE"
       ]
@@ -285,7 +343,7 @@
       "kind": "skills",
       "origin": "https://github.com/likweitan/abap-skills",
       "path": "bundled/skills/likweitan-abap-skills",
-      "revision": "5c0652f1be087554567057f40574becd2097b580",
+      "revision": "a7645467dfaf5be94db405a7153e9bead0648403",
       "branch": "main",
       "license_files": [
         "LICENSE"
@@ -425,13 +483,37 @@
       ]
     },
     {
+      "id": "sap-ai-skills-library",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/SAP/ai-skills-library",
+      "path": "bundled/skills/sap-ai-skills-library",
+      "revision": "0597fa5e5bb1fc48a92c7c796892c9cdd76b10a7",
+      "branch": "main",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
       "id": "sap-automation-pilot-agent-skills",
       "repository": "bundled",
       "kind": "skills",
       "origin": "https://github.com/SAP/automation-pilot-agent-skills",
       "path": "bundled/skills/sap-automation-pilot-agent-skills",
       "revision": "f95d57bbdb8bb8916374fe6637b13594e092704c",
-      "branch": null,
+      "branch": "main",
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "sap-basis-ops",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/adam0thman/sap-basis-ops",
+      "path": "bundled/skills/sap-basis-ops",
+      "revision": "f23d0caff2d75591e99ea3882fd38facaa227fbd",
+      "branch": "main",
       "license_files": [
         "LICENSE"
       ]
@@ -444,6 +526,18 @@
       "path": "bundled/skills/sap-samples-cap-agentic-engineered",
       "revision": "a70fd5f6bb66ffb878b0db805aca2c94a7435a32",
       "branch": null,
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "sap-ui-theme-designer-plugins",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/SAP/ui-theme-designer-plugins-for-coding-agents",
+      "path": "bundled/skills/sap-ui-theme-designer-plugins",
+      "revision": "4e30f5750f760cca24a898c3a6daa8eebfa060a0",
+      "branch": "main",
       "license_files": [
         "LICENSE"
       ]
@@ -478,6 +572,18 @@
       "path": "bundled/skills/shrek-abaper-sap-transport-gate",
       "revision": "5e4615a52d40238916e3a1b997871a21b5cc0c0c",
       "branch": null,
+      "license_files": [
+        "LICENSE"
+      ]
+    },
+    {
+      "id": "ui5-plugins-coding-agents",
+      "repository": "bundled",
+      "kind": "skills",
+      "origin": "https://github.com/UI5/plugins-coding-agents",
+      "path": "bundled/skills/ui5-plugins-coding-agents",
+      "revision": "34a5f3d4a714d533dbefe810c125e167079cf63c",
+      "branch": "main",
       "license_files": [
         "LICENSE"
       ]

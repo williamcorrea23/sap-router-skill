@@ -1,0 +1,5 @@
+.DS_Store
+node_modules/
+
+# Eval working dirs
+plugins/*/skills/*-workspace/

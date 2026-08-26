@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-__version__ = "5.0.0"
+__version__ = "6.0.0"
 
 # === ZROUTER LIVE STATE (probe cache, used by bootstrap/fallback engine) ===
 # Cached probe result. None=not checked, True=installed, False=missing
@@ -496,8 +496,8 @@ class SapRouter:
                 pass
         return fallback
 
-    def _route_registry_profile(self, profile, destination, strategy, details):
-        chain = self._mcp_chain(profile, [])
+    def _route_registry_profile(self, profile, destination, strategy, details, fallback=None):
+        chain = self._mcp_chain(profile, fallback or [])
         route = {
             "destination": destination,
             "strategy": strategy,
@@ -652,6 +652,18 @@ class SapRouter:
                 "CAP/CDS MCPs and BTP/CF operational fallback."
             )
 
+        # Step 0: BTP administration and SuccessFactors use the shared
+        # capability registry. Candidate servers remain fail-closed until
+        # promoted, but routing must still expose the reviewed integration.
+        if any(kw in action_lower for kw in ["btp", "subaccount", "entitlement", "role_collection", "role collection", "environment_instance"]):
+            return self._route_registry_profile(
+                "btp",
+                "SAP BTP Administration",
+                "btp-registry-chain",
+                "BTP administration via the reviewed BTP MCP candidate; promotion and credentials are required before execution.",
+                ["lemaiwo-btp-mcp-server"]
+            )
+
         # Step 0a: Cloud ALM (CALM) operations
         if any(kw in action_lower for kw in ["calm_", "alm_", "cloud_alm"]):
             return {
@@ -702,10 +714,10 @@ class SapRouter:
         if "sf_" in action_lower:
             return {
                 "destination": "sf-mcp (OData)",
-                "mcp_server": "sf-mcp",
-                "mcp_servers": ["sf-mcp"],
+                "mcp_server": "aiadiguru2025-sf-mcp",
+                "mcp_servers": ["aiadiguru2025-sf-mcp", "sf-mcp"],
                 "strategy": "hcm-cloud",
-                "details": "SuccessFactors API via OData V2 endpoint"
+                "details": "SuccessFactors API via the reviewed MCP candidate, with the legacy sf-mcp fallback; execution remains fail-closed until promotion."
             }
 
         # Step 3: Functional WRITE gate — BAPIs fire only in functional-action context

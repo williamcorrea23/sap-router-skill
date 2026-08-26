@@ -1,0 +1,17 @@
+{
+  "name": "btp-mcp-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "odata-mcp-proxy --config btp-admin-api-config.json",
+    "build:btp": "mbt build",
+    "deploy:btp": "cf deploy mta_archives/btp-mcp-server_1.0.0.mtar"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "odata-mcp-proxy": "^1.0.0"
+  }
+}

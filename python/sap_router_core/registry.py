@@ -41,6 +41,13 @@ def load_servers() -> dict[str, dict[str, Any]]:
     return {item["id"]: item for item in data.get("servers", [])}
 
 
+def load_mcp_capability_specs() -> dict[str, dict[str, Any]]:
+    path = REGISTRIES / "mcp-capabilities.json"
+    if not path.exists():
+        return {}
+    return load_json(path).get("capabilities", {})
+
+
 def load_policies() -> dict[str, Any]:
     return load_json(REGISTRIES / "policies.json")
 
@@ -65,11 +72,29 @@ def resolve_servers_for_capability(capability: str) -> list[dict[str, Any]]:
         if capability in server.get("capabilities", [])
         and server.get("status") == "enabled"
     ]
-    return sorted(servers, key=lambda item: item.get("routing", {}).get("priority", 999))
+    if servers:
+        return sorted(servers, key=lambda item: item.get("routing", {}).get("priority", 999))
+    # Fail closed. Reviewed candidates remain visible in diagnostics/search but
+    # never become route selections until explicitly promoted into mcps.json.
+    return []
 
 
 def classify_task(task: str) -> dict[str, Any]:
     text = task.lower()
+    if any(token in text for token in ("undeploy", "desimplantar")) and any(token in text for token in ("cpi", "iflow", "integration flow")):
+        route = {"capability": "sap.cpi.artifact.undeploy", "profile": "sap-cpi-developer", "fallback_group": "cpi"}
+        servers = resolve_servers_for_capability(route["capability"])
+        return {
+            "request_id": str(uuid.uuid4()),
+            "intent": task,
+            "capability": route["capability"],
+            "profile": route["profile"],
+            "fallback_group": route["fallback_group"],
+            "candidate_servers": [server["id"] for server in servers],
+            "selected_server": servers[0]["id"] if servers else None,
+            "selection_reason": "destructive verb matched; approval and strong confirmation required",
+            "created_at": now_iso(),
+        }
     if any(token in text for token in ("deploy", "implantar", "publicar")) and any(token in text for token in ("cpi", "iflow", "integration flow")):
         route = {"capability": "sap.cpi.artifact.deploy", "profile": "sap-cpi-developer", "fallback_group": "cpi"}
         servers = resolve_servers_for_capability(route["capability"])
@@ -400,6 +425,7 @@ def probe_server(server_id: str, execute: bool = False, timeout: int = 10) -> di
 
 def validate_catalog() -> dict[str, Any]:
     errors: list[str] = []
+    warnings: list[str] = []
     capabilities = load_capabilities()
     servers = load_servers()
     profiles = load_profiles()
@@ -452,11 +478,41 @@ def validate_catalog() -> dict[str, Any]:
     mcp_config_path = ROOT / ".mcp.json"
     candidates_path = REGISTRIES / "mcp-candidates.json"
     if mcp_config_path.exists() and candidates_path.exists():
-        configured_ids = set(load_json(mcp_config_path).get("mcpServers", {}))
-        candidate_ids = {item["id"] for item in load_json(candidates_path).get("candidates", [])}
-        unmanaged = configured_ids - set(servers) - candidate_ids
+        mcp_config = load_json(mcp_config_path)
+        configured_ids = set(mcp_config.get("mcpServers", {}))
+        planned_ids = set(mcp_config.get("plannedServers", {}))
+        candidate_items = load_json(candidates_path).get("candidates", [])
+        candidate_ids = [item["id"] for item in candidate_items]
+        candidate_set = set(candidate_ids)
+        duplicates = sorted({item for item in candidate_ids if candidate_ids.count(item) > 1})
+        if duplicates:
+            errors.append(f"MCP candidates contain duplicate ids: {duplicates}")
+        missing_planned = sorted(candidate_set - planned_ids)
+        if missing_planned:
+            errors.append(f"MCP candidates missing from plannedServers: {missing_planned}")
+        promoted_candidates = sorted(configured_ids & candidate_set)
+        if promoted_candidates:
+            errors.append(f"MCP candidates cannot be active without promotion: {promoted_candidates}")
+        unmanaged = configured_ids - set(servers) - candidate_set
         if unmanaged:
             errors.append(f"MCP config has unmanaged servers: {sorted(unmanaged)}")
+        mcp_specs = load_mcp_capability_specs()
+        enabled_servers = {
+            server_id for server_id, server in servers.items()
+            if server.get("status") == "enabled"
+        }
+        for capability, spec in mcp_specs.items():
+            if capability not in capabilities:
+                errors.append(f"MCP capability {capability}: missing from capabilities.json")
+            for server_id in [spec.get("primary")] + list(spec.get("fallbacks", [])):
+                if not server_id or server_id.startswith("plugin:"):
+                    continue
+                if server_id not in enabled_servers:
+                    state = "disabled candidate" if server_id in candidate_set else "unknown or disabled server"
+                    errors.append(f"MCP capability {capability}: {state} {server_id} is not routable")
+            primary = spec.get("primary")
+            if primary in servers and capability not in servers[primary].get("capabilities", []):
+                errors.append(f"MCP capability {capability}: primary {primary} does not advertise the capability")
     return {
         "status": "PASS" if not errors else "FAIL",
         "checked_at": now_iso(),
@@ -471,4 +527,5 @@ def validate_catalog() -> dict[str, Any]:
             "bundled_sources": len(locked_ids),
         },
         "errors": errors,
+        "warnings": warnings,
     }

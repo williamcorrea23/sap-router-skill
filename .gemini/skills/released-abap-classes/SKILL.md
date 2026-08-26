@@ -1,121 +1,169 @@
 ---
 name: released-abap-classes
-description: SAP released ABAP APIs — C1/C2/C3/sAPIsC0 release contracts, released class hierarchies (cl_abap*, cl_system*, xco*, cl_bali*), API contract verification, ABAP Cloud compatibility checking, SAP API release lifecycle. Use when checking if a SAP class is released for customer use, selecting APIs for ABAP Cloud development, or verifying release contracts.
-trigger:
-  keywords: [released, abap, classes, apis, release-contracts, c1, c2, cloud, compatibility, sap-classes]
-  intent: >-
-    Use when checking SAP class release contracts (C0-C4), verifying ABAP Cloud API compatibility, or selecting released APIs for development.
+description: Find released ABAP classes for ABAP Cloud Development. Use when user asks about ABAP classes for specific functionality like email, UUID generation, time/date handling, JSON/XML processing, RAP, string processing, random numbers, regex, Base64, HTTP calls, unit testing, PDF rendering, parallel processing, application logs, or any other ABAP Cloud class lookup.
 ---
 
-# SAP Released ABAP APIs
+# Released ABAP Classes
 
-SAP API release contracts and compatible ABAP APIs for cloud development.
+Reference for released ABAP classes available in ABAP for Cloud Development (SAP BTP ABAP Environment).
 
-## Release Contracts
+## Quick Reference by Category
 
-| Contract | Meaning | Stability |
-|---|---|---|
-| C1 | Released for customer use | Stable — SAP guarantees compatibility |
-| C2 | Released with restrictions | Stable but usage-limited |
-| C3 | Released for system-internal use | May change |
-| [sAPIsC0] | Cloud Platform released | Stable for ABAP Cloud |
+| Category | Key Classes |
+|----------|-------------|
+| **Console Output** | `IF_OO_ADT_CLASSRUN`, `CL_DEMO_CLASSRUN`, `CL_XCO_CP_ADT_SIMPLE_CLASSRUN` |
+| **UUID** | `CL_SYSTEM_UUID`, `XCO_CP`, `XCO_CP_UUID` |
+| **Time & Date** | `CL_ABAP_CONTEXT_INFO`, `XCO_CP_TIME`, `CL_ABAP_TSTMP`, `CL_ABAP_UTCLONG`, `CL_ABAP_DATFM`, `CL_ABAP_TIMEFM` |
+| **Calendar** | `CL_FHC_CALENDAR_RUNTIME`, `CL_SCAL_UTILS` |
+| **String Processing** | `CL_ABAP_CHAR_UTILITIES`, `CL_ABAP_STRING_UTILITIES`, `XCO_CP` |
+| **Numbers/Math** | `CL_ABAP_MATH`, `CL_ABAP_DECFLOAT`, `CL_ABAP_BIGINT`, `CL_ABAP_RATIONAL` |
+| **Random Numbers** | `CL_ABAP_RANDOM_*` (INT, INT8, FLOAT, PACKED, DECFLOAT16/34), `CL_ABAP_PROB_DISTRIBUTION` |
+| **Regular Expressions** | `CL_ABAP_REGEX`, `CL_ABAP_MATCHER` |
+| **Codepage/Binary** | `CL_ABAP_CONV_CODEPAGE`, `CL_ABAP_GZIP*`, `CL_WEB_HTTP_UTILITY` |
+| **JSON/XML** | `XCO_CP_JSON`, `/UI2/CL_JSON`, `CL_SXML_*`, `CL_IXML_*` |
+| **Email** | `CL_BCS_MAIL_MESSAGE` |
+| **HTTP Calls** | `CL_WEB_HTTP_CLIENT_MANAGER`, `CL_HTTP_DESTINATION_PROVIDER` |
+| **RAP** | `CL_ABAP_BEHV_AUX`, `CL_ABAP_BEHAVIOR_HANDLER`, `CL_ABAP_BEHAVIOR_SAVER` |
+| **RTTS** | `CL_ABAP_TYPEDESCR` and hierarchy |
+| **Dynamic Programming** | `CL_ABAP_DYN_PRG`, `CL_ABAP_CORRESPONDING` |
+| **User Info** | `CL_ABAP_CONTEXT_INFO`, `XCO_CP=>sy->user()` |
+| **Unit Testing** | `CL_ABAP_UNIT_ASSERT`, `CL_OSQL_TEST_ENVIRONMENT`, `CL_CDS_TEST_ENVIRONMENT` |
+| **Parallel Processing** | `CL_ABAP_PARALLEL` |
+| **Application Log** | `CL_BALI_LOG` |
+| **Background Jobs** | `CL_BGMC_PROCESS_FACTORY` |
+| **Locking** | `CL_ABAP_LOCK_OBJECT_FACTORY` |
+| **XLSX** | `XCO_CP_XLSX` |
+| **Zip Files** | `CL_ABAP_ZIP` |
+| **PDF Rendering** | `CL_FP_ADS_UTIL` |
 
-## Key Released Class Hierarchies
+## Common Use Cases
 
-### CL_ABAP_* — Core ABAP Runtime
+### Get Current Date/Time in UTC
 ```abap
-" Character/string utilities
-cl_abap_char_utilities=>newline
-cl_abap_char_utilities=>horizontal_tab
+"Using CL_ABAP_CONTEXT_INFO
+DATA(sys_date) = cl_abap_context_info=>get_system_date( ).  "e.g. 20240101
+DATA(sys_time) = cl_abap_context_info=>get_system_time( ).  "e.g. 152450
 
-" Math operations
-cl_abap_math=>round( iv_number = 3.14159 iv_decimals = 2 )  " → 3.14
-
-" UUID generation
-DATA(lv_uuid) = cl_system_uuid=>create_uuid_c32_static( ).
-
-" Random integers
-DATA(lv_random) = cl_abap_random_int=>create( seed = cl_abap_random=>seed( )
-  min = 1 max = 100 )->get_next( ).
+"Using XCO (various formats)
+DATA(date_utc) = xco_cp=>sy->date( xco_cp_time=>time_zone->utc )->as( xco_cp_time=>format->abap )->value.
+DATA(time_utc) = xco_cp=>sy->time( xco_cp_time=>time_zone->utc )->as( xco_cp_time=>format->iso_8601_extended )->value.
+DATA(moment_utc) = xco_cp=>sy->moment( xco_cp_time=>time_zone->utc )->as( xco_cp_time=>format->iso_8601_extended )->value.
 ```
 
-### XCO — eXtensible Component Objects
+### Send Email
 ```abap
-" CDS metadata access
-DATA(lo_cds) = xco_cp_cds=>object_for( 'Z_I_PRODUCT' ).
-DATA(lv_exists) = lo_cds->exists( ).
-
-" Package metadata
-DATA(lo_package) = xco_cp_abap_repository=>object->devc->for( '$ZFOO' ).
-DATA(lt_objects) = lo_package->list_objects( )->get( ).
-
-" DDIC table library
-DATA(lo_table) = xco_cp_ddl=>field( 'MARA' )->field( 'MATNR' ).
-DATA(lv_type) = lo_table->content( )->get_data_type( ).
+TRY.
+    DATA(mail) = cl_bcs_mail_message=>create_instance( ).
+    mail->set_sender( 'sender@example.com' ).
+    mail->add_recipient( 'recipient@example.com' ).
+    mail->set_subject( 'Subject' ).
+    mail->set_main( cl_bcs_mail_textpart=>create_instance(
+      iv_content      = '<h1>Hello</h1><p>Message body.</p>'
+      iv_content_type = 'text/html' ) ).
+    mail->send( IMPORTING et_status = DATA(status) ).
+  CATCH cx_bcs_mail INTO DATA(error).
+ENDTRY.
 ```
 
-### CL_HTTP_CLIENT / CL_WEB_HTTP_CLIENT
+### Generate UUID
 ```abap
-" Released HTTP client (C1 contract)
-DATA(lo_client) = cl_web_http_client_manager=>create_by_http_destination(
-  i_destination = cl_http_destination_provider=>create_by_cloud_destination(
-    i_name = 'MY_S4_SYSTEM' ) ).
-DATA(lo_request) = lo_client->get_http_request( ).
-DATA(lo_response) = lo_client->execute( i_method = if_web_http_client=>get ).
-DATA(lv_body) = lo_response->get_text( ).
+"CL_SYSTEM_UUID
+DATA(uuid_x16) = cl_system_uuid=>create_uuid_x16_static( ).
+DATA(uuid_c36) = cl_system_uuid=>create_uuid_c36_static( ).
+
+"XCO
+DATA(uuid) = xco_cp=>uuid( )->value.
+DATA(uuid_c36_xco) = xco_cp=>uuid( )->as( xco_cp_uuid=>format->c36 )->value.
 ```
 
-### /UI2/CL_JSON
+### JSON Processing
 ```abap
-" Released JSON serialization (C1)
-DATA(lv_json) = /ui2/cl_json=>serialize( data = ls_data ).
-/ui2/cl_json=>deserialize( EXPORTING json = lv_json CHANGING data = ls_data ).
+"ABAP -> JSON
+DATA(json) = xco_cp_json=>data->from_abap( some_structure )->to_string( ).
+
+"JSON -> ABAP
+xco_cp_json=>data->from_string( json_string )->write_to( REF #( target_structure ) ).
+
+"Using /UI2/CL_JSON
+DATA(json2) = /ui2/cl_json=>serialize( data = some_data ).
+/ui2/cl_json=>deserialize( EXPORTING json = json2 CHANGING data = target ).
 ```
 
-### CL_BCS_MAIL_MESSAGE (Mail)
+### HTTP Client Call
 ```abap
-" Released mail client (C1)
-DATA(lo_mail) = cl_bcs_mail_message=>create_instance( ).
-lo_mail->set_sender( 'noreply@company.com' ).
-lo_mail->add_recipient( 'user@company.com' ).
-lo_mail->set_subject( 'Report Ready' ).
-lo_mail->set_body( 'Your report is attached.' ).
-lo_mail->send( ).
+TRY.
+    DATA(dest) = cl_http_destination_provider=>create_by_url( 'https://api.example.com' ).
+    DATA(client) = cl_web_http_client_manager=>create_by_http_destination( dest ).
+    DATA(request) = client->get_http_request( ).
+    DATA(response) = client->execute( if_web_http_client=>get ).
+    DATA(status) = response->get_status( ).
+    DATA(body) = response->get_text( ).
+  CATCH cx_web_http_client_error cx_http_dest_provider_error INTO DATA(error).
+ENDTRY.
 ```
 
-### CL_BALI_LOG (Application Log — new)
+### Get Current User
 ```abap
-" New BAL API (C1 in ABAP Cloud)
-DATA(lo_log) = cl_bali_log=>create( ).
-lo_log->add_item( item = cl_bali_message_item=>create(
-  severity = if_bali_constants=>c_severity_error
-  id = 'ZROUTER' number = '001' variable_1 = 'Failed' ) ).
-lo_log->save( ).
+"Using CL_ABAP_CONTEXT_INFO
+DATA(user_alias) = cl_abap_context_info=>get_user_alias( ).
+DATA(user_name) = cl_abap_context_info=>get_user_formatted_name( ).
+
+"Using XCO
+DATA(user) = xco_cp=>sy->user( )->name.
 ```
 
-## Checking API Release Status
+## Detailed Reference
 
-```abap
-" Programmatic check
-cl_abap_objectdescr=>get_object_type_info(
-  EXPORTING p_name = 'CL_WEB_HTTP_CLIENT'
-  IMPORTING p_release_contract = DATA(lv_contract) ).
-" lv_contract = 'C1' (released) or 'C3' (not released for customer)
-```
+For comprehensive code examples and all available classes, read:
+- [references/Released_ABAP_Classes.md](references/Released_ABAP_Classes.md)
 
-## Not Released (Avoid in ABAP Cloud)
+### Reference File Structure
 
-| Class | Alternative |
-|---|---|
-| CL_GUI_FRONTEND_SERVICES | Not available in cloud |
-| CL_ABAP_BROWSER | Not cloud-compatible |
-| CL_SALV_TABLE | Use CDS + Fiori |
-| Function modules (custom) | Released RFC scenarios only |
-| Direct DB access | CDS views only |
+The reference file is organized into these sections (use grep patterns to search):
 
-## Gotchas
-
-- **C1 does not mean "no changes"** — SAP may deprecate C1 APIs with 12-month notice
-- **XCO library is the future direction** for DDIC/programmatic metadata
-- **cl_http_client** is NOT released — use **cl_web_http_client** instead
-- **/ui2/cl_json** is released but not in all C1 contract documents
+| Section | Search Pattern |
+|---------|---------------|
+| Console Output | `Running a Class and Displaying Output` |
+| UUID | `Creating and Transforming UUIDs` |
+| SY Components | `XCO Representations of SY Components` |
+| RAP | `## RAP` |
+| Transactional Consistency | `Transactional Consistency` |
+| Numbers/Calculations | `Numbers and Calculations` |
+| String Processing | `String Processing` |
+| Codepages/Binary | `Handling Codepages and Binary` |
+| Regular Expressions | `Regular Expressions` |
+| Time and Date | `Time and Date` |
+| Calendar | `Calendar-Related Information` |
+| RTTS | `Runtime Type Services` |
+| Assignments | `## Assignments` |
+| Structure Components | `Non-Initial Structure Components` |
+| Table Comparison | `Comparing Content of Compatible` |
+| Dynamic Programming | `Dynamic Programming` |
+| Current User | `Getting the Current User Name` |
+| XML/JSON | `XML/JSON` |
+| Repository Objects | `ABAP Repository Object Information` |
+| Generating Objects | `Generating ABAP Repository Objects` |
+| Call Stack | `Call Stack` |
+| Email | `Sending Emails` |
+| Tenant Info | `Tenant Information` |
+| Exceptions | `Exception Classes` |
+| Parallel Processing | `Parallel Processing` |
+| Application Log | `Application Log` |
+| Background Jobs | `Running Code in the Background` |
+| Locking | `## Locking` |
+| HTTP Calls | `Calling Services` |
+| XLSX | `Reading and Writing XLSX Content` |
+| Zip Files | `Zip Files` |
+| Unit Testing | `ABAP Unit` |
+| Units of Measurement | `Units of Measurement` |
+| ATC | `Programmatic ABAP Test Cockpit` |
+| Number Ranges | `Handling Number Ranges` |
+| Releasing APIs | `Releasing APIs` |
+| Application Jobs | `Application Jobs` |
+| Generative AI | `Generative AI` |
+| Transport Requests | `Programmatically Creating and Releasing Transport` |
+| HTML/XML Cleanup | `Repairing and Cleaning up HTML` |
+| IDE Actions | `Creating and Using IDE Actions` |
+| PDF Rendering | `Output Management` |
+| CSV Export | `Writing Internal Table Content to CSV` |
+| Garbage Collection | `Triggering Garbage Collection` |

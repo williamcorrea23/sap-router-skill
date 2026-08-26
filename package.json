@@ -1,7 +1,7 @@
 {
   "name": "sap-router-orchestrator",
-  "version": "4.5.0",
-  "description": "SAP Router Orchestrator v4.5.0 - 88 skills, 11 reviewed MCPs and 40 fail-closed fallback candidates, with SAP ABAP deployment gates.",
+  "version": "6.0.0",
+  "description": "SAP Router Orchestrator v6.0.0 - 162 global skills, 12 registered MCPs, and fail-closed reviewed candidates for Claude, Codex, and Gemini.",
   "private": true,
   "scripts": {
     "abap:lint": "abaplint templates/abaplint.json",
@@ -75,6 +75,8 @@
     "cpi:create": "python scripts/cpi_iflow_packager.py create",
     "cpi:validate": "python scripts/cpi_iflow_packager.py validate",
     "cpi:list": "python scripts/cpi_iflow_packager.py list",
+    "cpi:quality": "python scripts/cpi_client.py quality",
+    "cpi:tools-status": "python scripts/cpi_client.py tools-status",
     "validate:all": "python scripts/healthcheck.py --quiet --json && npm run abap:review:ci && python scripts/sap_router.py status",
     "spec:analyze": "python scripts/sap_router.py analyze-spec --spec",
     "spec:pipeline": "python scripts/sap_router.py pipeline --spec",

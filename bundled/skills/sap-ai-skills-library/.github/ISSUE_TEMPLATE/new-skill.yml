@@ -1,0 +1,51 @@
+name: Register a New Skill
+description: Register your skill repository with the AI Skills Library to get it listed on skills.cloud.sap.
+labels: ["new skill"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for contributing a skill! The AI Skills Library uses a **bring-your-own-repo** model — your skill code stays in your own GitHub repository. Opening this issue kicks off the onboarding process: a maintainer will review your submission and add your repo to the AI Skills Library.
+
+        **Before submitting, make sure your repo is ready.** See the checklist below.
+
+  - type: input
+    id: repo-url
+    attributes:
+      label: Repository URL
+      description: The public GitHub repository that contains your skill(s). Must be on github.com.
+      placeholder: https://github.com/your-org/your-repo
+    validations:
+      required: true
+
+  - type: textarea
+    id: skills-listing
+    attributes:
+      label: Skills in this repository
+      description: List each skill with its directory slug and a one-line description.
+      placeholder: |
+        my-skill — Does X when the user asks about Y
+        another-skill — Helps with Z in context of ...
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: readiness
+    attributes:
+      label: Readiness checklist
+      description: Confirm your repository meets the required structure before submitting.
+      options:
+        - label: The repository is public on github.com
+          required: true
+        - label: Each skill has a `skills/<slug>/SKILL.md` file with `name` and `description` frontmatter
+          required: true
+        - label: Author information is available (e.g. in README or `package.json`)
+          required: true
+        - label: License information is available (e.g. a `LICENSE` file or `package.json`)
+          required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Anything else the maintainers should know — target audience, related skills, limitations, etc.

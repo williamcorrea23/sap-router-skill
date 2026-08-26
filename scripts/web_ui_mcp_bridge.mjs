@@ -192,3 +192,7 @@ rl.on("line", async (line) => {
     error(id, -32000, err?.message || String(err));
   }
 });
+
+// The smoke driver and stdio MCP hosts close stdin after a request batch.
+// Explicitly exit so the bridge cannot keep a completed batch alive.
+rl.on("close", () => process.exit(0));

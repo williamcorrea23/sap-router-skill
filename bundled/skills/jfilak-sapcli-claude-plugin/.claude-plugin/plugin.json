@@ -1,0 +1,12 @@
+{
+  "name": "sapcli-abap-tools",
+  "description": "ABAP system exploration and analysis tools powered by sapcli",
+  "version": "1.2.0",
+  "author": {
+    "name": "Jakub Filak"
+  },
+  "homepage": "https://github.com/jfilak/sapcli-claude-plugin",
+  "repository": "https://github.com/jfilak/sapcli-claude-plugin",
+  "license": "Apache-2.0",
+  "keywords": ["sap", "abap", "sapcli", "adt"]
+}

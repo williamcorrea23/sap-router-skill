@@ -1,0 +1,7 @@
+{
+  "name": "sap-basis-ops",
+  "version": "0.1.0",
+  "description": "SAP Basis / technical-operations skills at the OS and DB layer — start/stop, housekeeping, health triage, and DB-specific commands for NetWeaver/S4 on Linux, Windows and AIX. Every procedure is cited to help.sap.com / official Operations Guides.",
+  "keywords": ["sap", "basis", "netweaver", "s4hana", "operations", "sysadmin", "sapcontrol", "hana", "ase", "oracle", "db2", "maxdb", "sqlserver"],
+  "license": "MIT"
+}

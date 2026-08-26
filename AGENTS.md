@@ -1,13 +1,13 @@
 # SAP Router Skill — Multi-IDE Agent Instructions
 
-> **89 skills mirrored across 4 IDEs — same SKILL.md content in each.**
+> **162 skills mirrored across Claude, Codex, Gemini Antigravity, and Cursor.**
 >
 > | IDE | Skill Directory | Entry Point |
 > |---|---|---|
-> | **Claude Code** | `.claude/skills/` (89 skills) | `.claude/skills/run-sap-router-skill/SKILL.md` |
-> | **Antigravity (Gemini)** | `.gemini/skills/` (89 skills) | `.gemini/skills/run-sap-router-skill/SKILL.md` |
-> | **Codex / OpenAI** | `.codex/skills/` (89 skills) | `.codex/AGENTS.md` |
-> | **Cursor** | `.cursor/skills/` (89 skills) | `.cursor/skills/run-sap-router-skill/SKILL.md` |
+> | **Claude Code** | `.claude/skills/` (162 skills) | `.claude/skills/run-sap-router-skill/SKILL.md` |
+> | **Antigravity (Gemini)** | `.gemini/skills/` (162 skills) | `.gemini/skills/run-sap-router-skill/SKILL.md` |
+> | **Codex / OpenAI** | `.codex/skills/` (162 skills) | `.codex/AGENTS.md` |
+> | **Cursor** | `.cursor/skills/` (162 skills) | `.cursor/skills/run-sap-router-skill/SKILL.md` |
 >
 > All skills auto-trigger by file context and keyword. See SKILL.md for master dispatch.
 > **New (2026-07-13):** `rtk-token-optimizer` (60-90% token savings via CLI proxy) + `context-mode` (98% tool output reduction via MCP sandbox).

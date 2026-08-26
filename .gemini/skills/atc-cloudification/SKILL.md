@@ -1,118 +1,89 @@
 ---
 name: atc-cloudification
-description: ATC cloudification and code quality — ABAP Test Cockpit check variants, custom ATC checks (SCI), ATC exemption management, CI/ATC in transport pipelines, central ATC system, S/4HANA custom code migration checks. Use when running ATC checks, configuring check variants, creating custom ATC checks, or setting up quality gates for ABAP transports.
-trigger:
-  keywords: [ATC, ABAP Test Cockpit, check variant, SCI, custom check, code quality, S/4HANA migration, exemption, quality gate, transport pipeline]
-  intent: >-
-    Run ABAP Test Cockpit checks, configure check variants, create custom SCI checks, manage exemptions, and set up quality gates for ABAP transports.
+description: Configure ATC Cloud Readiness and Clean Core checks using the SAP Cloudification Repository for Released APIs. Use when users ask about ATC check variants for cloud readiness, clean core compliance, released API checks, cloudification repository setup, objectReleaseInfo JSON files, SAP Cloud ERP or SAP Cloud ERP Private API validation, or migrating custom code to ABAP Cloud. Triggers include "configure ATC cloud readiness", "set up clean core check", "cloudification repository URL", "released APIs check", or "which JSON file for my S/4HANA version".
 ---
 
-# ATC Cloudification
+# ATC Cloudification Repository Check
 
-ABAP Test Cockpit (ATC) — static code analysis for ABAP quality and cloud readiness.
+Configure the ABAP Test Cockpit (ATC) check **"Usage of Released APIs (Cloudification Repository)"** to validate custom code against SAP's released API list for SAP Cloud ERP and SAP Cloud ERP Private.
 
-## ATC Check Types
+## Overview
 
-| Check Category | Source | Example |
-|---|---|---|
-| SAP Standard | Built-in | SELECT * check, PERFORM check |
-| Custom SCI Checks | Customer | Company-specific naming rules |
-| Cloud Readiness | SAP | Non-released API usage |
-| Security | SAP + Custom | SQL injection, auth checks |
-| Performance | SAP + Custom | SELECT in loop detection |
+The [SAP Cloudification Repository](https://github.com/SAP/abap-atc-cr-cv-s4hc) contains the list of released and unreleased APIs for SAP Cloud ERP. The JSON files from this repository are used as content for the ATC check, enabling customers and partners to analyse existing custom code for released API usage across all ECC and S/4HANA releases.
 
-## Check Variants
+## Quick Reference
 
-```
-ATC Transaction (ATC):
-  1. Create check variant: ZROUTER_QUALITY
-  2. Select checks:
-     ✓ Cloud Readiness (SAP)
-     ✓ Security checks (SAP)
-     ✓ Performance checks (SAP)
-     ✓ Z_CL_CHECK_NAMING (custom)
-  3. Assign to package: ZROUTER*
-```
+Read `references/quick-reference.md` for:
 
-## Custom ATC Check
+- JSON file URLs for each target product and version
+- ATC check variant configuration steps
+- Available JSON files and their purpose
+- SAP Notes required for setup
 
-```abap
-CLASS z_cl_atc_naming DEFINITION PUBLIC FINAL CREATE PUBLIC.
-  PUBLIC SECTION.
-    INTERFACES if_ci_atc_check.
+## Configuration by Target Product
 
-  PRIVATE SECTION.
-    METHODS check_object_name
-      IMPORTING io_object TYPE REF TO if_ci_atc_object.
-ENDCLASS.
+### SAP Cloud ERP
 
-CLASS z_cl_atc_naming IMPLEMENTATION.
-  METHOD if_ci_atc_check~run.
-    LOOP AT io_check_set->get_objects( ) INTO DATA(lo_object).
-      check_object_name( lo_object ).
-    ENDLOOP.
-  ENDMETHOD.
+1. Activate in your ATC check variant: **"Cloud Readiness"** → **Usage of Released APIs (Cloudification Repository)**
+2. In the check attributes, enter the URL:
+   ```
+   https://raw.githubusercontent.com/SAP/abap-atc-cr-cv-s4hc/main/src/objectReleaseInfoLatest.json
+   ```
 
-  METHOD check_object_name.
-    DATA(lv_name) = io_object->get_name( ).
-    IF lv_name NP 'Z*'.
-      " Finding: object doesn't start with Z
-      io_object->create_finding(
-        iv_code = 'Z001'
-        iv_text = |Object { lv_name } must start with Z|
-        iv_priority = if_ci_atc_finding=>c_priority_medium ).
-    ENDIF.
-  ENDMETHOD.
-ENDCLASS.
-```
+### SAP Cloud ERP Private
 
-## ATC Exemption
+1. Activate in your ATC check variant: **"Clean Core"** → **Usage of Released APIs (Cloudification Repository)**
+2. In the check attributes, enter the URL for your version:
+   - **Latest version**: `https://raw.githubusercontent.com/SAP/abap-atc-cr-cv-s4hc/main/src/objectReleaseInfo_PCELatest.json`
+   - **Specific release**: Replace `PCELatest` with the version, e.g. `PCE2025_0` for Release 2025 FPS00
 
-When a check finding is accepted (false positive or accepted risk):
-```
-ATC Result → Right-click → Request Exemption
-  → Reason: "External RFC call is via whitelisted destination"
-  → Validity: 12 months
-  → Approver: QA Lead
-```
+### New Clean Core Check (Note 3565942)
 
-## Central ATC System
+For the newer ATC checks **"Usage of APIs"** and **"Allowed Enhancement Technologies"**, use:
 
 ```
-DEV System → Check run → Central ATC (SOLMAN/TMS)
-  → Results aggregated across landscape
-  → Quality gate in ChaRM / Focused Build
+https://raw.githubusercontent.com/SAP/abap-atc-cr-cv-s4hc/main/src/objectClassifications_SAP.json
 ```
 
-## CI/CD Pipeline Integration
+## Clean Core Levels and API State Mapping
 
-```yaml
-# .abapgit-ci.yml
-atc:
-  check_variant: ZROUTER_QUALITY
-  fail_on_priority: [CRITICAL, ERROR]
-  max_exemptions: 10
-  block_transport_on_failure: true
-```
+Custom objects are assigned Clean Core **levels**, while SAP objects are categorized into **states**. The mapping is:
 
-## S/4HANA Custom Code Migration
+| Clean Core Level | API State          | Meaning                                                                                               |
+| ---------------- | ------------------ | ----------------------------------------------------------------------------------------------------- |
+| **Level A**      | Released           | Allowed in ABAP Cloud developments (language version "ABAP for Cloud Development")                    |
+| **Level A**      | Deprecated         | Still usable in ABAP Cloud, but a newer recommended API exists and should be preferred                |
+| **Level B**      | Classic API        | Usable only in standard ABAP developments (language version "Standard ABAP"), not in ABAP Cloud       |
+| **Level C**      | Not to be released | Not permitted in ABAP Cloud developments, but a successor API is available and should be used instead |
+| **Level D**      | No API             | Not usable in ABAP Cloud, and also not recommended for standard ABAP developments                     |
 
-ATC cloud readiness checks:
-- Checks for non-released APIs
-- Checks for deprecated function modules
-- Checks for direct DB access
-- Checks for Dynpro usage
+### Key rules
 
-```bash
-# Run cloud readiness check from command line (via ADT)
-# Use sap_router.py for routing
-python scripts/sap_router.py route --action BASIS_CODE_ANALYSIS
-# → ZROUTER RFC → TRINT_INSPECT_OBJECTS FM
-```
+- **Level A** (Released): Use these APIs for all new ABAP Cloud development. These are the target.
+- **Level B** (Classic API): Permitted for clean core extensions in standard ABAP only. Use the wrapper pattern (Tier 2 RFC proxy) to bridge to ABAP Cloud when no Level A successor exists.
+- **Level C** (Not to be released): A successor API exists — migrate to the successor.
+- **Level D** (No API): Avoid entirely. No successor is planned.
+- **Deprecated**: Technically still Level A, but plan migration to the newer replacement API.
 
-## Gotchas
+### JSON files and states
 
-- **ATC check runs as current user** — auth-limited results if user can't see all objects
-- **Exemptions must be reviewed** — automatic 12-month expiry
-- **Central ATC needs RFC** — SOLMAN or separate ATC system
-- **Custom checks are SCI classes** — implement if_ci_atc_check interface
+- `objectReleaseInfo*.json` files contain states: `released`, `deprecated`, `notToBeReleased`, `notReleased`
+- `objectClassifications*.json` files contain states: `classicAPI`, `noAPI`, `internalAPI`
+- Labels: `remote-enabled` (RFC-enabled), `transactional-consistent` (suitable for RAP-based applications)
+
+## Workflow
+
+1. **Determine the target product**: SAP Cloud ERP or SAP Cloud ERP Private
+2. **Identify the correct JSON file** using the quick reference
+3. **Verify prerequisites**: Ensure required SAP Notes are implemented
+4. **Configure ATC check variant** with the appropriate check and JSON URL
+5. **Run ATC checks** on custom code to identify usage of unreleased APIs
+6. **Review findings** and plan remediation using successor API information and the level mapping above
+
+## Cloudification API Viewer
+
+Use the online viewers to browse released APIs interactively:
+
+- **SAP Cloud ERP**: https://sap.github.io/abap-atc-cr-cv-s4hc/
+- **SAP Cloud ERP Private**: https://sap.github.io/abap-atc-cr-cv-s4hc/?version=objectReleaseInfo_PCELatest.json
+- **Classic API Clean Core Model**: https://sap.github.io/abap-atc-cr-cv-s4hc/?version=objectClassifications_SAP.json

@@ -3,10 +3,23 @@
   "routes": [
     {"match": ["read_source", "search", "syntax_check", "where_used", "code_search"], "capability": "sap.adt.source.read", "profile": "sap-abap-developer", "fallback_group": "adt"},
     {"match": ["SPRO", "SM30", "SU01", "PFCG", "MM01", "VA01", "FB01"], "capability": "sap.gui.transaction.execute", "profile": "sap-basis-consultant", "fallback_group": "sap-gui"},
-    {"match": ["cpi", "iflow", "integration flow", "mpl"], "capability": "sap.cpi.artifact.read", "profile": "sap-cpi-developer", "fallback_group": "cpi"},
+    {"match": ["undeploy cpi", "undeploy iflow", "desimplantar iflow"], "capability": "sap.cpi.artifact.undeploy", "profile": "sap-cpi-developer", "fallback_group": "cpi"},
+    {"match": ["cpi sync", "sync iflow"], "capability": "sap.cpi.sync.execute", "profile": "sap-cpi-developer", "fallback_group": "cpi"},
+    {"match": ["generate iflow", "gerar iflow"], "capability": "sap.cpi.iflow.generate", "profile": "sap-cpi-developer", "fallback_group": "cpi"},
+    {"match": ["plot iflow", "iflow diagram"], "capability": "sap.cpi.diagram.generate", "profile": "sap-cpi-developer", "fallback_group": "cpi"},
+    {"match": ["cpilint", "cpi quality", "iflow quality"], "capability": "sap.cpi.quality.check", "profile": "sap-cpi-developer", "fallback_group": "cpi"},
+    {"match": ["steampipe cpi", "cpi sql"], "capability": "sap.cpi.query.read", "profile": "sap-cpi-developer", "fallback_group": "cpi"},
+    {"match": ["mapping test", "test cpi mapping"], "capability": "sap.cpi.mapping.test", "profile": "sap-cpi-developer", "fallback_group": "cpi"},
+    {"match": ["runtime artifact", "cpi runtime"], "capability": "sap.cpi.runtime.read", "profile": "sap-cpi-developer", "fallback_group": "cpi"},
+    {"match": ["message details", "mpl details"], "capability": "sap.cpi.message.detail.read", "profile": "sap-cpi-developer", "fallback_group": "cpi"},
+    {"match": ["mpl", "message processing log"], "capability": "sap.cpi.message.read", "profile": "sap-cpi-developer", "fallback_group": "cpi"},
+    {"match": ["cpi", "iflow", "integration flow"], "capability": "sap.cpi.artifact.read", "profile": "sap-cpi-developer", "fallback_group": "cpi"},
     {"match": ["apim", "api management", "api proxy", "policy"], "capability": "sap.apim.proxy.read", "profile": "sap-api-management-consultant", "fallback_group": "apim"},
     {"match": ["fiori"], "capability": "sap.fiori.app.generate", "profile": "sap-fiori-developer", "fallback_group": "fiori"},
     {"match": ["ui5", "sapui5", "openui5"], "capability": "sap.ui5.project.validate", "profile": "sap-ui5-developer", "fallback_group": "ui5"},
     {"match": ["cap", "cds"], "capability": "sap.cap.model.search", "profile": "sap-cap-developer", "fallback_group": "cap"}
+    ,{"match": ["btp", "subaccount", "entitlement", "role collection", "environment instance"], "capability": "sap.btp.account.read", "profile": "sap-btp-devops-engineer", "fallback_group": "btp"}
+    ,{"match": ["successfactors", "employee central", "sfapi", "employee data"], "capability": "sap.successfactors.data.read", "profile": "sap-hcm-consultant", "fallback_group": "successfactors"}
+    ,{"match": ["basis", "kernel", "saprouter", "housekeeping", "health triage"], "capability": "sap.documentation.search", "profile": "sap-basis-consultant", "fallback_group": "basis"}
   ]
 }

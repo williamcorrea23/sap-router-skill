@@ -1,4 +1,4 @@
-# SAP Router Orchestrator v4.5.0
+# SAP Router Orchestrator v6.0.0
 
 > **Build SAP applications from your IDE. No SAP GUI required.**
 >
@@ -7,10 +7,10 @@
 > action: ADT direct, SAP GUI fallback, SOAP RFC, or ZROUTER batch. Writes are
 > gated behind an explicit `--functional` flag, so no BAPI fires by accident.
 >
-> **94 skills | 8 active MCPs (+41 planned) | 40 CLIs | 8-stage pipeline | v4.5.0**
+> **162 skills | 8 active MCPs + fail-closed candidates | 40 CLIs | 8-stage pipeline | v6.0.0**
 
-> **Status, honestly.** 8 of the 49 declared MCP servers launch from a clean clone;
-> the other 41 sit under `plannedServers` in `.mcp.json` because their entrypoint is
+> **Status, honestly.** 8 MCP servers launch from a clean clone;
+> the remaining reviewed candidates sit under `plannedServers` in `.mcp.json` because their entrypoint is
 > not installed or they were never promoted out of `.agents/registries/mcp-candidates.json`.
 > `npm run hc` now reports that split instead of counting an unprobed server as ready.
 > Self-learning records routing telemetry only when you invoke `npm run learn:*` by
@@ -105,7 +105,7 @@ python scripts/self_learn.py persist   # Preserve learned context
 ### Post-Install — Healthcheck + .env Setup
 
 ```bash
-# Run healthcheck — probes the 8 active MCPs, flags the 41 planned, verifies .env
+# Run healthcheck — probes active MCPs, flags planned candidates, verifies .env
 npm run hc
 
 # If .env missing, generate interactive prompt
@@ -124,7 +124,7 @@ cp .env.template .env
 |---|---|---|
 | **Install** | `git clone ... && python scripts/healthcheck.py` | Clone + verify everything works |
 | **Update** | `git pull && npm install && npm run hc` | Pull latest + refresh deps + healthcheck |
-| **Health** | `npm run hc` | Probes 8 active MCPs + flags 41 planned + .env completeness |
+| **Health** | `npm run hc` | Probes active MCPs + flags planned candidates + .env completeness |
 | **Health** | `npm run hc:prompt` | Interactive setup wizard for missing vars |
 | **Route** | `npm run router -- --action MM_CREATE_MATERIAL` | Route action: ADT → GUI → RFC |
 | **Route** | `npm run router:gui -- --action SPRO_CONFIG` | Force SAP GUI fallback |
@@ -146,7 +146,7 @@ cp .env.template .env
 
 ---
 
-## Complete Skill Catalog (94 skills)
+## Complete Skill Catalog (162 skills)
 
 ### Skill Categories
 
@@ -164,7 +164,7 @@ cp .env.template .env
 
 ---
 
-## MCP Server Reference (8 active, 41 planned)
+## MCP Server Reference (8 active, fail-closed planned candidates)
 
 ### MCP Details
 
@@ -266,7 +266,7 @@ sap-router-skill/
 ├── .abaplint.json               ← 60+ ABAP lint rules
 ├── package.json                 ← 63 npm scripts
 │
-├── .claude/skills/              ← 94 skills (generated from .agents/skills)
+├── .claude/skills/              ← 162 skills (generated from .agents/skills)
 │   ├── karpathy-guidelines/     ← v4.0: Think→Simplify→Surgical→Verify
 │   ├── sap-gui-scripting/       ← SAP GUI automation + BDC + ALV
 │   ├── sap-gui-web-enrich/      ← Web-search fill missing nav data
