@@ -66,14 +66,17 @@ Design iFlows following the standard pattern:
 Sender (HTTPS/SFTP/IDoc) → Content Modifier → Groovy Script → Request-Reply → Receiver
 ```
 
-Deploy and monitor via MCP:
+Deploy and monitor through the canonical reviewed MCP:
 
 ```bash
-# List deployed iFlows: call MCP tool mcp__mcp-integration-suite__get-all-iflows
-# Deploy new iFlow: call MCP tool mcp__mcp-integration-suite__deploy-iflow
-# Check failed messages: call MCP tool mcp__mcp-integration-suite__get-messages
-# Get runtime stats: call MCP tool mcp__sap-cpi-mcp__cpi_artifacts with runtime=true
+# Design-time content: cpi_packages -> cpi_artifacts
+# Runtime: cpi_runtime_artifacts
+# Failed messages: cpi_logs -> cpi_message_details
+# Mutations: cpi_deploy_plan -> human approval -> cpi_deploy_commit
 ```
+
+Use `sap-cpi-mcp` first. Fall back to `integration-suite-ui-mcp` only when the
+background API path is blocked. Community CPI MCPs remain disabled until promoted.
 
 ## Step 3 — Set Up API Management
 
@@ -150,7 +153,7 @@ Supported connectors: Salesforce, ServiceNow, Workday, SharePoint, Box, Slack, a
 ## Verification
 
 1. **Integration Suite enabled**: BTP Cockpit → Services → Instances shows Integration Suite in "Started" state
-2. **CPI accessible**: Call Integration Suite MCP `get-all-iflows` or Hermes MCP `cpi_mcp` — returns flow list without error
+2. **CPI accessible**: Call `cpi_test_connection`, then `cpi_packages` with a bounded limit
 3. **API proxy works**: Send request to proxy endpoint, verify rate limiting and auth policies fire
 4. **Trading partner agreement active**: Send test EDI message, verify it routes to correct receiver
 5. **Migration completeness**: All PI/PO interfaces have CPI equivalent deployed and tested end-to-end

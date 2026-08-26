@@ -1,115 +1,144 @@
 {
-  "version": "6.0.0",
+  "version": "6.1.0",
   "default_policy": "fail_closed",
   "capabilities": {
     "sap.abap.source.read": {
       "primary": "arc-1",
-      "fallbacks": ["abap-mcp", "aibap", "mcp-abap-adt"],
+      "fallbacks": ["aibap"],
       "mutation": false
     },
     "sap.abap.source.modify": {
       "primary": "arc-1",
-      "fallbacks": ["abap-mcp", "aibap", "mcp-abap-adt"],
+      "fallbacks": ["aibap"],
       "mutation": true,
       "requires_approval": true
     },
     "sap.gui.transaction.run": {
       "primary": "mcp-sap-gui",
-      "fallbacks": ["mcp-sap-gui-kts", "sapgui-mcp-go", "sapient-mcp-py", "sap-gui-library-mcp"],
+      "fallbacks": [],
       "mutation": true,
       "requires_approval": true
     },
     "sap.cpi.package.read": {
-      "primary": "ci-mcp-server",
-      "fallbacks": ["sap-cpi", "mcp-integration-suite", "integration-suite-ui-mcp"],
+      "primary": "sap-cpi-mcp",
+      "fallbacks": ["integration-suite-ui-mcp"],
       "mutation": false
     },
     "sap.cpi.artifact.read": {
-      "primary": "ci-mcp-server",
-      "fallbacks": ["sap-cpi", "mcp-integration-suite", "integration-suite-ui-mcp"],
+      "primary": "sap-cpi-mcp",
+      "fallbacks": ["integration-suite-ui-mcp"],
+      "mutation": false
+    },
+    "sap.cpi.runtime.read": {
+      "primary": "sap-cpi-mcp",
+      "fallbacks": ["integration-suite-ui-mcp"],
+      "mutation": false
+    },
+    "sap.cpi.message.read": {
+      "primary": "sap-cpi-mcp",
+      "fallbacks": ["integration-suite-ui-mcp"],
+      "mutation": false
+    },
+    "sap.cpi.message.detail.read": {
+      "primary": "sap-cpi-mcp",
+      "fallbacks": ["integration-suite-ui-mcp"],
+      "mutation": false
+    },
+    "sap.cpi.trace.read": {
+      "primary": "sap-cpi-mcp",
+      "fallbacks": ["integration-suite-ui-mcp"],
+      "mutation": false
+    },
+    "sap.cpi.quality.check": {
+      "primary": "sap-cpi-mcp",
+      "fallbacks": [],
+      "mutation": false
+    },
+    "sap.cpi.query.read": {
+      "primary": "sap-cpi-mcp",
+      "fallbacks": [],
+      "mutation": false
+    },
+    "sap.cpi.mapping.test": {
+      "primary": "sap-cpi-mcp",
+      "fallbacks": [],
       "mutation": false
     },
     "sap.cpi.artifact.deploy": {
-      "primary": "sap-cpi",
-      "fallbacks": ["mcp-integration-suite", "integration-suite-ui-mcp"],
+      "primary": "sap-cpi-mcp",
+      "fallbacks": ["integration-suite-ui-mcp"],
       "mutation": true,
       "requires_approval": true,
       "plan_then_commit": true
     },
-    "sap.cpi.message.read": {
-      "primary": "ci-mcp-server",
-      "fallbacks": ["sap-cpi", "mcp-integration-suite", "integration-suite-ui-mcp"],
-      "mutation": false
+    "sap.cpi.artifact.undeploy": {
+      "primary": "sap-cpi-mcp",
+      "fallbacks": ["integration-suite-ui-mcp"],
+      "mutation": true,
+      "requires_approval": true,
+      "plan_then_commit": true
     },
-    "sap.cpi.trace.read": {
-      "primary": "sap-cpi",
-      "fallbacks": ["mcp-integration-suite", "integration-suite-ui-mcp"],
-      "mutation": false
+    "sap.cpi.iflow.generate": {
+      "primary": "sap-cpi-mcp",
+      "fallbacks": [],
+      "mutation": true,
+      "requires_approval": true,
+      "plan_then_commit": true
+    },
+    "sap.cpi.diagram.generate": {
+      "primary": "sap-cpi-mcp",
+      "fallbacks": [],
+      "mutation": true,
+      "requires_approval": true,
+      "plan_then_commit": true
+    },
+    "sap.cpi.sync.execute": {
+      "primary": "sap-cpi-mcp",
+      "fallbacks": [],
+      "mutation": true,
+      "requires_approval": true,
+      "plan_then_commit": true
     },
     "sap.apim.proxy.read": {
-      "primary": "sap-api-management",
-      "fallbacks": ["mcp-integration-suite", "apim-ui-mcp"],
+      "primary": "sap-apim-mcp",
+      "fallbacks": ["apim-ui-mcp"],
       "mutation": false
     },
     "sap.apim.proxy.modify": {
-      "primary": "sap-api-management",
+      "primary": "sap-apim-mcp",
       "fallbacks": ["apim-ui-mcp"],
       "mutation": true,
       "requires_approval": true,
       "plan_then_commit": true
     },
     "sap.apim.proxy.deploy": {
-      "primary": "sap-api-management",
+      "primary": "sap-apim-mcp",
       "fallbacks": ["apim-ui-mcp"],
       "mutation": true,
       "requires_approval": true,
       "plan_then_commit": true
     },
     "sap.fiori.app.generate": {
-      "primary": "plugin:sap-fiori-mcp-server:fiori-mcp",
-      "fallbacks": ["plugin:ui5:ui5-mcp-server"],
+      "primary": "fiori-mcp",
+      "fallbacks": ["ui5-mcp"],
       "mutation": true,
       "requires_approval": true,
       "plan_then_commit": true
     },
     "sap.ui5.project.validate": {
-      "primary": "plugin:ui5:ui5-mcp-server",
+      "primary": "ui5-mcp",
       "fallbacks": [],
       "mutation": false
     },
     "sap.cap.model.search": {
-      "primary": "plugin:cds-mcp:cds-mcp",
-      "fallbacks": ["cap-mcp-plugin"],
+      "primary": "cap-mcp",
+      "fallbacks": [],
       "mutation": false
     },
     "sap.cap.project.build": {
-      "primary": "plugin:cds-mcp:cds-mcp",
-      "fallbacks": ["cap-mcp-plugin"],
-      "mutation": false
-    },
-    "sap.btp.account.read": {
-      "primary": "lemaiwo-btp-mcp-server",
+      "primary": "cap-mcp",
       "fallbacks": [],
       "mutation": false
-    },
-    "sap.btp.account.modify": {
-      "primary": "lemaiwo-btp-mcp-server",
-      "fallbacks": [],
-      "mutation": true,
-      "requires_approval": true,
-      "plan_then_commit": true
-    },
-    "sap.successfactors.data.read": {
-      "primary": "aiadiguru2025-sf-mcp",
-      "fallbacks": ["sf-mcp"],
-      "mutation": false
-    },
-    "sap.successfactors.data.modify": {
-      "primary": "aiadiguru2025-sf-mcp",
-      "fallbacks": ["sf-mcp"],
-      "mutation": true,
-      "requires_approval": true,
-      "plan_then_commit": true
     },
     "sap.smartform.analyze": {
       "primary": "smartform-ai-generator",
@@ -128,7 +157,7 @@
     },
     "sap.smartform.deploy": {
       "primary": "smartform-ai-generator",
-      "fallbacks": ["mcp-abap-adt", "arc-1"],
+      "fallbacks": ["arc-1"],
       "mutation": true,
       "requires_approval": true,
       "plan_then_commit": true
@@ -142,7 +171,22 @@
   "profiles": {
     "sap-cpi-developer": {
       "skills": ["cpi-iflow-development", "btp-integration-suite"],
-      "capabilities": ["sap.cpi.package.read", "sap.cpi.artifact.read", "sap.cpi.artifact.deploy", "sap.cpi.message.read", "sap.cpi.trace.read"]
+      "capabilities": [
+        "sap.cpi.package.read",
+        "sap.cpi.artifact.read",
+        "sap.cpi.runtime.read",
+        "sap.cpi.message.read",
+        "sap.cpi.message.detail.read",
+        "sap.cpi.trace.read",
+        "sap.cpi.quality.check",
+        "sap.cpi.query.read",
+        "sap.cpi.mapping.test",
+        "sap.cpi.artifact.deploy",
+        "sap.cpi.artifact.undeploy",
+        "sap.cpi.iflow.generate",
+        "sap.cpi.diagram.generate",
+        "sap.cpi.sync.execute"
+      ]
     },
     "sap-apim-architect": {
       "skills": ["sap-api-policy", "sap-api-style"],

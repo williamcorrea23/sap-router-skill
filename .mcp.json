@@ -68,9 +68,15 @@
         "CPI_OAUTH_CLIENT_ID": "${CPI_OAUTH_CLIENT_ID}",
         "CPI_CLIENT_ID": "${CPI_CLIENT_ID}",
         "CPI_OAUTH_CLIENT_SECRET": "${CPI_OAUTH_CLIENT_SECRET}",
-        "CPI_CLIENT_SECRET": "${CPI_CLIENT_SECRET}"
+        "CPI_CLIENT_SECRET": "${CPI_CLIENT_SECRET}",
+        "CPI_TOOL_WORKSPACE": "${CPI_TOOL_WORKSPACE}",
+        "CPILINT_CMD": "${CPILINT_CMD}",
+        "CPI_SYNC_CMD": "${CPI_SYNC_CMD}",
+        "CPI_STEAMPIPE_CMD": "${CPI_STEAMPIPE_CMD}",
+        "CPI_IFLOW_PLOTTER_CMD": "${CPI_IFLOW_PLOTTER_CMD}",
+        "CPI_MAPPING_TEST_CMD": "${CPI_MAPPING_TEST_CMD}"
       },
-      "description": "Canonical local SAP CPI MCP stdio bridge. Exposes read tools plus gated deploy plan/commit with PUT and POST override fallback."
+      "description": "Canonical local SAP CPI MCP stdio bridge. Content/runtime/MPL/quality reads plus fail-closed plan/approve/commit workflows and optional configured adapters."
     },
     "sap-apim-mcp": {
       "type": "stdio",
@@ -754,6 +760,26 @@
     "cap-mcp-plugin": {
       "type": "plugin",
       "description": "SAP CAP MCP plugin fallback for CAP model search/build guidance.",
+      "_status": "planned",
+      "_reason": "not promoted from mcp-candidates.json"
+    },
+    "vadimklimov-cpi-mcp-server": {
+      "type": "stdio",
+      "command": "cpi-mcp-server",
+      "args": [],
+      "env": {
+        "CPI_BASE_URL": "${CPI_BASE_URL}",
+        "CPI_OAUTH_TOKEN_URL": "${CPI_OAUTH_TOKEN_URL}",
+        "CPI_OAUTH_CLIENT_ID": "${CPI_OAUTH_CLIENT_ID}",
+        "CPI_OAUTH_CLIENT_SECRET": "${CPI_OAUTH_CLIENT_SECRET}"
+      },
+      "description": "vadimklimov/cpi-mcp-server read-oriented Go MCP. Reviewed as a reference; no binary is installed or launched.",
+      "_status": "planned",
+      "_reason": "not promoted from mcp-candidates.json"
+    },
+    "karthickshiva-sap-cpi-mcp-server": {
+      "type": "remote_tenant_artifact",
+      "description": "Native CPI/OpenAPI MCP artifact candidate. Requires tenant deployment and a separate security review.",
       "_status": "planned",
       "_reason": "not promoted from mcp-candidates.json"
     }

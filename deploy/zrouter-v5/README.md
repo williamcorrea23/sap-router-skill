@@ -14,6 +14,14 @@ nada. Depois desmarque e rode de novo.
 Cria: `ZROUTER_CFG`, `ZROUTER_LOG`, `ZROUTER_PEND`, a classe `ZCL_ZROUTER_GW`,
 e semeia o registry.
 
+O instalador referencia as tabelas só dinamicamente, para conseguir ativar num
+sistema onde elas ainda não existem — que é o único sistema onde ele serve para
+alguma coisa. Um efeito colateral disso: o tipo é criado e ativado na mesma
+execução, e o buffer de nametab da sessão pode ainda não enxergá-lo na hora de
+semear. Se acontecer, o log diz e você **roda uma segunda vez marcando apenas
+"Registry inicial"**. Ele não passa em silêncio: registry vazio deixaria o
+serviço no ar com `TBL.READ` sem alcançar tabela nenhuma.
+
 **2. Objeto de autorização** — SU21, objeto `ZROUTER`, classe a seu critério:
 
 | Campo | Tipo | Valores |

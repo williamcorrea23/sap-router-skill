@@ -74,20 +74,27 @@ def resolve_servers_for_capability(capability: str) -> list[dict[str, Any]]:
     ]
     if servers:
         return sorted(servers, key=lambda item: item.get("routing", {}).get("priority", 999))
-    # Preserve fail-closed behavior while exposing reviewed, not-yet-promoted
-    # candidates to routing and diagnostics. They are never executable here.
-    specs = load_mcp_capability_specs().get(capability, {})
-    candidate_ids = [specs.get("primary")] + list(specs.get("fallbacks", []))
-    return [
-        {"id": server_id, "status": "candidate", "capabilities": [capability],
-         "routing": {"priority": index}, "candidate": True}
-        for index, server_id in enumerate(candidate_ids)
-        if server_id and not server_id.startswith("plugin:")
-    ]
+    # Fail closed. Reviewed candidates remain visible in diagnostics/search but
+    # never become route selections until explicitly promoted into mcps.json.
+    return []
 
 
 def classify_task(task: str) -> dict[str, Any]:
     text = task.lower()
+    if any(token in text for token in ("undeploy", "desimplantar")) and any(token in text for token in ("cpi", "iflow", "integration flow")):
+        route = {"capability": "sap.cpi.artifact.undeploy", "profile": "sap-cpi-developer", "fallback_group": "cpi"}
+        servers = resolve_servers_for_capability(route["capability"])
+        return {
+            "request_id": str(uuid.uuid4()),
+            "intent": task,
+            "capability": route["capability"],
+            "profile": route["profile"],
+            "fallback_group": route["fallback_group"],
+            "candidate_servers": [server["id"] for server in servers],
+            "selected_server": servers[0]["id"] if servers else None,
+            "selection_reason": "destructive verb matched; approval and strong confirmation required",
+            "created_at": now_iso(),
+        }
     if any(token in text for token in ("deploy", "implantar", "publicar")) and any(token in text for token in ("cpi", "iflow", "integration flow")):
         route = {"capability": "sap.cpi.artifact.deploy", "profile": "sap-cpi-developer", "fallback_group": "cpi"}
         servers = resolve_servers_for_capability(route["capability"])
@@ -490,16 +497,22 @@ def validate_catalog() -> dict[str, Any]:
         if unmanaged:
             errors.append(f"MCP config has unmanaged servers: {sorted(unmanaged)}")
         mcp_specs = load_mcp_capability_specs()
+        enabled_servers = {
+            server_id for server_id, server in servers.items()
+            if server.get("status") == "enabled"
+        }
         for capability, spec in mcp_specs.items():
             if capability not in capabilities:
                 errors.append(f"MCP capability {capability}: missing from capabilities.json")
             for server_id in [spec.get("primary")] + list(spec.get("fallbacks", [])):
                 if not server_id or server_id.startswith("plugin:"):
                     continue
-                if server_id not in set(servers) and server_id not in candidate_set:
-                    errors.append(f"MCP capability {capability}: unknown server {server_id}")
-            if spec.get("primary") in candidate_set and spec.get("primary") not in set(servers):
-                warnings.append(f"MCP capability {capability}: primary {spec['primary']} is reviewed but not promoted")
+                if server_id not in enabled_servers:
+                    state = "disabled candidate" if server_id in candidate_set else "unknown or disabled server"
+                    errors.append(f"MCP capability {capability}: {state} {server_id} is not routable")
+            primary = spec.get("primary")
+            if primary in servers and capability not in servers[primary].get("capabilities", []):
+                errors.append(f"MCP capability {capability}: primary {primary} does not advertise the capability")
     return {
         "status": "PASS" if not errors else "FAIL",
         "checked_at": now_iso(),

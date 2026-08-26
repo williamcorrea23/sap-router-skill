@@ -75,6 +75,8 @@
     "cpi:create": "python scripts/cpi_iflow_packager.py create",
     "cpi:validate": "python scripts/cpi_iflow_packager.py validate",
     "cpi:list": "python scripts/cpi_iflow_packager.py list",
+    "cpi:quality": "python scripts/cpi_client.py quality",
+    "cpi:tools-status": "python scripts/cpi_client.py tools-status",
     "validate:all": "python scripts/healthcheck.py --quiet --json && npm run abap:review:ci && python scripts/sap_router.py status",
     "spec:analyze": "python scripts/sap_router.py analyze-spec --spec",
     "spec:pipeline": "python scripts/sap_router.py pipeline --spec",

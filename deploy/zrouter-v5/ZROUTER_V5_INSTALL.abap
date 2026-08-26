@@ -5,10 +5,15 @@
 *&
 *& COMO USAR
 *&   1. SE38 -> criar programa executável ZROUTER_V5_INSTALL -> colar este
-*&      fonte -> ativar. Nenhum objeto precisa existir antes: este programa
-*&      não referencia nada do ZROUTER.
+*&      fonte -> ativar. Nenhum objeto do ZROUTER precisa existir antes: as
+*&      tabelas são referenciadas SÓ dinamicamente, justamente para que este
+*&      programa ative num sistema virgem. Não reintroduza `TYPE zrouter_cfg`
+*&      nem `MODIFY zrouter_cfg` — é dependência de compilação, e o instalador
+*&      deixa de ativar exatamente onde precisa rodar. check_sync.py recusa.
 *&   2. Executar. Marcar o que instalar e rodar primeiro em SIMULAÇÃO.
 *&   3. Rodar de verdade. Ao final, o autoteste diz o que ficou de pé.
+*&      Se o registry não for semeado porque o tipo ainda não está visível
+*&      nesta sessão, rode uma segunda vez só com "Registry inicial".
 *&
 *& O QUE ELE CRIA
 *&   - Tabelas ZROUTER_CFG, ZROUTER_LOG, ZROUTER_PEND
@@ -1250,26 +1255,92 @@ CLASS lcl_seed IMPLEMENTATION.
       RETURN.
     ENDIF.
 
+    " ------------------------------------------------------------------
+    " Tudo daqui para baixo é DINÂMICO, e isso não é preciosismo.
+    "
+    " `DATA ls_cfg TYPE zrouter_cfg` e `MODIFY zrouter_cfg` são dependências
+    " de DDIC resolvidas em tempo de COMPILAÇÃO. Com elas, este programa não
+    " ativa num sistema onde ZROUTER_CFG ainda não existe — que é exatamente
+    " o sistema onde ele precisa rodar. O passo 1 do README (colar em SE38 e
+    " ativar) falhava com "ZROUTER_CFG é desconhecida", e nada era instalado,
+    " nem em simulação.
+    "
+    " Era o mesmo bootstrap circular que este instalador usa como argumento
+    " para não depender do SAPlink. Encontrado por peer-review em 2026-08-04,
+    " e mecanizado em check_sync.py para não voltar.
+    " ------------------------------------------------------------------
+    DATA(lv_tab) = 'ZROUTER_CFG'.
+    DATA lr_row TYPE REF TO data.
+    FIELD-SYMBOLS <ls_row> TYPE any.
+
+    TRY.
+        CREATE DATA lr_row TYPE (lv_tab).
+        ASSIGN lr_row->* TO <ls_row>.
+      CATCH cx_sy_create_data_error.
+        " A tabela foi criada e ativada nesta mesma execução, e o buffer de
+        " nametab da sessão pode ainda não enxergar o tipo. Não é falha de
+        " instalação — é ordem. Mas também não pode passar em silêncio: sem as
+        " linhas TBL.<NOME> o serviço sobe parecendo pronto e TBL.READ não
+        " alcança tabela nenhuma.
+        lcl_log=>fail( 'Registry não semeado: o tipo ZROUTER_CFG ainda não está visível nesta sessão.' ).
+        lcl_log=>warn( 'Rode o instalador uma segunda vez, apenas com "Registry inicial" marcado.' ).
+        RETURN.
+    ENDTRY.
+
+    FIELD-SYMBOLS <lv_fld> TYPE any.
+    DATA lv_ts TYPE timestampl.
+    DATA lv_written TYPE i.
+
     LOOP AT lt_seed INTO ls_s.
-      DATA ls_cfg TYPE zrouter_cfg.
-      CLEAR ls_cfg.
-      ls_cfg-module         = ls_s-module.
-      ls_cfg-action         = ls_s-action.
-      ls_cfg-op_mode        = ls_s-mode.
-      ls_cfg-needs_approval = ls_s-approval.
-      ls_cfg-active         = ls_s-active.
-      ls_cfg-auth_actvt     = COND #( WHEN ls_s-mode = 'W' THEN '02' ELSE '03' ).
-      ls_cfg-timeout_s      = 30.
-      ls_cfg-changed_by     = sy-uname.
-      GET TIME STAMP FIELD ls_cfg-changed_at.
-      MODIFY zrouter_cfg FROM @ls_cfg.
-      IF sy-subrc = 0.
-        lcl_log=>ok( |{ ls_s-module }/{ ls_s-action } gravada| ).
-      ELSE.
-        lcl_log=>fail( |{ ls_s-module }/{ ls_s-action } não gravada| ).
+      CLEAR <ls_row>.
+      DATA(lv_bad_field) = abap_false.
+
+      " Cada ASSIGN é conferido: um nome de campo errado passaria silencioso e
+      " gravaria linha de registry meio preenchida, que é pior que não gravar.
+      DEFINE _set.
+        ASSIGN COMPONENT &1 OF STRUCTURE <ls_row> TO <lv_fld>.
+        IF sy-subrc = 0.
+          <lv_fld> = &2.
+        ELSE.
+          lv_bad_field = abap_true.
+        ENDIF.
+      END-OF-DEFINITION.
+
+      _set 'MODULE'         ls_s-module.
+      _set 'ACTION'         ls_s-action.
+      _set 'OP_MODE'        ls_s-mode.
+      _set 'NEEDS_APPROVAL' ls_s-approval.
+      _set 'ACTIVE'         ls_s-active.
+      _set 'AUTH_ACTVT'     COND char2( WHEN ls_s-mode = 'W' THEN '02' ELSE '03' ).
+      _set 'TIMEOUT_S'      30.
+      _set 'CHANGED_BY'     sy-uname.
+
+      " GET TIME STAMP precisa de alvo tipado; um field-symbol genérico não
+      " serve. Calcula num local e só então move.
+      GET TIME STAMP FIELD lv_ts.
+      _set 'CHANGED_AT'     lv_ts.
+
+      IF lv_bad_field = abap_true.
+        lcl_log=>fail( |{ ls_s-module }/{ ls_s-action }: campo ausente em { lv_tab }| ).
+        CONTINUE.
       ENDIF.
+
+      TRY.
+          MODIFY (lv_tab) FROM @<ls_row>.
+          IF sy-subrc = 0.
+            lv_written = lv_written + 1.
+            lcl_log=>ok( |{ ls_s-module }/{ ls_s-action } gravada| ).
+          ELSE.
+            lcl_log=>fail( |{ ls_s-module }/{ ls_s-action } não gravada| ).
+          ENDIF.
+        CATCH cx_sy_dynamic_osql_semantics cx_sy_open_sql_db INTO DATA(lx_sql).
+          lcl_log=>fail( |{ ls_s-module }/{ ls_s-action }: { lx_sql->get_text( ) }| ).
+      ENDTRY.
     ENDLOOP.
-    COMMIT WORK.
+
+    IF lv_written > 0.
+      COMMIT WORK.
+    ENDIF.
   ENDMETHOD.
 ENDCLASS.
 

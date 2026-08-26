@@ -29,9 +29,19 @@ Full development lifecycle for SAP Cloud Integration (CPI) iFlows — from sourc
 
 - SAP BTP subaccount with Integration Suite enabled
 - Service Key for Process Integration Runtime (OAuth2 client_credentials)
-- Environment vars set: `CPI_TENANT_URL`, `CPI_TOKEN_URL`, `CPI_CLIENT_ID`, `CPI_CLIENT_SECRET`
+- Environment vars set: `CPI_BASE_URL`, `CPI_OAUTH_TOKEN_URL`, `CPI_OAUTH_CLIENT_ID`, `CPI_OAUTH_CLIENT_SECRET`
 - Groovy 2.4+ syntax knowledge (CPI uses Nashorn engine, ECMAScript 5.1 dialect)
 - Access to CPI Web UI for monitoring and trace
+
+## Canonical routing
+
+Route CPI API operations to the reviewed local `sap-cpi-mcp` first. Use
+`integration-suite-ui-mcp` only when API/background access is blocked and a logged-in
+browser session is available. Never route to disabled community candidates.
+
+Read [CPI MCP tool contracts](references/cpi-mcp-tool-contracts.md) before invoking
+tenant or local tooling operations. Consult [CPI tooling catalog](references/cpi-tooling-catalog.md)
+when selecting an optional external adapter.
 
 ## iFlow ZIP Structure
 
@@ -148,8 +158,16 @@ Validate the packaged iFlow ZIP (structure, MANIFEST.MF, required files):
 npm run cpi:validate -- --input <iflow>.zip
 ```
 
-There is no automated Groovy linter in this repo — review the script by hand
-against these rules before packaging:
+Run the canonical read-only quality workflow:
+
+```bash
+python scripts/cpi_client.py quality --input <iflow>.zip --engine auto
+# MCP equivalent: cpi_quality_check
+```
+
+The built-in structural validator always runs. `cpilint` runs only when
+`CPILINT_CMD` resolves to an installed executable; no download is attempted.
+Also review Groovy against these rules:
 
 - hardcoded passwords → **error**
 - no exception subprocess → **warning**
@@ -158,12 +176,17 @@ against these rules before packaging:
 
 ## Step 6 — Deploy to CPI Tenant
 
-```bash
-# List packages: call MCP tool mcp__mcp-integration-suite__packages
-# Deploy iFlow: call MCP tool mcp__mcp-integration-suite__deploy-iflow
-# Check messages: call MCP tool mcp__mcp-integration-suite__get-messages
-# Check runtime: call MCP tool mcp__sap-cpi-mcp__cpi_logs (message processing logs)
+Use canonical MCP tools:
+
+```text
+cpi_packages -> cpi_artifacts -> cpi_runtime_artifacts
+cpi_logs -> cpi_message_details
+cpi_deploy_plan -> independent human approval -> cpi_deploy_commit
 ```
+
+Treat `cpi_deploy_plan` as read-only planning. Execute `cpi_deploy_commit` only with
+the approved `action_id`, `plan_hash`, `argument_hash`, and `precondition_hash`.
+Apply the same sequence to undeploy, iFlow generation, plotting, and Git sync.
 
 ## Integration Patterns
 
@@ -191,9 +214,9 @@ against these rules before packaging:
 
 ## Verification
 
-1. **Lint passes**: Call MCP tool `cpi_lint` (Hermes MCP) on all scripts and flow.xml — zero errors
+1. **Quality passes**: Call `cpi_quality_check`; structural validation passes and configured cpilint reports no errors
 2. **ZIP validates**: Packager `validate` command exits 0
-3. **Deploy succeeds**: Call Integration Suite MCP `get-messages` or Hermes MCP `cpi_mcp` — artifact shows "Started"
+3. **Deploy succeeds**: Use `cpi_deploy_plan`, obtain independent approval, then call `cpi_deploy_commit`; `cpi_runtime_artifacts` shows "Started"
 4. **Test message flows**: Send test payload via HTTPS endpoint, check CPI Web UI → Monitor → Messages for successful processing
 5. **Trace enabled**: CPI Web UI → Monitor → Trace shows input/output payloads at each step
 6. **Error subprocess works**: Inject invalid payload, verify exception subprocess triggers and MessageLog shows "FAILED" status

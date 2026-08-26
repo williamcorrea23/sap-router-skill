@@ -32,7 +32,9 @@
         "sap.adt.source.read",
         "sap.adt.source.write",
         "sap.adt.object.activate",
-        "sap.adt.search.execute"
+        "sap.adt.search.execute",
+        "sap.abap.source.read",
+        "sap.abap.source.modify"
       ],
       "safety": {
         "default_mode": "read_only",
@@ -76,7 +78,9 @@
         "sap.adt.source.read",
         "sap.adt.source.write",
         "sap.adt.object.activate",
-        "sap.adt.search.execute"
+        "sap.adt.search.execute",
+        "sap.abap.source.read",
+        "sap.abap.source.modify"
       ],
       "safety": {
         "default_mode": "read_only",
@@ -123,6 +127,7 @@
         "sap.gui.session.attach",
         "sap.gui.screen.read",
         "sap.gui.transaction.execute",
+        "sap.gui.transaction.run",
         "sap.gui.control.modify"
       ],
       "safety": {
@@ -148,7 +153,7 @@
       "source": {
         "repository": "local-wrapper-from-official-api",
         "license": "project",
-        "version": "0.1.0"
+        "version": "0.3.0"
       },
       "runtime": {
         "command": "python",
@@ -176,9 +181,18 @@
       "capabilities": [
         "sap.cpi.package.read",
         "sap.cpi.artifact.read",
+        "sap.cpi.runtime.read",
         "sap.cpi.message.read",
+        "sap.cpi.message.detail.read",
         "sap.cpi.trace.read",
-        "sap.cpi.artifact.deploy"
+        "sap.cpi.quality.check",
+        "sap.cpi.query.read",
+        "sap.cpi.mapping.test",
+        "sap.cpi.artifact.deploy",
+        "sap.cpi.artifact.undeploy",
+        "sap.cpi.iflow.generate",
+        "sap.cpi.diagram.generate",
+        "sap.cpi.sync.execute"
       ],
       "safety": {
         "default_mode": "read_only",

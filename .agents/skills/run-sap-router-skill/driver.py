@@ -383,6 +383,8 @@ def main():
     check("cpi_client deploy --help", r.returncode == 0 and "plan" in r.stdout and "commit" in r.stdout, r.stderr)
 
     deploy_work = tempfile.mkdtemp(prefix="cpi_deploy_smoke_")
+    previous_cpi_workspace = os.environ.get("CPI_TOOL_WORKSPACE")
+    os.environ["CPI_TOOL_WORKSPACE"] = deploy_work
     try:
         smoke_zip = os.path.join(deploy_work, "smoke-iflow.zip")
         r = run([os.path.join(SCRIPTS, "cpi_iflow_packager.py"), "template", "--name", "smoke-iflow", "--output", smoke_zip])
@@ -417,6 +419,10 @@ def main():
             blocked_text = r_commit.stderr + r_commit.stdout
             check("apim rejected commit blocked", r_commit.returncode != 0 and ("approval-not-approved" in blocked_text or "preconditions-not-met" in blocked_text), r_commit.stderr or r_commit.stdout)
     finally:
+        if previous_cpi_workspace is None:
+            os.environ.pop("CPI_TOOL_WORKSPACE", None)
+        else:
+            os.environ["CPI_TOOL_WORKSPACE"] = previous_cpi_workspace
         shutil.rmtree(deploy_work, ignore_errors=True)
 
     mcp_payload = "\n".join([
@@ -425,8 +431,17 @@ def main():
         json.dumps({"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}}),
         "",
     ])
-    r = run_raw([PY, "scripts/sap_integration_mcp.py", "--product", "cpi"], mcp_payload)
-    check("cpi MCP stdio tools/list", r.returncode == 0 and "cpi_deploy_plan" in r.stdout and "cpi_deploy_commit" in r.stdout, r.stderr or r.stdout)
+    cpi_mcp_payload = mcp_payload.rstrip() + "\n" + json.dumps({"jsonrpc": "2.0", "id": 3, "method": "tools/call", "params": {"name": "cpi_external_tools_status", "arguments": {}}}) + "\n"
+    r = run_raw([PY, "scripts/sap_integration_mcp.py", "--product", "cpi"], cpi_mcp_payload)
+    check(
+        "cpi MCP stdio contracts",
+        r.returncode == 0
+        and "cpi_deploy_plan" in r.stdout
+        and "cpi_undeploy_commit" in r.stdout
+        and '"annotations"' in r.stdout
+        and '"structuredContent"' in r.stdout,
+        r.stderr or r.stdout,
+    )
 
     r = run_raw([PY, "scripts/sap_integration_mcp.py", "--product", "apim"], mcp_payload)
     check("apim MCP stdio tools/list", r.returncode == 0 and "apim_deploy_plan" in r.stdout and "apim_deploy_execute" in r.stdout, r.stderr or r.stdout)
