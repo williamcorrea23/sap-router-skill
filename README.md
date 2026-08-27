@@ -1,4 +1,4 @@
-# SAP Router Orchestrator v6.0.0
+# SAP Harness v7.1.0
 
 > **Build SAP applications from your IDE. No SAP GUI required.**
 >
@@ -7,14 +7,22 @@
 > action: ADT direct, SAP GUI fallback, SOAP RFC, or ZROUTER batch. Writes are
 > gated behind an explicit `--functional` flag, so no BAPI fires by accident.
 >
-> **162 skills | 11 active MCPs + 63 fail-closed candidates | 40 CLIs | 8-stage pipeline | v6.0.0**
+> **164 skills | 11 active MCPs + 63 fail-closed candidates | 44 CLIs | 8-stage pipeline | ZROUTER Remote FS**
 
-> **Status, honestly.** 11 MCP servers launch from a clean clone;
-> the remaining reviewed candidates sit under `plannedServers` in `.mcp.json` because their entrypoint is
-> not installed or they were never promoted out of `.agents/registries/mcp-candidates.json`.
-> `npm run hc` now reports that split instead of counting an unprobed server as ready.
+> **Status, honestly.** 11 MCP servers launch from a clean clone. The other 63
+> reviewed entries sit under `plannedServers` in `.mcp.json` because their entrypoint is
+> not installed, or their upstream source was never vendored — `bundled/mcps/<id>/` holds a
+> pointer README, not code. A server in `plannedServers` **never routes**: capability
+> resolution is fail-closed, and `npm run hc` reports that split instead of counting an
+> unprobed server as ready.
+>
+> **The harness plans; it does not dispatch.** `sap_harness run` resolves a task to a
+> capability, an agent profile and a launchable server, and registers mutating work with
+> the approval broker. There is no agent dispatcher wired in, so it prints the plan and
+> says so — `--execute` is refused rather than reporting work it did not do.
+>
 > Self-learning records routing telemetry only when you invoke `npm run learn:*` by
-> hand — nothing writes it automatically yet — and the fallback tiers return a
+> hand — nothing writes it automatically — and the fallback tiers return a
 > `tool_call` for the calling agent to execute rather than executing it themselves.
 
 ---
@@ -53,9 +61,9 @@ flowchart TD
     REQ["User Request"] --> Q1{"CAVEMAN scope?<br/>1-2 files, find/fix/review"}
     Q1 -->|"YES"| CV["cavecrew-investigator<br/>cavecrew-builder<br/>cavecrew-reviewer"]
     Q1 -->|"NO"| Q2{"ADT operation?<br/>read, write, search, activate"}
-    Q2 -->|"YES"| ADT["arc-1 (primary)<br/>aibap (secondary)<br/>mcp-abap-adt (tertiary)"]
+    Q2 -->|"YES"| ADT["arc-1 (primary)<br/>aibap (secondary)"]
     Q2 -->|"NO"| Q3{"GUI required?<br/>SPRO,SM30,SU01,MM01,VA01..."}
-    Q3 -->|"YES"| GUI["IMMEDIATE GUI fallback<br/>mcp-sap-gui → kts → Go<br/>Missing data? Web-enrich"]
+    Q3 -->|"YES"| GUI["IMMEDIATE GUI fallback<br/>mcp-sap-gui<br/>Missing data? Web-enrich"]
     Q3 -->|"NO"| Q4{"BAPI batch?<br/>create PO, post FI..."}
     Q4 -->|"YES"| RFC["ZROUTER RFC<br/>9 module handlers"]
     Q4 -->|"NO"| Q5{"Spec pipeline?<br/>implement specification"}
@@ -118,11 +126,116 @@ cp .env.template .env
 
 ---
 
+## The Harness
+
+`scripts/sap_harness.py` is the capability-routing, evaluation and distribution front end.
+
+| Subcommand | What it does |
+|---|---|
+| `run` | Resolves a task to a capability, an agent profile and a launchable server. Registers mutating work with the approval broker. **Prints the plan; does not execute it** — `--execute` is refused with exit 2 |
+| `eval` | Runs the evaluation scenarios. `--scenario` (repeatable), `--live`, `--json` |
+| `benchmark` | Scenario metrics plus a safety gate read from the catalog validator |
+| `mcp` | `list` / `probe` / `search` over the capability catalog |
+| `agents` | Lists subagents and the real provider readiness of each capability they declare |
+| `share` | Validates and packages a skill (`.zip` + Slack card) |
+| `test-remote-fs` | Verifies the TypeScript↔ABAP contract of the ZROUTER Remote FS |
+
+```bash
+npm run harness:eval                 # 5 scenarios, 33 assertions, offline hermetic
+npm run harness:benchmark            # metrics + catalog safety gate
+npm run harness:mcp -- list          # which capability resolves to which server
+npm run harness:agents               # subagents and provider readiness
+npm run harness:share -- --skill sap-cpi-flowpilot
+npm run harness:remote-fs:mock       # TS↔ABAP contract, never contacts SAP
+```
+
+### Evaluation suite
+
+Offline is the default and hermetic: no network, no SAP system, no MCP subprocess.
+`--live` adds the checks that need a real backend, and every result reports which mode
+produced it.
+
+Each scenario exercises code that ships in this repository. Where a property must hold,
+the scenario also feeds a deliberately broken input and requires the check to reject it —
+a scenario that cannot fail measures nothing.
+
+| Scenario | Assertions | What it exercises |
+|---|---|---|
+| `catalog_fail_closed` | 5 | Validates the real catalog, then runs 4 mutations (open policy, unknown provider, unapproved mutation, catalogued-but-unwired source) and requires rejection of each |
+| `capability_routing` | 6 | Selected provider must be in `.mcp.json`; a planned-only capability resolves to nothing; an unregistered capability resolves to `[]` |
+| `approval_gate` | 7 | Real broker: consume before approval, wrong hash, missing hash, valid consume, replay |
+| `zrouter_fs_contract` | 10 | Cross-checks the `FS_*` actions the TS client dispatches against the ABAP handler branches, plus SOAP envelope XML escaping |
+| `skill_packaging` | 5 | Accepts a valid skill; rejects one with no frontmatter, no `SKILL.md`, or a missing directory |
+
+The suite reports assertion counts, not a token figure — the harness does not measure
+tokens, so it does not print one.
+
+### Fail-closed capability catalog
+
+Routing resolves through `.agents/registries/mcp-capabilities.json` (39 capabilities):
+
+| Provider situation | Result |
+|---|---|
+| In `.mcp.json` `mcpServers` | Reachable |
+| In `plannedServers` | Known but not launchable — **never** counts toward reachability |
+| In neither | Validation error |
+| Capability with no reachable provider | Error, unless it declares `status: "planned"` (then a visible gap) |
+
+`npm run catalog:validate` runs two independent validators and merges their findings;
+neither can mask the other. It also enforces reconciliation: every catalogued source of
+`kind: mcp` must exist in `mcps.json` or `mcp-candidates.json`, so a repository cannot be
+listed as integrated while being unreachable and unreviewed.
+
+---
+
+## ZROUTER Remote FileSystem
+
+`packages/vscode-abap-remote-fs-zrouter/` adapts `vscode_abap_remote_fs` to run entirely on
+ZROUTER, with no native ADT endpoint — so it works on ECC and on systems where ADT is
+blocked.
+
+**Dual transport**: HTTP POST JSON to SICF (`/sap/bc/zrouter`) with a cached CSRF token and
+retry on 403; automatic fallback to SOAP RFC (`/sap/bc/soap/rfc` → `ZROUTER_DISPATCH_FM`).
+Every interpolated value in the SOAP envelope is XML-escaped, and the response parser
+tolerates namespace prefixes, CDATA and self-closing elements, treating a SOAP Fault as an
+error rather than a success.
+
+| VFS method | ZROUTER action | Backend |
+|---|---|---|
+| `stat(uri)` | `FS_STAT` | TADIR metadata |
+| `readDirectory(uri)` | `FS_DIR` | TADIR package listing |
+| `readFile(uri)` | `FS_READ` | `READ REPORT` (PROG/INCLUDE), `cl_oo_factory` (CLAS/INTF) |
+| `writeFile(uri, content, transport)` | `FS_WRITE` | `RS_CORR_INSERT` + `INSERT REPORT` / `set_source` |
+| `activate(uri, transport)` | `FS_ACTIVATE` | `RS_WORKING_OBJECTS_ACTIVATE` |
+| `lock(uri)` / `unlock(uri)` | `FS_LOCK` / `FS_UNLOCK` | `RS_ACCESS_PERMISSION` |
+
+Mutations are fail-closed: `FS_WRITE` and `FS_ACTIVATE` validate the transport against
+`E070` and raise when it is absent or not modifiable. There is no local-object guessing.
+
+The ABAP side is `ZCL_ZROUTER_HANDLER_FS` in `templates/zrouter_dispatch.prog.abap`,
+reachable as module `FS`; the BASIS handler also delegates `FS_*` for older clients.
+Not yet supported: Data Definitions (CDS/DDLS) — `normalize_type` rejects unsupported
+types with an explicit message rather than failing quietly.
+
+```bash
+npm run harness:remote-fs:mock       # verify the contract against checked-in sources
+cd packages/vscode-abap-remote-fs-zrouter && npm install && npm run typecheck
+```
+
+---
+
 ## Core Commands
 
 | Category | Command | What It Does |
 |---|---|---|
 | **Install** | `git clone ... && python scripts/healthcheck.py` | Clone + verify everything works |
+| **Harness** | `npm run harness:eval` | Evaluation suite — 5 scenarios, 33 assertions |
+| **Harness** | `npm run harness:benchmark` | Metrics + catalog safety gate |
+| **Harness** | `npm run harness:mcp -- list` | Capability → provider resolution |
+| **Harness** | `npm run harness:share -- --skill <name>` | Validate + package a skill |
+| **Harness** | `npm run harness:remote-fs:mock` | ZROUTER Remote FS contract check |
+| **Catalog** | `npm run catalog:validate` | Fail-closed catalog validation (both validators) |
+| **Skill** | `npm run skill:validate -- <name>` | Validate skill frontmatter and structure |
 | **Update** | `git pull && npm install && npm run hc` | Pull latest + refresh deps + healthcheck |
 | **Health** | `npm run hc` | Probes active MCPs + flags planned candidates + .env completeness |
 | **Health** | `npm run hc:prompt` | Interactive setup wizard for missing vars |
@@ -146,7 +259,7 @@ cp .env.template .env
 
 ---
 
-## Complete Skill Catalog (162 skills)
+## Complete Skill Catalog (164 skills)
 
 ### Skill Categories
 
@@ -164,31 +277,46 @@ cp .env.template .env
 
 ---
 
-## MCP Server Reference (8 active, fail-closed planned candidates)
+## MCP Server Reference
 
-### MCP Details
+### Active — 11 servers that launch from a clean clone
 
-| # | MCP Server | Type | Tools/Entities | Criticality | Description |
-|---|---|---|---|---|---|
-| 1 | `arc-1` | stdio (npx) | 12 intent tools | **HIGH** | Enterprise ADT — SAPRead, SAPWrite, SAPSearch, SAPActivate, SAPTransport, SAPDiagnose |
-| 2 | `aibap` | stdio (Go) | 69 tools | **HIGH** | ABAP dev — source, objects, testing, ST22, BAdI, DEBUG, transport |
-| 3 | `mcp-abap-adt` | stdio (node) | 13 tools | MEDIUM | TypeScript ADT bridge — GetProgram, GetClass, GetTable, SearchObject |
-| 4 | `mcp-sap-gui` | stdio (node) | GUI automation | MEDIUM | Primary GUI fallback — navigate, BDC, ALV read, popup handling |
-| 5 | `mcp-sap-gui-kts` | stdio (python) | GUI automation | LOW | Secondary GUI (kts982) — broader transaction coverage |
-| 6 | `sapgui-mcp-go` | stdio (Go) | GUI automation | LOW | Tertiary GUI (Hochfrequenz) — lightweight Go bridge |
-| 7 | `sap-rfc-mcp-server` | stdio (python) | RFC dispatch | MEDIUM | ZROUTER dispatch — 9 module handlers via BAPI/RFC |
-| 8 | `sf-mcp` | stdio (node) | OData V2 | LOW | SuccessFactors HCM — Employee, Org, Compensation, Time |
-| 9 | `mcp-sap-notes` | stdio (node) | 2 tools | LOW | SAP Notes search + fetch from me.sap.com |
-| 10 | `btp-mcp` | stdio (node) | 7 entities | LOW | BTP account management — GlobalAccount, Subaccounts, Entitlements |
-| 11 | `odata-mcp-proxy` | stdio (node) | 32 entities | LOW | CPI admin OData bridge — config-driven |
-| 12 | `btp-sap-odata-to-mcp` | stdio (node) | 3 tools | MEDIUM | Progressive discovery OData — discover → metadata → execute |
-| 13 | `pinecone-rag` | stdio (node) | vector store | OPTIONAL | Pinecone vector DB — RAG pipeline for SAP knowledge |
-| 14 | `supabase-rag` | stdio (node) | pgvector | OPTIONAL | Supabase pgvector — RAG pipeline alternative |
-| 15 | `azure-ai-search` | stdio (node) | semantic search | OPTIONAL | Azure AI Search — enterprise semantic search |
-| 16 | `ui5-mcp-server` | plugin | 10 tools | LOW | UI5/SAPUI5 app creation, linter, API reference |
-| 17 | `fiori-mcp-server` | plugin | 8 tools | LOW | Fiori app generation (CAP/RAP), metadata, modification |
-| 18 | `mdk-mcp-server` | plugin | 5 tools | LOW | MDK project creation, page/action generation, deploy |
-| 19 | `cds-mcp-server` | plugin | 2 tools | LOW | CAP CDS model search, documentation |
+These are the entries in `.mcp.json` `mcpServers`. Only these can be selected by capability
+routing.
+
+| # | MCP Server | Type | Criticality | Description |
+|---|---|---|---|---|
+| 1 | `arc-1` | stdio (npx) | **HIGH** | Enterprise ADT — SAPRead, SAPWrite, SAPSearch, SAPActivate, SAPTransport, SAPDiagnose |
+| 2 | `aibap` | stdio (Go) | **HIGH** | ABAP dev — source, objects, testing, ST22, BAdI, DEBUG, transport (69 tools) |
+| 3 | `mcp-sap-gui` | stdio (python) | MEDIUM | GUI fallback — navigate, BDC, ALV read, popup handling |
+| 4 | `sap-cpi-mcp` | stdio (python) | MEDIUM | Cloud Integration — content/runtime/MPL reads, plan→approve→commit deploys |
+| 5 | `sap-apim-mcp` | stdio (python) | LOW | API Management — proxy reads, policy validation, gated deploys |
+| 6 | `integration-suite-ui-mcp` | stdio (node) | LOW | Playwright web-UI fallback for Integration Suite/CPI |
+| 7 | `apim-ui-mcp` | stdio (node) | LOW | Playwright web-UI fallback for API Management |
+| 8 | `ui5-mcp` | stdio (npx) | LOW | UI5 tooling — project validation, linter, Web Components |
+| 9 | `fiori-mcp` | stdio (npx) | LOW | SAP Fiori tools — Fiori Elements generation, app modification |
+| 10 | `cap-mcp` | stdio (npx) | LOW | SAP CAP — CDS model search, project build |
+| 11 | `context-mode` | stdio (node) | LOW | Sandboxed execution + context compression |
+
+### Planned — 63 reviewed candidates, none launchable
+
+Listed under `plannedServers` in `.mcp.json` and described in
+`.agents/registries/mcp-candidates.json`. Each carries an explicit `blockedBy` / `reason`.
+Two distinct blockers:
+
+- **Entrypoint not installed** — the package or binary is not present in this environment.
+- **Source not vendored** — `bundled/mcps/<id>/` contains a pointer README with the upstream
+  URL, not the code. Nothing can be started from it.
+
+Promoting a candidate means vendoring (or pinning an installable package), passing runtime
+and safety review, and moving it into `mcps.json`. Until then it is invisible to routing:
+`resolve_servers_for_capability` returns nothing rather than picking a server that cannot
+start.
+
+```bash
+npm run harness:mcp -- list                       # capability → selected provider
+python scripts/mcp_launcher.py probe --server arc-1
+```
 
 ---
 
@@ -261,12 +389,12 @@ sap-router-skill/
 ├── SKILL.md                     ← Master dispatch (Karpathy wrapper)
 ├── COMPARISON.md                ← 72-repo cross-reference analysis
 ├── CHANGELOG.md                 ← Version history
-├── .mcp.json                    ← 8 active servers + 41 under plannedServers
+├── .mcp.json                    ← 11 active servers + 63 under plannedServers
 ├── .env.template                ← 40+ env vars grouped by domain
 ├── .abaplint.json               ← 60+ ABAP lint rules
-├── package.json                 ← 63 npm scripts
+├── package.json                 ← 90 npm scripts
 │
-├── .claude/skills/              ← 162 skills (generated from .agents/skills)
+├── .claude/skills/              ← 164 skills (generated from .agents/skills)
 │   ├── karpathy-guidelines/     ← v4.0: Think→Simplify→Surgical→Verify
 │   ├── sap-gui-scripting/       ← SAP GUI automation + BDC + ALV
 │   ├── sap-gui-web-enrich/      ← Web-search fill missing nav data
@@ -274,9 +402,9 @@ sap-router-skill/
 │   ├── sap-llm-engineering/     ← LLM eval harness + prompt optimizer
 │   ├── sap-workflow-pipeline/   ← 8-stage spec-to-transport
 │   ├── sap-api-policy/          ← API Management + OpenAPI specs
-│   └── ... (68 more domain skills)
+│   └── ... (157 more domain skills)
 │
-├── scripts/                     ← 40 Python CLIs
+├── scripts/                     ← 44 Python CLIs
 │   ├── sap_router.py            ← Routing engine (ADT→GUI→RFC→Pipeline)
 │   ├── healthcheck.py           ← MCP entrypoint + .env guardian
 │   ├── self_learn.py            ← Hermes-style context adaptation
@@ -380,6 +508,35 @@ aibap: remove_from_transport(objects=["ZCL_ZROUTER_DISPATCH"])
 
 ---
 
+## Integrated Sources
+
+`.agents/registries/bundled-sources.json` catalogues 76 upstream repositories across
+CPI/Integration Suite, OData, UI5/Fiori, BDC and SRE/incident domains, plus
+[marcellourbani/vscode_abap_remote_fs](https://github.com/marcellourbani/vscode_abap_remote_fs),
+whose backend was reimplemented on ZROUTER (see above).
+
+**What "catalogued" means here.** A source in that registry is known, classified and
+searchable via `python scripts/source_catalog.py search`. It is **not** necessarily
+runnable. For MCP sources, `bundled/mcps/<id>/` currently holds a pointer README with the
+upstream URL rather than vendored code, so those are registered as `disabled_candidate` in
+`mcp-candidates.json` with an explicit reason and listed under `plannedServers`.
+
+Capabilities motivated by a catalogued repository but served today by an
+already-configured server carry `contributed_by` and `provider_note` in
+`mcp-capabilities.json`, so the substitution is explicit rather than implied. For example
+`sap.odata.service.query` credits the two GutjahrAI OData MCPs while routing to `arc-1`.
+
+The catalog validator enforces this: every `kind: mcp` source must resolve to a record in
+`mcps.json` or `mcp-candidates.json`, so nothing can sit in the catalog looking integrated
+while being unreachable and unreviewed.
+
+```bash
+python scripts/source_catalog.py search --query "cpi message monitoring"
+npm run catalog:validate
+```
+
+---
+
 ## Related Repositories
 
 Key integrations:
@@ -402,6 +559,6 @@ Key integrations:
 ## Contributing
 
 PRs and issues welcome. See [SKILL.md](SKILL.md) for the full dispatch table and
-94-skill reference. MIT licensed — use freely.
+full skill reference. MIT licensed — use freely.
 
 --
