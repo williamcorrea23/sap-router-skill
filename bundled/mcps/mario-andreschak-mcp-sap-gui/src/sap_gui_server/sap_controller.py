@@ -101,7 +101,7 @@ def _handle_multiple_logon_popup(process_pid: int) -> Optional[int]:
         return None
 
 def _find_any_sap_window() -> Optional[Any]:
-    """Find any SAP GUI window from saplogon.exe process"""
+    """Find any SAP GUI window from SAP Logon or SAP GUI 8 process."""
     result = []
 
     def enum_windows_callback(hwnd, _):
@@ -119,8 +119,8 @@ def _find_any_sap_window() -> Optional[Any]:
                 process = psutil.Process(pid)
                 process_name = process.name().lower()
 
-                # Check if window belongs to saplogon.exe
-                if process_name == 'saplogon.exe':
+                # SAP GUI 8 may host sessions in SAPgui.exe instead of saplogon.exe.
+                if process_name in {'saplogon.exe', 'sapgui.exe'}:
                     # Exclude the SAP Logon window itself
                     if "SAP Logon" not in title:
                         logger.debug(f"Found SAP window - Title: '{title}', Handle: {hwnd}, PID: {pid}")
@@ -332,6 +332,7 @@ class SapController:
                 hwnd = _find_any_sap_window()
                 if not hwnd:
                     raise Exception("No SAP GUI window found")
+                _main_window_hwnd = hwnd
                 logger.debug("Using fallback _find_any_sap_window")
 
             # Get window title for logging
