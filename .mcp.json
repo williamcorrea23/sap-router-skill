@@ -124,6 +124,36 @@
         "CHROME_DEBUGGING_PORT": "${CHROME_DEBUGGING_PORT}"
       },
       "description": "Playwright-ready Web UI fallback for SAP API Management. Uses logged-in user browser session; no credential parameters accepted."
+    },
+    "ui5-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@ui5/mcp-server@0.2.14"
+      ],
+      "env": {},
+      "description": "SAPUI5 tooling MCP. Project validation, UI5 linter, API reference and Web Components rendering guidance."
+    },
+    "fiori-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@sap-ux/fiori-mcp-server@1.8.1"
+      ],
+      "env": {},
+      "description": "SAP Fiori tools MCP. Fiori Elements app generation, manifest inspection and application modification."
+    },
+    "cap-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@cap-js/mcp-server@0.0.5"
+      ],
+      "env": {},
+      "description": "SAP CAP MCP. CDS model search and CAP project build."
     }
   },
   "plannedServers": {
@@ -370,7 +400,11 @@
     "lemaiwo-btp-mcp-server": {
       "type": "stdio",
       "command": "npm",
-      "args": ["--prefix", "bundled/mcps/lemaiwo-btp-mcp-server", "start"],
+      "args": [
+        "--prefix",
+        "bundled/mcps/lemaiwo-btp-mcp-server",
+        "start"
+      ],
       "env": {},
       "description": "SAP BTP administration OData MCP candidate; remains disabled until dependencies and credentials are reviewed.",
       "_status": "planned",
@@ -379,7 +413,10 @@
     "aiadiguru2025-sf-mcp": {
       "type": "stdio",
       "command": "python",
-      "args": ["-m", "main"],
+      "args": [
+        "-m",
+        "main"
+      ],
       "cwd": "bundled/mcps/aiadiguru2025-sf-mcp",
       "env": {
         "SF_BASE_URL": "${SF_BASE_URL}",
@@ -782,6 +819,134 @@
       "description": "Native CPI/OpenAPI MCP artifact candidate. Requires tenant deployment and a separate security review.",
       "_status": "planned",
       "_reason": "not promoted from mcp-candidates.json"
+    },
+    "1nbuc-mcp-integration-suite": {
+      "type": "stdio",
+      "command": null,
+      "args": [],
+      "repository": "https://github.com/1nbuc/mcp-integration-suite",
+      "description": "1nbuc/mcp-integration-suite - Integration Suite MCP (iFlow content, deploy, MPL).",
+      "blockedBy": "Upstream source not vendored; bundled/mcps/<id>/ holds a pointer README only."
+    },
+    "anuradha504-integration-suite": {
+      "type": "stdio",
+      "command": null,
+      "args": [],
+      "repository": "https://github.com/Anuradha504/integration-suite",
+      "description": "Anuradha504/integration-suite - Integration Suite operations MCP.",
+      "blockedBy": "Upstream source not vendored; bundled/mcps/<id>/ holds a pointer README only."
+    },
+    "gutjahrai-sap-odata-mcp": {
+      "type": "stdio",
+      "command": null,
+      "args": [],
+      "repository": "https://github.com/GutjahrAI/sap-odata-mcp-server",
+      "description": "GutjahrAI/sap-odata-mcp-server - generic SAP OData v2/v4 service MCP (TypeScript).",
+      "blockedBy": "Upstream source not vendored; bundled/mcps/<id>/ holds a pointer README only."
+    },
+    "gutjahrai-sap-odata-mcp-py": {
+      "type": "stdio",
+      "command": null,
+      "args": [],
+      "repository": "https://github.com/GutjahrAI/sap-odata-mcp-py",
+      "description": "GutjahrAI/sap-odata-mcp-py - generic SAP OData service MCP (Python).",
+      "blockedBy": "Upstream source not vendored; bundled/mcps/<id>/ holds a pointer README only."
+    },
+    "karthickshiva-sap-cpi-mcp": {
+      "type": "stdio",
+      "command": null,
+      "args": [],
+      "repository": "https://github.com/karthickshiva-png/sap-cpi-mcp-server",
+      "description": "karthickshiva-png/sap-cpi-mcp-server - CPI artifact and runtime MCP.",
+      "blockedBy": "Upstream source not vendored; bundled/mcps/<id>/ holds a pointer README only."
+    },
+    "keelside-mcp-sap-cpi": {
+      "type": "stdio",
+      "command": null,
+      "args": [],
+      "repository": "https://github.com/Keelside/mcp-sap-cpi",
+      "description": "Keelside/mcp-sap-cpi - CPI content and message monitoring MCP.",
+      "blockedBy": "Upstream source not vendored; bundled/mcps/<id>/ holds a pointer README only."
+    },
+    "lopezmas-sap-pi-mcp": {
+      "type": "stdio",
+      "command": null,
+      "args": [],
+      "repository": "https://github.com/lopezmas/sap-pi-mcp-server",
+      "description": "lopezmas/sap-pi-mcp-server - SAP PI/PO channel and message MCP.",
+      "blockedBy": "Upstream source not vendored; bundled/mcps/<id>/ holds a pointer README only."
+    },
+    "premsaidaggolu-cpi-multitenant-mcp": {
+      "type": "stdio",
+      "command": null,
+      "args": [],
+      "repository": "https://github.com/premsaidaggolu/sap-cpi-multi-tenant-mcp-server",
+      "description": "premsaidaggolu/sap-cpi-multi-tenant-mcp-server - multi-tenant CPI MCP.",
+      "blockedBy": "Upstream source not vendored; bundled/mcps/<id>/ holds a pointer README only."
+    },
+    "stiaansdw-ci-mcp-server": {
+      "type": "stdio",
+      "command": null,
+      "args": [],
+      "repository": "https://github.com/stiaansdw/ci-mcp-server-claude-web_deprecated",
+      "description": "stiaansdw/ci-mcp-server-claude-web (deprecated upstream) - Cloud Integration MCP.",
+      "blockedBy": "Upstream source not vendored; bundled/mcps/<id>/ holds a pointer README only."
+    },
+    "ui5-webcomponents-mcp": {
+      "type": "stdio",
+      "command": null,
+      "args": [],
+      "repository": "https://github.com/UI5/webcomponents-mcp-server",
+      "description": "UI5/webcomponents-mcp-server - UI5 Web Components authoring MCP.",
+      "blockedBy": "Upstream source not vendored; bundled/mcps/<id>/ holds a pointer README only."
+    },
+    "vadimklimov-cpi-mcp": {
+      "type": "stdio",
+      "command": null,
+      "args": [],
+      "repository": "https://github.com/vadimklimov/cpi-mcp-server",
+      "description": "vadimklimov/cpi-mcp-server - CPI tenant MCP (Go).",
+      "blockedBy": "Upstream source not vendored; bundled/mcps/<id>/ holds a pointer README only."
+    },
+    "jfilak-sapcli": {
+      "type": "stdio",
+      "command": null,
+      "args": [],
+      "repository": "https://github.com/jfilak/sapcli",
+      "description": "jfilak/sapcli - SAP ADT command line client; MCP surface not packaged upstream.",
+      "blockedBy": "Upstream source not vendored; bundled/mcps/<id>/ holds a pointer README only."
+    },
+    "clementringot-rosa": {
+      "type": "stdio",
+      "command": null,
+      "args": [],
+      "repository": "https://github.com/clementringot/rosa",
+      "description": "clementringot/rosa - SAP assistant MCP.",
+      "blockedBy": "Upstream source not vendored; bundled/mcps/<id>/ holds a pointer README only."
+    },
+    "nickels-sap-btp-docs-mcp": {
+      "type": "stdio",
+      "command": null,
+      "args": [],
+      "repository": "https://github.com/nickels/sap-btp-docs-mcp",
+      "description": "SAP BTP documentation retrieval MCP.",
+      "blockedBy": "Upstream source not vendored; bundled/mcps/<id>/ holds a pointer README only."
+    },
+    "marianfoo-mcp-sap-docs": {
+      "type": "stdio",
+      "command": null,
+      "args": [],
+      "repository": "https://github.com/marianfoo/mcp-sap-docs",
+      "description": "marianfoo/mcp-sap-docs - SAP documentation MCP.",
+      "blockedBy": "Upstream source not vendored; bundled/mcps/<id>/ holds a pointer README only."
+    },
+    "mario-andreschak-mcp-sap-gui": {
+      "type": "stdio",
+      "command": null,
+      "args": [],
+      "repository": "https://github.com/mario-andreschak/mcp-sap-gui",
+      "description": "mario-andreschak/mcp-sap-gui - SAP GUI automation MCP (alternative to mcp-sap-gui).",
+      "blockedBy": "Upstream source not vendored; bundled/mcps/<id>/ holds a pointer README only."
     }
   },
   "_plannedServersNote": "Entries here are NOT launched. They are either candidates from .agents/registries/mcp-candidates.json that were never promoted (the fail-closed policy scripts/mcp_launcher.py enforces), or reviewed servers whose declared entrypoint does not exist on disk. Promote one by installing its entrypoint, adding it to .agents/registries/mcps.json, then moving the block back into mcpServers.",

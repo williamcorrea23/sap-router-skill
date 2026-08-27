@@ -1,0 +1,19 @@
+{
+  "name": "cf-app-management",
+  "enabled": true,
+  "instructions": "SAP Automation Pilot operations bridge for landscape management.",
+  "mcpTools": [
+    {
+      "commandId": "cf-sapcp:ListCfOrgs:1",
+      "name": "list_cf_orgs",
+      "enabled": true,
+      "inputReferences": [],
+      "tags": {},
+      "title": "List Cf Orgs",
+      "destructiveHint": false,
+      "idempotentHint": false,
+      "openWorldHint": false,
+      "readOnlyHint": false
+    }
+  ]
+}

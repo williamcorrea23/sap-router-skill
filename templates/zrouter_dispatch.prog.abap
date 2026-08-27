@@ -1332,6 +1332,408 @@ CLASS zcl_zrouter_handler_hcm IMPLEMENTATION.
 ENDCLASS.
 
 
+*&---------------------------------------------------------------------*
+*& Handler FS - Remote FileSystem para vscode_abap_remote_fs
+*&
+*& Backend das acoes FS_* consumidas por ZRouterClient (dual transport
+*& REST/SICF + SOAP RFC). Expoe objetos de repositorio como sistema de
+*& arquivos: FS_DIR lista, FS_STAT descreve, FS_READ/FS_WRITE movem fonte,
+*& FS_ACTIVATE compila, FS_LOCK/FS_UNLOCK controlam permissao de edicao.
+*&
+*& Escrita e ativacao sao mutantes: exigem transporte explicito no payload
+*& e falham fechado quando ausente.
+*&---------------------------------------------------------------------*
+
+CLASS zcl_zrouter_handler_fs DEFINITION PUBLIC FINAL CREATE PUBLIC
+  INHERITING FROM zcl_zrouter_handler_abstract.
+  PUBLIC SECTION.
+    TYPES:
+      BEGIN OF ty_fs_request,
+        object_type TYPE string,
+        object_name TYPE string,
+        package     TYPE string,
+        source      TYPE string,
+        transport   TYPE string,
+      END OF ty_fs_request,
+
+      BEGIN OF ty_fs_entry,
+        object_type TYPE string,
+        object_name TYPE string,
+        package     TYPE string,
+        author      TYPE string,
+      END OF ty_fs_entry,
+      ty_fs_entries TYPE STANDARD TABLE OF ty_fs_entry WITH EMPTY KEY.
+
+    METHODS constructor
+      IMPORTING
+        io_logger TYPE REF TO zif_zrouter_logger
+        io_config TYPE REF TO zif_zrouter_config.
+  PROTECTED SECTION.
+    METHODS handle_custom_action REDEFINITION.
+  PRIVATE SECTION.
+    CONSTANTS mc_max_source_lines TYPE i VALUE 100000.
+
+    METHODS parse_request
+      IMPORTING iv_payload        TYPE string
+      RETURNING VALUE(rs_request) TYPE ty_fs_request
+      RAISING   zcx_zrouter.
+    METHODS normalize_type
+      IMPORTING iv_object_type TYPE string
+      RETURNING VALUE(rv_type) TYPE trobjtype
+      RAISING   zcx_zrouter.
+    METHODS require_transport
+      IMPORTING is_request TYPE ty_fs_request
+      RAISING   zcx_zrouter.
+
+    METHODS fs_stat
+      IMPORTING is_request       TYPE ty_fs_request
+      RETURNING VALUE(rs_result) TYPE zif_zrouter_handler=>ty_action_result
+      RAISING   zcx_zrouter.
+    METHODS fs_dir
+      IMPORTING is_request       TYPE ty_fs_request
+      RETURNING VALUE(rs_result) TYPE zif_zrouter_handler=>ty_action_result
+      RAISING   zcx_zrouter.
+    METHODS fs_read
+      IMPORTING is_request       TYPE ty_fs_request
+      RETURNING VALUE(rs_result) TYPE zif_zrouter_handler=>ty_action_result
+      RAISING   zcx_zrouter.
+    METHODS fs_write
+      IMPORTING is_request       TYPE ty_fs_request
+      RETURNING VALUE(rs_result) TYPE zif_zrouter_handler=>ty_action_result
+      RAISING   zcx_zrouter.
+    METHODS fs_activate
+      IMPORTING is_request       TYPE ty_fs_request
+      RETURNING VALUE(rs_result) TYPE zif_zrouter_handler=>ty_action_result
+      RAISING   zcx_zrouter.
+    METHODS fs_set_lock
+      IMPORTING is_request       TYPE ty_fs_request
+                iv_lock          TYPE abap_bool
+      RETURNING VALUE(rs_result) TYPE zif_zrouter_handler=>ty_action_result
+      RAISING   zcx_zrouter.
+
+    METHODS read_clif_source
+      IMPORTING is_request       TYPE ty_fs_request
+      RETURNING VALUE(rt_source) TYPE string_table
+      RAISING   zcx_zrouter.
+    METHODS write_clif_source
+      IMPORTING is_request TYPE ty_fs_request
+      RAISING   zcx_zrouter.
+ENDCLASS.
+
+CLASS zcl_zrouter_handler_fs IMPLEMENTATION.
+  METHOD constructor.
+    super->constructor( io_logger = io_logger io_config = io_config iv_module = 'FS' ).
+  ENDMETHOD.
+
+  METHOD handle_custom_action.
+    DATA(ls_request) = parse_request( iv_payload ).
+    CASE to_upper( iv_action ).
+      WHEN 'FS_STAT'.
+        rs_result = fs_stat( ls_request ).
+      WHEN 'FS_DIR'.
+        rs_result = fs_dir( ls_request ).
+      WHEN 'FS_READ'.
+        rs_result = fs_read( ls_request ).
+      WHEN 'FS_WRITE'.
+        rs_result = fs_write( ls_request ).
+      WHEN 'FS_ACTIVATE'.
+        rs_result = fs_activate( ls_request ).
+      WHEN 'FS_LOCK'.
+        rs_result = fs_set_lock( is_request = ls_request iv_lock = abap_true ).
+      WHEN 'FS_UNLOCK'.
+        rs_result = fs_set_lock( is_request = ls_request iv_lock = abap_false ).
+      WHEN OTHERS.
+        RAISE EXCEPTION TYPE zcx_zrouter EXPORTING mv_text = |Unknown FS action: { iv_action }|.
+    ENDCASE.
+  ENDMETHOD.
+
+  METHOD parse_request.
+    IF iv_payload IS INITIAL.
+      RAISE EXCEPTION TYPE zcx_zrouter EXPORTING mv_text = 'FS payload is empty'.
+    ENDIF.
+    TRY.
+        /ui2/cl_json=>deserialize(
+          EXPORTING json = iv_payload
+          CHANGING  data = rs_request ).
+      CATCH cx_root.
+        RAISE EXCEPTION TYPE zcx_zrouter EXPORTING mv_text = 'FS payload is not valid JSON'.
+    ENDTRY.
+    rs_request-object_type = to_upper( rs_request-object_type ).
+    rs_request-object_name = to_upper( rs_request-object_name ).
+    rs_request-package     = to_upper( rs_request-package ).
+  ENDMETHOD.
+
+  METHOD normalize_type.
+    CASE to_upper( iv_object_type ).
+      WHEN 'PROG' OR 'REPORT' OR 'PROGRAM' OR 'INCL' OR 'INCLUDE'.
+        rv_type = 'PROG'.
+      WHEN 'CLAS' OR 'CLASS'.
+        rv_type = 'CLAS'.
+      WHEN 'INTF' OR 'INTERFACE'.
+        rv_type = 'INTF'.
+      WHEN 'FUGR' OR 'FUNCTIONGROUP'.
+        rv_type = 'FUGR'.
+      WHEN 'DEVC' OR 'PACKAGE'.
+        rv_type = 'DEVC'.
+      WHEN OTHERS.
+        RAISE EXCEPTION TYPE zcx_zrouter
+          EXPORTING mv_text = |Unsupported FS object_type: { iv_object_type }|.
+    ENDCASE.
+  ENDMETHOD.
+
+  METHOD require_transport.
+    " Fail closed: no implicit transport, no local-object guessing.
+    IF is_request-transport IS INITIAL.
+      RAISE EXCEPTION TYPE zcx_zrouter
+        EXPORTING mv_text = 'FS mutation requires an explicit transport request in the payload'.
+    ENDIF.
+    SELECT SINGLE trkorr FROM e070
+      INTO @DATA(lv_trkorr)
+      WHERE trkorr    = @is_request-transport
+        AND trstatus IN ( 'D', 'L' ).
+    IF sy-subrc <> 0 OR lv_trkorr IS INITIAL.
+      RAISE EXCEPTION TYPE zcx_zrouter
+        EXPORTING mv_text = |Transport { is_request-transport } not found or not modifiable|.
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD fs_stat.
+    DATA(lv_type) = normalize_type( is_request-object_type ).
+    SELECT SINGLE object, obj_name, devclass, author
+      FROM tadir
+      INTO @DATA(ls_tadir)
+      WHERE pgmid    = 'R3TR'
+        AND object   = @lv_type
+        AND obj_name = @is_request-object_name.
+    IF sy-subrc <> 0.
+      rs_result = build_result(
+        iv_status  = 'ERROR'
+        iv_message = |Object { lv_type } { is_request-object_name } not found| ).
+      RETURN.
+    ENDIF.
+
+    DATA(ls_entry) = VALUE ty_fs_entry(
+      object_type = CONV string( ls_tadir-object )
+      object_name = CONV string( ls_tadir-obj_name )
+      package     = CONV string( ls_tadir-devclass )
+      author      = CONV string( ls_tadir-author ) ).
+
+    rs_result = build_result(
+      iv_status  = 'SUCCESS'
+      iv_message = 'Object metadata read'
+      iv_data    = /ui2/cl_json=>serialize( data = ls_entry
+                                            pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
+  ENDMETHOD.
+
+  METHOD fs_dir.
+    IF is_request-package IS INITIAL.
+      RAISE EXCEPTION TYPE zcx_zrouter EXPORTING mv_text = 'FS_DIR requires a package'.
+    ENDIF.
+
+    SELECT object, obj_name, devclass, author
+      FROM tadir
+      INTO TABLE @DATA(lt_tadir)
+      WHERE pgmid    = 'R3TR'
+        AND devclass = @is_request-package
+        AND delflag  = @abap_false
+      ORDER BY object, obj_name.
+
+    DATA lt_entries TYPE ty_fs_entries.
+    LOOP AT lt_tadir INTO DATA(ls_row).
+      APPEND VALUE ty_fs_entry(
+        object_type = CONV string( ls_row-object )
+        object_name = CONV string( ls_row-obj_name )
+        package     = CONV string( ls_row-devclass )
+        author      = CONV string( ls_row-author ) ) TO lt_entries.
+    ENDLOOP.
+
+    rs_result = build_result(
+      iv_status  = 'SUCCESS'
+      iv_message = |{ lines( lt_entries ) } objects in package { is_request-package }|
+      iv_data    = /ui2/cl_json=>serialize( data = lt_entries
+                                            pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
+  ENDMETHOD.
+
+  METHOD fs_read.
+    DATA lt_source TYPE string_table.
+    DATA(lv_type) = normalize_type( is_request-object_type ).
+
+    IF is_request-object_name IS INITIAL.
+      RAISE EXCEPTION TYPE zcx_zrouter EXPORTING mv_text = 'FS_READ requires object_name'.
+    ENDIF.
+
+    CASE lv_type.
+      WHEN 'PROG'.
+        READ REPORT is_request-object_name INTO lt_source.
+        IF sy-subrc <> 0.
+          rs_result = build_result(
+            iv_status  = 'ERROR'
+            iv_message = |Program { is_request-object_name } not found| ).
+          RETURN.
+        ENDIF.
+      WHEN 'CLAS' OR 'INTF'.
+        lt_source = read_clif_source( is_request ).
+      WHEN OTHERS.
+        RAISE EXCEPTION TYPE zcx_zrouter
+          EXPORTING mv_text = |FS_READ not supported for type { lv_type }|.
+    ENDCASE.
+
+    DATA(lv_source) = concat_lines_of( table = lt_source
+                                       sep   = cl_abap_char_utilities=>newline ).
+
+    rs_result = build_result(
+      iv_status  = 'SUCCESS'
+      iv_message = |{ lines( lt_source ) } lines read|
+      iv_data    = lv_source ).
+  ENDMETHOD.
+
+  METHOD fs_write.
+    require_transport( is_request ).
+    DATA(lv_type) = normalize_type( is_request-object_type ).
+
+    IF is_request-object_name IS INITIAL.
+      RAISE EXCEPTION TYPE zcx_zrouter EXPORTING mv_text = 'FS_WRITE requires object_name'.
+    ENDIF.
+
+    SPLIT is_request-source AT cl_abap_char_utilities=>newline INTO TABLE DATA(lt_source).
+    IF lines( lt_source ) > mc_max_source_lines.
+      RAISE EXCEPTION TYPE zcx_zrouter
+        EXPORTING mv_text = |Source exceeds { mc_max_source_lines } lines|.
+    ENDIF.
+
+    CALL FUNCTION 'RS_CORR_INSERT'
+      EXPORTING
+        object              = is_request-object_name
+        object_class        = lv_type
+        mode                = 'I'
+        global_lock         = abap_true
+        devclass            = is_request-package
+        korrnum             = is_request-transport
+        suppress_dialog     = abap_true
+      EXCEPTIONS
+        cancelled           = 1
+        permission_failure  = 2
+        unknown_objectclass = 3
+        OTHERS              = 4.
+    IF sy-subrc <> 0.
+      RAISE EXCEPTION TYPE zcx_zrouter
+        EXPORTING mv_text = |Transport registration failed for { is_request-object_name }, subrc={ sy-subrc }|.
+    ENDIF.
+
+    CASE lv_type.
+      WHEN 'PROG'.
+        INSERT REPORT is_request-object_name FROM lt_source.
+        IF sy-subrc <> 0.
+          RAISE EXCEPTION TYPE zcx_zrouter
+            EXPORTING mv_text = |INSERT REPORT failed for { is_request-object_name }, subrc={ sy-subrc }|.
+        ENDIF.
+      WHEN 'CLAS' OR 'INTF'.
+        write_clif_source( is_request ).
+      WHEN OTHERS.
+        RAISE EXCEPTION TYPE zcx_zrouter
+          EXPORTING mv_text = |FS_WRITE not supported for type { lv_type }|.
+    ENDCASE.
+
+    rs_result = build_result(
+      iv_status  = 'SUCCESS'
+      iv_message = |{ lines( lt_source ) } lines written to { is_request-object_name } on { is_request-transport }| ).
+  ENDMETHOD.
+
+  METHOD fs_activate.
+    require_transport( is_request ).
+    DATA(lv_type) = normalize_type( is_request-object_type ).
+
+    DATA lt_objects TYPE STANDARD TABLE OF dwinactiv.
+    APPEND VALUE dwinactiv( obj_name = is_request-object_name
+                            object   = lv_type ) TO lt_objects.
+
+    CALL FUNCTION 'RS_WORKING_OBJECTS_ACTIVATE'
+      EXPORTING
+        activate_ddic_objects  = abap_false
+        with_popup             = abap_false
+      TABLES
+        objects                = lt_objects
+      EXCEPTIONS
+        excecution_error       = 1
+        cancelled              = 2
+        insert_into_corr_error = 3
+        OTHERS                 = 4.
+    IF sy-subrc <> 0.
+      rs_result = build_result(
+        iv_status  = 'ERROR'
+        iv_message = |Activation failed for { is_request-object_name }, subrc={ sy-subrc }| ).
+      RETURN.
+    ENDIF.
+
+    rs_result = build_result(
+      iv_status  = 'SUCCESS'
+      iv_message = |{ lv_type } { is_request-object_name } activated| ).
+  ENDMETHOD.
+
+  METHOD fs_set_lock.
+    DATA(lv_type) = normalize_type( is_request-object_type ).
+    DATA(lv_mode) = COND char1( WHEN iv_lock = abap_true THEN 'S' ELSE 'F' ).
+    DATA(lv_verb) = COND string( WHEN iv_lock = abap_true THEN 'locked' ELSE 'unlocked' ).
+
+    CALL FUNCTION 'RS_ACCESS_PERMISSION'
+      EXPORTING
+        global_lock              = abap_true
+        mode                     = lv_mode
+        object                   = is_request-object_name
+        object_class             = lv_type
+        suppress_corr_check      = abap_false
+      EXCEPTIONS
+        canceled_in_corr         = 1
+        enqueued_by_user         = 2
+        enqueue_system_failure   = 3
+        illegal_parameter_values = 4
+        locked_by_author         = 5
+        no_modify_permission     = 6
+        no_show_permission       = 7
+        permission_failure       = 8
+        request_language_denied  = 9
+        OTHERS                   = 10.
+    IF sy-subrc <> 0.
+      rs_result = build_result(
+        iv_status  = 'ERROR'
+        iv_message = |Cannot set lock on { is_request-object_name }, subrc={ sy-subrc }| ).
+      RETURN.
+    ENDIF.
+
+    rs_result = build_result(
+      iv_status  = 'SUCCESS'
+      iv_message = |{ is_request-object_name } { lv_verb }| ).
+  ENDMETHOD.
+
+  METHOD read_clif_source.
+    TRY.
+        DATA(lo_factory) = cl_oo_factory=>create_instance( ).
+        DATA(lo_clif) = lo_factory->create_clif_source(
+                          CONV seoclsname( is_request-object_name ) ).
+        lo_clif->get_source( IMPORTING source = rt_source ).
+      CATCH cx_root INTO DATA(lx_read).
+        RAISE EXCEPTION TYPE zcx_zrouter
+          EXPORTING mv_text = |Cannot read source of { is_request-object_name }: { lx_read->get_text( ) }|.
+    ENDTRY.
+  ENDMETHOD.
+
+  METHOD write_clif_source.
+    SPLIT is_request-source AT cl_abap_char_utilities=>newline INTO TABLE DATA(lt_source).
+    TRY.
+        DATA(lo_factory) = cl_oo_factory=>create_instance( ).
+        DATA(lo_clif) = lo_factory->create_clif_source(
+                          CONV seoclsname( is_request-object_name ) ).
+        lo_clif->lock( ).
+        lo_clif->set_source( lt_source ).
+        lo_clif->save( ).
+        lo_clif->unlock( ).
+      CATCH cx_root INTO DATA(lx_write).
+        RAISE EXCEPTION TYPE zcx_zrouter
+          EXPORTING mv_text = |Cannot write source of { is_request-object_name }: { lx_write->get_text( ) }|.
+    ENDTRY.
+  ENDMETHOD.
+ENDCLASS.
+
 CLASS zcl_zrouter_handler_basis DEFINITION PUBLIC FINAL CREATE PUBLIC
   INHERITING FROM zcl_zrouter_handler_abstract.
   PUBLIC SECTION.
@@ -1372,7 +1774,14 @@ CLASS zcl_zrouter_handler_basis IMPLEMENTATION.
       WHEN 'CODE_ANALYSIS'.
         rs_result = code_analysis( iv_payload ).
       WHEN OTHERS.
-        RAISE EXCEPTION TYPE zcx_zrouter EXPORTING mv_text = |Unknown BASIS action: { iv_action }|.
+        " Remote FileSystem actions live in ZCL_ZROUTER_HANDLER_FS. Older
+        " clients address them as BASIS/FS_*, so delegate instead of failing.
+        IF to_upper( iv_action ) CP 'FS_*'.
+          DATA(lo_fs) = NEW zcl_zrouter_handler_fs( io_logger = mo_logger io_config = mo_config ).
+          rs_result = lo_fs->handle_action( iv_action = iv_action iv_payload = iv_payload ).
+        ELSE.
+          RAISE EXCEPTION TYPE zcx_zrouter EXPORTING mv_text = |Unknown BASIS action: { iv_action }|.
+        ENDIF.
     ENDCASE.
   ENDMETHOD.
 
@@ -1482,7 +1891,7 @@ CLASS zcl_zrouter_dispatch IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD validate_and_check.
-    IF mo_config->is_action_allowed( iv_module = iv_module iv_action = iv_action ) = abap_bool.
+    IF mo_config->is_action_allowed( iv_module = iv_module iv_action = iv_action ) = abap_true.
       " Ação permitida na configuração
     ELSE.
       RAISE EXCEPTION TYPE zcx_zrouter EXPORTING mv_text = |Action { iv_action } for { iv_module } not allowed|.
@@ -1514,6 +1923,8 @@ CLASS zcl_zrouter_dispatch IMPLEMENTATION.
         ro_handler = NEW zcl_zrouter_handler_hcm( io_logger = mo_logger io_config = mo_config ).
       WHEN 'BASIS'.
         ro_handler = NEW zcl_zrouter_handler_basis( io_logger = mo_logger io_config = mo_config ).
+      WHEN 'FS'.
+        ro_handler = NEW zcl_zrouter_handler_fs( io_logger = mo_logger io_config = mo_config ).
       WHEN OTHERS.
         RAISE EXCEPTION TYPE zcx_zrouter EXPORTING mv_text = |Unknown module: { iv_module }|.
     ENDCASE.

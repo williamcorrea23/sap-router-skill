@@ -133,6 +133,10 @@ def consume(
     data = guarded_plan(action_id)
     if data.get("status") == "ERROR":
         return data
+    if data.get("status") == "CONSUMED":
+        # Replay of a one-time approval. Report it as such: "not approved" hides
+        # the difference between never-approved and already-spent.
+        return {"status": "ERROR", "error": "approval-already-consumed", "action_id": action_id}
     if data.get("status") != "APPROVED":
         return {"status": "ERROR", "error": "approval-not-approved", "action_id": action_id, "current_status": data.get("status")}
     if data.get("effect") in {"mutating", "destructive"} and not plan_hash_arg:

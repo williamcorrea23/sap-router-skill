@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-# Healthcheck — probes 42 MCPs (+18 planned) + .env completeness (run first)
+# Healthcheck — probes 11 configured MCPs (+63 planned) + .env completeness (run first)
 npm run hc
 npm run hc:prompt       # Interactive setup for missing .env vars
 
@@ -81,12 +81,12 @@ npm run update          # git pull + npm install + healthcheck
 | `SKILL.md` | Master dispatch table, 4-principle Karpathy wrapper, routing decision tree |
 | `scripts/sap_router.py` | Routing engine with ADT-first/GUI-fallback/SOAP-RFC/caveman delegation/pipeline orchestration |
 | `scripts/fallback_engine.py` | 6-tier cascading fallback with retry, verification, 36 mapped actions |
-| `scripts/healthcheck.py` | Probes 42 MCPs (+18 planned) + SOAP RFC, validates .env, generates interactive prompts |
+| `scripts/healthcheck.py` | Probes 11 configured MCPs (+63 planned) + SOAP RFC, validates .env, generates interactive prompts |
 | `scripts/self_learn.py` | Hermes-style context adaptation — tracks MCP latency/reliability, adapts routing |
 | `scripts/zrouter_bootstrap.py` | ZROUTER probe + install (ADT/GUI/Offline) + fallback mapping |
 | `scripts/xls_to_bapi.py` | CSV/XLSX → BAPI JSON with field mapping validation |
 | `scripts/memory_manager.py` | MEMORY.md session lifecycle + ABAPLINT section |
-| `.mcp.json` | 42 MCP server configs (+18 planned) — ADT, GUI (3 tiers), RFC, SOAP, CPI, CF, APIM, RAG (3), PI/PO, BW, Datasphere, Steampunk, Sapient, Integration Suite, CPI OData Proxy, ABAP-MCP, Cloud ALM, CTS Transport + 4 plugins |
+| `.mcp.json` | 11 launchable MCP servers in `mcpServers` (ADT x2, GUI, CPI, APIM, CPI/APIM web UI, UI5, Fiori, CAP, context-mode) plus 63 reviewed-but-disabled entries in `plannedServers`. A server in `plannedServers` never routes: capability resolution is fail-closed. |
 | `README.md` | GitHub landing page — 4 Mermaid diagrams, skill catalog, MCP reference, 130 topic tags, SEO footer |
 
 ## Cross-file consistency rules

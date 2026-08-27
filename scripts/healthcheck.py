@@ -145,6 +145,26 @@ MCP_HEALTHCHECK_SPEC = {
         "criticality": "LOW",
         "description": "SAP API Management — API proxy, policies, publication",
     },
+    # Standalone npx MCPs configured in .mcp.json (providers for the
+    # sap.ui5.*, sap.fiori.* and sap.cap.* capabilities).
+    "ui5-mcp": {
+        "env_vars": [],
+        "probe_command": "npx -y @ui5/mcp-server@0.2.14 --help",
+        "criticality": "LOW",
+        "description": "UI5 tooling — project validation, linter, Web Components guidance",
+    },
+    "fiori-mcp": {
+        "env_vars": [],
+        "probe_command": "npx -y @sap-ux/fiori-mcp-server@1.8.1 --help",
+        "criticality": "LOW",
+        "description": "SAP Fiori tools — Fiori Elements generation and app modification",
+    },
+    "cap-mcp": {
+        "env_vars": [],
+        "probe_command": "npx -y @cap-js/mcp-server@0.0.5 --help",
+        "criticality": "LOW",
+        "description": "SAP CAP — CDS model search and project build",
+    },
     # Plugin MCPs (auto-available when IDE plugin loaded)
     "plugin:ui5:ui5-mcp-server": {
         "env_vars": [],

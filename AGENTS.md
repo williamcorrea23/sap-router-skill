@@ -1,18 +1,39 @@
-# SAP Router Skill — Multi-IDE Agent Instructions
+# SAP Router Skill & Harness — Multi-IDE Agent Instructions
 
-> **162 skills mirrored across Claude, Codex, Gemini Antigravity, and Cursor.**
+> **164 skills mirrored across Claude, Codex, Gemini Antigravity, and Cursor.**
 >
 > | IDE | Skill Directory | Entry Point |
 > |---|---|---|
-> | **Claude Code** | `.claude/skills/` (162 skills) | `.claude/skills/run-sap-router-skill/SKILL.md` |
-> | **Antigravity (Gemini)** | `.gemini/skills/` (162 skills) | `.gemini/skills/run-sap-router-skill/SKILL.md` |
-> | **Codex / OpenAI** | `.codex/skills/` (162 skills) | `.codex/AGENTS.md` |
-> | **Cursor** | `.cursor/skills/` (162 skills) | `.cursor/skills/run-sap-router-skill/SKILL.md` |
+> | **Claude Code** | `.claude/skills/` (164 skills) | `.claude/skills/run-sap-router-skill/SKILL.md` |
+> | **Antigravity (Gemini)** | `.gemini/skills/` (164 skills) | `.gemini/skills/run-sap-router-skill/SKILL.md` |
+> | **Codex / OpenAI** | `.codex/skills/` (164 skills) | `.codex/AGENTS.md` |
+> | **Cursor** | `.cursor/skills/` (164 skills) | `.cursor/skills/run-sap-router-skill/SKILL.md` |
 >
 > All skills auto-trigger by file context and keyword. See SKILL.md for master dispatch.
-> **New (2026-07-13):** `rtk-token-optimizer` (60-90% token savings via CLI proxy) + `context-mode` (98% tool output reduction via MCP sandbox).
+> **New (v7.0.0):** `sap_harness.py` (Multi-Agent Autonomous Runtime + Eval Suite) + ZROUTER Remote FileSystem adapter + Automation Pilot & Skill-Share pipelines.
 
-## Implemented v6 operating model
+## SAP Harness v7.0 (Autonomous Multi-Agent & Eval Engine)
+
+```bash
+# Autonomous mission execution
+python scripts/sap_harness.py run --agent cpi --task "triage failed messages in CPI"
+
+# Evaluation & Benchmark test suite (Offline Hermetic by default)
+python scripts/sap_harness.py eval --suite all
+python scripts/sap_harness.py benchmark
+
+# Specialized subagent directory
+python scripts/sap_harness.py agents
+
+# Test ZROUTER Remote FileSystem integration (for vscode_abap_remote_fs)
+python scripts/sap_harness.py test-remote-fs
+
+# Automation Pilot MCP compiler & Skill packager
+python scripts/automation_pilot_compiler.py --catalog cf --command ListCfOrgs
+python scripts/skill_packager.py sap-cpi-flowpilot --slack-json
+```
+
+## Implemented v7 operating model
 
 Canonical source is `.agents/skills` plus `.agents/registries/mcp-capabilities.json`.
 Claude and Gemini skill trees are generated mirrors; Codex and Cursor reuse `.agents/skills`
@@ -57,7 +78,7 @@ credentials required. Everything runs offline:
 | `scripts/abap_serializer.py` | Multi-format ABAP packer: .nugg, abapGit, ZDOWNLOAD XML |
 | `scripts/cpi_iflow_packager.py` | CPI iFlow ZIP create/validate/extract |
 | `scripts/fallback_engine.py` | 6-tier cascading fallback with retry, verification, 36 mapped actions |
-| `scripts/healthcheck.py` | Probes 35 MCPs (+18 planned), validates .env, generates interactive prompts |
+| `scripts/healthcheck.py` | Probes the 11 configured MCPs (+63 planned candidates), validates .env, generates interactive prompts |
 | `scripts/self_learn.py` | Hermes-style context adaptation — tracks MCP latency/reliability, adapts routing |
 | `scripts/zrouter_bootstrap.py` | ZROUTER probe + install (ADT/GUI/Offline) + fallback mapping |
 | `scripts/btp_diagram.py` | BTP architecture diagram generator from skill references |

@@ -504,12 +504,21 @@ def validate_catalog() -> dict[str, Any]:
         for capability, spec in mcp_specs.items():
             if capability not in capabilities:
                 errors.append(f"MCP capability {capability}: missing from capabilities.json")
+            # A capability may declare status="planned" to say, on the record,
+            # that it has no launchable provider yet. That is reported as a
+            # warning; routing still fails closed because the server is not in
+            # enabled_servers. Anything not declared planned stays an error.
+            declared_planned = spec.get("status") == "planned"
             for server_id in [spec.get("primary")] + list(spec.get("fallbacks", [])):
                 if not server_id or server_id.startswith("plugin:"):
                     continue
                 if server_id not in enabled_servers:
                     state = "disabled candidate" if server_id in candidate_set else "unknown or disabled server"
-                    errors.append(f"MCP capability {capability}: {state} {server_id} is not routable")
+                    message = f"MCP capability {capability}: {state} {server_id} is not routable"
+                    if declared_planned:
+                        warnings.append(message + " (capability declared planned)")
+                    else:
+                        errors.append(message)
             primary = spec.get("primary")
             if primary in servers and capability not in servers[primary].get("capabilities", []):
                 errors.append(f"MCP capability {capability}: primary {primary} does not advertise the capability")

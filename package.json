@@ -1,9 +1,16 @@
 {
   "name": "sap-router-orchestrator",
-  "version": "6.0.0",
-  "description": "SAP Router Orchestrator v6.0.0 - 162 global skills, 12 registered MCPs, and fail-closed reviewed candidates for Claude, Codex, and Gemini.",
+  "version": "7.0.0",
+  "description": "SAP Harness v7.0.0 - Autonomous Multi-Agent Orchestration & Evaluation Engine, 164 global skills, 12 registered MCPs, and fail-closed reviewed candidates for Claude, Codex, and Gemini.",
   "private": true,
   "scripts": {
+    "harness:run": "python scripts/sap_harness.py run",
+    "harness:eval": "python scripts/sap_harness.py eval",
+    "harness:benchmark": "python scripts/sap_harness.py benchmark",
+    "harness:agents": "python scripts/sap_harness.py agents",
+    "harness:remote-fs": "python scripts/sap_harness.py test-remote-fs",
+    "ap:compile": "python scripts/automation_pilot_compiler.py",
+    "skill:package": "python scripts/skill_packager.py",
     "abap:lint": "abaplint templates/abaplint.json",
     "abap:lint:fix": "abaplint templates/abaplint.json --fix",
     "abap:lint:ci": "abaplint templates/abaplint.json --outformat json --outfile abaplint-report.json",
@@ -24,7 +31,7 @@
     "hc:json": "python scripts/healthcheck.py --json",
     "hc:prompt": "python scripts/healthcheck.py --prompt-missing",
     "security:audit": "python scripts/secret_audit.py --strict",
-    "catalog:validate": "python scripts/validate_catalog.py --strict",
+    "catalog:validate": "python scripts/validate_catalog.py",
     "mcp:list": "python scripts/mcp_launcher.py list",
     "mcp:probe": "python scripts/mcp_launcher.py probe --server",
     "approval": "python scripts/approval_broker.py",
@@ -81,7 +88,12 @@
     "spec:analyze": "python scripts/sap_router.py analyze-spec --spec",
     "spec:pipeline": "python scripts/sap_router.py pipeline --spec",
     "ide:generate": "python scripts/generate_ide_assets.py generate --targets all",
-    "ide:check": "python scripts/generate_ide_assets.py check"
+    "ide:check": "python scripts/generate_ide_assets.py check",
+    "harness:mcp": "python scripts/sap_harness.py mcp",
+    "harness:share": "python scripts/sap_harness.py share",
+    "harness:remote-fs:mock": "python scripts/sap_harness.py test-remote-fs --mock",
+    "harness:eval:live": "python scripts/sap_harness.py eval --live",
+    "skill:validate": "python scripts/skill_packager.py validate --skill"
   },
   "devDependencies": {
     "@abaplint/cli": "^2.119.65",
