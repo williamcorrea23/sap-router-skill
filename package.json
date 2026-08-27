@@ -1,7 +1,7 @@
 {
   "name": "sap-router-orchestrator",
-  "version": "7.0.0",
-  "description": "SAP Harness v7.0.0 - Autonomous Multi-Agent Orchestration & Evaluation Engine, 164 global skills, 12 registered MCPs, and fail-closed reviewed candidates for Claude, Codex, and Gemini.",
+  "version": "7.1.0",
+  "description": "SAP Harness v7.1.0 - capability routing, fail-closed MCP catalog and evaluation harness. 164 skills, 11 active MCP servers plus 63 reviewed fail-closed candidates, ZROUTER Remote FileSystem for VS Code, for Claude, Codex and Gemini.",
   "private": true,
   "scripts": {
     "harness:run": "python scripts/sap_harness.py run",

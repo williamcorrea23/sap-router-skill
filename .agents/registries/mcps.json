@@ -118,12 +118,16 @@
       "runtime": {
         "command": "python",
         "args": [
-          "packages/mcp-sap-gui-mario/server.py"
+          "-m",
+          "sap_gui_server.server"
         ],
         "transport": "stdio",
         "platforms": [
           "windows"
-        ]
+        ],
+        "env": {
+          "PYTHONPATH": "bundled/mcps/mario-andreschak-mcp-sap-gui/src"
+        }
       },
       "auth": {
         "mode": "logged_in_user_or_env",
