@@ -7,9 +7,9 @@
 > action: ADT direct, SAP GUI fallback, SOAP RFC, or ZROUTER batch. Writes are
 > gated behind an explicit `--functional` flag, so no BAPI fires by accident.
 >
-> **162 skills | 8 active MCPs + fail-closed candidates | 40 CLIs | 8-stage pipeline | v6.0.0**
+> **162 skills | 11 active MCPs + 63 fail-closed candidates | 40 CLIs | 8-stage pipeline | v6.0.0**
 
-> **Status, honestly.** 8 MCP servers launch from a clean clone;
+> **Status, honestly.** 11 MCP servers launch from a clean clone;
 > the remaining reviewed candidates sit under `plannedServers` in `.mcp.json` because their entrypoint is
 > not installed or they were never promoted out of `.agents/registries/mcp-candidates.json`.
 > `npm run hc` now reports that split instead of counting an unprobed server as ready.

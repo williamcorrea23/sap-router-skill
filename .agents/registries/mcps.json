@@ -12,7 +12,9 @@
       },
       "runtime": {
         "command": "npx",
-        "args": ["arc-1"],
+        "args": [
+          "arc-1"
+        ],
         "transport": "stdio",
         "platforms": [
           "windows",
@@ -34,7 +36,14 @@
         "sap.adt.object.activate",
         "sap.adt.search.execute",
         "sap.abap.source.read",
-        "sap.abap.source.modify"
+        "sap.abap.source.modify",
+        "sap.odata.service.query",
+        "sap.odata.service.mutate",
+        "sap.incident.resolution.diagnose",
+        "sap.incident.resolution.remediate",
+        "sap.remotefs.file.read",
+        "sap.remotefs.file.write",
+        "sap.remotefs.object.activate"
       ],
       "safety": {
         "default_mode": "read_only",
@@ -192,7 +201,9 @@
         "sap.cpi.artifact.undeploy",
         "sap.cpi.iflow.generate",
         "sap.cpi.diagram.generate",
-        "sap.cpi.sync.execute"
+        "sap.cpi.sync.execute",
+        "sap.cpi.bundle.package",
+        "sap.cpi.multitenant.manage"
       ],
       "safety": {
         "default_mode": "read_only",
@@ -339,7 +350,8 @@
         "env_refs": []
       },
       "capabilities": [
-        "sap.ui5.project.validate"
+        "sap.ui5.project.validate",
+        "sap.ui5.webcomponents.render"
       ],
       "safety": {
         "default_mode": "read_only",
@@ -460,12 +472,23 @@
       },
       "runtime": {
         "command": "node",
-        "args": ["bundled/tools/context-mode/start.mjs"],
-        "env": {"CONTEXT_MODE_PLATFORM": "codex"},
+        "args": [
+          "bundled/tools/context-mode/start.mjs"
+        ],
+        "env": {
+          "CONTEXT_MODE_PLATFORM": "codex"
+        },
         "transport": "stdio",
-        "platforms": ["windows", "linux", "macos"]
+        "platforms": [
+          "windows",
+          "linux",
+          "macos"
+        ]
       },
-      "auth": {"mode": "none", "env_refs": []},
+      "auth": {
+        "mode": "none",
+        "env_refs": []
+      },
       "capabilities": [
         "agent.context.execute",
         "agent.context.fetch",
@@ -481,7 +504,10 @@
         "tools_list": true,
         "domain_probe": "jsonrpc_tools"
       },
-      "routing": {"priority": 5, "fallback_group": "agent-context"},
+      "routing": {
+        "priority": 5,
+        "fallback_group": "agent-context"
+      },
       "owner": "sap-tutor"
     },
     {
@@ -538,7 +564,7 @@
     {
       "id": "smartform-ai-generator",
       "display_name": "Smart Form AI Generator MCP",
-      "status": "enabled",
+      "status": "planned",
       "source": {
         "repository": "local-packages-smartform-ai-generator",
         "license": "MIT",
@@ -582,7 +608,8 @@
         "priority": 10,
         "fallback_group": "smartform"
       },
-      "owner": "sap-abap-developer"
+      "owner": "sap-abap-developer",
+      "notes": "Python entrypoint 'smartform_ai.server' is not installed in this repo. Kept planned so fail-closed routing returns no candidate instead of selecting a server that cannot start."
     }
   ]
 }

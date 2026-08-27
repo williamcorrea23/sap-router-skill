@@ -4,12 +4,16 @@
   "capabilities": {
     "sap.abap.source.read": {
       "primary": "arc-1",
-      "fallbacks": ["aibap"],
+      "fallbacks": [
+        "aibap"
+      ],
       "mutation": false
     },
     "sap.abap.source.modify": {
       "primary": "arc-1",
-      "fallbacks": ["aibap"],
+      "fallbacks": [
+        "aibap"
+      ],
       "mutation": true,
       "requires_approval": true
     },
@@ -21,32 +25,44 @@
     },
     "sap.cpi.package.read": {
       "primary": "sap-cpi-mcp",
-      "fallbacks": ["integration-suite-ui-mcp"],
+      "fallbacks": [
+        "integration-suite-ui-mcp"
+      ],
       "mutation": false
     },
     "sap.cpi.artifact.read": {
       "primary": "sap-cpi-mcp",
-      "fallbacks": ["integration-suite-ui-mcp"],
+      "fallbacks": [
+        "integration-suite-ui-mcp"
+      ],
       "mutation": false
     },
     "sap.cpi.runtime.read": {
       "primary": "sap-cpi-mcp",
-      "fallbacks": ["integration-suite-ui-mcp"],
+      "fallbacks": [
+        "integration-suite-ui-mcp"
+      ],
       "mutation": false
     },
     "sap.cpi.message.read": {
       "primary": "sap-cpi-mcp",
-      "fallbacks": ["integration-suite-ui-mcp"],
+      "fallbacks": [
+        "integration-suite-ui-mcp"
+      ],
       "mutation": false
     },
     "sap.cpi.message.detail.read": {
       "primary": "sap-cpi-mcp",
-      "fallbacks": ["integration-suite-ui-mcp"],
+      "fallbacks": [
+        "integration-suite-ui-mcp"
+      ],
       "mutation": false
     },
     "sap.cpi.trace.read": {
       "primary": "sap-cpi-mcp",
-      "fallbacks": ["integration-suite-ui-mcp"],
+      "fallbacks": [
+        "integration-suite-ui-mcp"
+      ],
       "mutation": false
     },
     "sap.cpi.quality.check": {
@@ -66,14 +82,18 @@
     },
     "sap.cpi.artifact.deploy": {
       "primary": "sap-cpi-mcp",
-      "fallbacks": ["integration-suite-ui-mcp"],
+      "fallbacks": [
+        "integration-suite-ui-mcp"
+      ],
       "mutation": true,
       "requires_approval": true,
       "plan_then_commit": true
     },
     "sap.cpi.artifact.undeploy": {
       "primary": "sap-cpi-mcp",
-      "fallbacks": ["integration-suite-ui-mcp"],
+      "fallbacks": [
+        "integration-suite-ui-mcp"
+      ],
       "mutation": true,
       "requires_approval": true,
       "plan_then_commit": true
@@ -101,26 +121,34 @@
     },
     "sap.apim.proxy.read": {
       "primary": "sap-apim-mcp",
-      "fallbacks": ["apim-ui-mcp"],
+      "fallbacks": [
+        "apim-ui-mcp"
+      ],
       "mutation": false
     },
     "sap.apim.proxy.modify": {
       "primary": "sap-apim-mcp",
-      "fallbacks": ["apim-ui-mcp"],
+      "fallbacks": [
+        "apim-ui-mcp"
+      ],
       "mutation": true,
       "requires_approval": true,
       "plan_then_commit": true
     },
     "sap.apim.proxy.deploy": {
       "primary": "sap-apim-mcp",
-      "fallbacks": ["apim-ui-mcp"],
+      "fallbacks": [
+        "apim-ui-mcp"
+      ],
       "mutation": true,
       "requires_approval": true,
       "plan_then_commit": true
     },
     "sap.fiori.app.generate": {
       "primary": "fiori-mcp",
-      "fallbacks": ["ui5-mcp"],
+      "fallbacks": [
+        "ui5-mcp"
+      ],
       "mutation": true,
       "requires_approval": true,
       "plan_then_commit": true
@@ -143,34 +171,150 @@
     "sap.smartform.analyze": {
       "primary": "smartform-ai-generator",
       "fallbacks": [],
-      "mutation": false
+      "mutation": false,
+      "status": "planned",
+      "provider_note": "Provider smartform-ai-generator is planned (entrypoint not installed); capability is unreachable by design."
     },
     "sap.smartform.spec": {
       "primary": "smartform-ai-generator",
       "fallbacks": [],
-      "mutation": false
+      "mutation": false,
+      "status": "planned",
+      "provider_note": "Provider smartform-ai-generator is planned (entrypoint not installed); capability is unreachable by design."
     },
     "sap.smartform.package": {
       "primary": "smartform-ai-generator",
       "fallbacks": [],
-      "mutation": false
+      "mutation": false,
+      "status": "planned",
+      "provider_note": "Provider smartform-ai-generator is planned (entrypoint not installed); capability is unreachable by design."
     },
     "sap.smartform.deploy": {
       "primary": "smartform-ai-generator",
-      "fallbacks": ["arc-1"],
+      "fallbacks": [
+        "arc-1"
+      ],
       "mutation": true,
       "requires_approval": true,
-      "plan_then_commit": true
+      "plan_then_commit": true,
+      "status": "planned",
+      "provider_note": "Provider smartform-ai-generator is planned (entrypoint not installed); capability is unreachable by design."
     },
     "sap.smartform.compare": {
       "primary": "smartform-ai-generator",
       "fallbacks": [],
+      "mutation": false,
+      "status": "planned",
+      "provider_note": "Provider smartform-ai-generator is planned (entrypoint not installed); capability is unreachable by design."
+    },
+    "sap.cpi.bundle.package": {
+      "primary": "sap-cpi-mcp",
+      "fallbacks": [],
+      "mutation": true,
+      "requires_approval": true,
+      "plan_then_commit": true,
+      "contributed_by": [
+        "finkeflo-flowmate",
+        "vaibhav8097-sap-cpi-devops"
+      ],
+      "provider_note": "Routed to an already-configured server. The contributing sources are catalogued in bundled-sources.json and registered as disabled candidates in mcp-candidates.json; they are NOT the runtime provider."
+    },
+    "sap.cpi.multitenant.manage": {
+      "primary": "sap-cpi-mcp",
+      "fallbacks": [],
+      "mutation": false,
+      "contributed_by": [
+        "premsaidaggolu-cpi-multitenant-mcp"
+      ],
+      "provider_note": "Routed to an already-configured server. The contributing sources are catalogued in bundled-sources.json and registered as disabled candidates in mcp-candidates.json; they are NOT the runtime provider."
+    },
+    "sap.odata.service.query": {
+      "primary": "arc-1",
+      "fallbacks": [
+        "sap-cpi-mcp"
+      ],
+      "mutation": false,
+      "contributed_by": [
+        "gutjahrai-sap-odata-mcp",
+        "gutjahrai-sap-odata-mcp-py"
+      ],
+      "provider_note": "Routed to an already-configured server. The contributing sources are catalogued in bundled-sources.json and registered as disabled candidates in mcp-candidates.json; they are NOT the runtime provider."
+    },
+    "sap.odata.service.mutate": {
+      "primary": "arc-1",
+      "fallbacks": [],
+      "mutation": true,
+      "requires_approval": true,
+      "plan_then_commit": true,
+      "contributed_by": [
+        "gutjahrai-sap-odata-mcp"
+      ],
+      "provider_note": "Routed to an already-configured server. The contributing sources are catalogued in bundled-sources.json and registered as disabled candidates in mcp-candidates.json; they are NOT the runtime provider."
+    },
+    "sap.ui5.webcomponents.render": {
+      "primary": "ui5-mcp",
+      "fallbacks": [
+        "fiori-mcp"
+      ],
+      "mutation": false,
+      "contributed_by": [
+        "ui5-webcomponents-mcp"
+      ],
+      "provider_note": "Routed to an already-configured server. The contributing sources are catalogued in bundled-sources.json and registered as disabled candidates in mcp-candidates.json; they are NOT the runtime provider."
+    },
+    "sap.incident.resolution.diagnose": {
+      "primary": "arc-1",
+      "fallbacks": [
+        "sap-cpi-mcp",
+        "mcp-sap-gui"
+      ],
+      "mutation": false,
+      "contributed_by": [
+        "codetush7-sap-incident-agent",
+        "mrrishi550-ai-self-healing"
+      ],
+      "provider_note": "Routed to an already-configured server. The contributing sources are catalogued in bundled-sources.json and registered as disabled candidates in mcp-candidates.json; they are NOT the runtime provider."
+    },
+    "sap.incident.resolution.remediate": {
+      "primary": "arc-1",
+      "fallbacks": [
+        "mcp-sap-gui"
+      ],
+      "mutation": true,
+      "requires_approval": true,
+      "plan_then_commit": true,
+      "contributed_by": [
+        "codetush7-sap-incident-agent",
+        "mrrishi550-ai-self-healing"
+      ],
+      "provider_note": "Routed to an already-configured server. The contributing sources are catalogued in bundled-sources.json and registered as disabled candidates in mcp-candidates.json; they are NOT the runtime provider."
+    },
+    "sap.remotefs.file.read": {
+      "primary": "arc-1",
+      "fallbacks": [],
       "mutation": false
+    },
+    "sap.remotefs.file.write": {
+      "primary": "arc-1",
+      "fallbacks": [],
+      "mutation": true,
+      "requires_approval": true,
+      "plan_then_commit": true
+    },
+    "sap.remotefs.object.activate": {
+      "primary": "arc-1",
+      "fallbacks": [],
+      "mutation": true,
+      "requires_approval": true,
+      "plan_then_commit": true
     }
   },
   "profiles": {
     "sap-cpi-developer": {
-      "skills": ["cpi-iflow-development", "btp-integration-suite"],
+      "skills": [
+        "cpi-iflow-development",
+        "btp-integration-suite"
+      ],
       "capabilities": [
         "sap.cpi.package.read",
         "sap.cpi.artifact.read",
@@ -189,16 +333,37 @@
       ]
     },
     "sap-apim-architect": {
-      "skills": ["sap-api-policy", "sap-api-style"],
-      "capabilities": ["sap.apim.proxy.read", "sap.apim.proxy.modify", "sap.apim.proxy.deploy"]
+      "skills": [
+        "sap-api-policy",
+        "sap-api-style"
+      ],
+      "capabilities": [
+        "sap.apim.proxy.read",
+        "sap.apim.proxy.modify",
+        "sap.apim.proxy.deploy"
+      ]
     },
     "sap-fiori-ui5-developer": {
-      "skills": ["sap-fiori-tools", "sapui5-framework", "sap-fiori-apps-reference"],
-      "capabilities": ["sap.fiori.app.generate", "sap.ui5.project.validate"]
+      "skills": [
+        "sap-fiori-tools",
+        "sapui5-framework",
+        "sap-fiori-apps-reference"
+      ],
+      "capabilities": [
+        "sap.fiori.app.generate",
+        "sap.ui5.project.validate"
+      ]
     },
     "sap-cap-developer": {
-      "skills": ["sap-cap", "btp-cloud-foundry", "btp-business-application-studio"],
-      "capabilities": ["sap.cap.model.search", "sap.cap.project.build"]
+      "skills": [
+        "sap-cap",
+        "btp-cloud-foundry",
+        "btp-business-application-studio"
+      ],
+      "capabilities": [
+        "sap.cap.model.search",
+        "sap.cap.project.build"
+      ]
     }
   }
 }

@@ -31,7 +31,7 @@
         "SYNTAX_CHECK_BEFORE_ACTIVATE",
         "TAVILY_API_KEY"
       ],
-      "description": "DimiDR/ABAP-MCP \u2014 Standalone MCP Server for agentic ABAP development (68 tools, method surgery, DDIC validation, Clean ABAP workflow). Credentials hardcoded \u2014 ${SAP_URL} resolution fixed."
+      "description": "DimiDR/ABAP-MCP — Standalone MCP Server for agentic ABAP development (68 tools, method surgery, DDIC validation, Clean ABAP workflow). Credentials hardcoded — ${SAP_URL} resolution fixed."
     },
     {
       "id": "abap-mcp-adt-powerup",
@@ -50,7 +50,7 @@
         "SAP_URL",
         "SAP_USER"
       ],
-      "description": "ABAP MCP ADT PowerUp (babamba2/abap-mcp-adt-powerup) \u2014 Extended ADT MCP with advanced ABAP tools. Node.js."
+      "description": "ABAP MCP ADT PowerUp (babamba2/abap-mcp-adt-powerup) — Extended ADT MCP with advanced ABAP tools. Node.js."
     },
     {
       "id": "azure-ai-search",
@@ -82,7 +82,7 @@
         ]
       },
       "env_refs": [],
-      "description": "SAP BTP MCP \u2014 7 entity sets: GlobalAccount, Subaccounts, Directories, Assignments, AllowedDataCenters, EnvironmentInstances, AvailableEnvironments. OData-based via btp-admin-api-config.json. Built on odata-mcp-proxy."
+      "description": "SAP BTP MCP — 7 entity sets: GlobalAccount, Subaccounts, Directories, Assignments, AllowedDataCenters, EnvironmentInstances, AvailableEnvironments. OData-based via btp-admin-api-config.json. Built on odata-mcp-proxy."
     },
     {
       "id": "btp-sap-odata-to-mcp",
@@ -96,7 +96,7 @@
         ]
       },
       "env_refs": [],
-      "description": "BTP OData MCP \u2014 3 progressive-discovery tools (discover-sap-data, get-entity-metadata, execute-sap-operation) instead of 200+ entity tools. S/4HANA/ECC via BTP Destination + Principal Propagation. Token-optimized."
+      "description": "BTP OData MCP — 3 progressive-discovery tools (discover-sap-data, get-entity-metadata, execute-sap-operation) instead of 200+ entity tools. S/4HANA/ECC via BTP Destination + Principal Propagation. Token-optimized."
     },
     {
       "id": "bw-modeling-mcp",
@@ -142,7 +142,7 @@
         "CF_PASSWORD",
         "CF_USER"
       ],
-      "description": "Cloud Foundry MCP \u2014 cf push/deploy, org/space management, service marketplace, logs, SSH. BTP Cloud Foundry runtime operations."
+      "description": "Cloud Foundry MCP — cf push/deploy, org/space management, service marketplace, logs, SSH. BTP Cloud Foundry runtime operations."
     },
     {
       "id": "ci-mcp-server",
@@ -163,7 +163,7 @@
         "CPI_DESTINATION_CLIENT_SECRET",
         "CPI_DESTINATION_TOKEN_URL"
       ],
-      "description": "lemaiwo/ci-mcp-server \u2014 configuration-driven SAP Cloud Integration (CPI) OData V2 API proxy. Exposes 32 entity sets (packages, logs, security material, Partner Directory)."
+      "description": "lemaiwo/ci-mcp-server — configuration-driven SAP Cloud Integration (CPI) OData V2 API proxy. Exposes 32 entity sets (packages, logs, security material, Partner Directory)."
     },
     {
       "id": "cloud-alm-itsm",
@@ -236,7 +236,7 @@
         "ERPL_URL",
         "ERPL_USER"
       ],
-      "description": "erpl-adt MCP \u2014 single-binary ADT CLI, zero-dependency, Go-based. Transport CRUD, ABAP source CRUD, ABAP Unit, ATC checks, object search. Latest release v2026.06.27."
+      "description": "erpl-adt MCP — single-binary ADT CLI, zero-dependency, Go-based. Transport CRUD, ABAP source CRUD, ABAP Unit, ATC checks, object search. Latest release v2026.06.27."
     },
     {
       "id": "guniweb-sap-mcp",
@@ -256,7 +256,7 @@
         "SAP_URL",
         "SAP_USER"
       ],
-      "description": "guniweb-sap-mcp \u2014 multi-protocol MCP for OData V2/V4, IDocs, and RFC/BAPI. 22 tools across 4 tiers. 918 unit tests. 7 auth types. n8n-compatible."
+      "description": "guniweb-sap-mcp — multi-protocol MCP for OData V2/V4, IDocs, and RFC/BAPI. 22 tools across 4 tiers. 918 unit tests. 7 auth types. n8n-compatible."
     },
     {
       "id": "mcp-abap-adt",
@@ -275,7 +275,7 @@
         "SAP_URL",
         "SAP_USERNAME"
       ],
-      "description": "TypeScript SAP ADT MCP \u2014 13 tools: GetProgram, GetClass, GetFunctionGroup, GetFunction, GetStructure, GetTable, GetTableContents, GetPackage, GetTypeInfo, GetInclude, SearchObject, GetInterface, GetTransaction. MIT license."
+      "description": "TypeScript SAP ADT MCP — 13 tools: GetProgram, GetClass, GetFunctionGroup, GetFunction, GetStructure, GetTable, GetTableContents, GetPackage, GetTypeInfo, GetInclude, SearchObject, GetInterface, GetTransaction. MIT license."
     },
     {
       "id": "mcp-calm-server",
@@ -296,7 +296,7 @@
         "CALM_UAA_CLIENT_SECRET",
         "CALM_UAA_URL"
       ],
-      "description": "fr0ster/mcp-calm-server \u2014 SAP Cloud ALM MCP server. Exposes 54 tools covering all 9 Cloud ALM services."
+      "description": "fr0ster/mcp-calm-server — SAP Cloud ALM MCP server. Exposes 54 tools covering all 9 Cloud ALM services."
     },
     {
       "id": "mcp-integration-suite",
@@ -321,7 +321,7 @@
         "CPI_OAUTH_CLIENT_SECRET",
         "CPI_OAUTH_TOKEN_URL"
       ],
-      "description": "1nbuc/mcp-integration-suite \u2014 SAP Integration Suite API management (iFlow, package, message mapping, testing, monitoring). Requires S-User credentials or OAuth2 service key."
+      "description": "1nbuc/mcp-integration-suite — SAP Integration Suite API management (iFlow, package, message mapping, testing, monitoring). Requires S-User credentials or OAuth2 service key."
     },
     {
       "id": "mcp-sap-gui-kts",
@@ -338,7 +338,7 @@
       "env_refs": [
         "SAP_CONNECTION"
       ],
-      "description": "SAP GUI MCP (kts982/mcp-sap-gui v0.1.3) \u2014 Python. Installed editable from packages/mcp-sap-gui-kts-code."
+      "description": "SAP GUI MCP (kts982/mcp-sap-gui v0.1.3) — Python. Installed editable from packages/mcp-sap-gui-kts-code."
     },
     {
       "id": "mcp-sap-notes",
@@ -355,7 +355,7 @@
         "SAP_NOTES_PASSWORD",
         "SAP_NOTES_USERNAME"
       ],
-      "description": "SAP Notes MCP \u2014 search and fetch SAP Notes from me.sap.com. Supports enriched metadata, correction details, ABAP object references. Archived repo \u2014 moved to marianfoo/sap-mcp-servers."
+      "description": "SAP Notes MCP — search and fetch SAP Notes from me.sap.com. Supports enriched metadata, correction details, ABAP object references. Archived repo — moved to marianfoo/sap-mcp-servers."
     },
     {
       "id": "odata-mcp-go",
@@ -381,7 +381,7 @@
         ]
       },
       "env_refs": [],
-      "description": "SAP Cloud Integration OData MCP \u2014 32 entity sets: IntegrationPackages, IntegrationDesigntimeArtifacts, MessageProcessingLogs, DataStoreEntries, KeystoreEntries, UserCredentials, OAuth2ClientCredentials, Partners, etc. npm package. Config-driven OData\u2192MCP bridge. MIT license."
+      "description": "SAP Cloud Integration OData MCP — 32 entity sets: IntegrationPackages, IntegrationDesigntimeArtifacts, MessageProcessingLogs, DataStoreEntries, KeystoreEntries, UserCredentials, OAuth2ClientCredentials, Partners, etc. npm package. Config-driven OData→MCP bridge. MIT license."
     },
     {
       "id": "pinecone-rag",
@@ -457,7 +457,7 @@
         "APIM_PASSWORD",
         "APIM_USER"
       ],
-      "description": "SAP API Management MCP \u2014 API proxy lifecycle, policy deployment, security/traffic config, OpenAPI import, API Business Hub publication. Pre-configured for sap-api-policy skill."
+      "description": "SAP API Management MCP — API proxy lifecycle, policy deployment, security/traffic config, OpenAPI import, API Business Hub publication. Pre-configured for sap-api-policy skill."
     },
     {
       "id": "sap-cpi",
@@ -475,7 +475,7 @@
         "CPI_PASSWORD",
         "CPI_USER"
       ],
-      "description": "SAP Cloud Integration (CPI) MCP \u2014 iFlow deploy/undeploy, message processing logs, trace logs, keystore, credentials, system status. Direct CPI tenant connection."
+      "description": "SAP Cloud Integration (CPI) MCP — iFlow deploy/undeploy, message processing logs, trace logs, keystore, credentials, system status. Direct CPI tenant connection."
     },
     {
       "id": "sap-gui-library-mcp",
@@ -495,7 +495,7 @@
         "SAPGUI_PASSWORD",
         "SAPGUI_USER"
       ],
-      "description": "sap-gui-library MCP \u2014 Python abstraction over SAP GUI Scripting COM API. pip install sap-gui-library. Requires SAP GUI 770+ with Accessibility Mode."
+      "description": "sap-gui-library MCP — Python abstraction over SAP GUI Scripting COM API. pip install sap-gui-library. Requires SAP GUI 770+ with Accessibility Mode."
     },
     {
       "id": "sap-gui-mcp-jduncan",
@@ -515,7 +515,7 @@
         "SAPGUI_PASSWORD",
         "SAPGUI_USER"
       ],
-      "description": "SAP GUI MCP (jduncan8142/sap_gui_mcp v0.1.0) \u2014 FastMCP-based, Python. Installed editable from packages/sap_gui_mcp."
+      "description": "SAP GUI MCP (jduncan8142/sap_gui_mcp v0.1.0) — FastMCP-based, Python. Installed editable from packages/sap_gui_mcp."
     },
     {
       "id": "sap-pi-mcp",
@@ -553,7 +553,7 @@
         "SAP_RFC_PASSWORD",
         "SAP_RFC_USER"
       ],
-      "description": "SAP RFC MCP server \u2014 ZROUTER dispatch via RFC. Default route for BAPI-based batch operations (MM, SD, FI, QM, PP, WM, CO, HCM, BASIS)."
+      "description": "SAP RFC MCP server — ZROUTER dispatch via RFC. Default route for BAPI-based batch operations (MM, SD, FI, QM, PP, WM, CO, HCM, BASIS)."
     },
     {
       "id": "sap-transport-mcp",
@@ -578,7 +578,7 @@
         "SAP_SYSTEM_ID",
         "SAP_USERNAME"
       ],
-      "description": "Nidhideep/sap-transport-mcp \u2014 CTS Transport Request management (list, inspect, release, delete) via SAP ADT REST API."
+      "description": "Nidhideep/sap-transport-mcp — CTS Transport Request management (list, inspect, release, delete) via SAP ADT REST API."
     },
     {
       "id": "sapgui-mcp-go",
@@ -595,7 +595,7 @@
         "SAPGUI_PASSWORD",
         "SAPGUI_USER"
       ],
-      "description": "SAP GUI MCP in Go (Hochfrequenz/sapgui.mcp v0.13.3) \u2014 TERTIARY fallback. Requires: go install github.com/Hochfrequenz/sapgui.mcp/cmd/sapgui-mcp@latest (when fixed upstream)."
+      "description": "SAP GUI MCP in Go (Hochfrequenz/sapgui.mcp v0.13.3) — TERTIARY fallback. Requires: go install github.com/Hochfrequenz/sapgui.mcp/cmd/sapgui-mcp@latest (when fixed upstream)."
     },
     {
       "id": "sapgui-mcp-webgui",
@@ -613,7 +613,7 @@
         "SAPGUI_MCP_CONFIG_PATH",
         "SAP_SYSTEM"
       ],
-      "description": "SAP GUI MCP WebGUI (Hochfrequenz/sapgui.mcp v0.13.4) \u2014 Chrome/Playwright browser automation for SAP Web GUI. Linux/Mac/Windows."
+      "description": "SAP GUI MCP WebGUI (Hochfrequenz/sapgui.mcp v0.13.4) — Chrome/Playwright browser automation for SAP Web GUI. Linux/Mac/Windows."
     },
     {
       "id": "sapient-mcp",
@@ -648,7 +648,7 @@
         "SAPIENT_HOST",
         "SAPIENT_KEY"
       ],
-      "description": "Sapient MCP (toni-ramchandani/sapient-mcp v1.0.0) \u2014 Intelligent SAP GUI automation, RoboSAPiens-powered. Python."
+      "description": "Sapient MCP (toni-ramchandani/sapient-mcp v1.0.0) — Intelligent SAP GUI automation, RoboSAPiens-powered. Python."
     },
     {
       "id": "sf-mcp",
@@ -666,7 +666,7 @@
         "SF_URL",
         "SF_USERNAME"
       ],
-      "description": "SuccessFactors OData MCP \u2014 HCM cloud operations: Employee data, org structure, compensation, time off. Route prefix: sf_* actions."
+      "description": "SuccessFactors OData MCP — HCM cloud operations: Employee data, org structure, compensation, time off. Route prefix: sf_* actions."
     },
     {
       "id": "supabase-rag",
@@ -701,55 +701,387 @@
         "SAP_SYSTEMS",
         "STEAMPUNK_MODE"
       ],
-      "description": "vibing-steampunk MCP \u2014 ADT-to-MCP bridge in Go, 257+ stars, 147 MCP tools, hyperfocused single-tool mode (~200 tokens). Covers debug/deploy/analyze ABAP, package health, dead code detection, ABAP LSP, WebSocket RFC handler."
+      "description": "vibing-steampunk MCP — ADT-to-MCP bridge in Go, 257+ stars, 147 MCP tools, hyperfocused single-tool mode (~200 tokens). Covers debug/deploy/analyze ABAP, package health, dead code detection, ABAP LSP, WebSocket RFC handler."
     },
     {
       "id": "lemaiwo-btp-mcp-server",
       "status": "disabled_candidate",
       "reason": "Bundled source reviewed; install dependencies and configure BTP destinations before promotion.",
-      "runtime": {"type": "stdio", "command": "npm", "args": ["--prefix", "bundled/mcps/lemaiwo-btp-mcp-server", "start"]},
-      "env_refs": ["VCAP_SERVICES", "DESTINATIONS"],
+      "runtime": {
+        "type": "stdio",
+        "command": "npm",
+        "args": [
+          "--prefix",
+          "bundled/mcps/lemaiwo-btp-mcp-server",
+          "start"
+        ]
+      },
+      "env_refs": [
+        "VCAP_SERVICES",
+        "DESTINATIONS"
+      ],
       "description": "SAP BTP administration MCP using odata-mcp-proxy for account, entitlement, provisioning, and XSUAA APIs. Includes mutating operations; approval required."
     },
     {
       "id": "aiadiguru2025-sf-mcp",
       "status": "disabled_candidate",
       "reason": "Bundled source reviewed; configure SuccessFactors OAuth credentials and run its test suite before promotion.",
-      "runtime": {"type": "stdio", "command": "python", "args": ["-m", "main"], "cwd": "bundled/mcps/aiadiguru2025-sf-mcp"},
-      "env_refs": ["SF_BASE_URL", "SF_COMPANY_ID", "SF_USERNAME", "SF_PASSWORD", "SF_CLIENT_ID", "SF_CLIENT_SECRET"],
+      "runtime": {
+        "type": "stdio",
+        "command": "python",
+        "args": [
+          "-m",
+          "main"
+        ],
+        "cwd": "bundled/mcps/aiadiguru2025-sf-mcp"
+      },
+      "env_refs": [
+        "SF_BASE_URL",
+        "SF_COMPANY_ID",
+        "SF_USERNAME",
+        "SF_PASSWORD",
+        "SF_CLIENT_ID",
+        "SF_CLIENT_SECRET"
+      ],
       "description": "SAP SuccessFactors OData MCP with HR, permissions, audit, and compliance tools. Treat reads and writes as separate capabilities."
     },
     {
       "id": "hochfrequenz-sapgui-mcp",
       "status": "disabled_candidate",
       "reason": "Desktop/WebGUI automation requires local SAP GUI/browser setup and explicit transaction approval.",
-      "runtime": {"type": "stdio", "command": "sapgui_mcp"},
-      "env_refs": ["SAPGUI_MCP_CONFIG_PATH", "SAP_SYSTEM"],
+      "runtime": {
+        "type": "stdio",
+        "command": "sapgui_mcp"
+      },
+      "env_refs": [
+        "SAPGUI_MCP_CONFIG_PATH",
+        "SAP_SYSTEM"
+      ],
       "description": "Hochfrequenz SAP GUI/WebGUI MCP for Windows desktop scripting and browser-based SAP Web GUI automation."
     },
     {
       "id": "arc-mcp-xsuaa-auth",
       "status": "disabled_candidate",
       "reason": "Library only; does not expose a standalone MCP server. Promote only as a dependency of an HTTP MCP host.",
-      "runtime": {"type": "library", "package": "@arc-mcp/xsuaa-auth"},
-      "env_refs": ["CLIENT_SECRET", "XSUAA_CREDENTIALS", "VCAP_SERVICES"],
+      "runtime": {
+        "type": "library",
+        "package": "@arc-mcp/xsuaa-auth"
+      },
+      "env_refs": [
+        "CLIENT_SECRET",
+        "XSUAA_CREDENTIALS",
+        "VCAP_SERVICES"
+      ],
       "description": "Reusable XSUAA/OAuth2 and BTP principal-propagation authentication library for Express MCP servers."
     },
     {
       "id": "vadimklimov-cpi-mcp-server",
       "status": "disabled_candidate",
       "reason": "MIT source reviewed for read-only patterns; promote only after pinning a release, installing the binary, validating OAuth roles, and completing MCP safety tests.",
-      "runtime": {"type": "stdio", "command": "cpi-mcp-server", "args": []},
-      "env_refs": ["CPI_BASE_URL", "CPI_OAUTH_TOKEN_URL", "CPI_OAUTH_CLIENT_ID", "CPI_OAUTH_CLIENT_SECRET"],
+      "runtime": {
+        "type": "stdio",
+        "command": "cpi-mcp-server",
+        "args": []
+      },
+      "env_refs": [
+        "CPI_BASE_URL",
+        "CPI_OAUTH_TOKEN_URL",
+        "CPI_OAUTH_CLIENT_ID",
+        "CPI_OAUTH_CLIENT_SECRET"
+      ],
       "description": "vadimklimov/cpi-mcp-server — read-oriented Go MCP for packages, iFlows, value/message mappings, script collections, runtime artifacts, and monitoring. MIT; candidate only."
     },
     {
       "id": "karthickshiva-sap-cpi-mcp-server",
       "status": "disabled_candidate",
       "reason": "Very new single-commit implementation; validate authentication, deployment wrapper, and tenant isolation before any promotion.",
-      "runtime": {"type": "remote_tenant_artifact", "command": "", "args": []},
-      "env_refs": ["CPI_BASE_URL", "CPI_OAUTH_TOKEN_URL", "CPI_OAUTH_CLIENT_ID", "CPI_OAUTH_CLIENT_SECRET"],
+      "runtime": {
+        "type": "remote_tenant_artifact",
+        "command": "",
+        "args": []
+      },
+      "env_refs": [
+        "CPI_BASE_URL",
+        "CPI_OAUTH_TOKEN_URL",
+        "CPI_OAUTH_CLIENT_ID",
+        "CPI_OAUTH_CLIENT_SECRET"
+      ],
       "description": "karthickshiva-png/sap-cpi-mcp-server — native CPI/OpenAPI MCP artifact with MPL, runtime and deployment concepts. MIT; disabled candidate only."
+    },
+    {
+      "id": "1nbuc-mcp-integration-suite",
+      "status": "disabled_candidate",
+      "reason": "Bundled snapshot under bundled/mcps/ is a pointer README only - upstream source is not vendored, so no runtime can be started. Promote to mcps.json after vendoring or pinning an installable package, plus runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": null,
+        "args": []
+      },
+      "env_refs": [],
+      "bundled_source": "1nbuc-mcp-integration-suite",
+      "repository": "https://github.com/1nbuc/mcp-integration-suite",
+      "declared_capabilities": [
+        "sap.cpi.package.read",
+        "sap.cpi.artifact.read",
+        "sap.cpi.message.read"
+      ],
+      "description": "1nbuc/mcp-integration-suite - Integration Suite MCP (iFlow content, deploy, MPL)."
+    },
+    {
+      "id": "anuradha504-integration-suite",
+      "status": "disabled_candidate",
+      "reason": "Bundled snapshot under bundled/mcps/ is a pointer README only - upstream source is not vendored, so no runtime can be started. Promote to mcps.json after vendoring or pinning an installable package, plus runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": null,
+        "args": []
+      },
+      "env_refs": [],
+      "bundled_source": "anuradha504-integration-suite",
+      "repository": "https://github.com/Anuradha504/integration-suite",
+      "declared_capabilities": [
+        "sap.cpi.package.read",
+        "sap.cpi.artifact.read"
+      ],
+      "description": "Anuradha504/integration-suite - Integration Suite operations MCP."
+    },
+    {
+      "id": "gutjahrai-sap-odata-mcp",
+      "status": "disabled_candidate",
+      "reason": "Bundled snapshot under bundled/mcps/ is a pointer README only - upstream source is not vendored, so no runtime can be started. Promote to mcps.json after vendoring or pinning an installable package, plus runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": null,
+        "args": []
+      },
+      "env_refs": [],
+      "bundled_source": "gutjahrai-sap-odata-mcp",
+      "repository": "https://github.com/GutjahrAI/sap-odata-mcp-server",
+      "declared_capabilities": [
+        "sap.odata.service.query",
+        "sap.odata.service.mutate"
+      ],
+      "description": "GutjahrAI/sap-odata-mcp-server - generic SAP OData v2/v4 service MCP (TypeScript)."
+    },
+    {
+      "id": "gutjahrai-sap-odata-mcp-py",
+      "status": "disabled_candidate",
+      "reason": "Bundled snapshot under bundled/mcps/ is a pointer README only - upstream source is not vendored, so no runtime can be started. Promote to mcps.json after vendoring or pinning an installable package, plus runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": null,
+        "args": []
+      },
+      "env_refs": [],
+      "bundled_source": "gutjahrai-sap-odata-mcp-py",
+      "repository": "https://github.com/GutjahrAI/sap-odata-mcp-py",
+      "declared_capabilities": [
+        "sap.odata.service.query"
+      ],
+      "description": "GutjahrAI/sap-odata-mcp-py - generic SAP OData service MCP (Python)."
+    },
+    {
+      "id": "karthickshiva-sap-cpi-mcp",
+      "status": "disabled_candidate",
+      "reason": "Bundled snapshot under bundled/mcps/ is a pointer README only - upstream source is not vendored, so no runtime can be started. Promote to mcps.json after vendoring or pinning an installable package, plus runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": null,
+        "args": []
+      },
+      "env_refs": [],
+      "bundled_source": "karthickshiva-sap-cpi-mcp",
+      "repository": "https://github.com/karthickshiva-png/sap-cpi-mcp-server",
+      "declared_capabilities": [
+        "sap.cpi.artifact.read",
+        "sap.cpi.runtime.read"
+      ],
+      "description": "karthickshiva-png/sap-cpi-mcp-server - CPI artifact and runtime MCP."
+    },
+    {
+      "id": "keelside-mcp-sap-cpi",
+      "status": "disabled_candidate",
+      "reason": "Bundled snapshot under bundled/mcps/ is a pointer README only - upstream source is not vendored, so no runtime can be started. Promote to mcps.json after vendoring or pinning an installable package, plus runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": null,
+        "args": []
+      },
+      "env_refs": [],
+      "bundled_source": "keelside-mcp-sap-cpi",
+      "repository": "https://github.com/Keelside/mcp-sap-cpi",
+      "declared_capabilities": [
+        "sap.cpi.artifact.read",
+        "sap.cpi.message.read"
+      ],
+      "description": "Keelside/mcp-sap-cpi - CPI content and message monitoring MCP."
+    },
+    {
+      "id": "lopezmas-sap-pi-mcp",
+      "status": "disabled_candidate",
+      "reason": "Bundled snapshot under bundled/mcps/ is a pointer README only - upstream source is not vendored, so no runtime can be started. Promote to mcps.json after vendoring or pinning an installable package, plus runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": null,
+        "args": []
+      },
+      "env_refs": [],
+      "bundled_source": "lopezmas-sap-pi-mcp",
+      "repository": "https://github.com/lopezmas/sap-pi-mcp-server",
+      "declared_capabilities": [
+        "sap.pi.channel.read",
+        "sap.pi.message.read"
+      ],
+      "description": "lopezmas/sap-pi-mcp-server - SAP PI/PO channel and message MCP."
+    },
+    {
+      "id": "premsaidaggolu-cpi-multitenant-mcp",
+      "status": "disabled_candidate",
+      "reason": "Bundled snapshot under bundled/mcps/ is a pointer README only - upstream source is not vendored, so no runtime can be started. Promote to mcps.json after vendoring or pinning an installable package, plus runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": null,
+        "args": []
+      },
+      "env_refs": [],
+      "bundled_source": "premsaidaggolu-cpi-multitenant-mcp",
+      "repository": "https://github.com/premsaidaggolu/sap-cpi-multi-tenant-mcp-server",
+      "declared_capabilities": [
+        "sap.cpi.multitenant.manage"
+      ],
+      "description": "premsaidaggolu/sap-cpi-multi-tenant-mcp-server - multi-tenant CPI MCP."
+    },
+    {
+      "id": "stiaansdw-ci-mcp-server",
+      "status": "disabled_candidate",
+      "reason": "Bundled snapshot under bundled/mcps/ is a pointer README only - upstream source is not vendored, so no runtime can be started. Promote to mcps.json after vendoring or pinning an installable package, plus runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": null,
+        "args": []
+      },
+      "env_refs": [],
+      "bundled_source": "stiaansdw-ci-mcp-server",
+      "repository": "https://github.com/stiaansdw/ci-mcp-server-claude-web_deprecated",
+      "declared_capabilities": [
+        "sap.cpi.artifact.read"
+      ],
+      "description": "stiaansdw/ci-mcp-server-claude-web (deprecated upstream) - Cloud Integration MCP."
+    },
+    {
+      "id": "ui5-webcomponents-mcp",
+      "status": "disabled_candidate",
+      "reason": "Bundled snapshot under bundled/mcps/ is a pointer README only - upstream source is not vendored, so no runtime can be started. Promote to mcps.json after vendoring or pinning an installable package, plus runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": null,
+        "args": []
+      },
+      "env_refs": [],
+      "bundled_source": "ui5-webcomponents-mcp",
+      "repository": "https://github.com/UI5/webcomponents-mcp-server",
+      "declared_capabilities": [
+        "sap.ui5.webcomponents.render"
+      ],
+      "description": "UI5/webcomponents-mcp-server - UI5 Web Components authoring MCP."
+    },
+    {
+      "id": "vadimklimov-cpi-mcp",
+      "status": "disabled_candidate",
+      "reason": "Bundled snapshot under bundled/mcps/ is a pointer README only - upstream source is not vendored, so no runtime can be started. Promote to mcps.json after vendoring or pinning an installable package, plus runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": null,
+        "args": []
+      },
+      "env_refs": [],
+      "bundled_source": "vadimklimov-cpi-mcp",
+      "repository": "https://github.com/vadimklimov/cpi-mcp-server",
+      "declared_capabilities": [
+        "sap.cpi.artifact.read",
+        "sap.cpi.runtime.read"
+      ],
+      "description": "vadimklimov/cpi-mcp-server - CPI tenant MCP (Go)."
+    },
+    {
+      "id": "jfilak-sapcli",
+      "status": "disabled_candidate",
+      "reason": "Bundled snapshot is a pointer README; upstream source not vendored. Promote only after vendoring an installable runtime plus safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": null,
+        "args": []
+      },
+      "env_refs": [],
+      "bundled_source": "jfilak-sapcli",
+      "repository": "https://github.com/jfilak/sapcli",
+      "declared_capabilities": [
+        "sap.adt.source.read",
+        "sap.adt.object.activate"
+      ],
+      "description": "jfilak/sapcli - SAP ADT command line client; MCP surface not packaged upstream."
+    },
+    {
+      "id": "clementringot-rosa",
+      "status": "disabled_candidate",
+      "reason": "Bundled snapshot is a pointer README; upstream source not vendored. Promote only after vendoring an installable runtime plus safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": null,
+        "args": []
+      },
+      "env_refs": [],
+      "bundled_source": "clementringot-rosa",
+      "repository": "https://github.com/clementringot/rosa",
+      "declared_capabilities": [],
+      "description": "clementringot/rosa - SAP assistant MCP."
+    },
+    {
+      "id": "nickels-sap-btp-docs-mcp",
+      "status": "disabled_candidate",
+      "reason": "Bundled snapshot is a pointer README; upstream source not vendored. Promote only after vendoring an installable runtime plus safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": null,
+        "args": []
+      },
+      "env_refs": [],
+      "bundled_source": "nickels-sap-btp-docs-mcp",
+      "repository": "https://github.com/nickels/sap-btp-docs-mcp",
+      "declared_capabilities": [],
+      "description": "SAP BTP documentation retrieval MCP."
+    },
+    {
+      "id": "marianfoo-mcp-sap-docs",
+      "status": "disabled_candidate",
+      "reason": "Bundled snapshot is a pointer README; upstream source not vendored. Promote only after vendoring an installable runtime plus safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": null,
+        "args": []
+      },
+      "env_refs": [],
+      "bundled_source": "marianfoo-mcp-sap-docs",
+      "repository": "https://github.com/marianfoo/mcp-sap-docs",
+      "declared_capabilities": [],
+      "description": "marianfoo/mcp-sap-docs - SAP documentation MCP."
+    },
+    {
+      "id": "mario-andreschak-mcp-sap-gui",
+      "status": "disabled_candidate",
+      "reason": "Bundled snapshot is a pointer README; upstream source not vendored. Promote only after vendoring an installable runtime plus safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": null,
+        "args": []
+      },
+      "env_refs": [],
+      "bundled_source": "mario-andreschak-mcp-sap-gui",
+      "repository": "https://github.com/mario-andreschak/mcp-sap-gui",
+      "declared_capabilities": [
+        "sap.gui.transaction.run"
+      ],
+      "description": "mario-andreschak/mcp-sap-gui - SAP GUI automation MCP (alternative to mcp-sap-gui)."
     }
   ]
 }

@@ -1,0 +1,43 @@
+{
+  "name": "cf-app-management",
+  "enabled": true,
+  "instructions": "SAP Automation Pilot operations bridge for landscape management.",
+  "mcpTools": [
+    {
+      "commandId": "cf-sapcp:ListCfOrgs:1",
+      "name": "list_cf_orgs",
+      "enabled": true,
+      "inputReferences": [],
+      "tags": {},
+      "title": "List Cloud Foundry Orgs",
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": true,
+      "readOnlyHint": true
+    },
+    {
+      "commandId": "cf-sapcp:RestartCfApp:1",
+      "name": "restart_cf_app",
+      "enabled": true,
+      "inputReferences": [],
+      "tags": {},
+      "title": "Restart Cloud Foundry App",
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": false
+    },
+    {
+      "commandId": "cf-sapcp:ScaleCfApp:1",
+      "name": "scale_cf_app",
+      "enabled": true,
+      "inputReferences": [],
+      "tags": {},
+      "title": "Scale Cloud Foundry App",
+      "destructiveHint": false,
+      "idempotentHint": true,
+      "openWorldHint": false,
+      "readOnlyHint": false
+    }
+  ]
+}
