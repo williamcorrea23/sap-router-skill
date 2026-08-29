@@ -252,5 +252,176 @@ class RouterContractsTest(unittest.TestCase):
         self.assertEqual(proc.stderr, "")
 
 
+class ApimProxyPackagerTest(unittest.TestCase):
+    """The bundle packager must produce something the tenant will accept,
+    and must fail loudly when a flow references a policy that is not shipped."""
+
+    def _template(self, kind, name, output, extra=None):
+        return subprocess.run(
+            [sys.executable, "scripts/apim_proxy_packager.py", "template",
+             "--kind", kind, "--name", name, "--output", str(output)] + (extra or []),
+            cwd=ROOT, capture_output=True, text=True, encoding="utf-8",
+        )
+
+    def _validate(self, bundle):
+        proc = subprocess.run(
+            [sys.executable, "scripts/apim_proxy_packager.py", "validate", "--input", str(bundle), "--json"],
+            cwd=ROOT, capture_output=True, text=True, encoding="utf-8",
+        )
+        return proc, json.loads(proc.stdout)
+
+    def test_echo_template_validates_offline(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            bundle = Path(tmp) / "echo.zip"
+            self.assertEqual(self._template("echo", "ZTEST_ECHO", bundle).returncode, 0)
+            proc, report = self._validate(bundle)
+            self.assertEqual(proc.returncode, 0, proc.stdout)
+            self.assertEqual(report["status"], "OK", report)
+
+    def test_backend_template_requires_a_backend_url(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            bundle = Path(tmp) / "backend.zip"
+            self.assertNotEqual(self._template("backend", "ZTEST_API", bundle).returncode, 0)
+            self.assertEqual(
+                self._template("backend", "ZTEST_API", bundle,
+                               ["--backend-url", "https://example.com/odata"]).returncode,
+                0,
+            )
+            _, report = self._validate(bundle)
+            self.assertEqual(report["status"], "OK", report)
+
+    def test_missing_policy_file_is_an_error_not_a_warning(self):
+        import tempfile
+        import zipfile
+        with tempfile.TemporaryDirectory() as tmp:
+            source = Path(tmp) / "echo.zip"
+            self._template("echo", "ZTEST_ECHO", source)
+            stripped = Path(tmp) / "stripped.zip"
+            with zipfile.ZipFile(source) as src, zipfile.ZipFile(stripped, "w") as dst:
+                for entry in src.namelist():
+                    if entry != "Policy/Spike-Arrest.xml":
+                        dst.writestr(entry, src.read(entry))
+            proc, report = self._validate(stripped)
+            self.assertEqual(proc.returncode, 1)
+            self.assertEqual(report["status"], "ERROR")
+            self.assertTrue(any("Spike-Arrest" in error for error in report["errors"]), report)
+
+
+class ApprovalSpendOrderTest(unittest.TestCase):
+    """A one-time approval must survive a failed mutation. Verifying and spending
+    are separate steps so a transient error does not cost the operator a re-approval."""
+
+    def _broker(self, *broker_args):
+        proc = subprocess.run(
+            [sys.executable, "scripts/approval_broker.py", *broker_args],
+            cwd=ROOT, capture_output=True, text=True, encoding="utf-8",
+        )
+        return proc, json.loads(proc.stdout or "{}")
+
+    def _approved_plan(self, target):
+        _, plan = self._broker(
+            "plan", "--capability", "sap.apim.proxy.deploy", "--target", target,
+            "--summary", "audit regression check", "--effect", "mutating",
+            "--arguments-json", '{"a":1}', "--preconditions-json", '{"b":true}',
+        )
+        self._broker("approve", plan["action_id"])
+        return plan
+
+    def test_verify_does_not_spend_the_approval(self):
+        plan = self._approved_plan("ZTEST_VERIFY")
+        for _ in range(2):
+            proc, result = self._broker("verify", plan["action_id"], "--plan-hash", plan["plan_hash"])
+            self.assertEqual(proc.returncode, 0, proc.stdout)
+            self.assertEqual(result["status"], "APPROVED")
+        _, consumed = self._broker("consume", plan["action_id"], "--plan-hash", plan["plan_hash"])
+        self.assertEqual(consumed["status"], "CONSUMED")
+
+    def test_consume_remains_one_time_after_verify(self):
+        plan = self._approved_plan("ZTEST_ONCE")
+        self._broker("verify", plan["action_id"], "--plan-hash", plan["plan_hash"])
+        self._broker("consume", plan["action_id"], "--plan-hash", plan["plan_hash"])
+        proc, replay = self._broker("consume", plan["action_id"], "--plan-hash", plan["plan_hash"])
+        self.assertEqual(proc.returncode, 1)
+        self.assertEqual(replay["error"], "approval-already-consumed")
+
+    def test_verify_rejects_an_unapproved_plan(self):
+        _, plan = self._broker(
+            "plan", "--capability", "sap.apim.proxy.deploy", "--target", "ZTEST_PENDING",
+            "--summary", "audit regression check", "--effect", "mutating",
+            "--arguments-json", "{}", "--preconditions-json", "{}",
+        )
+        proc, result = self._broker("verify", plan["action_id"], "--plan-hash", plan["plan_hash"])
+        self.assertEqual(proc.returncode, 1)
+        self.assertEqual(result["error"], "approval-not-approved")
+
+
+class ApimChannelBridgeTest(unittest.TestCase):
+    """The bridge splits read from mutate on purpose: an agent must not be able
+    to change the tenant by reaching for the read tool."""
+
+    BRIDGE = ["node", "scripts/web_ui_mcp_bridge.mjs", "--product", "apim"]
+
+    def _call(self, name, arguments):
+        request = "\n".join([
+            json.dumps({"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}}),
+            json.dumps({"jsonrpc": "2.0", "id": 2, "method": "tools/call",
+                        "params": {"name": name, "arguments": arguments}}),
+        ]) + "\n"
+        proc = subprocess.run(
+            self.BRIDGE, cwd=ROOT, input=request,
+            capture_output=True, text=True, encoding="utf-8",
+        )
+        for line in proc.stdout.splitlines():
+            message = json.loads(line)
+            if message.get("id") == 2:
+                return message["result"]["structuredContent"]
+        self.fail("bridge returned no result for id 2: " + proc.stdout + proc.stderr)
+
+    def test_mutating_action_is_refused_by_the_read_tool(self):
+        result = self._call("apim_execute_action", {"action_id": "proxies.import", "params": {"name": "ZTEST"}})
+        self.assertEqual(result["status"], "BLOCKED")
+        self.assertIn("apim_configure_plan", result["next_step"])
+
+    def test_read_action_is_refused_by_the_plan_tool(self):
+        result = self._call("apim_configure_plan", {"action_id": "proxies.list"})
+        self.assertEqual(result["status"], "BLOCKED")
+        self.assertIn("apim_execute_action", result["next_step"])
+
+    def test_commit_without_confirmation_is_refused(self):
+        result = self._call("apim_configure_commit", {
+            "plan_id": "apim-oauth-does-not-exist", "action_id": "x", "plan_hash": "y", "confirm": False,
+        })
+        self.assertEqual(result["status"], "BLOCKED")
+
+    def test_api_call_stays_inside_the_api_portal(self):
+        result = self._call("apim_api_call", {"path": "/sap/opu/odata/sap/ZMATERIAL_SRV/"})
+        self.assertEqual(result["status"], "BLOCKED")
+        self.assertIn("/apiportal/", result["reason"])
+
+    def test_test_proxy_refuses_private_and_link_local_targets(self):
+        for url in ("http://127.0.0.1:9/x", "http://169.254.169.254/latest/meta-data/", "http://192.168.1.1/"):
+            result = self._call("apim_test_proxy", {"url": url})
+            self.assertEqual(result["status"], "BLOCKED", url)
+            self.assertIn("private", result["reason"])
+
+    def test_test_proxy_refuses_hosts_outside_the_tenant(self):
+        result = self._call("apim_test_proxy", {"url": "https://evil.example.com/x"})
+        self.assertEqual(result["status"], "BLOCKED")
+
+    def test_test_proxy_refuses_state_changing_verbs(self):
+        result = self._call("apim_test_proxy", {"url": "https://anything.example.com/x", "method": "DELETE"})
+        self.assertEqual(result["status"], "BLOCKED")
+        self.assertIn("change state", result["reason"])
+
+    def test_action_search_reports_which_actions_mutate(self):
+        result = self._call("apim_search_actions", {"query": "proxy"})
+        by_id = {action["id"]: action for action in result["actions"]}
+        self.assertFalse(by_id["proxies.list"]["mutating"])
+        self.assertTrue(by_id["proxies.import"]["mutating"])
+        self.assertEqual(by_id["proxies.import"]["capability"], "sap.apim.proxy.deploy")
+
+
 if __name__ == "__main__":
     unittest.main()

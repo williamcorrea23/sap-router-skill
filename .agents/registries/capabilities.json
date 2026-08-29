@@ -167,6 +167,21 @@
       "domain": "apim"
     },
     {
+      "id": "sap.apim.channel.status",
+      "effect": "read",
+      "domain": "apim"
+    },
+    {
+      "id": "sap.apim.proxy.test",
+      "effect": "read",
+      "domain": "apim"
+    },
+    {
+      "id": "sap.apim.gateway.probe",
+      "effect": "read",
+      "domain": "apim"
+    },
+    {
       "id": "sap.webui.status",
       "effect": "read",
       "domain": "webui"

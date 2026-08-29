@@ -7,7 +7,7 @@
 > action: ADT direct, SAP GUI fallback, SOAP RFC, or ZROUTER batch. Writes are
 > gated behind an explicit `--functional` flag, so no BAPI fires by accident.
 >
-> **164 skills | 11 active MCPs + 63 fail-closed candidates | 44 CLIs | 8-stage pipeline | ZROUTER Remote FS**
+> **165 skills | 11 active MCPs + 63 fail-closed candidates | 44 CLIs | 8-stage pipeline | ZROUTER Remote FS**
 
 > **Status, honestly.** 11 MCP servers launch from a clean clone. The other 63
 > reviewed entries sit under `plannedServers` in `.mcp.json` because their entrypoint is
@@ -256,10 +256,39 @@ cd packages/vscode-abap-remote-fs-zrouter && npm install && npm run typecheck
 | **Data** | `npm run convert -- --input data.csv --module MM` | XLS/CSV → BAPI JSON |
 | **Serialize** | `npm run serialize -- --source file.abap --name ZCL_FOO` | Package ABAP for abapGit/.nugg/XML |
 | **CPI** | `python scripts/cpi_iflow_packager.py template --name my-flow` | Create CPI iFlow ZIP |
+| **APIM** | `npm run apim:session` | Report which API Management channel is usable |
+| **APIM** | `npm run apim:connect` | Start Chrome with remote debugging and wait for the tenant login (session channel only) |
+| **APIM** | `npm run apim:template -- --kind echo --name ZROUTER_SMOKE` | Generate a ready-to-deploy API proxy bundle |
+| **APIM** | `npm run apim:test` | Call a deployed proxy's runtime URL |
 
 ---
 
-## Complete Skill Catalog (164 skills)
+## SAP API Management — two channels
+
+`apim-ui-mcp` reaches API Management over whichever channel is configured, and reports which one it used on every call.
+
+| Channel | Auth | SAP-documented | Use for |
+|---|---|---|---|
+| **OAuth** (preferred) | `client_credentials` on an `apiportal-apiaccess` service key | Yes — [Accessing API Management APIs Programmatically](https://help.sap.com/docs/integration-suite/sap-integration-suite/api-access-plan-for-api-portal) | Everything, including gated configuration changes |
+| **Session** (fallback) | The tenant login already in the user's Chrome, reached over CDP | No | Reads and tests when no service key is available |
+
+The session channel runs `fetch()` inside the logged-in page, so cookies stay in the browser — the bridge never reads, stores or forwards them. It is a pragmatic fallback, not a supported SAP interface; prefer a service key wherever one can be created.
+
+```bash
+npm run apim:template -- --kind echo --name ZROUTER_SMOKE --output scratch/apim/echo.zip
+```
+
+Two starter models ship with the repo: `echo` targets a public echo service so a proxy can be smoke-tested with no backend, and `backend` is parameterised for a real backend with API key verification and a monthly quota. Policy XML follows the patterns published in [SAP/apibusinesshub-api-recipes](https://github.com/SAP/apibusinesshub-api-recipes) (Apache-2.0).
+
+Configuration changes never happen in one step: `apim_configure_plan` writes a plan, `python scripts/approval_broker.py approve <action_id>` records the human decision, and `apim_configure_commit` applies it. The commit verifies the approval, applies the change, and only then spends it — a failed mutation leaves the approval usable rather than burning it, and the result's `approval` field says which happened.
+
+Testing a proxy executes whatever sits behind it, so `apim_test_proxy` only issues `GET`/`HEAD`/`OPTIONS`, and only against hosts belonging to the tenant. Declare the proxy's virtual host in `APIM_RUNTIME_HOSTS`; loopback, link-local and private ranges are always refused.
+
+**Scope.** This MCP is API lifecycle tooling — proxies, products, policies, key value maps and their tests. It is not a business-data channel. [SAP API Policy v.4.2026a](https://help.sap.com/doc/sap-api-policy/latest/en-US/API_Policy_latest.pdf) §2.2.2 restricts autonomous agents that plan and chain business-API calls; for that scenario SAP points at the Integration Suite **MCP Gateway**, which `apim_mcp_gateway_probe` checks your tenant for.
+
+---
+
+## Complete Skill Catalog (165 skills)
 
 ### Skill Categories
 
@@ -292,7 +321,7 @@ routing.
 | 4 | `sap-cpi-mcp` | stdio (python) | MEDIUM | Cloud Integration — content/runtime/MPL reads, plan→approve→commit deploys |
 | 5 | `sap-apim-mcp` | stdio (python) | LOW | API Management — proxy reads, policy validation, gated deploys |
 | 6 | `integration-suite-ui-mcp` | stdio (node) | LOW | Playwright web-UI fallback for Integration Suite/CPI |
-| 7 | `apim-ui-mcp` | stdio (node) | LOW | Playwright web-UI fallback for API Management |
+| 7 | `apim-ui-mcp` | stdio (node) | LOW | API Management channel — OAuth service key (SAP-documented) or logged-in browser session; proxy list/test, action catalogue, MCP Gateway probe, gated configure, MCP app widgets |
 | 8 | `ui5-mcp` | stdio (npx) | LOW | UI5 tooling — project validation, linter, Web Components |
 | 9 | `fiori-mcp` | stdio (npx) | LOW | SAP Fiori tools — Fiori Elements generation, app modification |
 | 10 | `cap-mcp` | stdio (npx) | LOW | SAP CAP — CDS model search, project build |
@@ -394,7 +423,7 @@ sap-router-skill/
 ├── .abaplint.json               ← 60+ ABAP lint rules
 ├── package.json                 ← 90 npm scripts
 │
-├── .claude/skills/              ← 164 skills (generated from .agents/skills)
+├── .claude/skills/              ← 165 skills (generated from .agents/skills)
 │   ├── karpathy-guidelines/     ← v4.0: Think→Simplify→Surgical→Verify
 │   ├── sap-gui-scripting/       ← SAP GUI automation + BDC + ALV
 │   ├── sap-gui-web-enrich/      ← Web-search fill missing nav data

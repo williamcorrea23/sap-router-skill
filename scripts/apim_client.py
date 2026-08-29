@@ -238,24 +238,46 @@ def execute_plan(args: argparse.Namespace) -> dict:
     preconditions = deploy_preconditions(argparse.Namespace(bundle=arguments["bundle"]))
     if not all(preconditions.values()):
         return {"status": "BLOCKED", "reason": "preconditions-not-met", "preconditions": preconditions}
-    run_approval_broker([
-        "consume",
+    hash_args = [
         args.action_id,
         "--plan-hash", args.plan_hash,
         "--argument-hash", args.argument_hash or json_sha256(arguments),
         "--precondition-hash", args.precondition_hash or json_sha256(preconditions),
-    ])
-    body = Path(arguments["bundle"]).read_bytes()
-    client = ApimClient()
-    result = client.mutate(
-        arguments["path"],
-        arguments["method"],
-        body,
-        arguments["content_type"],
-        arguments["strategy"],
-    )
+    ]
+    # Verify now, mutate, then spend. Spending first would burn a one-time
+    # approval on a transient failure the tenant never saw.
+    run_approval_broker(["verify"] + hash_args)
+    # Reading the bundle can still fail between the precondition check and here.
+    # Report that as a failed mutation so the approval state is always stated.
+    try:
+        body = Path(arguments["bundle"]).read_bytes()
+        result = ApimClient().mutate(
+            arguments["path"],
+            arguments["method"],
+            body,
+            arguments["content_type"],
+            arguments["strategy"],
+        )
+    except Exception as exc:  # noqa: BLE001 - reported, not swallowed
+        result = {"status": "ERROR", "error": str(exc), "error_type": type(exc).__name__}
     result["plan_id"] = args.plan_id
     result["target"] = arguments["target"]
+    if result.get("status") != "OK":
+        result["approval"] = "still-open"
+        result["next_step"] = (
+            "The mutation failed, so approval {0} was not spent. Retry the commit, or reject it with: "
+            "python scripts/approval_broker.py reject {0}".format(args.action_id)
+        )
+        return result
+    try:
+        run_approval_broker(["consume"] + hash_args)
+        result["approval"] = "spent"
+    except RuntimeError as exc:
+        result["approval"] = "applied-but-not-spent"
+        result["warning"] = (
+            "The change was applied but approval {0} could not be marked consumed: {1}. "
+            "Reject it so it cannot be replayed.".format(args.action_id, exc)
+        )
     return result
 
 

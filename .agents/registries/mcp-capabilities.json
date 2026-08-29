@@ -144,6 +144,23 @@
       "requires_approval": true,
       "plan_then_commit": true
     },
+    "sap.apim.channel.status": {
+      "primary": "apim-ui-mcp",
+      "fallbacks": [
+        "sap-apim-mcp"
+      ],
+      "mutation": false
+    },
+    "sap.apim.proxy.test": {
+      "primary": "apim-ui-mcp",
+      "fallbacks": [],
+      "mutation": false
+    },
+    "sap.apim.gateway.probe": {
+      "primary": "apim-ui-mcp",
+      "fallbacks": [],
+      "mutation": false
+    },
     "sap.fiori.app.generate": {
       "primary": "fiori-mcp",
       "fallbacks": [

@@ -35,7 +35,11 @@ scratch/approvals/
 scratch/crew-plans/
 scratch/source-import/
 scratch/apim-plans/
+scratch/apim/
 scratch/cpi-plans/
+# BTP service keys carry client secrets; never commit them.
+*service-key*.json
+*servicekey*.json
 .healthcheck_cache.json
 reports/health/*.json
 reports/audit/

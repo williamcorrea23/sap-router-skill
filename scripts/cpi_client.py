@@ -563,12 +563,46 @@ def make_plan(capability: str, target: str, summary: str, effect: str, arguments
     return plan
 
 
-def consume_plan(args: argparse.Namespace, arguments: dict[str, Any], preconditions: dict[str, Any]) -> None:
-    run_approval_broker([
-        "consume", args.action_id, "--plan-hash", args.plan_hash,
+def approval_hash_args(args: argparse.Namespace, arguments: dict[str, Any], preconditions: dict[str, Any]) -> list[str]:
+    return [
+        args.action_id, "--plan-hash", args.plan_hash,
         "--argument-hash", args.argument_hash or json_sha256(arguments),
         "--precondition-hash", args.precondition_hash or json_sha256(preconditions),
-    ])
+    ]
+
+
+def with_approval(args: argparse.Namespace, arguments: dict[str, Any], preconditions: dict[str, Any], run) -> dict[str, Any]:
+    """Verify the approval, run the mutation, then spend it.
+
+    Spending up front burns a one-time approval on transient failures - a network
+    error or an HTTP 500 would leave the operator re-approving a change that
+    never landed.
+    """
+    hash_args = approval_hash_args(args, arguments, preconditions)
+    run_approval_broker(["verify"] + hash_args)
+    # The runtime helpers raise on HTTP errors, so catch here: the caller has to
+    # learn whether the approval is still spendable, not just see a traceback.
+    try:
+        result = run()
+    except Exception as exc:  # noqa: BLE001 - reported, not swallowed
+        result = {"status": "ERROR", "error": str(exc), "error_type": type(exc).__name__}
+    if result.get("status") != "OK":
+        result["approval"] = "still-open"
+        result["next_step"] = (
+            "The operation failed, so approval {0} was not spent. Retry the commit, or reject it with: "
+            "python scripts/approval_broker.py reject {0}".format(args.action_id)
+        )
+        return result
+    try:
+        run_approval_broker(["consume"] + hash_args)
+        result["approval"] = "spent"
+    except RuntimeError as exc:
+        result["approval"] = "applied-but-not-spent"
+        result["warning"] = (
+            "The operation succeeded but approval {0} could not be marked consumed: {1}. "
+            "Reject it so it cannot be replayed.".format(args.action_id, exc)
+        )
+    return result
 
 
 def deploy_arguments(args: argparse.Namespace) -> dict[str, Any]:
@@ -613,13 +647,21 @@ def commit_deploy(args: argparse.Namespace) -> dict[str, Any]:
     preconditions = tenant_preconditions({"zip_exists": bool(not args.zip or Path(arguments["zip"]).is_file())})
     if not all(preconditions.values()):
         return {"status": "BLOCKED", "reason": "preconditions-not-met", "preconditions": preconditions}
-    consume_plan(args, arguments, preconditions)
-    steps = []
-    if args.zip:
-        steps.append(upload_iflow_zip(args.artifact_id, args.version, arguments["zip"], args.strategy))
-    if args.runtime_deploy:
-        steps.append(deploy_runtime_artifact(args.artifact_id, args.version))
-    return {"status": "OK", "artifact_id": args.artifact_id, "version": args.version, "steps": steps}
+    def run() -> dict[str, Any]:
+        steps = []
+        if args.zip:
+            steps.append(upload_iflow_zip(args.artifact_id, args.version, arguments["zip"], args.strategy))
+        if args.runtime_deploy:
+            steps.append(deploy_runtime_artifact(args.artifact_id, args.version))
+        failed = [step for step in steps if isinstance(step, dict) and step.get("status") not in (None, "OK")]
+        return {
+            "status": "ERROR" if failed else "OK",
+            "artifact_id": args.artifact_id,
+            "version": args.version,
+            "steps": steps,
+        }
+
+    return with_approval(args, arguments, preconditions, run)
 
 
 def plan_undeploy(args: argparse.Namespace) -> dict[str, Any]:
@@ -637,8 +679,7 @@ def commit_undeploy(args: argparse.Namespace) -> dict[str, Any]:
     preconditions = tenant_preconditions()
     if not all(preconditions.values()):
         return {"status": "BLOCKED", "reason": "preconditions-not-met", "preconditions": preconditions}
-    consume_plan(args, arguments, preconditions)
-    return undeploy_runtime_artifact(args.artifact_id)
+    return with_approval(args, arguments, preconditions, lambda: undeploy_runtime_artifact(args.artifact_id))
 
 
 def local_operation_data(args: argparse.Namespace, operation: str) -> tuple[dict[str, Any], dict[str, Any], list[str]]:
@@ -681,19 +722,21 @@ def commit_local_operation(args: argparse.Namespace, operation: str) -> dict[str
     arguments, preconditions, _ = local_operation_data(args, operation)
     if not all(preconditions.values()):
         return {"status": "BLOCKED", "reason": "preconditions-not-met", "preconditions": preconditions}
-    consume_plan(args, arguments, preconditions)
-    if operation == "generate":
-        output = Path(arguments["output"])
-        if output.exists() and args.overwrite:
-            output.unlink()
-        result = subprocess.run(
-            [sys.executable, str(ROOT / "scripts" / "cpi_iflow_packager.py"), "template", "--name", args.name, "--output", str(output)],
-            cwd=ROOT, capture_output=True, text=True, timeout=EXTERNAL_TIMEOUT,
-        )
-        return {"status": "OK" if result.returncode == 0 else "ERROR", "operation": "generate", "output": str(output), "stdout": result.stdout[:CHARACTER_LIMIT], "stderr": result.stderr[:4000]}
-    if operation == "plot":
-        return run_external("plotter", ["--input", arguments["input"], "--output", arguments["output"], "--format", arguments["format"]])
-    return run_external("sync", [arguments["direction"], "--workspace", arguments["workspace"]])
+    def run() -> dict[str, Any]:
+        if operation == "generate":
+            output = Path(arguments["output"])
+            if output.exists() and args.overwrite:
+                output.unlink()
+            result = subprocess.run(
+                [sys.executable, str(ROOT / "scripts" / "cpi_iflow_packager.py"), "template", "--name", args.name, "--output", str(output)],
+                cwd=ROOT, capture_output=True, text=True, timeout=EXTERNAL_TIMEOUT,
+            )
+            return {"status": "OK" if result.returncode == 0 else "ERROR", "operation": "generate", "output": str(output), "stdout": result.stdout[:CHARACTER_LIMIT], "stderr": result.stderr[:4000]}
+        if operation == "plot":
+            return run_external("plotter", ["--input", arguments["input"], "--output", arguments["output"], "--format", arguments["format"]])
+        return run_external("sync", [arguments["direction"], "--workspace", arguments["workspace"]])
+
+    return with_approval(args, arguments, preconditions, run)
 
 
 def test_connection() -> dict[str, Any]:

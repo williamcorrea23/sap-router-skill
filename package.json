@@ -1,7 +1,7 @@
 {
   "name": "sap-router-orchestrator",
   "version": "7.1.0",
-  "description": "SAP Harness v7.1.0 - capability routing, fail-closed MCP catalog and evaluation harness. 164 skills, 11 active MCP servers plus 63 reviewed fail-closed candidates, ZROUTER Remote FileSystem for VS Code, for Claude, Codex and Gemini.",
+  "description": "SAP Harness v7.1.0 - capability routing, fail-closed MCP catalog and evaluation harness. 165 skills, 11 active MCP servers plus 63 reviewed fail-closed candidates, ZROUTER Remote FileSystem for VS Code, for Claude, Codex and Gemini.",
   "private": true,
   "scripts": {
     "harness:run": "python scripts/sap_harness.py run",
@@ -36,6 +36,11 @@
     "mcp:probe": "python scripts/mcp_launcher.py probe --server",
     "approval": "python scripts/approval_broker.py",
     "apim:health": "python scripts/apim_client.py health",
+    "apim:connect": "node scripts/apim_session_bootstrap.mjs connect",
+    "apim:session": "node scripts/apim_session_bootstrap.mjs status",
+    "apim:test": "node scripts/apim_session_bootstrap.mjs test",
+    "apim:template": "python scripts/apim_proxy_packager.py template",
+    "apim:validate": "python scripts/apim_proxy_packager.py validate --input",
     "cap:validate": "node scripts/cap_validate.mjs",
     "learn:mcp": "python scripts/self_learn.py record-mcp",
     "learn:route": "python scripts/self_learn.py record-route",
@@ -99,6 +104,7 @@
     "@abaplint/cli": "^2.119.65",
     "@abaplint/core": "^2.119.65",
     "@abaplint/database-sqlite": "^2.7.0",
+    "@modelcontextprotocol/ext-apps": "^1.7.5",
     "glob": "^13.0.6"
   },
   "abaplint": {
