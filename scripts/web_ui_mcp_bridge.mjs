@@ -146,12 +146,82 @@ function withMeta(toolDefinition, uri) {
 
 // ------------------------------------------------------- approval broker
 
-function runApprovalBroker(brokerArgs) {
-  const stdout = execFileSync("python", [path.join(ROOT, "scripts", "approval_broker.py"), ...brokerArgs], {
-    cwd: ROOT,
-    encoding: "utf8",
-  });
+function runApprovalBroker(brokerArgs, stdinPayload) {
+  const options = { cwd: ROOT, encoding: "utf8" };
+  if (stdinPayload !== undefined) {
+    options.input = stdinPayload;
+  }
+  const stdout = execFileSync("python", [path.join(ROOT, "scripts", "approval_broker.py"), ...brokerArgs], options);
   return JSON.parse(stdout || "{}");
+}
+
+// Hash through the broker, never here. The broker canonicalises with
+// json.dumps, which escapes non-ASCII; JSON.stringify does not, so any local
+// reimplementation silently produces a different hash the moment an argument
+// value leaves ASCII. Key order does not matter - the broker re-serialises
+// whatever JSON it is handed.
+function brokerJsonHash(value) {
+  const result = runApprovalBroker(["hash", "--json", "-"], Buffer.from(JSON.stringify(value), "utf8"));
+  return result.hash;
+}
+
+/**
+ * Refuse unless the plan file's arguments are the ones that were approved.
+ *
+ * approval_broker.write_plan() persists only argument_hash, so configureCommit
+ * reads the arguments themselves back out of scratch/apim-plans/. Editing that
+ * file after approval would otherwise apply arguments nobody reviewed - the
+ * broker's plan_hash check still passes, because it hashes its own stored copy.
+ * That stored argument_hash is the trust anchor: plan_hash and the approval
+ * signature both cover it.
+ *
+ * Returns { hash } when intact, or { refusal }. Either way nothing is spent.
+ */
+function approvedArgumentGuard(actionId, argumentsPayload, suppliedHash) {
+  let localHash;
+  let approved;
+  try {
+    localHash = brokerJsonHash(argumentsPayload);
+    approved = runApprovalBroker(["show", String(actionId)]);
+  } catch (err) {
+    return {
+      refusal: {
+        status: "BLOCKED",
+        reason: "approval-unreadable",
+        detail: err?.message || String(err),
+        action_id: actionId,
+        approval: "still-open",
+      },
+    };
+  }
+  const expected = approved.argument_hash;
+  if (localHash !== expected) {
+    return {
+      refusal: {
+        status: "BLOCKED",
+        reason: "argument-hash-mismatch",
+        detail: "The plan file's arguments do not match the approved plan; it was modified after approval.",
+        action_id: actionId,
+        approved_argument_hash: expected,
+        local_argument_hash: localHash,
+        approval: "still-open",
+      },
+    };
+  }
+  if (suppliedHash && String(suppliedHash) !== expected) {
+    return {
+      refusal: {
+        status: "BLOCKED",
+        reason: "argument-hash-mismatch",
+        detail: "argument_hash does not match the approved plan.",
+        action_id: actionId,
+        approved_argument_hash: expected,
+        supplied_argument_hash: String(suppliedHash),
+        approval: "still-open",
+      },
+    };
+  }
+  return { hash: localHash };
 }
 
 // Key-sorted JSON for the broker. JSON.stringify returns undefined (not a
@@ -846,13 +916,19 @@ async function configureCommit(input) {
   }
   const plan = JSON.parse(fs.readFileSync(planPath, "utf8"));
   const args = plan.arguments;
+  // Prove the plan file is untampered before anything reads these arguments,
+  // including the bundle-existence check below.
+  const guard = approvedArgumentGuard(input.action_id, args, input.argument_hash);
+  if (guard.refusal) {
+    return { ...guard.refusal, plan_id: input.plan_id };
+  }
   if (args.bundle && !fs.existsSync(args.bundle)) {
     return { status: "BLOCKED", reason: "preconditions-not-met", detail: `bundle missing: ${args.bundle}` };
   }
-  const hashArgs = [String(input.action_id), "--plan-hash", String(input.plan_hash)];
-  if (input.argument_hash) {
-    hashArgs.push("--argument-hash", String(input.argument_hash));
-  }
+  // The freshly recomputed hash, not the one the caller passed in: that makes
+  // the broker's argument-hash check load-bearing rather than a stored value
+  // compared to itself.
+  const hashArgs = [String(input.action_id), "--plan-hash", String(input.plan_hash), "--argument-hash", guard.hash];
   if (input.precondition_hash) {
     hashArgs.push("--precondition-hash", String(input.precondition_hash));
   }

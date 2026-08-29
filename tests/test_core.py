@@ -357,6 +357,118 @@ class ApprovalSpendOrderTest(unittest.TestCase):
         self.assertEqual(result["error"], "approval-not-approved")
 
 
+class PlanFileTamperTest(unittest.TestCase):
+    """A commit must run the arguments the human approved, not whatever is on
+    disk or on the command line by the time it runs.
+
+    approval_broker.write_plan() stores only argument_hash, so every commit path
+    re-supplies the arguments themselves. The broker cannot catch an edit to
+    them: its plan_hash check hashes its own stored copy, which still matches.
+    Each case below tampers after approval and asserts two things - the commit
+    refuses, and the one-time approval is still spendable afterwards.
+    """
+
+    def _broker(self, *broker_args, stdin=None):
+        proc = subprocess.run(
+            [sys.executable, "scripts/approval_broker.py", *broker_args],
+            cwd=ROOT, capture_output=True, text=True, encoding="utf-8", input=stdin,
+        )
+        return proc, json.loads(proc.stdout or "{}")
+
+    def _assert_still_spendable(self, plan):
+        """The refusal must not have burned the approval."""
+        proc, verified = self._broker("verify", plan["action_id"], "--plan-hash", plan["plan_hash"])
+        self.assertEqual(proc.returncode, 0, proc.stdout)
+        self.assertEqual(verified["status"], "APPROVED", verified)
+
+    def test_broker_hash_matches_the_hash_stored_at_plan_time(self):
+        """The `hash` subcommand is what non-Python callers rely on, so it has to
+        agree with write_plan() - including on non-ASCII, where json.dumps
+        escapes and JSON.stringify does not."""
+        arguments = {"target": "ZTEST_CAF\u00c9", "note": "caf\u00e9"}
+        _, plan = self._broker(
+            "plan", "--capability", "sap.apim.proxy.deploy", "--target", "ZTEST_HASH",
+            "--summary", "hash parity", "--effect", "mutating",
+            "--arguments-json", json.dumps(arguments), "--preconditions-json", "{}",
+        )
+        self.addCleanup(self._broker, "reject", plan["action_id"])
+        proc, hashed = self._broker("hash", "--json", "-", stdin=json.dumps(arguments))
+        self.assertEqual(proc.returncode, 0, proc.stdout)
+        self.assertEqual(hashed["hash"], plan["argument_hash"])
+
+        # Key order must not matter: the broker re-serialises what it is handed,
+        # which is why the bridge can pass a plain JSON.stringify of its object.
+        reordered = json.dumps({key: arguments[key] for key in reversed(list(arguments))})
+        _, again = self._broker("hash", "--json", "-", stdin=reordered)
+        self.assertEqual(again["hash"], plan["argument_hash"])
+
+    def test_apim_commit_refuses_a_plan_file_edited_after_approval(self):
+        import tempfile
+        with tempfile.TemporaryDirectory(dir=ROOT) as tmp:
+            bundle = Path(tmp) / "bundle.zip"
+            bundle.write_bytes(b"PK\x05\x06" + b"\x00" * 18)
+            proc = subprocess.run(
+                [sys.executable, "scripts/apim_client.py", "deploy", "plan",
+                 "--bundle", str(bundle), "--target", "ZTEST_TAMPER"],
+                cwd=ROOT, capture_output=True, text=True, encoding="utf-8",
+            )
+            plan = json.loads(proc.stdout)
+            self.addCleanup(self._broker, "reject", plan["action_id"])
+            self._broker("approve", plan["action_id"])
+
+            plan_path = ROOT / "scratch" / "apim-plans" / (plan["apim_plan_id"] + ".json")
+            self.addCleanup(plan_path.unlink, True)
+            local = json.loads(plan_path.read_text(encoding="utf-8"))
+            local["arguments"]["path"] = "/apiportal/api/1.0/Management.svc/APIProxies('ZEVIL')/$value"
+            plan_path.write_text(json.dumps(local, indent=2) + "\n", encoding="utf-8")
+
+            commit = subprocess.run(
+                [sys.executable, "scripts/apim_client.py", "deploy", "execute",
+                 "--plan-id", plan["apim_plan_id"], "--action-id", plan["action_id"],
+                 "--plan-hash", plan["plan_hash"], "--argument-hash", plan["argument_hash"],
+                 "--precondition-hash", plan["precondition_hash"], "--confirm"],
+                cwd=ROOT, capture_output=True, text=True, encoding="utf-8",
+            )
+            result = json.loads(commit.stdout)
+            self.assertEqual(commit.returncode, 1, commit.stdout)
+            self.assertEqual(result["status"], "BLOCKED", result)
+            self.assertEqual(result["reason"], "argument-hash-mismatch", result)
+            self.assertEqual(result["approval"], "still-open", result)
+            self._assert_still_spendable(plan)
+
+    def test_cpi_commit_refuses_arguments_swapped_at_the_command_line(self):
+        """cpi_client rebuilds its arguments from argv, so there the tampering
+        surface is the commit command rather than a plan file."""
+        env = dict(os.environ)
+        env.update({
+            "CPI_BASE_URL": "https://tenant.invalid",
+            "CPI_OAUTH_TOKEN_URL": "https://tenant.invalid/oauth/token",
+            "CPI_OAUTH_CLIENT_ID": "id",
+            "CPI_OAUTH_CLIENT_SECRET": "secret",
+        })
+        proc = subprocess.run(
+            [sys.executable, "scripts/cpi_client.py", "undeploy", "plan", "--artifact-id", "ZTEST_APPROVED"],
+            cwd=ROOT, capture_output=True, text=True, encoding="utf-8", env=env,
+        )
+        plan = json.loads(proc.stdout)
+        self.addCleanup(self._broker, "reject", plan["action_id"])
+        self._broker("approve", plan["action_id"], "--confirm", "ZTEST_APPROVED")
+
+        commit = subprocess.run(
+            [sys.executable, "scripts/cpi_client.py", "undeploy", "commit",
+             "--artifact-id", "ZTEST_SOMETHING_ELSE",
+             "--action-id", plan["action_id"], "--plan-hash", plan["plan_hash"],
+             "--argument-hash", plan["argument_hash"],
+             "--precondition-hash", plan["precondition_hash"]],
+            cwd=ROOT, capture_output=True, text=True, encoding="utf-8", env=env,
+        )
+        result = json.loads(commit.stdout)
+        self.assertEqual(result["status"], "BLOCKED", result)
+        self.assertEqual(result["reason"], "argument-hash-mismatch", result)
+        self.assertEqual(result["approval"], "still-open", result)
+        self._assert_still_spendable(plan)
+
+
 class ApimChannelBridgeTest(unittest.TestCase):
     """The bridge splits read from mutate on purpose: an agent must not be able
     to change the tenant by reaching for the read tool."""
@@ -414,6 +526,42 @@ class ApimChannelBridgeTest(unittest.TestCase):
         result = self._call("apim_test_proxy", {"url": "https://anything.example.com/x", "method": "DELETE"})
         self.assertEqual(result["status"], "BLOCKED")
         self.assertIn("change state", result["reason"])
+
+    def _broker(self, *broker_args):
+        proc = subprocess.run(
+            [sys.executable, "scripts/approval_broker.py", *broker_args],
+            cwd=ROOT, capture_output=True, text=True, encoding="utf-8",
+        )
+        return proc, json.loads(proc.stdout or "{}")
+
+    def test_commit_refuses_a_plan_file_edited_after_approval(self):
+        """The bridge cannot reproduce the broker's canonicalisation in JS, so it
+        shells out to `approval_broker.py hash` for the same answer."""
+        plan = self._call("apim_configure_plan", {
+            "action_id": "proxies.import", "params": {"name": "ZTEST_BRIDGE_TAMPER"},
+        })
+        self.assertIn("apim_plan_id", plan)
+        self.addCleanup(self._broker, "reject", plan["action_id"])
+        self._broker("approve", plan["action_id"])
+
+        plan_path = ROOT / "scratch" / "apim-plans" / (plan["apim_plan_id"] + ".json")
+        self.addCleanup(plan_path.unlink, True)
+        local = json.loads(plan_path.read_text(encoding="utf-8"))
+        local["arguments"]["path"] = "/apiportal/api/1.0/Management.svc/APIProxies('ZEVIL')/$value"
+        plan_path.write_text(json.dumps(local, indent=2) + "\n", encoding="utf-8")
+
+        result = self._call("apim_configure_commit", {
+            "plan_id": plan["apim_plan_id"], "action_id": plan["action_id"],
+            "plan_hash": plan["plan_hash"], "argument_hash": plan["argument_hash"],
+            "precondition_hash": plan["precondition_hash"], "confirm": True,
+        })
+        self.assertEqual(result["status"], "BLOCKED", result)
+        self.assertEqual(result["reason"], "argument-hash-mismatch", result)
+        self.assertEqual(result["approval"], "still-open", result)
+
+        proc, verified = self._broker("verify", plan["action_id"], "--plan-hash", plan["plan_hash"])
+        self.assertEqual(proc.returncode, 0, proc.stdout)
+        self.assertEqual(verified["status"], "APPROVED", verified)
 
     def test_action_search_reports_which_actions_mutate(self):
         result = self._call("apim_search_actions", {"query": "proxy"})

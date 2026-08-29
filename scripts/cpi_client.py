@@ -566,9 +566,64 @@ def make_plan(capability: str, target: str, summary: str, effect: str, arguments
 def approval_hash_args(args: argparse.Namespace, arguments: dict[str, Any], preconditions: dict[str, Any]) -> list[str]:
     return [
         args.action_id, "--plan-hash", args.plan_hash,
-        "--argument-hash", args.argument_hash or json_sha256(arguments),
+        # Always the hash of the arguments this commit will actually run. Taking
+        # args.argument_hash instead would hand the broker back its own stored
+        # value, so its check would compare that value to itself and pass no
+        # matter what the commit was told to do.
+        "--argument-hash", json_sha256(arguments),
+        # Preconditions are re-derived from the environment on every commit, so
+        # legitimate drift between plan and commit must not read as tampering.
+        # The all()-true gate in each commit path is what guards them.
         "--precondition-hash", args.precondition_hash or json_sha256(preconditions),
     ]
+
+
+def approved_argument_guard(action_id: str, arguments: dict[str, Any], supplied_hash: str | None) -> dict[str, Any] | None:
+    """Refuse unless the arguments about to run are the ones that were approved.
+
+    write_plan() persists only argument_hash, never the arguments, so every
+    commit path re-supplies them - here from argv, in apim_client from a local
+    plan file. Either source can be changed after the human approves, and the
+    broker cannot see it: its plan_hash check hashes its own stored copy. That
+    stored argument_hash is the trust anchor, since plan_hash and the approval
+    signature both cover it.
+
+    Returns None when the arguments match, or a refusal dict. Either way the
+    approval is left unspent.
+    """
+    local_hash = json_sha256(arguments)
+    try:
+        approved = run_approval_broker(["show", action_id])
+    except RuntimeError as exc:
+        return {
+            "status": "BLOCKED",
+            "reason": "approval-unreadable",
+            "detail": str(exc),
+            "action_id": action_id,
+            "approval": "still-open",
+        }
+    expected = approved.get("argument_hash")
+    if local_hash != expected:
+        return {
+            "status": "BLOCKED",
+            "reason": "argument-hash-mismatch",
+            "detail": "The commit arguments do not match the approved plan.",
+            "action_id": action_id,
+            "approved_argument_hash": expected,
+            "local_argument_hash": local_hash,
+            "approval": "still-open",
+        }
+    if supplied_hash and supplied_hash != expected:
+        return {
+            "status": "BLOCKED",
+            "reason": "argument-hash-mismatch",
+            "detail": "--argument-hash does not match the approved plan.",
+            "action_id": action_id,
+            "approved_argument_hash": expected,
+            "supplied_argument_hash": supplied_hash,
+            "approval": "still-open",
+        }
+    return None
 
 
 def with_approval(args: argparse.Namespace, arguments: dict[str, Any], preconditions: dict[str, Any], run) -> dict[str, Any]:
@@ -578,6 +633,9 @@ def with_approval(args: argparse.Namespace, arguments: dict[str, Any], precondit
     error or an HTTP 500 would leave the operator re-approving a change that
     never landed.
     """
+    tampered = approved_argument_guard(args.action_id, arguments, args.argument_hash)
+    if tampered:
+        return tampered
     hash_args = approval_hash_args(args, arguments, preconditions)
     run_approval_broker(["verify"] + hash_args)
     # The runtime helpers raise on HTTP errors, so catch here: the caller has to
