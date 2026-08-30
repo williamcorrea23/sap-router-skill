@@ -119,11 +119,17 @@
       ],
       "env": {
         "APIM_WEB_URL": "${APIM_WEB_URL}",
+        "APIM_SERVICE_KEY_FILE": "${APIM_SERVICE_KEY_FILE}",
+        "APIM_API_URL": "${APIM_API_URL}",
+        "APIM_TOKEN_URL": "${APIM_TOKEN_URL}",
+        "APIM_CLIENT_ID": "${APIM_CLIENT_ID}",
+        "APIM_CLIENT_SECRET": "${APIM_CLIENT_SECRET}",
+        "APIM_RUNTIME_HOSTS": "${APIM_RUNTIME_HOSTS}",
         "BROWSER_CHANNEL": "${BROWSER_CHANNEL}",
         "BROWSER_CDP_URL": "${BROWSER_CDP_URL}",
         "CHROME_DEBUGGING_PORT": "${CHROME_DEBUGGING_PORT}"
       },
-      "description": "Playwright-ready Web UI fallback for SAP API Management. Uses logged-in user browser session; no credential parameters accepted."
+      "description": "SAP API Management channel MCP. Primary channel is OAuth client_credentials on the apiportal-apiaccess service key (SAP-documented); fallback is the user's logged-in browser session via CDP, which accepts no credential parameters and never exports cookies. Proxy list/test, action catalogue, MCP Gateway probe, and gated configure via plan/approve/commit. Ships MCP app widgets."
     },
     "ui5-mcp": {
       "type": "stdio",

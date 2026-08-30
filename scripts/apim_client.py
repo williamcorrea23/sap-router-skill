@@ -227,6 +227,55 @@ def plan_deploy(args: argparse.Namespace) -> dict:
     return broker_plan
 
 
+def approved_argument_guard(action_id: str, arguments: object, supplied_hash: str | None) -> dict | None:
+    """Refuse unless the arguments about to run are the ones that were approved.
+
+    write_plan() persists only argument_hash, so the arguments themselves live
+    in the local plan file under scratch/apim-plans/ and nothing re-derives them
+    at commit time. Editing that file after approval would otherwise deploy
+    arguments nobody reviewed - the broker's plan_hash check still passes,
+    because the broker hashes its own stored copy, not this one. That stored
+    argument_hash is the trust anchor: plan_hash and the approval signature both
+    cover it, so it cannot be edited without invalidating the approval.
+
+    Returns None when the plan is intact, or a refusal dict. Either way the
+    approval is left unspent.
+    """
+    local_hash = json_sha256(arguments)
+    try:
+        approved = run_approval_broker(["show", action_id])
+    except RuntimeError as exc:
+        return {
+            "status": "BLOCKED",
+            "reason": "approval-unreadable",
+            "detail": str(exc),
+            "action_id": action_id,
+            "approval": "still-open",
+        }
+    expected = approved.get("argument_hash")
+    if local_hash != expected:
+        return {
+            "status": "BLOCKED",
+            "reason": "argument-hash-mismatch",
+            "detail": "The plan file's arguments do not match the approved plan; it was modified after approval.",
+            "action_id": action_id,
+            "approved_argument_hash": expected,
+            "local_argument_hash": local_hash,
+            "approval": "still-open",
+        }
+    if supplied_hash and supplied_hash != expected:
+        return {
+            "status": "BLOCKED",
+            "reason": "argument-hash-mismatch",
+            "detail": "--argument-hash does not match the approved plan.",
+            "action_id": action_id,
+            "approved_argument_hash": expected,
+            "supplied_argument_hash": supplied_hash,
+            "approval": "still-open",
+        }
+    return None
+
+
 def execute_plan(args: argparse.Namespace) -> dict:
     if not args.confirm:
         return {"status": "BLOCKED", "reason": "Missing --confirm. Review and approve the plan first."}
@@ -235,27 +284,60 @@ def execute_plan(args: argparse.Namespace) -> dict:
         return {"status": "ERROR", "reason": f"Plan not found: {args.plan_id}"}
     plan = json.loads(path.read_text(encoding="utf-8"))
     arguments = plan["arguments"]
+    # Before anything reads these arguments - including the precondition check,
+    # which derives from them - prove they are still the approved ones.
+    tampered = approved_argument_guard(args.action_id, arguments, args.argument_hash)
+    if tampered:
+        return {**tampered, "plan_id": args.plan_id}
     preconditions = deploy_preconditions(argparse.Namespace(bundle=arguments["bundle"]))
     if not all(preconditions.values()):
         return {"status": "BLOCKED", "reason": "preconditions-not-met", "preconditions": preconditions}
-    run_approval_broker([
-        "consume",
+    hash_args = [
         args.action_id,
         "--plan-hash", args.plan_hash,
-        "--argument-hash", args.argument_hash or json_sha256(arguments),
+        # Send the hash just recomputed from the plan file, not the one the
+        # commit command carries: that makes the broker's own argument-hash
+        # check load-bearing instead of a stored value compared to itself.
+        "--argument-hash", json_sha256(arguments),
+        # Preconditions are re-derived from the environment on every commit, so
+        # legitimate drift (a host configured between plan and commit) must not
+        # be read as tampering. The all()-true gate above is what guards them.
         "--precondition-hash", args.precondition_hash or json_sha256(preconditions),
-    ])
-    body = Path(arguments["bundle"]).read_bytes()
-    client = ApimClient()
-    result = client.mutate(
-        arguments["path"],
-        arguments["method"],
-        body,
-        arguments["content_type"],
-        arguments["strategy"],
-    )
+    ]
+    # Verify now, mutate, then spend. Spending first would burn a one-time
+    # approval on a transient failure the tenant never saw.
+    run_approval_broker(["verify"] + hash_args)
+    # Reading the bundle can still fail between the precondition check and here.
+    # Report that as a failed mutation so the approval state is always stated.
+    try:
+        body = Path(arguments["bundle"]).read_bytes()
+        result = ApimClient().mutate(
+            arguments["path"],
+            arguments["method"],
+            body,
+            arguments["content_type"],
+            arguments["strategy"],
+        )
+    except Exception as exc:  # noqa: BLE001 - reported, not swallowed
+        result = {"status": "ERROR", "error": str(exc), "error_type": type(exc).__name__}
     result["plan_id"] = args.plan_id
     result["target"] = arguments["target"]
+    if result.get("status") != "OK":
+        result["approval"] = "still-open"
+        result["next_step"] = (
+            "The mutation failed, so approval {0} was not spent. Retry the commit, or reject it with: "
+            "python scripts/approval_broker.py reject {0}".format(args.action_id)
+        )
+        return result
+    try:
+        run_approval_broker(["consume"] + hash_args)
+        result["approval"] = "spent"
+    except RuntimeError as exc:
+        result["approval"] = "applied-but-not-spent"
+        result["warning"] = (
+            "The change was applied but approval {0} could not be marked consumed: {1}. "
+            "Reject it so it cannot be replayed.".format(args.action_id, exc)
+        )
     return result
 
 

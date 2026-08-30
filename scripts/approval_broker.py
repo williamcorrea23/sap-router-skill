@@ -10,6 +10,7 @@ import argparse
 import hashlib
 import json
 import getpass
+import sys
 import uuid
 from datetime import datetime, timedelta, UTC
 from pathlib import Path
@@ -42,6 +43,27 @@ def json_hash(raw: str) -> str:
         raise ValueError(f"invalid-json:{exc.msg}") from exc
     payload = json.dumps(value, sort_keys=True, separators=(",", ":")).encode("utf-8")
     return hashlib.sha256(payload).hexdigest()
+
+
+def hash_document(source: str) -> dict:
+    """Canonical hash of a JSON document, using the same rules as plan/consume.
+
+    Exposed as a subcommand so non-Python callers can reproduce this exactly
+    instead of reimplementing it: json.dumps escapes non-ASCII and
+    JSON.stringify does not, so a JavaScript copy of json_hash() silently
+    diverges on any argument value outside ASCII.
+    """
+    if source == "-":
+        raw = sys.stdin.buffer.read().decode("utf-8")
+    else:
+        path = Path(source)
+        if not path.is_file():
+            return {"status": "ERROR", "error": "not-found", "path": str(path)}
+        raw = path.read_text(encoding="utf-8")
+    try:
+        return {"status": "OK", "hash": json_hash(raw)}
+    except ValueError as exc:
+        return {"status": "ERROR", "error": str(exc)}
 
 
 def approval_signature(data: dict) -> str:
@@ -124,12 +146,18 @@ def set_status(action_id: str, status: str, confirm: str | None = None) -> dict:
     return data
 
 
-def consume(
+def check_spendable(
     action_id: str,
     plan_hash_arg: str | None = None,
     argument_hash_arg: str | None = None,
     precondition_hash_arg: str | None = None,
 ) -> dict:
+    """Every check `consume` makes, without spending the approval.
+
+    Callers verify first, perform the mutation, then consume. Spending the
+    approval up front burns it on transient failures - a network error or an
+    HTTP 500 would leave the operator re-approving a change that never landed.
+    """
     data = guarded_plan(action_id)
     if data.get("status") == "ERROR":
         return data
@@ -150,6 +178,18 @@ def consume(
     expected_signature = approval_signature(data)
     if data.get("approval_signature") != expected_signature:
         return {"status": "ERROR", "error": "approval-signature-mismatch", "action_id": action_id}
+    return data
+
+
+def consume(
+    action_id: str,
+    plan_hash_arg: str | None = None,
+    argument_hash_arg: str | None = None,
+    precondition_hash_arg: str | None = None,
+) -> dict:
+    data = check_spendable(action_id, plan_hash_arg, argument_hash_arg, precondition_hash_arg)
+    if data.get("status") == "ERROR":
+        return data
     data["status"] = "CONSUMED"
     data["consumed_at"] = now()
     data["updated_at"] = data["consumed_at"]
@@ -174,6 +214,13 @@ def main() -> int:
     approve_p.add_argument("--confirm")
     reject_p = sub.add_parser("reject")
     reject_p.add_argument("action_id")
+    hash_p = sub.add_parser("hash", help="Canonical hash of a JSON document, matching plan/consume hashing.")
+    hash_p.add_argument("--json", default="-", help="Path to a JSON file, or '-' to read stdin.")
+    verify_p = sub.add_parser("verify", help="Run every consume check without spending the approval.")
+    verify_p.add_argument("action_id")
+    verify_p.add_argument("--plan-hash")
+    verify_p.add_argument("--argument-hash")
+    verify_p.add_argument("--precondition-hash")
     consume_p = sub.add_parser("consume")
     consume_p.add_argument("action_id")
     consume_p.add_argument("--plan-hash")
@@ -201,6 +248,10 @@ def main() -> int:
         result = set_status(args.action_id, "APPROVED", args.confirm)
     elif args.command == "reject":
         result = set_status(args.action_id, "REJECTED")
+    elif args.command == "hash":
+        result = hash_document(args.json)
+    elif args.command == "verify":
+        result = check_spendable(args.action_id, args.plan_hash, args.argument_hash, args.precondition_hash)
     elif args.command == "consume":
         result = consume(args.action_id, args.plan_hash, args.argument_hash, args.precondition_hash)
     elif args.command == "status":

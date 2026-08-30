@@ -19,9 +19,9 @@ Local optimization:
 - use Context Mode for large outputs, indexed fetches, and session checkpoints.
 
 Parity proof:
-- skills: 164 sha256:b81f1b68450b0f1c3b5c3428c4b0a7c5dbe3b163d88febd589b47056e3474acb
+- skills: 165 sha256:df88df6d47623b2cb8519c0291287107146b84864ec9d21b117422f9c355d51e
 - profiles: 38 sha256:1f96a9a25baec0d70da537110ab3aa8793a8a5c882d609477f76f21c0daad813
-- registries: 10 sha256:d0f5012e25a62f2c5720ae7ef9e0c7e4a35e1c865e66dc8b3481943c06af2386
+- registries: 10 sha256:9b826019b85b0ad744827bd43b029581624f31f774edfb070223567def530344
 
 Run:
 `python scripts/generate_ide_assets.py check`

@@ -1,0 +1,105 @@
+<!doctype html>
+<meta charset="utf-8" />
+<style>
+  :root {
+    color-scheme: light dark;
+    --fg: #16181d;
+    --muted: #61656e;
+    --line: #e2e4e9;
+    --warn-bg: #fff6e5;
+    --warn-fg: #7a4b00;
+    --code-bg: #f5f6f9;
+  }
+  :root.dark {
+    --fg: #e6e8ed;
+    --muted: #9aa0ab;
+    --line: #33373f;
+    --warn-bg: #3a2f16;
+    --warn-fg: #f0c778;
+    --code-bg: #1e2229;
+  }
+  body { margin: 0; font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--fg); }
+  .banner { padding: 10px 12px; background: var(--warn-bg); color: var(--warn-fg); font-size: 13px; }
+  section { padding: 10px 12px; border-bottom: 1px solid var(--line); }
+  h2 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  td { padding: 4px 10px 4px 0; vertical-align: top; }
+  td.k { color: var(--muted); white-space: nowrap; }
+  td.v { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; word-break: break-all; }
+  pre {
+    margin: 0; padding: 10px; background: var(--code-bg); border-radius: 7px; overflow-x: auto;
+    font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  .steps { margin: 0; padding-left: 18px; font-size: 13px; }
+  .steps li { margin-bottom: 4px; }
+</style>
+<div class="banner" id="banner">This plan changes the tenant. Nothing runs until a human approves it.</div>
+<section>
+  <h2>Planned change</h2>
+  <table id="facts"></table>
+</section>
+<section>
+  <h2>Approve, then commit</h2>
+  <ol class="steps">
+    <li>Review the request above.</li>
+    <li>Run the approval command:</li>
+  </ol>
+  <pre id="approve">…</pre>
+</section>
+<script type="module">
+  /*__EXT_APPS_BUNDLE__*/
+  const { App } = globalThis.ExtApps;
+
+  function applyTheme(theme) {
+    document.documentElement.classList.toggle("dark", theme === "dark");
+  }
+
+  function row(table, key, value) {
+    if (value === undefined || value === null || value === "") {
+      return;
+    }
+    const tr = document.createElement("tr");
+    const k = document.createElement("td");
+    k.className = "k";
+    k.textContent = key;
+    const v = document.createElement("td");
+    v.className = "v";
+    v.textContent = String(value);
+    tr.append(k, v);
+    table.append(tr);
+  }
+
+  function render(plan) {
+    const args = plan.arguments || {};
+    const table = document.getElementById("facts");
+    table.replaceChildren();
+    row(table, "Action", args.action_id);
+    row(table, "Target", args.target);
+    row(table, "Request", args.method && args.path ? `${args.method} ${args.path}` : undefined);
+    row(table, "Channel", args.channel);
+    row(table, "Bundle", args.bundle);
+    row(table, "Plan id", plan.apim_plan_id || plan.plan_id);
+    row(table, "Approval id", plan.action_id);
+
+    if (args.channel === "session") {
+      document.getElementById("banner").textContent =
+        "This plan uses the logged-in browser session, which is not an SAP-documented API channel. Prefer a service key where one is available. Nothing runs until a human approves it.";
+    }
+    document.getElementById("approve").textContent =
+      plan.approve_command || (plan.action_id ? `python scripts/approval_broker.py approve ${plan.action_id}` : "No approval id in this plan.");
+  }
+
+  (async () => {
+    const app = new App({ name: "ApimDeployConfirm", version: "1.0.0" }, {}, { autoResize: true });
+    app.ontoolresult = ({ content }) => {
+      try {
+        render(JSON.parse(content[0].text));
+      } catch {
+        render({});
+      }
+    };
+    app.onhostcontextchanged = (ctx) => applyTheme(ctx?.theme);
+    await app.connect();
+    applyTheme(app.getHostContext()?.theme);
+  })();
+</script>

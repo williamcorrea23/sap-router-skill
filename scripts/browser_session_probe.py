@@ -13,15 +13,37 @@ def cdp_url() -> str:
     return f"http://127.0.0.1:{port}"
 
 
+def apim_oauth_configured() -> bool:
+    """The APIM bridge prefers the documented service-key channel, which needs no browser."""
+    if os.environ.get("APIM_SERVICE_KEY_FILE"):
+        return True
+    return all(
+        os.environ.get(name)
+        for name in ("APIM_API_URL", "APIM_TOKEN_URL", "APIM_CLIENT_ID", "APIM_CLIENT_SECRET")
+    )
+
+
 def main() -> int:
     cpi_url = os.environ.get("CPI_WEB_URL")
     apim_url = os.environ.get("APIM_WEB_URL")
     base_url = cpi_url or apim_url
+    # A configured APIM service key settles the APIM case on its own: that channel
+    # needs no browser, so requiring one would report a working tenant as degraded.
+    # CPI_WEB_URL means this probe is being run for CPI, where the key does not apply.
+    if not cpi_url and apim_oauth_configured():
+        print(json.dumps({
+            "status": "READY",
+            "channel": "oauth",
+            "reason": "APIM service key configured; the browser session channel is not needed.",
+            "session": "not_required",
+        }, indent=2))
+        return 0
     if not base_url:
         result = {
             "status": "UNAVAILABLE",
-            "reason": "CPI_WEB_URL or APIM_WEB_URL missing",
+            "reason": "no APIM service key, and CPI_WEB_URL or APIM_WEB_URL missing",
             "session": "not_checked",
+            "fix": "Set APIM_SERVICE_KEY_FILE for the documented channel, or CPI_WEB_URL/APIM_WEB_URL for the browser session fallback.",
         }
         print(json.dumps(result, indent=2))
         return 1

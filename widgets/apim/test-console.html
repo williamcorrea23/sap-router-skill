@@ -1,0 +1,122 @@
+<!doctype html>
+<meta charset="utf-8" />
+<style>
+  :root {
+    color-scheme: light dark;
+    --fg: #16181d;
+    --muted: #61656e;
+    --line: #e2e4e9;
+    --ok: #1a7f4b;
+    --bad: #b3261e;
+    --code-bg: #f5f6f9;
+  }
+  :root.dark {
+    --fg: #e6e8ed;
+    --muted: #9aa0ab;
+    --line: #33373f;
+    --ok: #57c98a;
+    --bad: #ef8a84;
+    --code-bg: #1e2229;
+  }
+  body { margin: 0; font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--fg); }
+  .bar { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+  .status { font-weight: 700; }
+  .status.ok { color: var(--ok); }
+  .status.bad { color: var(--bad); }
+  .method { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 600; }
+  .url { color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; word-break: break-all; }
+  .timing { margin-left: auto; color: var(--muted); font-size: 12px; white-space: nowrap; }
+  section { padding: 10px 12px; border-bottom: 1px solid var(--line); }
+  h2 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  pre {
+    margin: 0; padding: 10px; background: var(--code-bg); border-radius: 7px;
+    overflow-x: auto; max-height: 240px; overflow-y: auto;
+    font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  table { border-collapse: collapse; width: 100%; font-size: 12px; }
+  td { padding: 3px 8px 3px 0; vertical-align: top; }
+  td.k { color: var(--muted); white-space: nowrap; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .note { color: var(--muted); font-size: 12px; padding: 10px 12px; }
+</style>
+<div class="bar">
+  <span class="status" id="status">…</span>
+  <span class="method" id="method"></span>
+  <span class="url" id="url"></span>
+  <span class="timing" id="timing"></span>
+</div>
+<section id="headers-box" hidden>
+  <h2>Response headers</h2>
+  <table id="headers"></table>
+</section>
+<section id="body-box" hidden>
+  <h2>Response body</h2>
+  <pre id="body"></pre>
+</section>
+<div class="note" id="note" hidden></div>
+<script type="module">
+  /*__EXT_APPS_BUNDLE__*/
+  const { App } = globalThis.ExtApps;
+
+  const el = (id) => document.getElementById(id);
+
+  function applyTheme(theme) {
+    document.documentElement.classList.toggle("dark", theme === "dark");
+  }
+
+  function pretty(text) {
+    try {
+      return JSON.stringify(JSON.parse(text), null, 2);
+    } catch {
+      return text;
+    }
+  }
+
+  function render(result) {
+    const ok = result.status === "OK";
+    const statusEl = el("status");
+    statusEl.textContent = result.http_status ? `${result.http_status}` : result.status ?? "—";
+    statusEl.className = `status ${ok ? "ok" : "bad"}`;
+    el("method").textContent = result.method ?? "";
+    el("url").textContent = result.url ?? "";
+    el("timing").textContent = result.elapsed_ms != null ? `${result.elapsed_ms} ms` : "";
+
+    const headers = result.headers && typeof result.headers === "object" ? Object.entries(result.headers) : [];
+    const table = el("headers");
+    table.replaceChildren();
+    for (const [key, value] of headers) {
+      const tr = document.createElement("tr");
+      const k = document.createElement("td");
+      k.className = "k";
+      k.textContent = key;
+      const v = document.createElement("td");
+      v.textContent = value;
+      tr.append(k, v);
+      table.append(tr);
+    }
+    el("headers-box").hidden = headers.length === 0;
+
+    const bodyText = typeof result.body === "string" ? result.body : "";
+    el("body").textContent = pretty(bodyText);
+    el("body-box").hidden = bodyText.length === 0;
+
+    const notes = [];
+    if (result.truncated) notes.push("Body truncated.");
+    if (result.reason) notes.push(result.reason);
+    el("note").textContent = notes.join(" ");
+    el("note").hidden = notes.length === 0;
+  }
+
+  (async () => {
+    const app = new App({ name: "ApimTestConsole", version: "1.0.0" }, {}, { autoResize: true });
+    app.ontoolresult = ({ content }) => {
+      try {
+        render(JSON.parse(content[0].text));
+      } catch {
+        render({ status: "ERROR", reason: "could not parse the tool result" });
+      }
+    };
+    app.onhostcontextchanged = (ctx) => applyTheme(ctx?.theme);
+    await app.connect();
+    applyTheme(app.getHostContext()?.theme);
+  })();
+</script>

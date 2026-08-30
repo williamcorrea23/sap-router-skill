@@ -516,12 +516,12 @@
     },
     {
       "id": "apim-ui-mcp",
-      "display_name": "API Management Web UI MCP",
+      "display_name": "API Management Channel MCP",
       "status": "enabled",
       "source": {
-        "repository": "local-playwright-ready-wrapper",
+        "repository": "local-dual-channel-wrapper",
         "license": "project",
-        "version": "0.1.0"
+        "version": "0.3.0"
       },
       "runtime": {
         "command": "node",
@@ -538,21 +538,36 @@
         ]
       },
       "auth": {
-        "mode": "logged_in_browser_session",
+        "mode": "oauth_service_key_primary_browser_session_fallback",
         "env_refs": [
-          "APIM_WEB_URL"
-        ]
+          "APIM_SERVICE_KEY_FILE",
+          "APIM_API_URL",
+          "APIM_TOKEN_URL",
+          "APIM_CLIENT_ID",
+          "APIM_CLIENT_SECRET",
+          "APIM_WEB_URL",
+          "APIM_RUNTIME_HOSTS",
+          "CHROME_DEBUGGING_PORT"
+        ],
+        "notes": "OAuth client_credentials on the apiportal-apiaccess service key is SAP's documented path and is preferred. The logged-in browser session is an undocumented fallback used only when no service key is configured; cookies stay in the browser."
       },
       "capabilities": [
         "sap.webui.status",
         "sap.webui.open",
         "sap.webui.plan",
-        "sap.webui.evidence.capture"
+        "sap.webui.evidence.capture",
+        "sap.apim.channel.status",
+        "sap.apim.proxy.read",
+        "sap.apim.proxy.test",
+        "sap.apim.proxy.modify",
+        "sap.apim.proxy.deploy",
+        "sap.apim.gateway.probe"
       ],
       "safety": {
         "default_mode": "read_only",
         "mutations": "plan_approve_commit",
-        "cookies_export": "deny"
+        "cookies_export": "deny",
+        "scope": "API lifecycle tooling only; not a business data channel. See SAP API Policy v.4.2026a."
       },
       "probes": {
         "initialize": true,

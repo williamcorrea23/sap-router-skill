@@ -58,6 +58,14 @@ CPI/APIM/Fiori/UI5/CAP now route through API/CLI/plugin MCPs first and use Web U
 fallbacks (`integration-suite-ui-mcp`, `apim-ui-mcp`) only when background access is blocked.
 The Web UI bridge uses the logged-in browser session and does not accept credential values.
 
+`apim-ui-mcp` carries two API Management channels and reports which one each call used.
+OAuth `client_credentials` on an `apiportal-apiaccess` service key is SAP's documented path
+and wins whenever it is configured; the logged-in browser session is an undocumented fallback
+for reads and tests, running `fetch()` inside the page so cookies never leave the browser.
+Scope is API lifecycle only — proxies, products, policies, key value maps and their tests —
+never business data; SAP API Policy v.4.2026a §2.2.2 points agentic business-API access at the
+Integration Suite MCP Gateway instead, which `apim_mcp_gateway_probe` checks the tenant for.
+
 Mutating capabilities use plan/approval/commit semantics. Local approval state is handled by:
 
 ```bash
