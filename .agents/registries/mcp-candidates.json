@@ -31,7 +31,7 @@
         "SYNTAX_CHECK_BEFORE_ACTIVATE",
         "TAVILY_API_KEY"
       ],
-      "description": "DimiDR/ABAP-MCP — Standalone MCP Server for agentic ABAP development (68 tools, method surgery, DDIC validation, Clean ABAP workflow). Credentials hardcoded — ${SAP_URL} resolution fixed."
+      "description": "DimiDR/ABAP-MCP \u2014 Standalone MCP Server for agentic ABAP development (68 tools, method surgery, DDIC validation, Clean ABAP workflow). Credentials hardcoded \u2014 ${SAP_URL} resolution fixed."
     },
     {
       "id": "abap-mcp-adt-powerup",
@@ -50,7 +50,7 @@
         "SAP_URL",
         "SAP_USER"
       ],
-      "description": "ABAP MCP ADT PowerUp (babamba2/abap-mcp-adt-powerup) — Extended ADT MCP with advanced ABAP tools. Node.js."
+      "description": "ABAP MCP ADT PowerUp (babamba2/abap-mcp-adt-powerup) \u2014 Extended ADT MCP with advanced ABAP tools. Node.js."
     },
     {
       "id": "azure-ai-search",
@@ -82,7 +82,7 @@
         ]
       },
       "env_refs": [],
-      "description": "SAP BTP MCP — 7 entity sets: GlobalAccount, Subaccounts, Directories, Assignments, AllowedDataCenters, EnvironmentInstances, AvailableEnvironments. OData-based via btp-admin-api-config.json. Built on odata-mcp-proxy."
+      "description": "SAP BTP MCP \u2014 7 entity sets: GlobalAccount, Subaccounts, Directories, Assignments, AllowedDataCenters, EnvironmentInstances, AvailableEnvironments. OData-based via btp-admin-api-config.json. Built on odata-mcp-proxy."
     },
     {
       "id": "btp-sap-odata-to-mcp",
@@ -96,7 +96,7 @@
         ]
       },
       "env_refs": [],
-      "description": "BTP OData MCP — 3 progressive-discovery tools (discover-sap-data, get-entity-metadata, execute-sap-operation) instead of 200+ entity tools. S/4HANA/ECC via BTP Destination + Principal Propagation. Token-optimized."
+      "description": "BTP OData MCP \u2014 3 progressive-discovery tools (discover-sap-data, get-entity-metadata, execute-sap-operation) instead of 200+ entity tools. S/4HANA/ECC via BTP Destination + Principal Propagation. Token-optimized."
     },
     {
       "id": "bw-modeling-mcp",
@@ -142,7 +142,7 @@
         "CF_PASSWORD",
         "CF_USER"
       ],
-      "description": "Cloud Foundry MCP — cf push/deploy, org/space management, service marketplace, logs, SSH. BTP Cloud Foundry runtime operations."
+      "description": "Cloud Foundry MCP \u2014 cf push/deploy, org/space management, service marketplace, logs, SSH. BTP Cloud Foundry runtime operations."
     },
     {
       "id": "ci-mcp-server",
@@ -163,7 +163,7 @@
         "CPI_DESTINATION_CLIENT_SECRET",
         "CPI_DESTINATION_TOKEN_URL"
       ],
-      "description": "lemaiwo/ci-mcp-server — configuration-driven SAP Cloud Integration (CPI) OData V2 API proxy. Exposes 32 entity sets (packages, logs, security material, Partner Directory)."
+      "description": "lemaiwo/ci-mcp-server \u2014 configuration-driven SAP Cloud Integration (CPI) OData V2 API proxy. Exposes 32 entity sets (packages, logs, security material, Partner Directory)."
     },
     {
       "id": "cloud-alm-itsm",
@@ -236,7 +236,7 @@
         "ERPL_URL",
         "ERPL_USER"
       ],
-      "description": "erpl-adt MCP — single-binary ADT CLI, zero-dependency, Go-based. Transport CRUD, ABAP source CRUD, ABAP Unit, ATC checks, object search. Latest release v2026.06.27."
+      "description": "erpl-adt MCP \u2014 single-binary ADT CLI, zero-dependency, Go-based. Transport CRUD, ABAP source CRUD, ABAP Unit, ATC checks, object search. Latest release v2026.06.27."
     },
     {
       "id": "guniweb-sap-mcp",
@@ -256,7 +256,7 @@
         "SAP_URL",
         "SAP_USER"
       ],
-      "description": "guniweb-sap-mcp — multi-protocol MCP for OData V2/V4, IDocs, and RFC/BAPI. 22 tools across 4 tiers. 918 unit tests. 7 auth types. n8n-compatible."
+      "description": "guniweb-sap-mcp \u2014 multi-protocol MCP for OData V2/V4, IDocs, and RFC/BAPI. 22 tools across 4 tiers. 918 unit tests. 7 auth types. n8n-compatible."
     },
     {
       "id": "mcp-abap-adt",
@@ -275,7 +275,7 @@
         "SAP_URL",
         "SAP_USERNAME"
       ],
-      "description": "TypeScript SAP ADT MCP — 13 tools: GetProgram, GetClass, GetFunctionGroup, GetFunction, GetStructure, GetTable, GetTableContents, GetPackage, GetTypeInfo, GetInclude, SearchObject, GetInterface, GetTransaction. MIT license."
+      "description": "TypeScript SAP ADT MCP \u2014 13 tools: GetProgram, GetClass, GetFunctionGroup, GetFunction, GetStructure, GetTable, GetTableContents, GetPackage, GetTypeInfo, GetInclude, SearchObject, GetInterface, GetTransaction. MIT license."
     },
     {
       "id": "mcp-calm-server",
@@ -296,7 +296,7 @@
         "CALM_UAA_CLIENT_SECRET",
         "CALM_UAA_URL"
       ],
-      "description": "fr0ster/mcp-calm-server — SAP Cloud ALM MCP server. Exposes 54 tools covering all 9 Cloud ALM services."
+      "description": "fr0ster/mcp-calm-server \u2014 SAP Cloud ALM MCP server. Exposes 54 tools covering all 9 Cloud ALM services."
     },
     {
       "id": "mcp-integration-suite",
@@ -321,7 +321,7 @@
         "CPI_OAUTH_CLIENT_SECRET",
         "CPI_OAUTH_TOKEN_URL"
       ],
-      "description": "1nbuc/mcp-integration-suite — SAP Integration Suite API management (iFlow, package, message mapping, testing, monitoring). Requires S-User credentials or OAuth2 service key."
+      "description": "1nbuc/mcp-integration-suite \u2014 SAP Integration Suite API management (iFlow, package, message mapping, testing, monitoring). Requires S-User credentials or OAuth2 service key."
     },
     {
       "id": "mcp-sap-gui-kts",
@@ -338,7 +338,7 @@
       "env_refs": [
         "SAP_CONNECTION"
       ],
-      "description": "SAP GUI MCP (kts982/mcp-sap-gui v0.1.3) — Python. Installed editable from packages/mcp-sap-gui-kts-code."
+      "description": "SAP GUI MCP (kts982/mcp-sap-gui v0.1.3) \u2014 Python. Installed editable from packages/mcp-sap-gui-kts-code."
     },
     {
       "id": "mcp-sap-notes",
@@ -355,7 +355,7 @@
         "SAP_NOTES_PASSWORD",
         "SAP_NOTES_USERNAME"
       ],
-      "description": "SAP Notes MCP — search and fetch SAP Notes from me.sap.com. Supports enriched metadata, correction details, ABAP object references. Archived repo — moved to marianfoo/sap-mcp-servers."
+      "description": "SAP Notes MCP \u2014 search and fetch SAP Notes from me.sap.com. Supports enriched metadata, correction details, ABAP object references. Archived repo \u2014 moved to marianfoo/sap-mcp-servers."
     },
     {
       "id": "odata-mcp-go",
@@ -381,7 +381,7 @@
         ]
       },
       "env_refs": [],
-      "description": "SAP Cloud Integration OData MCP — 32 entity sets: IntegrationPackages, IntegrationDesigntimeArtifacts, MessageProcessingLogs, DataStoreEntries, KeystoreEntries, UserCredentials, OAuth2ClientCredentials, Partners, etc. npm package. Config-driven OData→MCP bridge. MIT license."
+      "description": "SAP Cloud Integration OData MCP \u2014 32 entity sets: IntegrationPackages, IntegrationDesigntimeArtifacts, MessageProcessingLogs, DataStoreEntries, KeystoreEntries, UserCredentials, OAuth2ClientCredentials, Partners, etc. npm package. Config-driven OData\u2192MCP bridge. MIT license."
     },
     {
       "id": "pinecone-rag",
@@ -457,7 +457,7 @@
         "APIM_PASSWORD",
         "APIM_USER"
       ],
-      "description": "SAP API Management MCP — API proxy lifecycle, policy deployment, security/traffic config, OpenAPI import, API Business Hub publication. Pre-configured for sap-api-policy skill."
+      "description": "SAP API Management MCP \u2014 API proxy lifecycle, policy deployment, security/traffic config, OpenAPI import, API Business Hub publication. Pre-configured for sap-api-policy skill."
     },
     {
       "id": "sap-cpi",
@@ -475,7 +475,7 @@
         "CPI_PASSWORD",
         "CPI_USER"
       ],
-      "description": "SAP Cloud Integration (CPI) MCP — iFlow deploy/undeploy, message processing logs, trace logs, keystore, credentials, system status. Direct CPI tenant connection."
+      "description": "SAP Cloud Integration (CPI) MCP \u2014 iFlow deploy/undeploy, message processing logs, trace logs, keystore, credentials, system status. Direct CPI tenant connection."
     },
     {
       "id": "sap-gui-library-mcp",
@@ -495,7 +495,7 @@
         "SAPGUI_PASSWORD",
         "SAPGUI_USER"
       ],
-      "description": "sap-gui-library MCP — Python abstraction over SAP GUI Scripting COM API. pip install sap-gui-library. Requires SAP GUI 770+ with Accessibility Mode."
+      "description": "sap-gui-library MCP \u2014 Python abstraction over SAP GUI Scripting COM API. pip install sap-gui-library. Requires SAP GUI 770+ with Accessibility Mode."
     },
     {
       "id": "sap-gui-mcp-jduncan",
@@ -515,7 +515,7 @@
         "SAPGUI_PASSWORD",
         "SAPGUI_USER"
       ],
-      "description": "SAP GUI MCP (jduncan8142/sap_gui_mcp v0.1.0) — FastMCP-based, Python. Installed editable from packages/sap_gui_mcp."
+      "description": "SAP GUI MCP (jduncan8142/sap_gui_mcp v0.1.0) \u2014 FastMCP-based, Python. Installed editable from packages/sap_gui_mcp."
     },
     {
       "id": "sap-pi-mcp",
@@ -553,7 +553,7 @@
         "SAP_RFC_PASSWORD",
         "SAP_RFC_USER"
       ],
-      "description": "SAP RFC MCP server — ZROUTER dispatch via RFC. Default route for BAPI-based batch operations (MM, SD, FI, QM, PP, WM, CO, HCM, BASIS)."
+      "description": "SAP RFC MCP server \u2014 ZROUTER dispatch via RFC. Default route for BAPI-based batch operations (MM, SD, FI, QM, PP, WM, CO, HCM, BASIS)."
     },
     {
       "id": "sap-transport-mcp",
@@ -578,7 +578,7 @@
         "SAP_SYSTEM_ID",
         "SAP_USERNAME"
       ],
-      "description": "Nidhideep/sap-transport-mcp — CTS Transport Request management (list, inspect, release, delete) via SAP ADT REST API."
+      "description": "Nidhideep/sap-transport-mcp \u2014 CTS Transport Request management (list, inspect, release, delete) via SAP ADT REST API."
     },
     {
       "id": "sapgui-mcp-go",
@@ -595,7 +595,7 @@
         "SAPGUI_PASSWORD",
         "SAPGUI_USER"
       ],
-      "description": "SAP GUI MCP in Go (Hochfrequenz/sapgui.mcp v0.13.3) — TERTIARY fallback. Requires: go install github.com/Hochfrequenz/sapgui.mcp/cmd/sapgui-mcp@latest (when fixed upstream)."
+      "description": "SAP GUI MCP in Go (Hochfrequenz/sapgui.mcp v0.13.3) \u2014 TERTIARY fallback. Requires: go install github.com/Hochfrequenz/sapgui.mcp/cmd/sapgui-mcp@latest (when fixed upstream)."
     },
     {
       "id": "sapgui-mcp-webgui",
@@ -613,7 +613,7 @@
         "SAPGUI_MCP_CONFIG_PATH",
         "SAP_SYSTEM"
       ],
-      "description": "SAP GUI MCP WebGUI (Hochfrequenz/sapgui.mcp v0.13.4) — Chrome/Playwright browser automation for SAP Web GUI. Linux/Mac/Windows."
+      "description": "SAP GUI MCP WebGUI (Hochfrequenz/sapgui.mcp v0.13.4) \u2014 Chrome/Playwright browser automation for SAP Web GUI. Linux/Mac/Windows."
     },
     {
       "id": "sapient-mcp",
@@ -648,7 +648,7 @@
         "SAPIENT_HOST",
         "SAPIENT_KEY"
       ],
-      "description": "Sapient MCP (toni-ramchandani/sapient-mcp v1.0.0) — Intelligent SAP GUI automation, RoboSAPiens-powered. Python."
+      "description": "Sapient MCP (toni-ramchandani/sapient-mcp v1.0.0) \u2014 Intelligent SAP GUI automation, RoboSAPiens-powered. Python."
     },
     {
       "id": "sf-mcp",
@@ -666,7 +666,7 @@
         "SF_URL",
         "SF_USERNAME"
       ],
-      "description": "SuccessFactors OData MCP — HCM cloud operations: Employee data, org structure, compensation, time off. Route prefix: sf_* actions."
+      "description": "SuccessFactors OData MCP \u2014 HCM cloud operations: Employee data, org structure, compensation, time off. Route prefix: sf_* actions."
     },
     {
       "id": "supabase-rag",
@@ -701,7 +701,7 @@
         "SAP_SYSTEMS",
         "STEAMPUNK_MODE"
       ],
-      "description": "vibing-steampunk MCP — ADT-to-MCP bridge in Go, 257+ stars, 147 MCP tools, hyperfocused single-tool mode (~200 tokens). Covers debug/deploy/analyze ABAP, package health, dead code detection, ABAP LSP, WebSocket RFC handler."
+      "description": "vibing-steampunk MCP \u2014 ADT-to-MCP bridge in Go, 257+ stars, 147 MCP tools, hyperfocused single-tool mode (~200 tokens). Covers debug/deploy/analyze ABAP, package health, dead code detection, ABAP LSP, WebSocket RFC handler."
     },
     {
       "id": "lemaiwo-btp-mcp-server",
@@ -789,7 +789,7 @@
         "CPI_OAUTH_CLIENT_ID",
         "CPI_OAUTH_CLIENT_SECRET"
       ],
-      "description": "vadimklimov/cpi-mcp-server — read-oriented Go MCP for packages, iFlows, value/message mappings, script collections, runtime artifacts, and monitoring. MIT; candidate only."
+      "description": "vadimklimov/cpi-mcp-server \u2014 read-oriented Go MCP for packages, iFlows, value/message mappings, script collections, runtime artifacts, and monitoring. MIT; candidate only."
     },
     {
       "id": "karthickshiva-sap-cpi-mcp-server",
@@ -806,7 +806,7 @@
         "CPI_OAUTH_CLIENT_ID",
         "CPI_OAUTH_CLIENT_SECRET"
       ],
-      "description": "karthickshiva-png/sap-cpi-mcp-server — native CPI/OpenAPI MCP artifact with MPL, runtime and deployment concepts. MIT; disabled candidate only."
+      "description": "karthickshiva-png/sap-cpi-mcp-server \u2014 native CPI/OpenAPI MCP artifact with MPL, runtime and deployment concepts. MIT; disabled candidate only."
     },
     {
       "id": "1nbuc-mcp-integration-suite",
@@ -1082,6 +1082,124 @@
         "sap.gui.transaction.run"
       ],
       "description": "mario-andreschak/mcp-sap-gui - SAP GUI automation MCP (alternative to mcp-sap-gui)."
+    },
+    {
+      "id": "syntaai-sap-security-mcp",
+      "status": "disabled_candidate",
+      "reason": "Catalog candidate from marianfoo/sap-ai-mcp-servers; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": null,
+        "args": []
+      },
+      "env_refs": [],
+      "repository": "https://github.com/SYNTAAI/sap-security-mcp",
+      "declared_capabilities": [
+        "sap.security.access.review",
+        "sap.security.sod.check",
+        "sap.security.compliance.audit"
+      ],
+      "description": "SYNTAAI/sap-security-mcp \u2014 SAP security analysis and compliance auditing via MCP (19 read-only tools for user access reviews, SoD violation checks, critical authorizations, SOX, GDPR, ISO 27001, RFC security)."
+    },
+    {
+      "id": "kts982-sap-odata-explorer",
+      "status": "disabled_candidate",
+      "reason": "Catalog candidate from marianfoo/sap-ai-mcp-servers; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": null,
+        "args": []
+      },
+      "env_refs": [],
+      "repository": "https://github.com/kts982/sap-odata-explorer",
+      "declared_capabilities": [
+        "sap.odata.service.discover",
+        "sap.odata.metadata.inspect",
+        "sap.fiori.readiness.lint"
+      ],
+      "description": "kts982/sap-odata-explorer \u2014 Desktop app and CLI for SAP Gateway OData service discovery, entity metadata with decoded SAP/UI5 annotations, test queries, and Fiori-readiness lint."
+    },
+    {
+      "id": "nicohern-abapilot-mcp",
+      "status": "disabled_candidate",
+      "reason": "Catalog candidate from marianfoo/sap-ai-mcp-servers; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": null,
+        "args": []
+      },
+      "env_refs": [],
+      "repository": "https://github.com/NicoHern/abapilot-mcp",
+      "declared_capabilities": [
+        "sap.abap.backend.query"
+      ],
+      "description": "NicoHern/abapilot-mcp \u2014 ABAPilot MCP Connector, stdio bridge to the in-system ABAPilot backend for ECC 6.0 and on-premise S/4HANA without requiring ADT or BTP."
+    },
+    {
+      "id": "arc-mcp-hub",
+      "status": "disabled_candidate",
+      "reason": "Catalog candidate from marianfoo/sap-ai-mcp-servers; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": null,
+        "args": []
+      },
+      "env_refs": [],
+      "repository": "https://github.com/arc-mcp/mcp-hub",
+      "declared_capabilities": [
+        "sap.adt.hub.route"
+      ],
+      "description": "arc-mcp/mcp-hub \u2014 Thin deterministic multi-system MCP hub fronting multiple ARC-1 instances (DEV/QA/PROD) behind one BTP front door with single sign-on."
+    },
+    {
+      "id": "sap-btp-admin-mcp",
+      "status": "disabled_candidate",
+      "reason": "Catalog candidate from marianfoo/sap-ai-mcp-servers; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": null,
+        "args": []
+      },
+      "env_refs": [],
+      "repository": "https://help.sap.com/docs/btp/sap-business-technology-platform/account-administration-using-mcp-servers",
+      "declared_capabilities": [
+        "sap.btp.account.admin",
+        "sap.btp.security.admin"
+      ],
+      "description": "Official SAP-hosted remote MCP service for BTP account administration, security, services, and connectivity management with SSO."
+    },
+    {
+      "id": "sap-joule-a2a-toolkit",
+      "status": "disabled_candidate",
+      "reason": "Catalog candidate from marianfoo/sap-ai-mcp-servers; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": null,
+        "args": []
+      },
+      "env_refs": [],
+      "repository": "https://github.com/SAP-samples/joule-a2a-agent-toolkit",
+      "declared_capabilities": [
+        "sap.joule.a2a.orchestrate"
+      ],
+      "description": "SAP-samples/joule-a2a-agent-toolkit \u2014 Skills and tooling for BTP/CF/Joule CLIs and building/deploying custom Joule A2A (agent-to-agent) agents on SAP BTP."
+    },
+    {
+      "id": "dnic-bw-modeling-mcp",
+      "status": "disabled_candidate",
+      "reason": "Catalog candidate from marianfoo/sap-ai-mcp-servers; promote only after runtime and safety review.",
+      "runtime": {
+        "type": "stdio",
+        "command": null,
+        "args": []
+      },
+      "env_refs": [],
+      "repository": "https://github.com/dnic-dev/bw-modeling-mcp",
+      "declared_capabilities": [
+        "sap.bw.modeling.read",
+        "sap.bw.modeling.write"
+      ],
+      "description": "dnic-dev/bw-modeling-mcp \u2014 BW Modeling MCP Server for SAP BW/4HANA objects via internal BWMT REST API."
     }
   ]
 }

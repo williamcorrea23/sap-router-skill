@@ -150,6 +150,7 @@ function runApprovalBroker(brokerArgs) {
   const stdout = execFileSync("python", [path.join(ROOT, "scripts", "approval_broker.py"), ...brokerArgs], {
     cwd: ROOT,
     encoding: "utf8",
+    timeout: 30000,
   });
   return JSON.parse(stdout || "{}");
 }
@@ -358,7 +359,11 @@ function apimSessionTools() {
 }
 
 function tools() {
-  return isApim ? [...baseTools(), ...apimSessionTools()] : baseTools();
+  return isApim ? [...baseTools(), ...apimSessionTools()] : [...baseTools(), {
+    name: 'cpi_webui_probe', description: 'Read one IntegrationPackages page in the existing tenant session; never mutate.',
+    inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+    annotations: { readOnlyHint: true, destructiveHint: false, idempotentHint: true }
+  }];
 }
 
 // --------------------------------------------------------- playwright path
@@ -393,7 +398,9 @@ async function status() {
   const channel = websocketAvailable() ? "cdp-websocket" : imported.error ? "unavailable" : "playwright";
   return {
     product,
-    ready: Boolean(base) && channel !== "unavailable",
+    ready: false,
+    configured: Boolean(base) && channel !== "unavailable",
+    domain_ready: false,
     url_env: envUrl,
     url_configured: Boolean(base),
     cdp_url: cdpBaseUrl(),
@@ -730,7 +737,7 @@ async function executeAction(input) {
   return managementRequest(built.path, { method: built.method, channel: input?.channel });
 }
 
-const PLAN_DIR = path.join(ROOT, "scratch", "apim-plans");
+const PLAN_DIR = path.join(process.env.SAP_ROUTER_STATE_DIR || path.join(ROOT, ".sap-router"), "apim-plans");
 
 /**
  * Confine upload bundles to a workspace, mirroring safe_workspace_path() in
@@ -754,7 +761,9 @@ function planPreconditions(action, bundle, channel) {
     channel,
     sanctioned_channel: channel === "oauth",
     session_origin: channel === "session" ? tenantOrigin() : "",
+    api_base: channel === "oauth" ? oauthStatus().api_base || "" : "",
     bundle_exists: bundle ? fs.existsSync(bundle) : true,
+    bundle_sha256: bundle && fs.existsSync(bundle) ? crypto.createHash('sha256').update(fs.readFileSync(bundle)).digest('hex') : "",
     mutating: action.mutating,
   };
 }
@@ -840,16 +849,24 @@ async function configureCommit(input) {
   if (!input?.confirm) {
     return { status: "BLOCKED", reason: "Missing confirm. Review and approve the plan first." };
   }
+  if (!/^[a-zA-Z0-9_-]+$/.test(String(input.plan_id || ""))) {
+    return { status: "BLOCKED", reason: "invalid-plan-id" };
+  }
   const planPath = path.join(PLAN_DIR, `${input.plan_id}.json`);
   if (!fs.existsSync(planPath)) {
     return { status: "ERROR", reason: `plan not found: ${input.plan_id}` };
   }
   const plan = JSON.parse(fs.readFileSync(planPath, "utf8"));
   const args = plan.arguments;
+  const action = getAction(args.action_id);
+  if (!action?.mutating) return { status: "BLOCKED", reason: "invalid-mutating-action" };
+  if (args.bundle) safeWorkspacePath(args.bundle);
   if (args.bundle && !fs.existsSync(args.bundle)) {
     return { status: "BLOCKED", reason: "preconditions-not-met", detail: `bundle missing: ${args.bundle}` };
   }
-  const hashArgs = [String(input.action_id), "--plan-hash", String(input.plan_hash)];
+  const hashArgs = [String(input.action_id), "--plan-hash", String(input.plan_hash),
+    "--arguments-json", stableJson(args),
+    "--preconditions-json", stableJson(planPreconditions(action, args.bundle, args.channel))];
   if (input.argument_hash) {
     hashArgs.push("--argument-hash", String(input.argument_hash));
   }
@@ -857,9 +874,9 @@ async function configureCommit(input) {
     hashArgs.push("--precondition-hash", String(input.precondition_hash));
   }
 
-  // Verify now, mutate, then spend. Spending first would burn a one-time
-  // approval on a transient failure the tenant never saw.
+  // Bind actual arguments and current preconditions, reserve once, then mutate.
   runApprovalBroker(["verify", ...hashArgs]);
+  runApprovalBroker(["begin", ...hashArgs]);
 
   // Never let a throw escape between verify and the approval report — the caller
   // has to learn whether the approval is still spendable.
@@ -876,8 +893,8 @@ async function configureCommit(input) {
       plan_id: input.plan_id,
       target: args.target,
       action_id: args.action_id,
-      approval: "still-open",
-      next_step: `The mutation failed, so approval ${input.action_id} was not spent. Retry the commit, or reject it with: python scripts/approval_broker.py reject ${input.action_id}`,
+      approval: "reconciliation-required",
+      next_step: `Do not retry. Reconcile remote state, reject approval ${input.action_id}, and create a new approved plan only if another operation is necessary.`,
     };
   }
 
@@ -897,6 +914,7 @@ async function configureCommit(input) {
 }
 
 async function performMutation(args) {
+  if (process.env.SAP_ROUTER_OFFLINE === '1') return { status: 'BLOCKED', reason: 'offline-network-denied' };
   if ((args.channel || "session") === "oauth") {
     const body = args.bundle ? fs.readFileSync(args.bundle) : args.payload || null;
     const result = await oauthRequest(toApiPath(args.path), {
@@ -977,6 +995,16 @@ async function captureEvidence(input) {
 }
 
 async function callTool(name, input) {
+  if (name === 'cpi_webui_probe' && !isApim) {
+    if (process.env.SAP_ROUTER_OFFLINE === '1') return payload({ status: 'BLOCKED', reason: 'offline-network-denied' });
+    const result = await withSession(requireSessionOrigin(), session => apiFetch(session, '/api/v1/IntegrationPackages?$top=1', { method: 'GET' }));
+    let items;
+    try {
+      const body = JSON.parse(result.body);
+      items = body?.d?.results ?? body?.value;
+    } catch { /* login HTML or malformed payload is not semantic readiness */ }
+    return payload({ status: result.status === 'OK' && Array.isArray(items) ? 'OK' : 'BLOCKED', domain_read: Array.isArray(items) });
+  }
   if (name.endsWith("_webui_status")) {
     return payload(await status());
   }

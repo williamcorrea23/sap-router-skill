@@ -174,6 +174,10 @@ def validate_server_definition(data: dict[str, Any]) -> list[str]:
             if hint not in tool or not isinstance(tool[hint], bool):
                 errors.append(f"Tool [{idx}] '{hint}' must be a boolean.")
                 
+        # Semantic contract: read-only and destructive are mutually exclusive
+        if tool.get("readOnlyHint") is True and tool.get("destructiveHint") is True:
+            errors.append(f"Tool [{idx}] conflicting hints: 'readOnlyHint' and 'destructiveHint' cannot both be true.")
+
         if tool.get("tags") != {}:
             errors.append(f"Tool [{idx}] 'tags' must be an empty object '{{}}'.")
             
@@ -197,21 +201,49 @@ def build_mcp_server(
     mcp_tools: list[dict[str, Any]] = []
 
     if custom_command:
-        snake_name = re.sub(r"(?<!^)(?=[A-Z])", "_", custom_command).lower()
-        title = re.sub(r"(?<!^)(?=[A-Z])", " ", custom_command).title()
-        tool_obj = {
-            "commandId": f"{catalog}{suffix}:{custom_command}:1",
-            "name": snake_name,
-            "enabled": True,
-            "inputReferences": [f"{catalog}-<<<TENANT_ID>>>:Credentials:1"] if tenant_id else [],
-            "tags": {},
-            "title": title,
-            "destructiveHint": is_destructive,
-            "idempotentHint": is_read_only,
-            "openWorldHint": is_read_only,
-            "readOnlyHint": is_read_only
-        }
-        mcp_tools.append(tool_obj)
+        # Check if custom_command is in STANDARD_CATALOG_COMMANDS for this catalog
+        matched_std = None
+        if catalog in STANDARD_CATALOG_COMMANDS:
+            for cmd in STANDARD_CATALOG_COMMANDS[catalog]:
+                if cmd["command"].lower() == custom_command.lower():
+                    matched_std = cmd
+                    break
+
+        if matched_std:
+            cmd_suffix = suffix if tenant_id else matched_std["suffix"]
+            tool_obj = {
+                "commandId": f"{catalog}{cmd_suffix}:{matched_std['command']}:{matched_std['version']}",
+                "name": matched_std["name"],
+                "enabled": True,
+                "inputReferences": [f"{catalog}-<<<TENANT_ID>>>:DefaultInputs:1"] if tenant_id else [],
+                "tags": {},
+                "title": matched_std["title"],
+                "destructiveHint": is_destructive if is_destructive else matched_std["destructive"],
+                "idempotentHint": matched_std["idempotent"],
+                "openWorldHint": matched_std["openWorld"],
+                "readOnlyHint": is_read_only if is_read_only else matched_std["readOnly"]
+            }
+            mcp_tools.append(tool_obj)
+        else:
+            snake_name = re.sub(r"(?<!^)(?=[A-Z])", "_", custom_command).lower()
+            title = re.sub(r"(?<!^)(?=[A-Z])", " ", custom_command).title()
+            inferred_read_only = is_read_only or any(snake_name.startswith(p) for p in ("list_", "get_", "fetch_", "search_"))
+            inferred_open_world = inferred_read_only
+            inferred_destructive = is_destructive if not inferred_read_only else False
+
+            tool_obj = {
+                "commandId": f"{catalog}{suffix}:{custom_command}:1",
+                "name": snake_name,
+                "enabled": True,
+                "inputReferences": [f"{catalog}-<<<TENANT_ID>>>:Credentials:1"] if tenant_id else [],
+                "tags": {},
+                "title": title,
+                "destructiveHint": inferred_destructive,
+                "idempotentHint": inferred_read_only,
+                "openWorldHint": inferred_open_world,
+                "readOnlyHint": inferred_read_only
+            }
+            mcp_tools.append(tool_obj)
     elif catalog in STANDARD_CATALOG_COMMANDS:
         for cmd_def in STANDARD_CATALOG_COMMANDS[catalog]:
             cmd_suffix = suffix if tenant_id else cmd_def["suffix"]

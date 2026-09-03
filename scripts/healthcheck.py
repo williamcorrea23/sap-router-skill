@@ -741,7 +741,7 @@ class HealthChecker:
     def check_canonical_v6_readiness(self):
         """Report v6 readiness stages for canonical .agents MCP registry."""
         registry_path = self.project_root / ".agents" / "registries" / "mcps.json"
-        if not registry_path.exists():
+        if not registry_path.exists() or self.project_root.resolve() != SKILL_DIR.resolve():
             self.results["readiness_v6"] = {"status": "SKIPPED", "reason": "canonical registry missing"}
             return self.results["readiness_v6"]
         sys.path.insert(0, str(self.project_root / "python"))
@@ -792,164 +792,67 @@ class HealthChecker:
         return self.results["readiness_v6"]
 
     def run_full_check(self):
-        """Run complete healthcheck across all MCPs and .env."""
-        # Load local .env into os.environ for verification
-        env_path = self.project_root / ".env"
-        if env_path.exists():
-            try:
-                env_content = env_path.read_text(encoding='utf-8')
-                for line in env_content.split('\n'):
-                    line_strip = line.strip()
-                    if not line_strip or line_strip.startswith('#') or '=' not in line_strip:
-                        continue
-                    k, v = line_strip.split('=', 1)
-                    k = k.strip()
-                    v = v.strip()
-                    if (v.startswith('"') and v.endswith('"')) or (v.startswith("'") and v.endswith("'")):
-                        v = v[1:-1]
-                    if v:
-                        os.environ[k] = v
-            except Exception:
-                pass
-
-        self.log("=" * 60)
-        self.log("SAP ROUTER HEALTHCHECK v4.2.0")
-        self.log(f"Timestamp: {self.results['timestamp']}")
-        self.log(f"Project: {self.project_root}")
-        self.log("=" * 60)
-
-        # 1. .env check
-        env_ok = self.check_env_file()
-
-        # 2. MCP connection probes
-        self.log("\n=== MCP CONNECTION PROBES ===")
-        high_ok = 0
-        high_total = 0
-
-        for name, spec in MCP_HEALTHCHECK_SPEC.items():
-            criticality = spec["criticality"]
-
-            # Check env vars
-            env_check = self.check_mcp_env_vars(name, spec)
-
-            # Check binary
-            binary_check = self.check_mcp_binary(name, spec)
-
-            # Check the entrypoint .mcp.json actually declares
-            target_check = self.check_mcp_target(name)
-
-            self.results["mcp_checks"][name] = {
-                "env": env_check,
-                "binary": binary_check,
-                "target": target_check,
-                "criticality": criticality,
-                "description": spec["description"],
-            }
-
-            # A missing entrypoint is fatal regardless of strict mode: the
-            # interpreter being on PATH says nothing if the file it would run
-            # was never built.
-            target_ok = target_check["status"] in ("PRESENT", "EXTERNAL")
-
-            if criticality in ("HIGH", "MEDIUM"):
-                high_total += 1
-                env_ok_mcp = env_check["status"] in ("ALL_SET", "CONFIGURED", "NO_ENV_NEEDED")
-                binary_ready_states = ("AVAILABLE",) if self.strict else ("AVAILABLE", "SKIPPED")
-                binary_ok = binary_check["status"] in binary_ready_states
-                if env_ok_mcp and binary_ok and target_ok:
-                    high_ok += 1
-
-            # Log status
-            ready = (
-                env_check["status"] in ("ALL_SET", "CONFIGURED", "NO_ENV_NEEDED")
-                and binary_check["status"] in (("AVAILABLE",) if self.strict else ("AVAILABLE", "SKIPPED"))
-                and target_ok
-            )
-            icon = "[OK]" if ready else "[WARN]"
-            self.log(f"  {icon} {name:25s} ({criticality:8s}): env={env_check['status']:15s} "
-                     f"binary={binary_check['status']:13s} target={target_check['status']}")
-
-        # Coverage: the loop above walks MCP_HEALTHCHECK_SPEC, so any server
-        # configured in .mcp.json but absent from that table is never probed at
-        # all. That blind spot hid the servers that actually work.
-        declared = set(self.load_mcp_declarations())
-        specced = set(MCP_HEALTHCHECK_SPEC)
+        """Canonical, offline-by-default diagnostic. Persistence is explicit."""
+        sys.path.insert(0, str(SKILL_DIR / "python"))
+        from sap_router_core.registry import load_servers, probe_server, tls_error
+        import time
+        started = time.monotonic()
+        offline = getattr(self, "offline", not self.v6_execute)
+        if not offline:
+            # Honor caller environment; never load credentials for offline tests.
+            from mcp_launcher import load_dotenv
+            load_dotenv()
+        registry_path = self.project_root / ".agents" / "registries" / "mcps.json"
+        if not registry_path.exists():
+            self.results.update(overall_status="BLOCKED", error_code="CANONICAL_REGISTRY_MISSING")
+            return self.results
+        servers = load_servers()
+        active = {k: v for k, v in servers.items() if v.get("status") == "enabled"}
+        candidates_path = self.project_root / ".agents" / "registries" / "mcp-candidates.json"
+        candidates = json.loads(candidates_path.read_text(encoding="utf-8")).get("candidates", []) if candidates_path.exists() else []
+        self.results["inventory"] = {
+            "active": sorted(active),
+            "planned": sorted(k for k, v in servers.items() if v.get("status") == "planned"),
+            "candidates": sorted(c["id"] for c in candidates),
+        }
+        selected = getattr(self, "check_mcp", None)
+        if selected and selected not in active:
+            self.results.update(overall_status="BLOCKED", error_code="SERVER_NOT_ENABLED")
+            return self.results
+        self.results["mode"] = "offline" if offline else "live-read-only"
+        self.results["policy_mode"] = "read_only"
+        self.results["tls"] = {"status": "BLOCKED" if tls_error() else "PASS"}
+        self.results["mcp_checks"] = {}
+        deadline = started + getattr(self, 'total_timeout', 180)
+        for server_id in active:
+            if selected and server_id != selected:
+                continue
+            remaining = deadline - time.monotonic()
+            result = probe_server(server_id, execute=not offline and remaining > 0,
+                                  timeout=max(1, min(getattr(self, 'timeout', 30), int(remaining))))
+            if not offline and remaining <= 0:
+                result.update(error_code='TOTAL_DEADLINE', error='Total diagnostic deadline reached; not executed.')
+            self.results["mcp_checks"][server_id] = result
+        self.results["readiness_v6"] = {
+            "status": "PASS" if all(p["status"] == "READY" for p in self.results["mcp_checks"].values()) else "DEGRADED",
+            "execute": not offline,
+            "servers": {sid: {'DECLARED': True, 'INSTALLED': p['checks']['binary'] == 'AVAILABLE',
+                              'CONFIGURED': p['checks']['env'] in ('ALL_SET', 'NO_ENV_NEEDED'),
+                              'INITIALIZED': p['checks']['initialize'] == 'PASS',
+                              'DOMAIN_READY': p['status'] == 'READY', 'MUTATION_READY': False,
+                              'probe_status': p['status']} for sid, p in self.results['mcp_checks'].items()},
+        }
         self.results["mcp_coverage"] = {
-            "declared_in_mcp_json": len(declared),
-            "listed_in_spec": len(specced),
-            "declared_but_never_probed": sorted(declared - specced),
-            "probed_but_not_declared": sorted(specced - declared),
+            "declared_in_registry": len(active),
+            "checked": len(self.results["mcp_checks"]),
+            "declared_but_never_probed": [] if not selected else sorted(set(active) - {selected}),
         }
-        unprobed = sorted(declared - specced)
-        if unprobed:
-            self.log(f"  [WARN] {len(unprobed)} MCP(s) in .mcp.json are not in "
-                     f"MCP_HEALTHCHECK_SPEC and were never probed: {', '.join(unprobed)}")
-
-        # SOAP RFC endpoint probe
-        soap_result = self.check_soap_rfc_endpoint()
-        self.results["soap_rfc_check"] = soap_result
-
-        # v6 canonical readiness stages
-        self.check_canonical_v6_readiness()
-
-        # 3. Project objects check
-        self.log("\n=== PROJECT OBJECTS ===")
-        checks = {
-            "templates/": (SKILL_DIR / "templates").exists(),
-            "templates/*.abap": len(list((SKILL_DIR / "templates").glob("*.abap"))) >= 4,
-            "scripts/*.py": len(list((SKILL_DIR / "scripts").glob("*.py"))) >= 24,
-            ".claude/skills/": len(list((SKILL_DIR / ".claude" / "skills").glob("*/SKILL.md"))) >= 85,
-            "zrouter_bootstrap.py": (SKILL_DIR / "scripts" / "zrouter_bootstrap.py").exists(),
-            "packages/samples/": (SKILL_DIR / "packages" / "samples").exists(),
-        }
-        for check_name, result in checks.items():
-            icon = "[OK]" if result else "[MISSING]"
-            self.log(f"  {icon} {check_name}")
-
-        # 4. Overall assessment
-        self.results["high_mcp_ok"] = f"{high_ok}/{high_total}"
-        self.results["strict"] = self.strict
-        if not env_ok or (self.strict and soap_result.get("status") == "BLOCKED"):
-            self.results["overall_status"] = "BLOCKED"
-            if not env_ok:
-                self.log(f"\n[BLOCKED] Critical env vars missing: {self.results['missing_critical']}")
-                self.results["recommendations"].append({
-                    "priority": "CRITICAL",
-                    "action": "Create .env file",
-                    "detail": f"Missing: {', '.join(self.results['missing_critical'])}",
-                    "fix": "cp .env.template .env && # edit .env with your credentials",
-                })
-            else:
-                self.log("\n[BLOCKED] Strict mode requires TLS verification! (Cannot disable verify via ARC_SAP_SSL_VERIFY or SAP_ALLOW_UNAUTHORIZED)")
-                self.results["recommendations"].append({
-                    "priority": "CRITICAL",
-                    "action": "Enable TLS verification",
-                    "detail": "Strict mode requires TLS verification to prevent compromised releases.",
-                    "fix": "Set ARC_SAP_SSL_VERIFY=true and SAP_ALLOW_UNAUTHORIZED=false in .env",
-                })
-        elif high_ok < high_total:
-            self.results["overall_status"] = "DEGRADED"
-            self.log(f"\n[DEGRADED] {high_ok}/{high_total} high-criticality MCPs ready")
-        else:
-            self.results["overall_status"] = "HEALTHY"
-            self.log(f"\n[HEALTHY] All {high_total} high-criticality MCPs available")
-
-        # 5. Recommendations
-        if self.results["recommendations"]:
-            self.log("\n=== RECOMMENDATIONS ===")
-            for rec in self.results["recommendations"]:
-                self.log(f"  [{rec['priority']}] {rec['action']}: {rec['detail']}")
-                if 'fix' in rec:
-                    self.log(f"    Fix: {rec['fix']}")
-
-        # v5.0: Cache healthcheck results
-        cache_path = self.project_root / ".healthcheck_cache.json"
-        try:
-            with open(cache_path, "w", encoding="utf-8") as f:
-                json.dump(self.results, f, indent=2)
-        except Exception:
-            pass
-
+        self.results["overall_status"] = (
+            "BLOCKED" if tls_error() and not offline else
+            "HEALTHY" if self.results["readiness_v6"]["status"] == "PASS" else "DEGRADED"
+        )
+        self.results["duration_ms"] = round((time.monotonic() - started) * 1000, 2)
+        self.log(f"Healthcheck: {self.results['overall_status']} ({self.results['mode']})")
         return self.results
 
     def prompt_missing(self):
@@ -1004,10 +907,14 @@ def main():
     parser.add_argument("--project-root", default=None, help="Override project root path")
     parser.add_argument("--check-mcp", help="Check specific MCP only")
     parser.add_argument("--strict", action="store_true", help="Fail closed: SKIPPED probes are not READY")
-    parser.add_argument("--read-only", action="store_true", help="Record read-only policy mode in output")
+    parser.add_argument("--read-only", action="store_true", help="No automatic persistence; reports require --output")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--offline", action="store_true", help="No network, subprocess probes, dotenv loading or installation (default)")
+    mode.add_argument("--execute", "--execute-v6", dest="execute_v6", action="store_true", help="Execute reviewed read-only probes")
+    parser.add_argument("--timeout", type=int, default=30, help="Per-server deadline in seconds (1-60)")
+    parser.add_argument('--total-timeout', type=int, default=180, help='Total diagnostic deadline in seconds')
     parser.add_argument("--output", help="Write JSON results to this path")
     parser.add_argument("--v6", action="store_true", help="Include canonical v6 MCP readiness stages")
-    parser.add_argument("--execute-v6", action="store_true", help="Execute canonical v6 initialize/domain probes")
 
     args = parser.parse_args()
 
@@ -1015,6 +922,15 @@ def main():
     # JSON mode is a machine contract: diagnostics belong on stderr, never stdout.
     checker = HealthChecker(project_root=project_root, verbose=(not args.quiet and not args.json))
     checker.strict = args.strict
+    if not 1 <= args.timeout <= 60:
+        parser.error("--timeout must be between 1 and 60")
+    checker.offline = not args.execute_v6
+    checker.read_only = args.read_only
+    checker.timeout = args.timeout
+    if args.total_timeout < 1:
+        parser.error('--total-timeout must be positive')
+    checker.total_timeout = args.total_timeout
+    checker.check_mcp = args.check_mcp
     checker.v6_execute = args.execute_v6
     results = checker.run_full_check()
     if args.read_only:

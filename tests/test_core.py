@@ -3,6 +3,7 @@ import os
 import subprocess
 import sys
 import unittest
+from isolated_runtime import run as isolated_run
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -228,7 +229,7 @@ class RouterContractsTest(unittest.TestCase):
         self.assertEqual(broken, {}, f"live servers with a missing entrypoint: {broken}")
 
     def test_mcp_launcher_blocks_unreviewed_fallback_execution(self):
-        proc = subprocess.run(
+        proc = isolated_run(
             [sys.executable, "scripts/mcp_launcher.py", "run", "--server", "sf-mcp"],
             cwd=ROOT, capture_output=True, text=True, encoding="utf-8",
         )
@@ -236,15 +237,15 @@ class RouterContractsTest(unittest.TestCase):
         self.assertIn("fallback-candidate-not-promoted", proc.stderr)
 
     def test_zrouter_artifacts_have_no_dynamic_evaluator(self):
-        proc = subprocess.run(
+        proc = isolated_run(
             [sys.executable, "scripts/normalize_zrouter_artifacts.py", "--check"],
             cwd=ROOT, capture_output=True, text=True, encoding="utf-8",
         )
         self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
 
     def test_healthcheck_json_is_machine_readable(self):
-        proc = subprocess.run(
-            [sys.executable, "scripts/healthcheck.py", "--quiet", "--json", "--read-only"],
+        proc = isolated_run(
+            [sys.executable, "scripts/healthcheck.py", "--quiet", "--json", "--read-only", "--offline"],
             cwd=ROOT, capture_output=True, text=True, encoding="utf-8",
         )
         payload = json.loads(proc.stdout)
@@ -257,14 +258,14 @@ class ApimProxyPackagerTest(unittest.TestCase):
     and must fail loudly when a flow references a policy that is not shipped."""
 
     def _template(self, kind, name, output, extra=None):
-        return subprocess.run(
+        return isolated_run(
             [sys.executable, "scripts/apim_proxy_packager.py", "template",
              "--kind", kind, "--name", name, "--output", str(output)] + (extra or []),
             cwd=ROOT, capture_output=True, text=True, encoding="utf-8",
         )
 
     def _validate(self, bundle):
-        proc = subprocess.run(
+        proc = isolated_run(
             [sys.executable, "scripts/apim_proxy_packager.py", "validate", "--input", str(bundle), "--json"],
             cwd=ROOT, capture_output=True, text=True, encoding="utf-8",
         )
@@ -310,11 +311,10 @@ class ApimProxyPackagerTest(unittest.TestCase):
 
 
 class ApprovalSpendOrderTest(unittest.TestCase):
-    """A one-time approval must survive a failed mutation. Verifying and spending
-    are separate steps so a transient error does not cost the operator a re-approval."""
+    """Verification does not spend; reserved execution cannot be replayed."""
 
     def _broker(self, *broker_args):
-        proc = subprocess.run(
+        proc = isolated_run(
             [sys.executable, "scripts/approval_broker.py", *broker_args],
             cwd=ROOT, capture_output=True, text=True, encoding="utf-8",
         )
@@ -369,7 +369,7 @@ class ApimChannelBridgeTest(unittest.TestCase):
             json.dumps({"jsonrpc": "2.0", "id": 2, "method": "tools/call",
                         "params": {"name": name, "arguments": arguments}}),
         ]) + "\n"
-        proc = subprocess.run(
+        proc = isolated_run(
             self.BRIDGE, cwd=ROOT, input=request,
             capture_output=True, text=True, encoding="utf-8",
         )
@@ -394,6 +394,10 @@ class ApimChannelBridgeTest(unittest.TestCase):
             "plan_id": "apim-oauth-does-not-exist", "action_id": "x", "plan_hash": "y", "confirm": False,
         })
         self.assertEqual(result["status"], "BLOCKED")
+
+    def test_commit_plan_path_traversal_is_refused(self):
+        result = self._call('apim_configure_commit', {'plan_id': '../escape', 'confirm': True})
+        self.assertEqual(result['reason'], 'invalid-plan-id')
 
     def test_api_call_stays_inside_the_api_portal(self):
         result = self._call("apim_api_call", {"path": "/sap/opu/odata/sap/ZMATERIAL_SRV/"})

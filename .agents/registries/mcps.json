@@ -13,7 +13,7 @@
       "runtime": {
         "command": "npx",
         "args": [
-          "arc-1"
+          "arc-1@1.1.2"
         ],
         "transport": "stdio",
         "platforms": [
@@ -477,7 +477,7 @@
       "runtime": {
         "command": "node",
         "args": [
-          "bundled/tools/context-mode/start.mjs"
+          "scripts/context_mode_safe.mjs"
         ],
         "env": {
           "CONTEXT_MODE_PLATFORM": "codex"

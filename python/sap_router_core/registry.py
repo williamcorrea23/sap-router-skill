@@ -10,7 +10,7 @@ import threading
 import time
 import uuid
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -28,7 +28,7 @@ def load_json(path: Path) -> dict[str, Any]:
 
 
 def now_iso() -> str:
-    return datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
+    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
 def load_capabilities() -> dict[str, dict[str, Any]]:
@@ -152,7 +152,7 @@ def classify_task(task: str) -> dict[str, Any]:
 def _env_status(env_refs: list[str]) -> str:
     concrete_refs = [
         ref for ref in env_refs
-        if not ref.endswith("_REF") and "PASSWORD" not in ref and "SECRET" not in ref and "TOKEN" not in ref
+        if not ref.endswith("_REF")
     ]
     if not concrete_refs:
         return "NO_ENV_NEEDED"
@@ -176,88 +176,16 @@ def _resolve_command(command: str) -> str:
     return command
 
 
-def _run_jsonrpc_stdio(command: str, args: list[str], timeout: int, env: dict[str, str] | None = None) -> dict[str, Any]:
-    requests = [
-        {
-            "jsonrpc": "2.0",
-            "id": 1,
-            "method": "initialize",
-            "params": {
-                "protocolVersion": "2024-11-05",
-                "capabilities": {},
-                "clientInfo": {"name": "sap-router-probe", "version": "1.0.0"},
-            },
-        },
-        {"jsonrpc": "2.0", "method": "notifications/initialized", "params": {}},
-        {"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}},
-    ]
-    payload = "".join(json.dumps(request) + "\n" for request in requests)
-    proc = subprocess.Popen(
-        [_resolve_command(command)] + args,
-        cwd=ROOT,
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
-        env=env,
-    )
-    responses: dict[int, dict[str, Any]] = {}
-    output: list[str] = []
-    errors: list[str] = []
-    lines: queue.Queue[str | None] = queue.Queue()
+def _run_jsonrpc_stdio(command: str, args: list[str], timeout: int, env=None, cwd=None, server_id=None):
+    from .probe_transport import stdio_probe
+    return stdio_probe(command, args, timeout, env, cwd or ROOT, server_id)
 
-    def read_stream(stream: Any, destination: list[str], publish: bool = False) -> None:
-        for line in iter(stream.readline, ""):
-            destination.append(line)
-            if publish:
-                lines.put(line)
-        if publish:
-            lines.put(None)
 
-    stdout_thread = threading.Thread(target=read_stream, args=(proc.stdout, output, True), daemon=True)
-    stderr_thread = threading.Thread(target=read_stream, args=(proc.stderr, errors), daemon=True)
-    stdout_thread.start()
-    stderr_thread.start()
-    assert proc.stdin is not None
-    proc.stdin.write(payload)
-    proc.stdin.flush()
-    deadline = time.monotonic() + timeout
-    while time.monotonic() < deadline and not (1 in responses and 2 in responses):
-        try:
-            line = lines.get(timeout=min(0.2, max(0.01, deadline - time.monotonic())))
-        except queue.Empty:
-            if proc.poll() is not None:
-                break
-            continue
-        if line is None:
-            break
-        try:
-            message = json.loads(line)
-        except json.JSONDecodeError:
-            continue
-        if isinstance(message.get("id"), int):
-            responses[message["id"]] = message
-    if proc.poll() is None:
-        proc.terminate()
-        try:
-            proc.wait(timeout=2)
-        except subprocess.TimeoutExpired:
-            proc.kill()
-            proc.wait(timeout=2)
-    stdout_thread.join(timeout=1)
-    stderr_thread.join(timeout=1)
-    stdout = "".join(output)
-    stderr = "".join(errors)
-    init_ok = 1 in responses and "result" in responses[1]
-    tools_ok = 2 in responses and isinstance(responses[2].get("result", {}).get("tools"), list)
-    error = None
-    if not init_ok or not tools_ok:
-        error = (stderr or stdout or "MCP did not return initialize/tools_list responses")[:300]
-    return {
-        "initialize": "PASS" if init_ok else "NOT_PROVED",
-        "tools_list": "PASS" if tools_ok else "NOT_PROVED",
-        "error": error,
-    }
+def tls_error() -> bool:
+    return (os.environ.get("ARC_SAP_SSL_VERIFY", "true").lower() in {"false", "0", "no"}
+            or any(os.environ.get(k, "false").lower() in {"true", "1", "yes"}
+                   for k in ("SAP_ALLOW_UNAUTHORIZED", "WEB_ALLOW_UNAUTHORIZED"))
+            or os.environ.get("NODE_TLS_REJECT_UNAUTHORIZED") == "0")
 
 
 def _run_command_probe(command: str, args: list[str], timeout: int) -> dict[str, Any]:
@@ -326,101 +254,73 @@ def _run_named_domain_probe(name: str, timeout: int) -> dict[str, Any]:
 
 
 def probe_server(server_id: str, execute: bool = False, timeout: int = 10) -> dict[str, Any]:
-    servers = load_servers()
-    if server_id not in servers:
-        return {
-            "server_id": server_id,
-            "status": "UNAVAILABLE",
-            "checked_at": now_iso(),
-            "error_code": "UNKNOWN_SERVER",
-        }
-    server = servers[server_id]
-    if server.get("status") != "enabled":
-        return {
-            "server_id": server_id,
-            "status": server.get("status", "DISABLED").upper(),
-            "checked_at": now_iso(),
-            "error_code": "SERVER_NOT_ENABLED",
-        }
-    runtime = server.get("runtime", {})
-    command = runtime.get("command")
-    args = runtime.get("args", [])
-    transport = runtime.get("transport", "stdio")
-    env_status = _env_status(server.get("auth", {}).get("env_refs", []))
-    binary_status = "SKIPPED"
-    initialize_status = "NOT_PROVED"
-    tools_list_status = "NOT_PROVED"
-    domain_probe_status = "NOT_PROVED"
-    exit_code = None
-    error = None
-    if execute and command:
-        try:
-            runtime_env = os.environ.copy()
-            runtime_env.update({key: str(value) for key, value in runtime.get("env", {}).items()})
-            probe_name = server.get("probes", {}).get("domain_probe")
-            if transport == "stdio" and server.get("probes", {}).get("initialize") and server.get("probes", {}).get("tools_list"):
-                stdio = _run_jsonrpc_stdio(command, args, timeout, runtime_env)
-                binary_status = "AVAILABLE" if stdio["initialize"] == "PASS" or stdio["tools_list"] == "PASS" else "ERROR"
-                initialize_status = stdio["initialize"]
-                tools_list_status = stdio["tools_list"]
-                error = stdio["error"]
-                if probe_name in {"browser_session_probe", "sap_gui_session_probe"}:
-                    domain = _run_named_domain_probe(probe_name, timeout)
-                    domain_probe_status = domain["domain_probe"]
-                    error = domain["error"] or error
-                elif probe_name == "help_command":
-                    domain_probe_status = "DEGRADED"
-                    error = error or "Help command proves install only, not domain readiness"
-                elif probe_name == "jsonrpc_tools":
-                    domain_probe_status = "PASS" if initialize_status == "PASS" and tools_list_status == "PASS" else "NOT_PROVED"
-                else:
-                    domain_probe_status = "NOT_PROVED"
-            else:
-                command_probe = _run_cli_domain_probe(command, args, probe_name or "command", timeout)
-                exit_code = command_probe["exit_code"]
-                binary_status = command_probe["binary"]
-                initialize_status = "NOT_APPLICABLE"
-                tools_list_status = "NOT_APPLICABLE"
-                domain_probe_status = command_probe["domain_probe"]
-                error = command_probe["error"]
-        except FileNotFoundError:
-            binary_status = "NOT_INSTALLED"
-            error = f"Command not found: {command}"
-        except subprocess.TimeoutExpired:
-            binary_status = "TIMEOUT"
-            error = "Probe timed out"
-    ready = (
-        env_status in ("ALL_SET", "NO_ENV_NEEDED")
-        and binary_status == "AVAILABLE"
-        and domain_probe_status == "PASS"
-        and (
-            (initialize_status == "PASS" and tools_list_status == "PASS")
-            or (initialize_status == "NOT_APPLICABLE" and tools_list_status == "NOT_APPLICABLE")
-        )
-    )
-    status = "READY" if ready else "UNAVAILABLE"
-    if not execute and env_status in ("ALL_SET", "NO_ENV_NEEDED"):
-        status = "DEGRADED"
-        error = "Domain probe not executed; SKIPPED is not READY"
-    elif execute and domain_probe_status == "DEGRADED":
-        status = "DEGRADED"
-    return {
-        "server_id": server_id,
-        "status": status,
-        "checked_at": now_iso(),
-        "expires_at": (datetime.utcnow() + timedelta(minutes=15)).replace(microsecond=0).isoformat() + "Z",
-        "checks": {
-            "env": env_status,
-            "binary": binary_status,
-            "initialize": initialize_status,
-            "tools_list": tools_list_status,
-            "domain_probe": domain_probe_status,
-        },
-        "capabilities_ready": server.get("capabilities", []) if ready else [],
-        "exit_code": exit_code,
-        "error_code": None if ready else "NOT_READY",
-        "error": error,
+    started = time.monotonic()
+    server = load_servers().get(server_id)
+    result = {
+        "server_id": server_id, "status": "UNAVAILABLE", "checked_at": now_iso(),
+        "expires_at": (datetime.now(timezone.utc) + timedelta(minutes=15)).isoformat().replace("+00:00", "Z"),
+        "checks": {"env": "NOT_PROVED", "binary": "SKIPPED", "initialize": "NOT_PROVED",
+                   "tools_list": "NOT_PROVED", "domain_probe": "NOT_PROVED"},
+        "capabilities_ready": [], "mutation_ready": False, "exit_code": None,
+        "error_code": "NOT_READY", "error": None,
     }
+    def finish(code=None, error=None):
+        if code:
+            result.update(error_code=code, error=error)
+        result["duration_ms"] = round((time.monotonic() - started) * 1000, 2)
+        return result
+    if not server or server.get("status") != "enabled":
+        return finish("SERVER_NOT_ENABLED", "Unknown, disabled or planned server.")
+    checks = result["checks"]
+    checks["env"] = _env_status(server.get("auth", {}).get("env_refs", []))
+    if not execute:
+        result["status"] = "DEGRADED"
+        return finish("NOT_EXECUTED", "Offline inventory only; semantic read not executed.")
+    if tls_error():
+        return finish("TLS_VERIFICATION_REQUIRED", "Enable certificate verification and configure the trusted CA before live probes.")
+    from .local_runtime import resolve_runtime
+    runtime = resolve_runtime(ROOT, server_id, server.get("runtime", {}))
+    command = runtime.get("command", "")
+    if command == 'python':
+        command = sys.executable
+    args = runtime.get("args", [])
+    if Path(command).stem.lower() in {"npx", "npm", "uvx", "pip", "pnpm", "bunx"}:
+        return finish("LOCAL_RUNTIME_REQUIRED", "Prepare a pinned local executable; probes never install packages.")
+    if server_id == "context-mode" and any(str(a).endswith("start.mjs") for a in args):
+        return finish("BOOTSTRAP_REVIEW_REQUIRED", "Auto-repair bootstrap is not allowed in a diagnostic.")
+    cwd = (ROOT / runtime.get("cwd", ".")).resolve()
+    if cwd != ROOT and ROOT not in cwd.parents:
+        return finish("INVALID_CWD", "Runtime working directory must stay inside the repository.")
+    if not shutil.which(command) and not Path(command).is_file():
+        checks["binary"] = "NOT_INSTALLED"
+        return finish("LOCAL_RUNTIME_REQUIRED", "Configured executable is not installed.")
+    try:
+        from .local_runtime import runtime_environment
+        runtime_env = runtime_environment(server_id, runtime)
+        # A child must not bypass TLS via a runtime override.
+        runtime_env.update(SAP_ALLOW_UNAUTHORIZED="false", WEB_ALLOW_UNAUTHORIZED="false",
+                           ARC_SAP_SSL_VERIFY="true", NODE_TLS_REJECT_UNAUTHORIZED="1")
+        if command == "python":
+            command = sys.executable
+        stdio = _run_jsonrpc_stdio(command, args, timeout, runtime_env, cwd, server_id)
+        checks.update({k: stdio[k] for k in ("initialize", "tools_list", "domain_probe") if k in stdio})
+        checks["binary"] = "AVAILABLE" if checks["initialize"] == "PASS" else "ERROR"
+        result["error"] = stdio.get("error")
+        if server_id == "mcp-sap-gui" and checks["initialize"] == "PASS":
+            domain = _run_named_domain_probe("sap_gui_session_probe", timeout)
+            checks["domain_probe"] = domain["domain_probe"]
+            result["error"] = None if checks["domain_probe"] == "PASS" else "No readable, non-busy SAP GUI session."
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return finish("PROBE_FAILED", type(exc).__name__ + ": probe failed; backend payload omitted.")
+    if all(checks[k] == "PASS" for k in ("initialize", "tools_list", "domain_probe")):
+        result.update(status="READY", error_code=None, error=None)
+        # Domain read readiness never grants mutation authority.
+        caps = load_capabilities()
+        result["capabilities_ready"] = [c for c in server.get("capabilities", [])
+                                       if caps.get(c, {}).get("effect") == "read"]
+    elif checks["initialize"] == "PASS":
+        result["status"] = "DEGRADED"
+    return finish()
 
 
 def validate_catalog() -> dict[str, Any]:

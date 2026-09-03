@@ -1,32 +1,53 @@
 [shell_environment_policy]
 inherit = "core"
 
-[mcp_servers.arc-1]
-command = "npx"
-args = ["arc-1"]
-env_vars = ["ARC_SAP_URL", "ARC_SAP_USER", "ARC_SAP_PASSWORD", "ARC_SAP_CLIENT"]
-
-[mcp_servers.mcp-sap-gui]
-command = "python"
-args = ["-m", "sap_gui_server.server"]
-env_vars = ["SAP_SYSTEM", "SAP_CLIENT", "SAP_USER", "SAP_PASSWORD", "SAPGUI_HOST", "SAPGUI_USER", "SAPGUI_PASSWORD", "SAPGUI_CLIENT", "PYTHONPATH"]
-
-[mcp_servers.ci-mcp-server]
-command = "node"
-args = ["packages/ci-mcp-server/node_modules/odata-mcp-proxy/dist/index.js", "--config", "packages/ci-mcp-server/ci-api-config.json"]
-env_vars = ["CPI_DESTINATION_BASE_URL", "CPI_DESTINATION_TOKEN_URL", "CPI_DESTINATION_CLIENT_ID", "CPI_DESTINATION_CLIENT_SECRET"]
-
-[mcp_servers.sap-api-management]
-command = "node"
-args = ["dist/index.js"]
-env_vars = ["APIM_HOST", "APIM_USER", "APIM_PASSWORD"]
-
-[mcp_servers.integration-suite-ui-mcp]
-command = "node"
-args = ["scripts/web_ui_mcp_bridge.mjs", "--product", "cpi"]
-env_vars = ["CPI_WEB_URL", "BROWSER_CHANNEL"]
-
-[mcp_servers.apim-ui-mcp]
-command = "node"
-args = ["scripts/web_ui_mcp_bridge.mjs", "--product", "apim"]
-env_vars = ["APIM_WEB_URL", "BROWSER_CHANNEL"]
+[mcp_servers."arc-1"]
+command = "C:\\Python314\\python.exe"
+args = ["C:\\Users\\William Correa\\Downloads\\sap-router-orchestrator-files\\sap-router-skill\\scripts\\mcp_launcher.py", "run", "--server", "arc-1"]
+cwd = "C:\\Users\\William Correa\\Downloads\\sap-router-orchestrator-files\\sap-router-skill"
+startup_timeout_sec = 30
+[mcp_servers."mcp-sap-gui"]
+command = "C:\\Python314\\python.exe"
+args = ["C:\\Users\\William Correa\\Downloads\\sap-router-orchestrator-files\\sap-router-skill\\scripts\\mcp_launcher.py", "run", "--server", "mcp-sap-gui"]
+cwd = "C:\\Users\\William Correa\\Downloads\\sap-router-orchestrator-files\\sap-router-skill"
+startup_timeout_sec = 30
+[mcp_servers."sap-cpi-mcp"]
+command = "C:\\Python314\\python.exe"
+args = ["C:\\Users\\William Correa\\Downloads\\sap-router-orchestrator-files\\sap-router-skill\\scripts\\mcp_launcher.py", "run", "--server", "sap-cpi-mcp"]
+cwd = "C:\\Users\\William Correa\\Downloads\\sap-router-orchestrator-files\\sap-router-skill"
+startup_timeout_sec = 30
+[mcp_servers."sap-apim-mcp"]
+command = "C:\\Python314\\python.exe"
+args = ["C:\\Users\\William Correa\\Downloads\\sap-router-orchestrator-files\\sap-router-skill\\scripts\\mcp_launcher.py", "run", "--server", "sap-apim-mcp"]
+cwd = "C:\\Users\\William Correa\\Downloads\\sap-router-orchestrator-files\\sap-router-skill"
+startup_timeout_sec = 30
+[mcp_servers."integration-suite-ui-mcp"]
+command = "C:\\Python314\\python.exe"
+args = ["C:\\Users\\William Correa\\Downloads\\sap-router-orchestrator-files\\sap-router-skill\\scripts\\mcp_launcher.py", "run", "--server", "integration-suite-ui-mcp"]
+cwd = "C:\\Users\\William Correa\\Downloads\\sap-router-orchestrator-files\\sap-router-skill"
+startup_timeout_sec = 30
+[mcp_servers."ui5-mcp"]
+command = "C:\\Python314\\python.exe"
+args = ["C:\\Users\\William Correa\\Downloads\\sap-router-orchestrator-files\\sap-router-skill\\scripts\\mcp_launcher.py", "run", "--server", "ui5-mcp"]
+cwd = "C:\\Users\\William Correa\\Downloads\\sap-router-orchestrator-files\\sap-router-skill"
+startup_timeout_sec = 30
+[mcp_servers."fiori-mcp"]
+command = "C:\\Python314\\python.exe"
+args = ["C:\\Users\\William Correa\\Downloads\\sap-router-orchestrator-files\\sap-router-skill\\scripts\\mcp_launcher.py", "run", "--server", "fiori-mcp"]
+cwd = "C:\\Users\\William Correa\\Downloads\\sap-router-orchestrator-files\\sap-router-skill"
+startup_timeout_sec = 30
+[mcp_servers."cap-mcp"]
+command = "C:\\Python314\\python.exe"
+args = ["C:\\Users\\William Correa\\Downloads\\sap-router-orchestrator-files\\sap-router-skill\\scripts\\mcp_launcher.py", "run", "--server", "cap-mcp"]
+cwd = "C:\\Users\\William Correa\\Downloads\\sap-router-orchestrator-files\\sap-router-skill"
+startup_timeout_sec = 30
+[mcp_servers."context-mode"]
+command = "C:\\Python314\\python.exe"
+args = ["C:\\Users\\William Correa\\Downloads\\sap-router-orchestrator-files\\sap-router-skill\\scripts\\mcp_launcher.py", "run", "--server", "context-mode"]
+cwd = "C:\\Users\\William Correa\\Downloads\\sap-router-orchestrator-files\\sap-router-skill"
+startup_timeout_sec = 30
+[mcp_servers."apim-ui-mcp"]
+command = "C:\\Python314\\python.exe"
+args = ["C:\\Users\\William Correa\\Downloads\\sap-router-orchestrator-files\\sap-router-skill\\scripts\\mcp_launcher.py", "run", "--server", "apim-ui-mcp"]
+cwd = "C:\\Users\\William Correa\\Downloads\\sap-router-orchestrator-files\\sap-router-skill"
+startup_timeout_sec = 30

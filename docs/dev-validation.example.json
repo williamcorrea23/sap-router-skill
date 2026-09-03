@@ -1,0 +1,12 @@
+{
+  "environment": "DEV",
+  "system": null,
+  "client": null,
+  "approval_required_per_operation": true,
+  "scenarios": {
+    "abap": {"object": null, "package": null, "transport": null, "expected": "create, activate and read isolated test class", "cleanup": null},
+    "cpi": {"tenant": null, "iflow_id": null, "expected": "deploy isolated flow with no productive receiver and verify", "cleanup": null},
+    "apim": {"tenant": null, "proxy_id": null, "expected": "deploy isolated echo proxy and read its response", "cleanup": null},
+    "mm": {"material": null, "material_type": null, "industry_sector": null, "base_unit": null, "views": [], "organizational_levels": {}, "expected": "create and read material; no stock or financial documents", "cleanup": null}
+  }
+}
