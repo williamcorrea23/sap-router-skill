@@ -146,11 +146,15 @@ class CpiApprovalContractTest(unittest.TestCase):
         arguments, preconditions = {"a": 1}, {"ready": True}
         args.argument_hash = cpi_client.json_sha256(arguments)
         args.precondition_hash = cpi_client.json_sha256(preconditions)
-        with mock.patch.object(cpi_client, "run_approval_broker") as broker:
+        def broker_reply(command):
+            if command[0] == "show":
+                return {"argument_hash": args.argument_hash}
+            return {"status": "APPROVED"}
+        with mock.patch.object(cpi_client, "run_approval_broker", side_effect=broker_reply) as broker:
             result = cpi_client.with_approval(args, arguments, preconditions, lambda: {"status": "OK"})
         self.assertEqual(result['approval'], 'spent')
-        self.assertEqual(broker.call_args_list[0].args[0][0], 'verify')
-        command = broker.call_args.args[0]
+        self.assertEqual([item.args[0][0] for item in broker.call_args_list], ['show', 'verify', 'begin', 'consume'])
+        command = broker.call_args_list[-1].args[0]
         self.assertEqual(command[:3], ["consume", "action-1", "--plan-hash"])
         self.assertIn(args.argument_hash, command)
         self.assertIn(args.precondition_hash, command)

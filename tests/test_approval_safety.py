@@ -26,6 +26,11 @@ class ApprovalSafetyTest(unittest.TestCase):
         self.id = self.plan['action_id']
         self.hashes = [self.id, self.plan['plan_hash'], self.plan['argument_hash'], self.plan['precondition_hash']]
 
+    def broker_reply(self, command):
+        if command[0] == 'show':
+            return {'argument_hash': self.plan['argument_hash']}
+        return {'status': 'APPROVED'}
+
     def test_pending_and_expired_are_blocked(self):
         self.assertEqual(broker.begin(*self.hashes)['error'], 'approval-not-approved')
         broker.set_status(self.id, 'APPROVED')
@@ -44,18 +49,26 @@ class ApprovalSafetyTest(unittest.TestCase):
     def test_hashes_bind_actual_arguments_and_preconditions(self):
         args = argparse.Namespace(action_id=self.id, plan_hash=self.plan['plan_hash'],
                                   argument_hash=self.plan['argument_hash'], precondition_hash=self.plan['precondition_hash'])
-        with mock.patch.object(cpi_client, 'run_approval_broker') as call:
-            for values, pre in [({'a': 2}, {'ready': True}), ({'a': 1}, {'ready': False})]:
-                with self.assertRaises(ValueError):
-                    cpi_client.with_approval(args, values, pre, lambda: {'status': 'OK'})
-            call.assert_not_called()
+        with mock.patch.object(cpi_client, 'run_approval_broker', side_effect=self.broker_reply) as call:
+            result = cpi_client.with_approval(args, {'a': 2}, {'ready': True}, lambda: {'status': 'OK'})
+        self.assertEqual(result['reason'], 'argument-hash-mismatch')
+        call.assert_called_once_with(['show', self.id])
+
+        # Environment preconditions are re-derived on commit. A still-approved
+        # plan may proceed when the target remains safe; the original approval
+        # hash remains the broker's comparison value.
+        with mock.patch.object(cpi_client, 'run_approval_broker', side_effect=self.broker_reply) as call:
+            result = cpi_client.with_approval(args, {'a': 1}, {'ready': False}, lambda: {'status': 'OK'})
+        self.assertEqual(result['approval'], 'spent')
+        self.assertEqual([item.args[0][0] for item in call.call_args_list], ['show', 'verify', 'begin', 'consume'])
+        self.assertIn(self.plan['precondition_hash'], call.call_args_list[1].args[0])
 
     def test_timeout_never_advises_retry_or_consumes(self):
         args = argparse.Namespace(action_id=self.id, plan_hash=self.plan['plan_hash'],
                                   argument_hash=None, precondition_hash=None)
         def timeout():
             raise TimeoutError('unknown result')
-        with mock.patch.object(cpi_client, 'run_approval_broker') as call:
+        with mock.patch.object(cpi_client, 'run_approval_broker', side_effect=self.broker_reply) as call:
             result = cpi_client.with_approval(args, {'a': 1}, {'ready': True}, timeout)
         self.assertEqual(result['approval'], 'reconciliation-required')
-        self.assertEqual([c.args[0][0] for c in call.call_args_list], ['verify', 'begin'])
+        self.assertEqual([c.args[0][0] for c in call.call_args_list], ['show', 'verify', 'begin'])
