@@ -24,6 +24,7 @@ SOURCES_FILE = REGISTRIES / "bundled-sources.json"
 LOCK_FILE = REGISTRIES / "bundled-sources.lock.json"
 INDEX_FILE = REGISTRIES / "bundled-assets.json"
 MCP_CANDIDATES_FILE = REGISTRIES / "mcp-candidates.json"
+HARNESS_CANDIDATES_FILE = REGISTRIES / "harness-candidates.json"
 SKILLS_DIR = ROOT / ".agents" / "skills"
 
 CAPABILITY_TERMS = {
@@ -232,6 +233,22 @@ def repository_asset(source: dict[str, Any], root: Path, kind: str) -> dict[str,
             "trust": source.get("trust", "bundled_unreviewed"), "status": source.get("status", default_status)}
 
 
+def harness_candidate_assets() -> list[dict[str, Any]]:
+    assets: list[dict[str, Any]] = []
+    for candidate in load(HARNESS_CANDIDATES_FILE, {}).get("candidates", []):
+        corpus = "SAP Router harness candidate " + json.dumps(candidate, ensure_ascii=False)
+        assets.append({"id": candidate["id"], "kind": "knowledge", "name": candidate["id"],
+                       "description": candidate.get("utility", candidate["id"]),
+                       "source_id": candidate["id"], "repository": candidate.get("repository"),
+                       "revision": candidate.get("revision"),
+                       "path": ".agents/registries/harness-candidates.json",
+                       "capabilities": infer_capabilities(corpus),
+                       "title_keywords": tokens(f"SAP Router harness {candidate['id']} {candidate.get('utility', '')}"),
+                       "keywords": tokens(corpus), "trust": "disabled_candidate",
+                       "status": "disabled_candidate"})
+    return assets
+
+
 def canonical_assets() -> list[dict[str, Any]]:
     assets: list[dict[str, Any]] = []
     for path in sorted(SKILLS_DIR.glob("*/SKILL.md")):
@@ -262,6 +279,10 @@ def canonical_assets() -> list[dict[str, Any]]:
                        "repository": "local .mcp.json", "revision": None, "path": ".mcp.json",
                        "capabilities": infer_capabilities(corpus), "title_keywords": tokens(f"{candidate['id']} {candidate.get('description', '')}"),
                        "keywords": tokens(corpus), "trust": "fallback", "status": "disabled_candidate"})
+    # Audited external repositories are searchable as references, but this
+    # registry is intentionally separate from bundled sources and launchable
+    # MCPs. Search must never fetch a repository or change its disabled state.
+    assets.extend(harness_candidate_assets())
     return assets
 
 
@@ -315,10 +336,21 @@ def search(query: str, kind: str | None, capability: str | None, limit: int) -> 
         build_index()
     data = load(INDEX_FILE, {})
     ranked = []
-    for asset in data.get("assets", []):
+    indexed_assets = data.get("assets", [])
+    current_candidates = harness_candidate_assets()
+    current_ids = {asset["id"] for asset in current_candidates}
+    # Search indexes are caches. Registry edits, removals and disabled status
+    # must take effect immediately, even before the next index generation.
+    indexed_assets = [asset for asset in indexed_assets
+                      if asset.get("id") not in current_ids
+                      and asset.get("path") != ".agents/registries/harness-candidates.json"]
+    indexed_assets.extend(current_candidates)
+    for asset in indexed_assets:
         score = score_asset(asset, query, kind, capability)
         if score > 0:
-            ranked.append({"score": score, **{k: asset.get(k) for k in ("id", "kind", "name", "description", "capabilities", "status", "trust", "path", "repository")}})
+            ranked.append({"score": score, **{k: asset.get(k) for k in (
+                "id", "kind", "name", "description", "capabilities", "status", "trust",
+                "path", "repository", "revision")}})
     ranked.sort(key=lambda item: (-item["score"], item["id"]))
     print(json.dumps({"query": query, "policy": "bundled MCPs remain disabled until reviewed", "results": ranked[:limit]}, indent=2, ensure_ascii=True))
     return 0 if ranked else 1

@@ -1,0 +1,1316 @@
+{
+  "status": "REVIEWED_WITH_GAPS",
+  "count": 63,
+  "network_used": false,
+  "promoted": [],
+  "approved_for_pilot": 0,
+  "candidates": [
+    {
+      "id": "abap-mcp",
+      "classification": "pending_evidence",
+      "priority": "fallback",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "abap-mcp-adt-powerup",
+      "classification": "pending_evidence",
+      "priority": "fallback",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "azure-ai-search",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "btp-mcp",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "btp-sap-odata-to-mcp",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "bw-modeling-mcp",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "cap-mcp-plugin",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "cf-cli-mcp",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "ci-mcp-server",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "cloud-alm-itsm",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "datasphere-mcp",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "erpl-adt",
+      "classification": "pending_evidence",
+      "priority": "fallback",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "erpl-adt-mcp",
+      "classification": "pending_evidence",
+      "priority": "fallback",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "guniweb-sap-mcp",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "mcp-abap-adt",
+      "classification": "pending_evidence",
+      "priority": "fallback",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "mcp-calm-server",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "mcp-integration-suite",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [
+        {
+          "snapshot": "bundled/mcps/1nbuc-mcp-integration-suite",
+          "origin": "https://github.com/1nbuc/mcp-integration-suite",
+          "revision": "bundled-candidate",
+          "license_files": [],
+          "dependency_manifests": []
+        }
+      ],
+      "promotion_allowed": false,
+      "missing": [
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "mcp-sap-gui-kts",
+      "classification": "pending_evidence",
+      "priority": "fallback",
+      "evidence": [
+        {
+          "snapshot": "bundled/mcps/kts982-mcp-sap-gui",
+          "origin": "https://github.com/kts982/mcp-sap-gui",
+          "revision": "4eca873220418523318771f6fbb383a2e24a79e1",
+          "license_files": [
+            "bundled\\mcps\\kts982-mcp-sap-gui\\LICENSE"
+          ],
+          "dependency_manifests": [
+            {
+              "file": "bundled\\mcps\\kts982-mcp-sap-gui\\pyproject.toml",
+              "sha256": "d69279b7d5eccacb4a9c0a6be2d7acdf429752c9279d48a0051a95ae72db7f59"
+            }
+          ]
+        }
+      ],
+      "promotion_allowed": false,
+      "missing": [
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "mcp-sap-notes",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "odata-mcp-go",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "odata-mcp-proxy",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "pinecone-rag",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "plugin:cds-mcp:cds-mcp",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "plugin:mdk-mcp:mdk-mcp",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "plugin:sap-fiori-mcp-server:fiori-mcp",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "plugin:ui5:ui5-mcp-server",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "sap-api-management",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "sap-cpi",
+      "classification": "pending_evidence",
+      "priority": "fallback",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "sap-gui-library-mcp",
+      "classification": "pending_evidence",
+      "priority": "fallback",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "sap-gui-mcp-jduncan",
+      "classification": "pending_evidence",
+      "priority": "fallback",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "sap-pi-mcp",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [
+        {
+          "snapshot": "bundled/mcps/lopezmas-sap-pi-mcp",
+          "origin": "https://github.com/lopezmas/sap-pi-mcp-server",
+          "revision": "bundled-candidate",
+          "license_files": [],
+          "dependency_manifests": []
+        }
+      ],
+      "promotion_allowed": false,
+      "missing": [
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "sap-rfc-mcp-server",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "sap-transport-mcp",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "sapgui-mcp-go",
+      "classification": "pending_evidence",
+      "priority": "fallback",
+      "evidence": [
+        {
+          "snapshot": "bundled/mcps/hochfrequenz-sapgui-mcp",
+          "origin": "https://github.com/Hochfrequenz/sapgui.mcp",
+          "revision": "83c0bb424dc9a28169630b28dfb7b01fa9226911",
+          "license_files": [
+            "bundled\\mcps\\hochfrequenz-sapgui-mcp\\LICENSE"
+          ],
+          "dependency_manifests": [
+            {
+              "file": "bundled\\mcps\\hochfrequenz-sapgui-mcp\\package.json",
+              "sha256": "678ca950950351fae94f3afc74ef4d61f3a680b28c1aa9286be1aafd4ca57e0a"
+            },
+            {
+              "file": "bundled\\mcps\\hochfrequenz-sapgui-mcp\\pyproject.toml",
+              "sha256": "348437d4fe589c1489c3a7bfd381de8f47ae646418f39ac55a2b0007a057d2c4"
+            },
+            {
+              "file": "bundled\\mcps\\hochfrequenz-sapgui-mcp\\requirements.txt",
+              "sha256": "913820a75046f89458fadf6773e5d0b33ebe05e609c2abc1938b6b6575bc1db4"
+            }
+          ]
+        }
+      ],
+      "promotion_allowed": false,
+      "missing": [
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "sapgui-mcp-webgui",
+      "classification": "pending_evidence",
+      "priority": "fallback",
+      "evidence": [
+        {
+          "snapshot": "bundled/mcps/hochfrequenz-sapgui-mcp",
+          "origin": "https://github.com/Hochfrequenz/sapgui.mcp",
+          "revision": "83c0bb424dc9a28169630b28dfb7b01fa9226911",
+          "license_files": [
+            "bundled\\mcps\\hochfrequenz-sapgui-mcp\\LICENSE"
+          ],
+          "dependency_manifests": [
+            {
+              "file": "bundled\\mcps\\hochfrequenz-sapgui-mcp\\package.json",
+              "sha256": "678ca950950351fae94f3afc74ef4d61f3a680b28c1aa9286be1aafd4ca57e0a"
+            },
+            {
+              "file": "bundled\\mcps\\hochfrequenz-sapgui-mcp\\pyproject.toml",
+              "sha256": "348437d4fe589c1489c3a7bfd381de8f47ae646418f39ac55a2b0007a057d2c4"
+            },
+            {
+              "file": "bundled\\mcps\\hochfrequenz-sapgui-mcp\\requirements.txt",
+              "sha256": "913820a75046f89458fadf6773e5d0b33ebe05e609c2abc1938b6b6575bc1db4"
+            }
+          ]
+        }
+      ],
+      "promotion_allowed": false,
+      "missing": [
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "sapient-mcp",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "sapient-mcp-py",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "sf-mcp",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "supabase-rag",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "vibing-steampunk",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "lemaiwo-btp-mcp-server",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [
+        {
+          "snapshot": "bundled/mcps/lemaiwo-btp-mcp-server",
+          "origin": "https://github.com/lemaiwo/btp-mcp-server",
+          "revision": "64e5e75f2ec04fd2c62644d763b09d6ca2b9034e",
+          "license_files": [
+            "bundled\\mcps\\lemaiwo-btp-mcp-server\\LICENSE"
+          ],
+          "dependency_manifests": [
+            {
+              "file": "bundled\\mcps\\lemaiwo-btp-mcp-server\\package.json",
+              "sha256": "61ca5efef5142b84ade6e083bd6027fabd7bb7489721c8b109a6599052d2863a"
+            }
+          ]
+        }
+      ],
+      "promotion_allowed": false,
+      "missing": [
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "aiadiguru2025-sf-mcp",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [
+        {
+          "snapshot": "bundled/mcps/aiadiguru2025-sf-mcp",
+          "origin": "https://github.com/aiadiguru2025/sf-mcp",
+          "revision": "b17ada8caf81b2edc1014a15353a6522a71657b5",
+          "license_files": [
+            "bundled\\mcps\\aiadiguru2025-sf-mcp\\LICENSE"
+          ],
+          "dependency_manifests": [
+            {
+              "file": "bundled\\mcps\\aiadiguru2025-sf-mcp\\pyproject.toml",
+              "sha256": "8ce07e9a9adebe29fb5dc80cd3ce89f33c84c8a2eb0888fd3103806375dc6896"
+            }
+          ]
+        }
+      ],
+      "promotion_allowed": false,
+      "missing": [
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "hochfrequenz-sapgui-mcp",
+      "classification": "pending_evidence",
+      "priority": "fallback",
+      "evidence": [
+        {
+          "snapshot": "bundled/mcps/hochfrequenz-sapgui-mcp",
+          "origin": "https://github.com/Hochfrequenz/sapgui.mcp",
+          "revision": "83c0bb424dc9a28169630b28dfb7b01fa9226911",
+          "license_files": [
+            "bundled\\mcps\\hochfrequenz-sapgui-mcp\\LICENSE"
+          ],
+          "dependency_manifests": [
+            {
+              "file": "bundled\\mcps\\hochfrequenz-sapgui-mcp\\package.json",
+              "sha256": "678ca950950351fae94f3afc74ef4d61f3a680b28c1aa9286be1aafd4ca57e0a"
+            },
+            {
+              "file": "bundled\\mcps\\hochfrequenz-sapgui-mcp\\pyproject.toml",
+              "sha256": "348437d4fe589c1489c3a7bfd381de8f47ae646418f39ac55a2b0007a057d2c4"
+            },
+            {
+              "file": "bundled\\mcps\\hochfrequenz-sapgui-mcp\\requirements.txt",
+              "sha256": "913820a75046f89458fadf6773e5d0b33ebe05e609c2abc1938b6b6575bc1db4"
+            }
+          ]
+        }
+      ],
+      "promotion_allowed": false,
+      "missing": [
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "arc-mcp-xsuaa-auth",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [
+        {
+          "snapshot": "bundled/mcps/arc-mcp-xsuaa-auth",
+          "origin": "https://github.com/arc-mcp/xsuaa-auth",
+          "revision": "55aa43e9f5955179434b360ce387d4bebc653d39",
+          "license_files": [
+            "bundled\\mcps\\arc-mcp-xsuaa-auth\\LICENSE"
+          ],
+          "dependency_manifests": [
+            {
+              "file": "bundled\\mcps\\arc-mcp-xsuaa-auth\\package.json",
+              "sha256": "dbc405247d1a61b28385005a426bad10957436846cff1c2d54a06e31b10e4b88"
+            }
+          ]
+        }
+      ],
+      "promotion_allowed": false,
+      "missing": [
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "vadimklimov-cpi-mcp-server",
+      "classification": "pending_evidence",
+      "priority": "fallback",
+      "evidence": [
+        {
+          "snapshot": "bundled/mcps/vadimklimov-cpi-mcp",
+          "origin": "https://github.com/vadimklimov/cpi-mcp-server",
+          "revision": "bundled-candidate",
+          "license_files": [],
+          "dependency_manifests": []
+        }
+      ],
+      "promotion_allowed": false,
+      "missing": [
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "karthickshiva-sap-cpi-mcp-server",
+      "classification": "pending_evidence",
+      "priority": "fallback",
+      "evidence": [
+        {
+          "snapshot": "bundled/mcps/karthickshiva-sap-cpi-mcp",
+          "origin": "https://github.com/karthickshiva-png/sap-cpi-mcp-server",
+          "revision": "bundled-candidate",
+          "license_files": [],
+          "dependency_manifests": []
+        }
+      ],
+      "promotion_allowed": false,
+      "missing": [
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "1nbuc-mcp-integration-suite",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [
+        {
+          "snapshot": "bundled/mcps/1nbuc-mcp-integration-suite",
+          "origin": "https://github.com/1nbuc/mcp-integration-suite",
+          "revision": "bundled-candidate",
+          "license_files": [],
+          "dependency_manifests": []
+        }
+      ],
+      "promotion_allowed": false,
+      "missing": [
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "anuradha504-integration-suite",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [
+        {
+          "snapshot": "bundled/mcps/anuradha504-integration-suite",
+          "origin": "https://github.com/Anuradha504/integration-suite",
+          "revision": "bundled-candidate",
+          "license_files": [],
+          "dependency_manifests": []
+        }
+      ],
+      "promotion_allowed": false,
+      "missing": [
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "gutjahrai-sap-odata-mcp",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [
+        {
+          "snapshot": "bundled/mcps/gutjahrai-sap-odata-mcp",
+          "origin": "https://github.com/GutjahrAI/sap-odata-mcp-server",
+          "revision": "bundled-candidate",
+          "license_files": [],
+          "dependency_manifests": []
+        }
+      ],
+      "promotion_allowed": false,
+      "missing": [
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "gutjahrai-sap-odata-mcp-py",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [
+        {
+          "snapshot": "bundled/mcps/gutjahrai-sap-odata-mcp-py",
+          "origin": "https://github.com/GutjahrAI/sap-odata-mcp-py",
+          "revision": "bundled-candidate",
+          "license_files": [],
+          "dependency_manifests": []
+        }
+      ],
+      "promotion_allowed": false,
+      "missing": [
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "karthickshiva-sap-cpi-mcp",
+      "classification": "pending_evidence",
+      "priority": "fallback",
+      "evidence": [
+        {
+          "snapshot": "bundled/mcps/karthickshiva-sap-cpi-mcp",
+          "origin": "https://github.com/karthickshiva-png/sap-cpi-mcp-server",
+          "revision": "bundled-candidate",
+          "license_files": [],
+          "dependency_manifests": []
+        }
+      ],
+      "promotion_allowed": false,
+      "missing": [
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "keelside-mcp-sap-cpi",
+      "classification": "pending_evidence",
+      "priority": "fallback",
+      "evidence": [
+        {
+          "snapshot": "bundled/mcps/keelside-mcp-sap-cpi",
+          "origin": "https://github.com/Keelside/mcp-sap-cpi",
+          "revision": "bundled-candidate",
+          "license_files": [],
+          "dependency_manifests": []
+        }
+      ],
+      "promotion_allowed": false,
+      "missing": [
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "lopezmas-sap-pi-mcp",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [
+        {
+          "snapshot": "bundled/mcps/lopezmas-sap-pi-mcp",
+          "origin": "https://github.com/lopezmas/sap-pi-mcp-server",
+          "revision": "bundled-candidate",
+          "license_files": [],
+          "dependency_manifests": []
+        }
+      ],
+      "promotion_allowed": false,
+      "missing": [
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "premsaidaggolu-cpi-multitenant-mcp",
+      "classification": "pending_evidence",
+      "priority": "fallback",
+      "evidence": [
+        {
+          "snapshot": "bundled/mcps/premsaidaggolu-cpi-multitenant-mcp",
+          "origin": "https://github.com/premsaidaggolu/sap-cpi-multi-tenant-mcp-server",
+          "revision": "bundled-candidate",
+          "license_files": [],
+          "dependency_manifests": []
+        }
+      ],
+      "promotion_allowed": false,
+      "missing": [
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "stiaansdw-ci-mcp-server",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [
+        {
+          "snapshot": "bundled/mcps/stiaansdw-ci-mcp-server",
+          "origin": "https://github.com/stiaansdw/ci-mcp-server-claude-web_deprecated",
+          "revision": "bundled-candidate",
+          "license_files": [],
+          "dependency_manifests": []
+        }
+      ],
+      "promotion_allowed": false,
+      "missing": [
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "ui5-webcomponents-mcp",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [
+        {
+          "snapshot": "bundled/mcps/ui5-webcomponents-mcp",
+          "origin": "https://github.com/UI5/webcomponents-mcp-server",
+          "revision": "bundled-candidate",
+          "license_files": [],
+          "dependency_manifests": []
+        }
+      ],
+      "promotion_allowed": false,
+      "missing": [
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "vadimklimov-cpi-mcp",
+      "classification": "pending_evidence",
+      "priority": "fallback",
+      "evidence": [
+        {
+          "snapshot": "bundled/mcps/vadimklimov-cpi-mcp",
+          "origin": "https://github.com/vadimklimov/cpi-mcp-server",
+          "revision": "bundled-candidate",
+          "license_files": [],
+          "dependency_manifests": []
+        }
+      ],
+      "promotion_allowed": false,
+      "missing": [
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "jfilak-sapcli",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [
+        {
+          "snapshot": "bundled/mcps/jfilak-sapcli",
+          "origin": "https://github.com/jfilak/sapcli",
+          "revision": "ab245ccea54ced8ad23e78aa992d01668722d3eb",
+          "license_files": [
+            "bundled\\mcps\\jfilak-sapcli\\LICENSE"
+          ],
+          "dependency_manifests": [
+            {
+              "file": "bundled\\mcps\\jfilak-sapcli\\pyproject.toml",
+              "sha256": "31ec4ab7b9a615115b4232a21fdc218bde468959a6809399252c7f1183433a25"
+            },
+            {
+              "file": "bundled\\mcps\\jfilak-sapcli\\requirements.txt",
+              "sha256": "48f610be3bcf0933b92956c5f9438514bf259aced3c9ac2297c185932d6a85a3"
+            }
+          ]
+        }
+      ],
+      "promotion_allowed": false,
+      "missing": [
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "clementringot-rosa",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [
+        {
+          "snapshot": "bundled/mcps/clementringot-rosa",
+          "origin": "https://github.com/ClementRingot/ROSA",
+          "revision": "73fecc7e3285379dc3e89c555774652f1f1646d3",
+          "license_files": [
+            "bundled\\mcps\\clementringot-rosa\\LICENSE"
+          ],
+          "dependency_manifests": [
+            {
+              "file": "bundled\\mcps\\clementringot-rosa\\package.json",
+              "sha256": "97f94f5f1aa3c18232a50339a2c40ec812ad77c396aa73376dd40768b2c13581"
+            }
+          ]
+        }
+      ],
+      "promotion_allowed": false,
+      "missing": [
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "nickels-sap-btp-docs-mcp",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [
+        {
+          "snapshot": "bundled/mcps/nickels-sap-btp-docs-mcp",
+          "origin": "https://github.com/nickels/sap-btp-docs-mcp",
+          "revision": "353b0fecaa5d94f764c99f35a4cb1cc96562d3b1",
+          "license_files": [],
+          "dependency_manifests": [
+            {
+              "file": "bundled\\mcps\\nickels-sap-btp-docs-mcp\\package.json",
+              "sha256": "471189dc478ed4041fe434619beada1a03dd06807aa334d6ac834a02a2391761"
+            }
+          ]
+        }
+      ],
+      "promotion_allowed": false,
+      "missing": [
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "marianfoo-mcp-sap-docs",
+      "classification": "pending_evidence",
+      "priority": "overlap-or-optional",
+      "evidence": [
+        {
+          "snapshot": "bundled/mcps/marianfoo-mcp-sap-docs",
+          "origin": "https://github.com/marianfoo/mcp-sap-docs",
+          "revision": "1c7c39d9e16c378f799299e9fedb9ce9d5c53265",
+          "license_files": [
+            "bundled\\mcps\\marianfoo-mcp-sap-docs\\LICENSE"
+          ],
+          "dependency_manifests": [
+            {
+              "file": "bundled\\mcps\\marianfoo-mcp-sap-docs\\package.json",
+              "sha256": "5bcc1bbb63c801ee29289726795c63191beef488c493f62d02bfeb887e9f7af5"
+            }
+          ]
+        }
+      ],
+      "promotion_allowed": false,
+      "missing": [
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "mario-andreschak-mcp-sap-gui",
+      "classification": "pending_evidence",
+      "priority": "fallback",
+      "evidence": [
+        {
+          "snapshot": "bundled/mcps/mario-andreschak-mcp-sap-gui",
+          "origin": "https://github.com/mario-andreschak/mcp-sap-gui",
+          "revision": "1bff66dbea315271e2dd874016a5aef085db3478",
+          "license_files": [
+            "bundled\\mcps\\mario-andreschak-mcp-sap-gui\\LICENSE"
+          ],
+          "dependency_manifests": [
+            {
+              "file": "bundled\\mcps\\mario-andreschak-mcp-sap-gui\\requirements.txt",
+              "sha256": "c97ed30287f50d81e6e28cba9d0e2ffb5f365cbd56b8bc543cd581c5f3fa1e3f"
+            }
+          ]
+        }
+      ],
+      "promotion_allowed": false,
+      "missing": [
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    },
+    {
+      "id": "smartform-ai-generator",
+      "classification": "pending_evidence",
+      "priority": "gap",
+      "evidence": [],
+      "promotion_allowed": false,
+      "missing": [
+        "unambiguous local snapshot",
+        "dependency/security review",
+        "read-only protocol and semantic tests",
+        "mutation approval/replay tests",
+        "maintenance verification",
+        "explicit promotion approval"
+      ],
+      "reason": "Static evidence is not sufficient to approve a live pilot."
+    }
+  ]
+}

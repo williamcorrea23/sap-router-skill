@@ -346,6 +346,14 @@
       "effect": "mutating",
       "domain": "remotefs"
     },
+    {"id":"engine.cap.project.inspect","effect":"read","domain":"engine-cap"},
+    {"id":"engine.cap.project.audit","effect":"read","domain":"engine-cap"},
+    {"id":"engine.cap.pipeline.preview","effect":"read","domain":"engine-cap"},
+    {"id":"engine.cap.project.plan","effect":"read","domain":"engine-cap"},
+    {"id":"engine.cap.quickstart.create","effect":"mutating","domain":"engine-cap"},
+    {"id":"engine.cap.ci.run","effect":"mutating","domain":"engine-cap"},
+    {"id":"engine.cap.dev.deploy","effect":"mutating","domain":"engine-cap"},
+    {"id":"engine.cap.run.diagnose","effect":"read","domain":"engine-cap"},
     {
       "id": "sap.pi.channel.read",
       "effect": "read",

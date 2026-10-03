@@ -17,10 +17,12 @@ import uuid
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-PLAN_DIR = ROOT / "scratch" / "apim-plans"
+PLAN_DIR = Path(os.environ.get("SAP_ROUTER_STATE_DIR", str(ROOT / "scratch"))) / "apim-plans"
 
 
 def load_dotenv() -> None:
+    if os.environ.get("SAP_ROUTER_OFFLINE") == "1":
+        return
     env_path = ROOT / ".env"
     if not env_path.exists():
         return
@@ -95,6 +97,8 @@ class ApimClient:
         return True, "configured"
 
     def request(self, path: str, method: str = "GET", body: bytes | None = None, headers: dict[str, str] | None = None) -> dict:
+        if os.environ.get('SAP_ROUTER_OFFLINE') == '1':
+            return {'status': 'BLOCKED', 'reason': 'offline-network-denied'}
         ok, reason = self.configured()
         if not ok:
             return {"status": "BLOCKED", "reason": reason}
@@ -110,6 +114,8 @@ class ApimClient:
             return {"status": "ERROR", "url": url, "reason": str(exc.reason)}
 
     def fetch_csrf(self) -> dict:
+        if os.environ.get('SAP_ROUTER_OFFLINE') == '1':
+            return {'status': 'BLOCKED', 'reason': 'offline-network-denied'}
         result = self.request("/apiportal/api/1.0/Management.svc/", headers={"X-CSRF-Token": "Fetch"})
         # urllib does not expose headers through request() result, so fetch directly here.
         ok, reason = self.configured()
@@ -179,6 +185,8 @@ def deploy_arguments(args: argparse.Namespace) -> dict:
 
 def deploy_preconditions(args: argparse.Namespace) -> dict:
     return {
+        'bundle_sha256': hashlib.sha256(Path(args.bundle).read_bytes()).hexdigest() if args.bundle and Path(args.bundle).is_file() else '',
+        'host': os.environ.get('APIM_HOST', ''),
         "bundle_exists": bool(args.bundle and Path(args.bundle).exists()),
         "host_configured": bool(os.environ.get("APIM_HOST")),
         "user_configured": bool(os.environ.get("APIM_USER")),
@@ -307,6 +315,7 @@ def execute_plan(args: argparse.Namespace) -> dict:
     # Verify now, mutate, then spend. Spending first would burn a one-time
     # approval on a transient failure the tenant never saw.
     run_approval_broker(["verify"] + hash_args)
+    run_approval_broker(["begin"] + hash_args)
     # Reading the bundle can still fail between the precondition check and here.
     # Report that as a failed mutation so the approval state is always stated.
     try:
@@ -323,10 +332,10 @@ def execute_plan(args: argparse.Namespace) -> dict:
     result["plan_id"] = args.plan_id
     result["target"] = arguments["target"]
     if result.get("status") != "OK":
-        result["approval"] = "still-open"
+        result["approval"] = "reconciliation-required"
         result["next_step"] = (
-            "The mutation failed, so approval {0} was not spent. Retry the commit, or reject it with: "
-            "python scripts/approval_broker.py reject {0}".format(args.action_id)
+            "Do not retry. Read the remote target and reconcile the outcome, then reject approval {0}. "
+            "A new attempt requires a new approved plan.".format(args.action_id)
         )
         return result
     try:

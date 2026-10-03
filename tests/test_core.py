@@ -2,7 +2,11 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
 import unittest
+import zipfile
+from unittest.mock import patch
+from isolated_runtime import run as isolated_run
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -13,6 +17,7 @@ import sap_router
 from sap_router import SapRouter
 from sap_router_core.registry import classify_task, load_servers, validate_catalog
 from source_catalog import INDEX_FILE, load, score_asset
+from skill_packager import package_skill
 
 
 class FunctionalWriteGateTest(unittest.TestCase):
@@ -228,7 +233,7 @@ class RouterContractsTest(unittest.TestCase):
         self.assertEqual(broken, {}, f"live servers with a missing entrypoint: {broken}")
 
     def test_mcp_launcher_blocks_unreviewed_fallback_execution(self):
-        proc = subprocess.run(
+        proc = isolated_run(
             [sys.executable, "scripts/mcp_launcher.py", "run", "--server", "sf-mcp"],
             cwd=ROOT, capture_output=True, text=True, encoding="utf-8",
         )
@@ -236,15 +241,15 @@ class RouterContractsTest(unittest.TestCase):
         self.assertIn("fallback-candidate-not-promoted", proc.stderr)
 
     def test_zrouter_artifacts_have_no_dynamic_evaluator(self):
-        proc = subprocess.run(
+        proc = isolated_run(
             [sys.executable, "scripts/normalize_zrouter_artifacts.py", "--check"],
             cwd=ROOT, capture_output=True, text=True, encoding="utf-8",
         )
         self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
 
     def test_healthcheck_json_is_machine_readable(self):
-        proc = subprocess.run(
-            [sys.executable, "scripts/healthcheck.py", "--quiet", "--json", "--read-only"],
+        proc = isolated_run(
+            [sys.executable, "scripts/healthcheck.py", "--quiet", "--json", "--read-only", "--offline"],
             cwd=ROOT, capture_output=True, text=True, encoding="utf-8",
         )
         payload = json.loads(proc.stdout)
@@ -252,19 +257,84 @@ class RouterContractsTest(unittest.TestCase):
         self.assertEqual(proc.stderr, "")
 
 
+class SpecKitRoutingTest(unittest.TestCase):
+    def test_broad_changes_are_detected_in_english_and_portuguese(self):
+        tasks = (
+            "implement a new ABAP report",
+            "adicionar uma nova funcionalidade com mudança de contrato e modelo de dados",
+            "criar integração entre CAP e CPI",
+        )
+        for task in tasks:
+            with self.subTest(task=task):
+                self.assertEqual(sap_router.spec_kit_scope(task)["mode"], "full")
+
+    def test_read_only_intent_wins_over_broad_topic_words(self):
+        tasks = (
+            "find integration config",
+            "explain integration architecture",
+            "explique a integração CPI",
+            "please specify the field name",
+            "o que é Spec Kit?",
+        )
+        for task in tasks:
+            with self.subTest(task=task):
+                self.assertEqual(sap_router.spec_kit_scope(task)["mode"], "none")
+
+    def test_localized_integration_fix_stays_light(self):
+        self.assertEqual(
+            sap_router.spec_kit_scope("corrija um bug pequeno na integração CPI")["mode"],
+            "light",
+        )
+
+    def test_full_route_is_wrapped_before_implementation(self):
+        ready = {"ready": True, "installed": True, "version": "1.0.6", "required": "1.0.6"}
+        with patch("sap_router.spec_kit_cli_status", return_value=ready):
+            route = SapRouter().get_route("add new feature with API contract")
+        self.assertEqual(route["strategy"], "spec-kit-background")
+        self.assertEqual(route["destination"], "sap-spec-kit")
+        self.assertIn("implementation_route", route)
+
+    def test_full_route_fails_closed_when_cli_is_not_ready(self):
+        missing = {"ready": False, "installed": False, "required": "1.0.6"}
+        with patch("sap_router.spec_kit_cli_status", return_value=missing):
+            route = SapRouter().get_route("add new feature with API contract")
+        self.assertEqual(route["strategy"], "spec-kit-dependency-pending")
+        self.assertEqual(route["destination"], "none")
+
+    def test_full_command_sequence_includes_quality_gates(self):
+        commands = sap_router.spec_kit_scope("use Spec Kit to implement this")["commands"]
+        for command in ("$speckit-clarify", "$speckit-checklist", "$speckit-analyze"):
+            self.assertIn(command, commands)
+
+    def test_explicit_product_request_is_not_confused_with_ordinary_specify(self):
+        self.assertEqual(sap_router.spec_kit_scope("Spec Kit: implement this change")["mode"], "full")
+        self.assertEqual(sap_router.spec_kit_scope("please specify the field name")["mode"], "none")
+
+    def test_sap_spec_kit_package_is_self_contained(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output = Path(temp_dir) / "sap-spec-kit.zip"
+            package_skill(ROOT / ".agents" / "skills" / "sap-spec-kit", output)
+            with zipfile.ZipFile(output) as archive:
+                names = set(archive.namelist())
+        self.assertIn("sap-spec-kit/SKILL.md", names)
+        self.assertIn("speckit-specify/SKILL.md", names)
+        self.assertIn("speckit-converge/SKILL.md", names)
+        self.assertIn(".specify/templates/spec-template.md", names)
+
+
 class ApimProxyPackagerTest(unittest.TestCase):
     """The bundle packager must produce something the tenant will accept,
     and must fail loudly when a flow references a policy that is not shipped."""
 
     def _template(self, kind, name, output, extra=None):
-        return subprocess.run(
+        return isolated_run(
             [sys.executable, "scripts/apim_proxy_packager.py", "template",
              "--kind", kind, "--name", name, "--output", str(output)] + (extra or []),
             cwd=ROOT, capture_output=True, text=True, encoding="utf-8",
         )
 
     def _validate(self, bundle):
-        proc = subprocess.run(
+        proc = isolated_run(
             [sys.executable, "scripts/apim_proxy_packager.py", "validate", "--input", str(bundle), "--json"],
             cwd=ROOT, capture_output=True, text=True, encoding="utf-8",
         )
@@ -310,11 +380,10 @@ class ApimProxyPackagerTest(unittest.TestCase):
 
 
 class ApprovalSpendOrderTest(unittest.TestCase):
-    """A one-time approval must survive a failed mutation. Verifying and spending
-    are separate steps so a transient error does not cost the operator a re-approval."""
+    """Verification does not spend; reserved execution cannot be replayed."""
 
     def _broker(self, *broker_args):
-        proc = subprocess.run(
+        proc = isolated_run(
             [sys.executable, "scripts/approval_broker.py", *broker_args],
             cwd=ROOT, capture_output=True, text=True, encoding="utf-8",
         )
@@ -416,7 +485,8 @@ class PlanFileTamperTest(unittest.TestCase):
             self.addCleanup(self._broker, "reject", plan["action_id"])
             self._broker("approve", plan["action_id"])
 
-            plan_path = ROOT / "scratch" / "apim-plans" / (plan["apim_plan_id"] + ".json")
+            state_dir = Path(os.environ.get("SAP_ROUTER_STATE_DIR", str(ROOT / "scratch")))
+            plan_path = state_dir / "apim-plans" / (plan["apim_plan_id"] + ".json")
             self.addCleanup(plan_path.unlink, True)
             local = json.loads(plan_path.read_text(encoding="utf-8"))
             local["arguments"]["path"] = "/apiportal/api/1.0/Management.svc/APIProxies('ZEVIL')/$value"
@@ -481,7 +551,7 @@ class ApimChannelBridgeTest(unittest.TestCase):
             json.dumps({"jsonrpc": "2.0", "id": 2, "method": "tools/call",
                         "params": {"name": name, "arguments": arguments}}),
         ]) + "\n"
-        proc = subprocess.run(
+        proc = isolated_run(
             self.BRIDGE, cwd=ROOT, input=request,
             capture_output=True, text=True, encoding="utf-8",
         )
@@ -506,6 +576,10 @@ class ApimChannelBridgeTest(unittest.TestCase):
             "plan_id": "apim-oauth-does-not-exist", "action_id": "x", "plan_hash": "y", "confirm": False,
         })
         self.assertEqual(result["status"], "BLOCKED")
+
+    def test_commit_plan_path_traversal_is_refused(self):
+        result = self._call('apim_configure_commit', {'plan_id': '../escape', 'confirm': True})
+        self.assertEqual(result['reason'], 'invalid-plan-id')
 
     def test_api_call_stays_inside_the_api_portal(self):
         result = self._call("apim_api_call", {"path": "/sap/opu/odata/sap/ZMATERIAL_SRV/"})
@@ -544,7 +618,8 @@ class ApimChannelBridgeTest(unittest.TestCase):
         self.addCleanup(self._broker, "reject", plan["action_id"])
         self._broker("approve", plan["action_id"])
 
-        plan_path = ROOT / "scratch" / "apim-plans" / (plan["apim_plan_id"] + ".json")
+        state_dir = Path(os.environ.get("SAP_ROUTER_STATE_DIR", str(ROOT / ".sap-router")))
+        plan_path = state_dir / "apim-plans" / (plan["apim_plan_id"] + ".json")
         self.addCleanup(plan_path.unlink, True)
         local = json.loads(plan_path.read_text(encoding="utf-8"))
         local["arguments"]["path"] = "/apiportal/api/1.0/Management.svc/APIProxies('ZEVIL')/$value"

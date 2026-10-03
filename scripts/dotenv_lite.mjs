@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 export function loadDotEnv(file = path.join(ROOT, ".env")) {
+  if (process.env.SAP_ROUTER_OFFLINE === "1") return 0;
   if (!fs.existsSync(file)) {
     return 0;
   }

@@ -86,3 +86,5 @@ packages/
 # Logs de sessao do sc4sap, em qualquer nivel: a regra ancorada na raiz
 # nao pegava os que nascem em subdiretorios de trabalho.
 **/.sc4sap/logs/
+# Machine-local runtimes, approval state, caches and credential/configuration backups.
+/.sap-router/

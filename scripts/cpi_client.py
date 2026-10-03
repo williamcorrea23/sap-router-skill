@@ -54,6 +54,8 @@ ARTIFACT_ENTITY_SETS = {
 
 
 def _load_dotenv() -> None:
+    if os.environ.get("SAP_ROUTER_OFFLINE") == "1":
+        return
     path = ROOT / ".env"
     if not path.exists():
         return
@@ -98,6 +100,8 @@ def odata_quote(value: Any) -> str:
 
 
 def require_requests() -> None:
+    if os.environ.get('SAP_ROUTER_OFFLINE') == '1':
+        raise RuntimeError('offline-network-denied')
     if not HAS_REQUESTS:
         raise RuntimeError("Missing dependency 'requests'. Install the project dependencies before using CPI HTTP operations.")
 
@@ -638,6 +642,7 @@ def with_approval(args: argparse.Namespace, arguments: dict[str, Any], precondit
         return tampered
     hash_args = approval_hash_args(args, arguments, preconditions)
     run_approval_broker(["verify"] + hash_args)
+    run_approval_broker(["begin"] + hash_args)
     # The runtime helpers raise on HTTP errors, so catch here: the caller has to
     # learn whether the approval is still spendable, not just see a traceback.
     try:
@@ -645,10 +650,10 @@ def with_approval(args: argparse.Namespace, arguments: dict[str, Any], precondit
     except Exception as exc:  # noqa: BLE001 - reported, not swallowed
         result = {"status": "ERROR", "error": str(exc), "error_type": type(exc).__name__}
     if result.get("status") != "OK":
-        result["approval"] = "still-open"
+        result["approval"] = "reconciliation-required"
         result["next_step"] = (
-            "The operation failed, so approval {0} was not spent. Retry the commit, or reject it with: "
-            "python scripts/approval_broker.py reject {0}".format(args.action_id)
+            "Do not retry. Read the remote target and reconcile the outcome, then reject approval {0}. "
+            "A new attempt requires a new approved plan.".format(args.action_id)
         )
         return result
     try:
@@ -798,14 +803,15 @@ def commit_local_operation(args: argparse.Namespace, operation: str) -> dict[str
 
 
 def test_connection() -> dict[str, Any]:
-    token = get_oauth_token()
-    response = requests.get(
-        f"{cpi_base_url()}/api/v1/",
-        headers={"Authorization": f"Bearer {token}", "Accept": "application/json"},
-        timeout=HTTP_TIMEOUT,
-    )
-    response.raise_for_status()
-    return {"status": "OK", "oauth": "OK", "api_http_status": response.status_code}
+    # A service root can return 404 or an HTML login page while the collection
+    # endpoint is valid. Prove one minimal, schema-checked domain read instead.
+    payload = query_cpi_odata("/api/v1/IntegrationPackages", params={"$top": 1})
+    items = payload.get("d", {}).get("results") if isinstance(payload, dict) else None
+    if items is None and isinstance(payload, dict):
+        items = payload.get("value")
+    if not isinstance(items, list):
+        raise ValueError("CPI semantic probe did not return an OData collection")
+    return {"status": "OK", "oauth": "OK", "api_http_status": 200, "operation": "IntegrationPackages.read", "count": len(items)}
 
 
 def add_pagination(parser: argparse.ArgumentParser) -> None:

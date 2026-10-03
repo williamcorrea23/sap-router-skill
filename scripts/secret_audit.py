@@ -21,19 +21,13 @@ DEFAULT_PATHS = [
 PATTERNS = {
     "private_key": re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----"),
     "api_token": re.compile(r"\b(?:sk|pat|ghp|glpat)-[A-Za-z0-9_\-]{12,}\b"),
-    "sap_password_literal": re.compile(r"(?i)(password|passwd|client_secret|api_key|auth_token)\s*[:=]\s*([\"'])(?!\$\{|<|your|change|dummy|test|example|password|secret)(.{8,}?)\2"),
+    "sap_password_literal": re.compile(r"(?i)(?<![A-Za-z0-9_])(password|passwd|client_secret|api_key|auth_token)(?![A-Za-z0-9_])[\"']?\s*[:=]\s*([\"'])(.{8,}?)\2"),
     "hardcoded_sap_host": re.compile(r"https?://\d{1,3}(?:\.\d{1,3}){3}:\d+"),
 }
 
-PLACEHOLDER_MARKERS = (
-    "ENV",
-    "REF",
-    "MISSING",
-    "PLACEHOLDER",
-    "TOKEN_URL",
-    "CLIENT_SECRET",
-    "PASSWORD",
-    "API_KEY",
+PLACEHOLDER_VALUE = re.compile(
+    r"(?:your|change|dummy|test|example|password|secret|env|ref|missing|placeholder|token_url|client_secret|api_key)(?:[_\-\s].*)?",
+    re.IGNORECASE,
 )
 
 SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv", "venv"}
@@ -78,21 +72,16 @@ def audit(paths: list[str]) -> dict:
         except OSError:
             continue
         rel = str(path.relative_to(ROOT))
+        # Credential keys are complete identifiers. POLICY_VERIFY_API_KEY is
+        # a policy name, while passwords or tokens inside its XML still count.
         for name, pattern in PATTERNS.items():
             for match in pattern.finditer(text):
                 matched = match.group(0)
-                value = match.group(2).strip() if name == "sap_password_literal" and match.lastindex == 2 else ""
-                value_upper = value.strip("\"'`.,)").upper()
+                value = match.group(3).strip() if name == "sap_password_literal" and match.lastindex >= 3 else ""
                 if name == "sap_password_literal":
                     if (
-                        "{" in matched
-                        or "Authorization" in matched
-                        or "Bearer" in matched
-                        or "Basic" in matched
-                        or value.startswith("$")
-                        or value.startswith("{")
-                        or value_upper.replace("_", "").isalnum() and value_upper == value_upper.upper()
-                        or any(marker in value_upper for marker in PLACEHOLDER_MARKERS)
+                        value.startswith(("$", "{", "<"))
+                        or PLACEHOLDER_VALUE.fullmatch(value.strip("\"'`.,)"))
                     ):
                         continue
                 line = text.count("\n", 0, match.start()) + 1

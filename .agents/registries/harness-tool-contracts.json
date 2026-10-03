@@ -1,0 +1,446 @@
+{
+  "schema_version": 1,
+  "policy": {
+    "runtime_fetch": false,
+    "requires_reviewed_schema": true,
+    "real_effects": [
+      "read"
+    ]
+  },
+  "contracts": [
+    {
+      "id": "cpi-packages-v1",
+      "status": "reviewed",
+      "capability": "sap.cpi.package.read",
+      "server": "sap-cpi-mcp",
+      "tool": "cpi_packages",
+      "effect": "read",
+      "approval_mode": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Optional exact package id."
+          },
+          "query": {
+            "type": "string",
+            "description": "Optional Id/Name substring filter."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum records to return (1-200).",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 200
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Records to skip.",
+            "default": 0,
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_sha256": "c81db9a24a9a8c4fa61758dd3bd877a608cbb2ec0238a99481b7b86bc6de1a24",
+      "result_assertions": [
+        {
+          "path": "items",
+          "type": "array"
+        },
+        {
+          "path": "count",
+          "type": "integer",
+          "minimum": 0,
+          "length_equals": "items"
+        },
+        {
+          "path": "source",
+          "equals": "cpi:IntegrationPackages"
+        }
+      ],
+      "review": {
+        "source": "scripts/sap_integration_mcp.py",
+        "method": "offline schema and CLI response inspection",
+        "reviewed_at": "2026-10-02",
+        "tenant_validation": "NOT_RUN"
+      }
+    },
+    {
+      "id": "cpi-artifacts-v1",
+      "status": "reviewed",
+      "capability": "sap.cpi.artifact.read",
+      "server": "sap-cpi-mcp",
+      "tool": "cpi_artifacts",
+      "effect": "read",
+      "approval_mode": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "package_id": {
+            "type": "string",
+            "description": "Optional package id filter."
+          },
+          "query": {
+            "type": "string",
+            "description": "Optional Id/Name substring filter."
+          },
+          "artifact_type": {
+            "type": "string",
+            "description": "Artifact category.",
+            "enum": [
+              "integration_flow",
+              "value_mapping",
+              "message_mapping",
+              "script_collection"
+            ],
+            "default": "integration_flow"
+          },
+          "runtime": {
+            "type": "boolean",
+            "default": false
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum records to return (1-200).",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 200
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Records to skip.",
+            "default": 0,
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_sha256": "7a14b1eeb32ef9d8cb2d7b252b26392127b5c8eeb70fea23bb1a8b1304dfa465",
+      "result_assertions": [
+        {
+          "path": "items",
+          "type": "array"
+        },
+        {
+          "path": "count",
+          "type": "integer",
+          "minimum": 0,
+          "length_equals": "items"
+        },
+        {
+          "path": "source",
+          "one_of": [
+            "cpi:IntegrationDesigntimeArtifacts",
+            "cpi:ValueMappingDesigntimeArtifacts",
+            "cpi:MessageMappingDesigntimeArtifacts",
+            "cpi:ScriptCollectionDesigntimeArtifacts",
+            "cpi:IntegrationRuntimeArtifacts"
+          ]
+        }
+      ],
+      "review": {
+        "source": "scripts/sap_integration_mcp.py",
+        "method": "offline schema and CLI response inspection",
+        "reviewed_at": "2026-10-02",
+        "tenant_validation": "NOT_RUN"
+      }
+    },
+    {
+      "id": "cpi-artifact-get-v1",
+      "status": "reviewed",
+      "capability": "sap.cpi.artifact.read",
+      "server": "sap-cpi-mcp",
+      "tool": "cpi_artifact_get",
+      "effect": "read",
+      "approval_mode": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "artifact_id": {
+            "type": "string",
+            "description": "Artifact id."
+          },
+          "version": {
+            "type": "string",
+            "description": "Artifact version.",
+            "default": "active"
+          },
+          "artifact_type": {
+            "type": "string",
+            "description": "Artifact category.",
+            "enum": [
+              "integration_flow",
+              "value_mapping",
+              "message_mapping",
+              "script_collection"
+            ],
+            "default": "integration_flow"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "artifact_id"
+        ]
+      },
+      "schema_sha256": "d713779da0c1112abc66efd259ff0bda182e3a41bd2af43234253e791b2c1f2c",
+      "result_assertions": [
+        {
+          "path": "item.Id",
+          "type": "string",
+          "nonempty": true
+        },
+        {
+          "path": "source",
+          "one_of": [
+            "cpi:IntegrationDesigntimeArtifacts",
+            "cpi:ValueMappingDesigntimeArtifacts",
+            "cpi:MessageMappingDesigntimeArtifacts",
+            "cpi:ScriptCollectionDesigntimeArtifacts",
+            "cpi:IntegrationRuntimeArtifacts"
+          ]
+        }
+      ],
+      "review": {
+        "source": "scripts/sap_integration_mcp.py",
+        "method": "offline schema and CLI response inspection",
+        "reviewed_at": "2026-10-02",
+        "tenant_validation": "NOT_RUN"
+      }
+    },
+    {
+      "id": "cpi-runtime-artifacts-v1",
+      "status": "reviewed",
+      "capability": "sap.cpi.runtime.read",
+      "server": "sap-cpi-mcp",
+      "tool": "cpi_runtime_artifacts",
+      "effect": "read",
+      "approval_mode": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Optional runtime status."
+          },
+          "query": {
+            "type": "string",
+            "description": "Optional Id/Name substring filter."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum records to return (1-200).",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 200
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Records to skip.",
+            "default": 0,
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_sha256": "0728ff5e3136b4e2bb5b04e67fef487191a34b2a6183507e976a364b8dc869ee",
+      "result_assertions": [
+        {
+          "path": "items",
+          "type": "array"
+        },
+        {
+          "path": "count",
+          "type": "integer",
+          "minimum": 0,
+          "length_equals": "items"
+        },
+        {
+          "path": "source",
+          "equals": "cpi:IntegrationRuntimeArtifacts"
+        }
+      ],
+      "review": {
+        "source": "scripts/sap_integration_mcp.py",
+        "method": "offline schema and CLI response inspection",
+        "reviewed_at": "2026-10-02",
+        "tenant_validation": "NOT_RUN"
+      }
+    },
+    {
+      "id": "cpi-logs-v1",
+      "status": "reviewed",
+      "capability": "sap.cpi.message.read",
+      "server": "sap-cpi-mcp",
+      "tool": "cpi_logs",
+      "effect": "read",
+      "approval_mode": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "description": "Optional MPL status."
+          },
+          "integration_flow_id": {
+            "type": "string",
+            "description": "Optional integration flow name."
+          },
+          "log_level": {
+            "type": "string",
+            "description": "Optional log level."
+          },
+          "from_time": {
+            "type": "string",
+            "description": "Optional ISO timestamp lower bound."
+          },
+          "to_time": {
+            "type": "string",
+            "description": "Optional ISO timestamp upper bound."
+          },
+          "top": {
+            "type": "integer",
+            "description": "Compatibility alias for limit.",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 200
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum records to return (1-200).",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 200
+          },
+          "offset": {
+            "type": "integer",
+            "description": "Records to skip.",
+            "default": 0,
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_sha256": "a9193018b9b0b09913444246a77ec53ce3653959c7067c853d33f305396817ec",
+      "result_assertions": [
+        {
+          "path": "items",
+          "type": "array"
+        },
+        {
+          "path": "count",
+          "type": "integer",
+          "minimum": 0,
+          "length_equals": "items"
+        },
+        {
+          "path": "source",
+          "equals": "cpi:MessageProcessingLogs"
+        }
+      ],
+      "review": {
+        "source": "scripts/sap_integration_mcp.py",
+        "method": "offline schema and CLI response inspection",
+        "reviewed_at": "2026-10-02",
+        "tenant_validation": "NOT_RUN"
+      }
+    },
+    {
+      "id": "cpi-message-details-v1",
+      "status": "reviewed",
+      "capability": "sap.cpi.message.detail.read",
+      "server": "sap-cpi-mcp",
+      "tool": "cpi_message_details",
+      "effect": "read",
+      "approval_mode": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "message_guid": {
+            "type": "string",
+            "description": "MessageGuid from an MPL record."
+          },
+          "include_adapter_attributes": {
+            "type": "boolean",
+            "default": false
+          },
+          "include_custom_headers": {
+            "type": "boolean",
+            "default": false
+          },
+          "include_trace": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "message_guid"
+        ]
+      },
+      "schema_sha256": "17df36bfe4b95e787b3f6b101898953555da51d75d219da247458cc9c0f21ac3",
+      "result_assertions": [
+        {
+          "path": "message.MessageGuid",
+          "type": "string",
+          "nonempty": true
+        },
+        {
+          "path": "source",
+          "equals": "cpi:MessageProcessingLogs"
+        }
+      ],
+      "review": {
+        "source": "scripts/sap_integration_mcp.py",
+        "method": "offline schema and CLI response inspection",
+        "reviewed_at": "2026-10-02",
+        "tenant_validation": "NOT_RUN"
+      }
+    },
+    {
+      "id": "apim-proxies-v1",
+      "status": "reviewed",
+      "capability": "sap.apim.proxy.read",
+      "server": "sap-apim-mcp",
+      "tool": "apim_proxies",
+      "effect": "read",
+      "approval_mode": "none",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Optional proxy id."
+          }
+        },
+        "additionalProperties": false
+      },
+      "schema_sha256": "11c4452ede2847029e562a63f041797c438f384ff39bc735e54f86a21e416d36",
+      "result_assertions": [
+        {
+          "path": "status",
+          "equals": "OK"
+        },
+        {
+          "path": "http_status",
+          "type": "integer",
+          "minimum": 200,
+          "maximum": 299
+        },
+        {
+          "path": "body",
+          "type": "string",
+          "nonempty": true,
+          "odata_json": true
+        }
+      ],
+      "review": {
+        "source": "scripts/sap_integration_mcp.py",
+        "method": "offline schema and CLI response inspection",
+        "reviewed_at": "2026-10-02",
+        "tenant_validation": "NOT_RUN"
+      }
+    }
+  ]
+}

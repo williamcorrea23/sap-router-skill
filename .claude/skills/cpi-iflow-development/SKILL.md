@@ -30,7 +30,9 @@ Full development lifecycle for SAP Cloud Integration (CPI) iFlows — from sourc
 - SAP BTP subaccount with Integration Suite enabled
 - Service Key for Process Integration Runtime (OAuth2 client_credentials)
 - Environment vars set: `CPI_BASE_URL`, `CPI_OAUTH_TOKEN_URL`, `CPI_OAUTH_CLIENT_ID`, `CPI_OAUTH_CLIENT_SECRET`
-- Groovy 2.4+ syntax knowledge (CPI uses Nashorn engine, ECMAScript 5.1 dialect)
+- Identify the target Script step version before writing code. Groovy uses its
+  JVM runtime; JavaScript uses a separate engine. Match imports and syntax to
+  the selected step version; see [SAP's Script step documentation](https://help.sap.com/docs/cloud-integration/sap-cloud-integration/use-scripting-appropriately).
 - Access to CPI Web UI for monitoring and trace
 
 ## Canonical routing
@@ -198,18 +200,23 @@ Apply the same sequence to undeploy, iFlow generation, plotting, and Git sync.
 
 - iFlow design-time size: ~10 MB
 - Message size: 100 MB max
-- Groovy execution timeout: 5 min
+- Verify script and adapter timeouts against the target tenant's current limits.
 - External call timeout: 10 min
 - Max parallel branches: 50
 
 ## Pitfalls
 
-- **Groovy Sandbox blocks file I/O** — Cause: CPI runs Groovy in Nashorn sandbox, `new File()` is blocked. Solution: Use Data Store or Header/Property for persistence.
-- **XmlSlurper vs XPath** — Cause: javax XPath is restricted in sandbox. Solution: Use `new XmlSlurper().parseText(body)` for XML navigation.
+- **Unsupported file I/O or libraries** — Groovy runs on the JVM. Follow
+  [SAP's scripting guidelines](https://help.sap.com/docs/cloud-integration/sap-cloud-integration/general-scripting-guidelines),
+  use supported Cloud Integration APIs, and use Data Store for persistence.
+- **XML parsing imports** — Match the parser import to the Groovy Script step
+  version. For Groovy 4, use `groovy.xml.XmlSlurper`; see
+  [SAP's runtime compatibility guidelines](https://help.sap.com/docs/cloud-integration/sap-cloud-integration/groovy-script?locale=en-US).
 - **Content Modifier expression syntax** — Cause: Wrong variable syntax causes silent failures. Solution: Use `${in.body}` not `${message.body}`; use `${property.X}` for properties.
 - **Body type mismatch** — Cause: Body can be String, InputStream, or byte[]. Solution: Always cast explicitly: `message.getBody(java.lang.String)`.
 - **Content-Type header lost after transform** — Cause: Setting body overrides headers. Solution: Set `Content-Type` header AFTER calling `message.setBody()`.
-- **Groovy timeout on large payloads** — Cause: 5-min script timeout. Solution: Split long operations across multiple iFlow steps; use Splitter for batch processing.
+- **Script timeout on large payloads** — Confirm the observed tenant timeout,
+  then split long operations across multiple iFlow steps or use Splitter for batch processing.
 - **Hardcoded credentials** — Cause: Passwords in Groovy scripts. Solution: Use Secure Parameters or OAuth2 credentials from Security Material.
 
 ## Verification

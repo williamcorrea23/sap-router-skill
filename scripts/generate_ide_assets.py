@@ -7,6 +7,7 @@ import filecmp
 import hashlib
 import json
 import shutil
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -74,6 +75,7 @@ def text_body(target: str) -> str:
         f"# SAP Router Skill for {label}\n\n"
         "Canonical source: `.agents/`.\n"
         "Karpathy wrapper: mandatory. Caveman compression: default.\n"
+        "Spec Kit background workflow: automatic for broad changes; `python scripts/sap_router.py spec-kit --task \"...\"`.\n"
         "Do not copy or fork skill bodies here; regenerate from canonical source.\n\n"
         "Runtime root:\n"
         "- `SAP_ROUTER_ROOT` must point to the canonical sap-router-skill repository.\n"
@@ -112,16 +114,29 @@ def safe_rmtree(path: Path) -> None:
 
 
 def copy_tree(src: Path, dst: Path) -> None:
-    if dst.exists():
-        safe_rmtree(dst)
-    shutil.copytree(src, dst, dirs_exist_ok=True)
+    if dst.is_symlink():
+        raise ValueError(f'Refusing symlink destination: {dst}')
+    if not src.is_dir():
+        raise FileNotFoundError(f'Skill source directory not found: {src}')
+    dst.mkdir(parents=True, exist_ok=True)
+    for item in src.rglob('*'):
+        relative = item.relative_to(src)
+        target = dst / relative
+        if item.is_dir():
+            target.mkdir(parents=True, exist_ok=True)
+        elif item.is_file():
+            target.parent.mkdir(parents=True, exist_ok=True)
+            if not target.is_file() or not filecmp.cmp(item, target, shallow=False):
+                shutil.copy2(item, target)
 
 
 def compare_dirs(left: Path, right: Path) -> list[str]:
     diffs: list[str] = []
     if not right.exists():
         return [f"missing:{right}"]
-    for src in left.rglob("SKILL.md"):
+    for src in left.rglob("*"):
+        if not src.is_file() or '__pycache__' in src.parts or src.suffix == '.pyc':
+            continue
         rel = src.relative_to(left)
         dst = right / rel
         if not dst.exists():
@@ -131,7 +146,40 @@ def compare_dirs(left: Path, right: Path) -> list[str]:
     return diffs
 
 
-def generate(targets: list[str], sync_global: bool = False) -> dict:
+def sync_global_skills(targets: list[str]) -> dict:
+    """Copy owned files only; back up replacements, preserve unrelated files/settings."""
+    unknown = set(targets) - set(GLOBAL_SKILLS_TARGETS)
+    if unknown:
+        raise ValueError(f'Unknown global targets: {sorted(unknown)}')
+    stamp = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ')
+    result = {}
+    for target in targets:
+        base = GLOBAL_SKILLS_TARGETS[target].resolve()
+        backup = base.parent / 'sap-router-backups' / stamp / 'skills'
+        changed = 0
+        for source in CANONICAL_SKILLS.rglob('*'):
+            if not source.is_file() or '__pycache__' in source.parts or source.suffix == '.pyc':
+                continue
+            rel = source.relative_to(CANONICAL_SKILLS)
+            destination = base / rel
+            resolved = destination.resolve()
+            if base not in resolved.parents or any(p.is_symlink() for p in [destination, *destination.parents] if p != base):
+                raise ValueError(f'Unsafe global destination: {destination}')
+            if destination.exists() and filecmp.cmp(source, destination, shallow=False):
+                continue
+            if destination.exists():
+                saved = backup / rel
+                saved.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(destination, saved)
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, destination)
+            changed += 1
+        result[target] = {'files_changed': changed, 'backup': str(backup) if backup.exists() else None,
+                          'diffs': compare_dirs(CANONICAL_SKILLS, base)}
+    return result
+
+
+def generate(targets: list[str], sync_global: bool = False, global_targets=None) -> dict:
     changed = []
     for target in targets:
         if target in TARGET_SKILLS:
@@ -147,20 +195,7 @@ def generate(targets: list[str], sync_global: bool = False) -> dict:
     changed.append(str(manifest_path.relative_to(ROOT)))
 
     if sync_global:
-        global_changed = []
-        skills_dirs = [s for s in CANONICAL_SKILLS.glob("*") if s.is_dir()]
-        for target_name, g_base in GLOBAL_SKILLS_TARGETS.items():
-            g_base.mkdir(parents=True, exist_ok=True)
-            for sdir in skills_dirs:
-                dst = g_base / sdir.name
-                copy_tree(sdir, dst)
-            global_changed.append(f"{target_name} ({str(g_base)}) -> {len(skills_dirs)} skills")
-
-        for target_name, g_file in GLOBAL_TEXT_TARGETS.items():
-            g_file.parent.mkdir(parents=True, exist_ok=True)
-            g_file.write_text(text_body(target_name), encoding="utf-8")
-            global_changed.append(f"{target_name} ({str(g_file)})")
-
+        global_changed = sync_global_skills(global_targets or ['codex'])
         return {"status": "OK", "generated": changed, "global_generated": global_changed}
 
     return {"status": "OK", "generated": changed}
@@ -207,14 +242,15 @@ def main() -> int:
     sub = parser.add_subparsers(dest="command", required=True)
     gen = sub.add_parser("generate")
     gen.add_argument("--targets", default="all", help="Comma-separated: all,claude,gemini,codex,cursor,kiro")
-    gen.add_argument("--global", dest="sync_global", action="store_true", help="Sync skills globally to ~/.gemini, ~/.claude, ~/.codex")
+    gen.add_argument("--global", dest="sync_global", action="store_true", help="Sync owned skills globally (Codex only by default); preserve settings")
+    gen.add_argument("--global-targets", default="codex", help="Explicit global targets, comma-separated; requires --global")
     sub.add_parser("check")
     sub.add_parser("diff")
     args = parser.parse_args()
 
     if args.command == "generate":
         targets = list(TARGET_SKILLS) + list(TEXT_TARGETS) if args.targets == "all" else [t.strip() for t in args.targets.split(",")]
-        result = generate(targets, sync_global=args.sync_global)
+        result = generate(targets, sync_global=args.sync_global, global_targets=args.global_targets.split(','))
     else:
         result = check()
     print(json.dumps(result, indent=2))

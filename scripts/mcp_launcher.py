@@ -19,6 +19,8 @@ def load_json(path: Path) -> dict:
 
 
 def load_dotenv() -> None:
+    if os.environ.get("SAP_ROUTER_OFFLINE") == "1":
+        return
     env_path = ROOT / ".env"
     if not env_path.exists():
         return
@@ -55,23 +57,49 @@ def list_capability(capability: str | None = None) -> dict:
     registry = load_json(REGISTRY)
     config = load_json(MCP_CONFIG)
     caps = registry.get("capabilities", {})
+    if capability and capability not in caps:
+        return {capability: {"selected": None, "ready": [], "blocked": [],
+                             "mutation": False, "requires_approval": False,
+                             "error": "unknown-capability"}}
     selected = {capability: caps[capability]} if capability else caps
+    canonical = load_json(ROOT / ".agents" / "registries" / "capabilities.json")
+    effects = {item["id"]: item.get("effect", "read") for item in canonical.get("capabilities", [])}
     result = {}
     for cap, spec in selected.items():
-        candidates = [spec["primary"]] + spec.get("fallbacks", [])
+        candidates = ([spec["primary"]] if spec.get("primary") else []) + spec.get("fallbacks", [])
         ready = []
         blocked = []
         for server in candidates:
             ok, reason = server_ready(server, config)
             (ready if ok else blocked).append({"server": server, "reason": reason})
+        effect = effects.get(cap, "read")
+        mutation = effect != "read"
+        requires_approval = bool(spec.get("requires_approval", mutation)) or mutation
+        if not candidates:
+            blocked.append({"server": None, "reason": "no-reviewed-provider"})
         result[cap] = {
             "selected": ready[0]["server"] if ready else None,
             "ready": ready,
             "blocked": blocked,
-            "mutation": spec.get("mutation", False),
-            "requires_approval": spec.get("requires_approval", False),
+            "mutation": mutation,
+            "requires_approval": requires_approval,
         }
     return result
+
+
+def _server_environment(server: dict, runtime: dict) -> dict[str, str]:
+    """Pass only platform variables, configured runtime values, and this MCP's auth refs."""
+    inherited = {"PATH", "PATHEXT", "SYSTEMROOT", "WINDIR", "COMSPEC", "TEMP", "TMP",
+                 "HOME", "USERPROFILE", "APPDATA", "LOCALAPPDATA", "LANG", "LC_ALL",
+                 "SSL_CERT_FILE", "SSL_CERT_DIR", "NODE_EXTRA_CA_CERTS", "SAP_ROUTER_STATE_DIR"}
+    names = inherited | set(server.get("auth", {}).get("env_refs", [])) | set(runtime.get("env", {}))
+    if server.get("id") == "arc-1":
+        names |= {"SAP_URL", "SAP_USER", "SAP_PASSWORD", "SAP_CLIENT"}
+    env = {name: os.environ[name] for name in names if name in os.environ}
+    env.update({key: str(value) for key, value in runtime.get("env", {}).items()})
+    env.update(ARC_SAP_SSL_VERIFY="true", SAP_ALLOW_UNAUTHORIZED="false",
+               WEB_ALLOW_UNAUTHORIZED="false", NODE_TLS_REJECT_UNAUTHORIZED="1")
+    return env
 
 
 def probe(server_id: str) -> dict:
@@ -86,12 +114,23 @@ def run_server(server_id: str) -> int:
         sys.path.insert(0, str(ROOT / "python"))
         from sap_router_core.registry import load_servers
         server = load_servers().get(server_id)
-        if not server:
+        if not server or server.get('status') != 'enabled':
             print(json.dumps({"error": "fallback-candidate-not-promoted", "server": server_id,
                               "reason": "Review and promote the candidate in .agents/registries/mcps.json first."}), file=sys.stderr)
             return 2
-        runtime = server.get("runtime", {})
+        from sap_router_core.local_runtime import resolve_runtime
+        from sap_router_core.registry import tls_error
+        if tls_error():
+            print(json.dumps({'error': 'TLS_VERIFICATION_REQUIRED'}), file=sys.stderr)
+            return 2
+        runtime = resolve_runtime(ROOT, server_id, server.get("runtime", {}))
         command = runtime.get("command")
+        if command and Path(command).stem.lower() in {'npx', 'npm', 'uvx', 'pip', 'pnpm', 'bunx'}:
+            print(json.dumps({'error': 'LOCAL_RUNTIME_REQUIRED', 'server': server_id}), file=sys.stderr)
+            return 2
+        if server_id == 'context-mode' and any(str(a).endswith('start.mjs') for a in runtime.get('args', [])):
+            print(json.dumps({'error': 'BOOTSTRAP_REVIEW_REQUIRED', 'server': server_id}), file=sys.stderr)
+            return 2
         if not command:
             print(json.dumps({"error": "missing-runtime", "server": server_id}), file=sys.stderr)
             return 2
@@ -99,8 +138,7 @@ def run_server(server_id: str) -> int:
         if missing:
             print(json.dumps({"error": "server-not-ready", "server": server_id, "reason": "missing-env:" + ",".join(missing)}), file=sys.stderr)
             return 2
-        env = os.environ.copy()
-        env.update({key: str(value) for key, value in runtime.get("env", {}).items()})
+        env = _server_environment(server, runtime)
         raw_cwd = runtime.get("cwd")
         cwd = (ROOT / raw_cwd).resolve() if raw_cwd else ROOT
         if ROOT not in cwd.parents and cwd != ROOT:

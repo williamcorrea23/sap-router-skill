@@ -1,13 +1,12 @@
 ---
 name: sap-security-patch
 description: >-
-  Run the monthly SAP Security Patch Day workflow — retrieve the current month's SAP Security Notes from
-  the SAP Support Portal (SAP Security Patch Day, second Tuesday), narrow them to the subset that applies
-  to THIS system (installed software-component versions + kernel), compare against what's already applied
-  (System Recommendations / SAP Focused Run / RSECNOTE), prioritize by CVSS/HotNews, and implement via
-  SNOTE. Use for "check this month's SAP security notes", "which security notes apply to <SID>", "SAP
-  patch day", "HotNews", "compare released notes vs applied". Browses the SAP Security Notes page. Cited
-  to help.sap.com / SAP Support Portal.
+  The monthly SAP Security Patch Day workflow — retrieve the current month's Security Notes from
+  the Support Portal, narrow them to the subset that applies to THIS system (installed component
+  versions + kernel), compare against what is already applied (System Recommendations / Focused
+  Run / RSECNOTE), prioritize by CVSS/HotNews, and implement via SNOTE. Use for "check this
+  month's SAP security notes", "which security notes apply to <SID>", "SAP patch day",
+  "HotNews", "compare released notes vs applied".
 ---
 
 # SAP Security Patch Day
@@ -95,10 +94,43 @@ Those are the action items.
 
 ---
 
+## 5a. Know what kind of correction the note carries — CI vs **TCI**
+
+Before planning, determine **how** the note delivers its fix. This changes the effort, the prerequisites
+and the downtime.
+
+| | **Classic CI** (correction instruction) | **TCI** (Transport-Based Correction Instruction) |
+|---|---|---|
+| Delivery | Correction instructions embedded in the note; SNOTE patches existing objects | A **transport** (package downloaded from SAP), imported into the system |
+| Used when | changes to **existing** repository objects | the fix needs **new objects** (new tables, DDIC, function modules) that a classic CI cannot create |
+| Applied via | **SNOTE** | **SNOTE** with TCI enabled — needs a minimum **SPAM/SAINT** level and one-time setup [P6] |
+| Effort | usually low | higher: transport import, prerequisites, more caution |
+
+**Structure worth internalising:** a correction instruction is bound to a **software component *and* a
+release range**. A note with 11 corrections typically has **one CI per release** — e.g. SAP Note 3096734
+carries 11 CIs for SAP_BASIS 700, 701, 702, 731, 740, 750… Only the CI matching *your* component version
+applies. That's why "does this note apply to my stack" is answered by the correction/validity ranges, not
+by the note title.
+
+**How to tell them apart:**
+- In SAP for Me: a TCI note says so in its text and its correction row carries a **download link** for the
+  transport package; a classic CI has none.
+- **Via the SAP Notes MCP** (`fetch(id, includeCorrections=true)`): each entry in `correctionDetails`
+  carries `softwareComponent` + `versionFrom`/`versionTo`, and **`downloadUrl` is present only for TCI**
+  — a structural check, no text parsing. (Contributed upstream; see the plugin README's MCP section.)
+- In the system: **SNOTE** shows the implementation type and will tell you if TCI support is missing
+  (errors **TN835 / TN872** — SAP Note 2499947). [P6]
+
+> ⚠️ **TCI is a transport import, not just a note.** Treat it with transport-level care
+> ([sap-transport-mgmt](../sap-transport-mgmt/SKILL.md)): DEV → QAS → PRD, backup first, and confirm the
+> SPAM/SAINT prerequisite *before* the change window — discovering it mid-window is the classic failure.
+
 ## 6. Implement & verify (change-controlled)
 
 - **SNOTE** (Note Assistant): download + implement in **DEV**, run the automatic activities, resolve
   prerequisites, test → **transport to QAS → PRD**. [P5]
+- **TCI notes:** ensure SPAM/SAINT meets the minimum and TCI is enabled, then implement via SNOTE, which
+  imports the transport. Follow **SAP Note 2543372** for the procedure. [P6]
 - **Kernel / SP notes:** apply the patched kernel or Support Package via **SUM / SPAM/SAINT** in a
   maintenance window (OS-specific kernel per platform — Linux/Windows/AIX download from the SAP Software
   Center). Cross-ref a future `sap-kernel-patch` skill.
@@ -120,6 +152,121 @@ Software Center.
 - **Restart after config/kernel notes:** [sap-system-lifecycle](../sap-system-lifecycle/SKILL.md).
 - **Post-patch health / new dumps:** [sap-health-triage](../sap-health-triage/SKILL.md).
 - **SAP Notes MCP** (retrieval): see the plugin's SAP Notes MCP notes (content path fix pending).
+- **`sap-support-case`** — when a Note search does not resolve it and a case is genuinely justified; routing, priority and the wizard traps.
+
+## Execution discipline (non-negotiable)
+
+### The holy rule — nothing runs unbacked
+
+**Every command executed must be traceable to one of exactly three things:**
+
+1. an **official SAP source** — help.sap.com page / Operations or Administration Guide, or
+2. an **SAP Note / KBA**, or
+3. an **explicit instruction from the user**.
+
+If a command is backed by none of those, **do not run it** — say what backing is missing and stop.
+"It's probably fine", "this is standard", and "I recall the syntax" are not backing. When the backing is
+a source, name it (page or Note number) alongside the command; when it is the user, quote the instruction.
+
+### Ambiguity ⇒ stop and confirm, before any execution
+
+If executing would require **assuming** anything the user did not state, you are **obliged** to confirm
+first. Never fill a gap with a plausible default. Common gaps that force a stop:
+
+- **client number**, SID, instance number, target host/node
+- **read-only vs state-changing** — if it is not explicit which was wanted, ask
+- **scope** — one instance vs the whole system, one tenant vs all, one client vs cross-client
+- which **database / dbms_type**, which environment (**PRD vs non-PRD**)
+- retention/age cut-offs, recovery points, target of a restore, transport target
+
+A wrong assumption here is not a typo — it is the difference between reading a log and stopping production.
+
+### But verify programmatically FIRST — *then* ask
+
+**Asking the user for something the system can answer is a failure.** Before you raise a question, ask
+the user to go and look, or request Computer Use / GUI access, you **must** first try to determine it
+programmatically. Only what genuinely cannot be derived — intent, authorization, a business decision, a
+value that exists only in the user's head — is a legitimate question.
+
+| Determine programmatically (do NOT ask) | Ask the user (cannot be derived) |
+|---|---|
+| Which DB — `echo $dbms_type`, profile `dbms/type` | Which **client** to act on |
+| SIDs / instances / hosts / ports — `sapcontrol … GetSystemInstanceList`, `ls /usr/sap` | Whether this system is in scope / approved |
+| Is it up, is the DB up — `GetProcessList`, `R3trans -d` | PRD change approval, downtime window |
+| Kernel / release / patch — `disp+work -version`, `saphostexec -version` | The intended recovery point or retention policy |
+| Which clients **exist** — table `T000` | Which of those clients is **meant** |
+| Free space, log locations, parameter values — `df -h`, `sappfpar`, profile | Business impact / urgency |
+
+Order, always: **verify programmatically → ask only what remains → never assume.**
+
+### Prefer programmatic over manual or GUI
+
+**Work down this ladder. Take the highest rung that does the job — and within that rung, the lowest
+privilege that suffices. Never skip a rung because you assume it is unavailable (see the burden of
+proof below).**
+
+| # | Path | Privilege | Notes |
+|---|---|---|---|
+| **1** | **REST / OData** — `GET` first | Narrowest. Scoped service user | Read-only by construction when you stay on `GET`. `$metadata` gives you the contract |
+| **2** | **SOAP / web service** | Scoped service user | Typed contract via `?wsdl`. Client-cert auth where offered — no password in a script |
+| **3** | **RFC / BAPI** (`creds exec`, JCo, `pyrfc`) | RFC user with `S_RFC` | **For ABAP *writes*, prefer this over 1–2**: BAPIs have real commit/rollback semantics and land in SM19/SM20 |
+| **4** | **OS shell as the *correct* user** → **DB utility** | ⚠️ Escalates — see below | The chain matters more than the rung |
+| **5** | **Browser automation** (headless or in-app) | Interactive user | Session-based UIs only. Fragile across releases |
+| **6** | **Computer Use / screen driving** | Interactive user | **Last resort.** Not repeatable, not diffable, breaks on any UI change |
+
+> ## ⚠️ Rung 4 is a chain, and each link widens the blast radius
+>
+> ```
+> ssh <host>                    ← host access
+>   → su - <sid>adm             ← SAP admin: can stop/start the system
+>   → su - ora<sid> / syb<sid>  ← DB owner: can drop data
+>   → sudo / root               ← everything
+>        → hdbsql | isql | dbmcli | sqlplus | db2   ← the actual command
+> ```
+>
+> **Stop at the least-privileged user that can run the command.** Most read-only checks need only
+> `<sid>adm`; DB utilities usually need the DB owner; **root is almost never the right answer** and
+> `saproot.sh` is the rare legitimate exception. Say which user you used and why.
+
+> ## Two axes, and they do not agree
+>
+> The ladder ranks by **automation quality** — repeatable, reviewable, loggable, diffable. Privilege
+> runs on a *different* axis and is **worst in the middle**: rung 4 (OS/root) can destroy a system,
+> while rung 6 (Computer Use) is merely an interactive user clicking. So Computer Use ranks last for
+> *reproducibility*, not because it is the most dangerous.
+>
+> **The practical rule: prefer the highest rung, but never escalate privilege to climb it.** A
+> read-only OData call beats an RFC that needs a write-capable user; an `<sid>adm` shell beats a root
+> shell. If climbing a rung requires more privilege than the task needs, stay where you are and say so.
+
+> ## 🛑 You must **demonstrate** the absence of a programmatic path, not assume it
+>
+> "There is no API for this" is a **finding that requires evidence**, not a default. Before dropping to
+> rung 5 or 6, actually probe:
+>
+> - **HTTP status codes tell you the access mode.** `401` → Basic auth works, **scriptable**.
+>   `302` regardless of credentials → session UI, browser needed. `404` → not deployed. `503` →
+>   deployed but stopped.
+> - **Look for a contract**: append `?wsdl`, `$metadata`, `/api`, `?sap-client=` and see what answers.
+> - **Ask the platform what it exposes**: `sapcontrol -function J2EEGetApplicationAliasList`,
+>   `hdbcons help`, `btp --help`, `xs help`, `<tool> -h`.
+> - **A Swing or WebDynpro *UI* being un-automatable does not mean the *objects* are.** The editor and
+>   the API are different doors — check for the second before declaring the first is the only one.
+>
+> Programmatic execution is repeatable, reviewable, loggable and diffable; screen-driving is none of
+> those. When you do drop to a lower rung, **say which rung you are on and what you probed** to rule
+> out the higher ones — so the user can correct you if they know of a path you missed.
+
+### Ask how output should be handled
+
+Work that produces evidence (logs, traces, command output, screenshots, reports) has two reasonable
+endings. **Ask which the user wants** rather than guessing:
+
+- **(a) persist it** — write the output/logs/screenshots to a file, and say exactly where; or
+- **(b) execute and report** — just run it and give a short final status summary.
+
+Don't dump large output into the conversation unasked, and don't silently discard evidence either — for
+troubleshooting and any change with a rollback, (a) is usually the right default to offer.
 
 ## Run as the correct OS user
 
@@ -164,7 +311,24 @@ behave as documented:
 1. `search` the topic (e.g. the component + symptom, or a Note number cited below).
 2. `fetch` the promising Note IDs for the current text, validity (affected releases/components),
    prerequisites and side effects.
-3. Prefer the Note over this file where they disagree, and say which Note you followed.
+3. **Check the `attachments` array.** SAP routinely puts the actual deliverable *in an attachment* rather
+   than the Note body — sizing guides, SQL script collections, configuration PDFs, spreadsheets. A Note
+   whose text says "see the attached document" is not fully read until you have it.
+4. Prefer the Note over this file where they disagree, and say which Note you followed.
+
+**Downloading an attachment:** `fetch` returns `attachments[].url` **and `attachments[].filename`**;
+**`fetch_attachment`** retrieves the bytes. Pass the URL verbatim — the URLs are opaque and cannot be
+constructed. If your MCP build predates that tool, open the URL in a signed-in browser instead and say the
+file was fetched manually.
+
+> ⚠️ **Two ways a hand-rolled fetch goes wrong — both verified.**
+> **1. Trusting the status code.** An unauthenticated request returns **HTTP 200 with a small HTML login
+> stub**, not an error. Check the content type and magic bytes, or you save a JavaScript redirect page
+> under a `.pdf` name.
+> **2. Naming the file from the URL.** SAP serves many attachments from a *generic endpoint* —
+> `…/services/attachment.htm?iv_key=…&iv_guid=…` — so the URL basename is `attachment.htm` even when the
+> payload is a 24-page PDF. Take the name from **`attachments[].filename`** or the response's
+> **`Content-Disposition`** header, never from the URL path.
 
 No MCP available? Look the Note up on `me.sap.com/notes/<id>` and say the check was skipped rather than
 assuming this file is current.
@@ -181,6 +345,19 @@ assuming this file is current.
   validation. help.sap.com (Focused Run).
 - **[P5]** **SNOTE** (Note Assistant) + **`RSECNOTE`** — implement/track security notes on the system.
   help.sap.com (Note Assistant).
+- **[P6]** **Transport-Based Correction Instructions (TCI)** — **SAP Note 2187425** (*Information about
+  SAP Note Transport based Correction Instructions*; the Note's entire Solution section reads *"See the
+  attached PDF for further information"* — the substance is the attachment **`TCI_for_Customer.pdf`**
+  (878,422 B, 24 pages). Fetch it with the MCP's `fetch_attachment`; the Note text alone tells you almost
+  nothing **[V]**),
+  **2543372** (*How to implement TCI*; also carries attachments), **2499947**
+  (*TN835 or TN872: the transport based correction of SAP Note is not available*), **2576306** (TCI for
+  download of digitally signed SAP Notes). Component BC-UPG-NA.
+  https://me.sap.com/notes/2187425 · https://me.sap.com/notes/2543372
+- **[P7]** CI/TCI structure verified directly against the SAP for Me backend during authoring: one
+  correction instruction per software component **and release range**; the correction row's
+  `DownloadURL` is populated **only** for TCI. Sampled 3096734 / 2168979 / 2961006 (classic CI, no
+  download URL) vs 3195213 / 3275780 / 3401735 (TCI, download URL present). **[V]**
 
 **To confirm/deepen** — check current SAP Notes with the SAP Notes MCP (`search`, then `fetch` the note ID): the current SAP Security Notes FAQ
 note and the System Recommendations setup guide for your Solution Manager / Focused Run release.

@@ -17,3 +17,9 @@ Thumbs.db
 
 # Node (if any tooling is added later)
 node_modules/
+
+# Runtime traces written into the CWD by SAP tooling (JCo, SAPCAR, etc.)
+# — these leak connectivity metadata (ASHOST, SYSNR, SAPROUTER routes, hosts).
+*.log
+dev_*
+dev_jco_rfc.log

@@ -24,7 +24,7 @@ BOR object types, eventos, receivers e gestão de status.
 
 ## Pré-requisitos
 
-- Python 3.8+ (`scripts/sap_router.py`)
+- Python 3.11+ (`scripts/sap_router.py`)
 - Node.js 18+ com `@abaplint/cli` instalado
 - ADT MCP conectado (arc-1 / aibap / mcp-abap-adt)
 - SAP system acessível (DEV) para deploy e activation

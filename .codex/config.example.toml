@@ -1,6 +1,64 @@
 [shell_environment_policy]
 inherit = "core"
+# Run python scripts/sync_codex_config.py --apply to resolve absolute paths and existing global aliases.
+# Commands below assume cwd is SAP_ROUTER_ROOT. Package installs never happen during launch.
+[shell_environment_policy]
+inherit = "core"
 
+[mcp_servers."arc-1"]
+command = "python"
+args = ["scripts/mcp_launcher.py", "run", "--server", "arc-1"]
+startup_timeout_sec = 30
+
+[mcp_servers."aibap"]
+command = "python"
+args = ["scripts/mcp_launcher.py", "run", "--server", "aibap"]
+startup_timeout_sec = 30
+
+[mcp_servers."mcp-sap-gui"]
+command = "python"
+args = ["scripts/mcp_launcher.py", "run", "--server", "mcp-sap-gui"]
+startup_timeout_sec = 30
+
+[mcp_servers."sap-cpi-mcp"]
+command = "python"
+args = ["scripts/mcp_launcher.py", "run", "--server", "sap-cpi-mcp"]
+startup_timeout_sec = 30
+
+[mcp_servers."sap-apim-mcp"]
+command = "python"
+args = ["scripts/mcp_launcher.py", "run", "--server", "sap-apim-mcp"]
+startup_timeout_sec = 30
+
+[mcp_servers."integration-suite-ui-mcp"]
+command = "python"
+args = ["scripts/mcp_launcher.py", "run", "--server", "integration-suite-ui-mcp"]
+startup_timeout_sec = 30
+
+[mcp_servers."apim-ui-mcp"]
+command = "python"
+args = ["scripts/mcp_launcher.py", "run", "--server", "apim-ui-mcp"]
+startup_timeout_sec = 30
+
+[mcp_servers."ui5-mcp"]
+command = "python"
+args = ["scripts/mcp_launcher.py", "run", "--server", "ui5-mcp"]
+startup_timeout_sec = 30
+
+[mcp_servers."fiori-mcp"]
+command = "python"
+args = ["scripts/mcp_launcher.py", "run", "--server", "fiori-mcp"]
+startup_timeout_sec = 30
+
+[mcp_servers."cap-mcp"]
+command = "python"
+args = ["scripts/mcp_launcher.py", "run", "--server", "cap-mcp"]
+startup_timeout_sec = 30
+
+[mcp_servers."context-mode"]
+command = "python"
+args = ["scripts/mcp_launcher.py", "run", "--server", "context-mode"]
+startup_timeout_sec = 30
 [mcp_servers.arc-1]
 command = "npx"
 args = ["arc-1"]

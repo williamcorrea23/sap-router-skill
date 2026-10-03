@@ -1,14 +1,14 @@
 ---
-name: sap-Codex-skills
+name: sap-codex-skills
 description: SAP Codex Custom Skills collection (KEIDAI-TechTime/sap-Codex-skills). Custom templates and system instructions for SAP tasks — template catalog (template_repo.py, xls_to_bapi.py), karpathy behavioral wrapper, prompt patterns for correct router dispatch, and authoring new SKILL.md files.
 trigger:
   keywords: [custom skill, skill template, system instructions, prompt pattern, template catalog, seed templates, write skill, skill frontmatter, instruction stacking]
   intent: Using or authoring custom Codex skill templates and system instructions so SAP tasks are phrased, dispatched, and executed consistently through the router
 prerequisites:
   - sap-router-skill repo cloned with scripts/ directory intact
-  - Python 3.10+ on PATH (template_repo.py, xls_to_bapi.py, sap_router.py)
+  - Python 3.11+ on PATH (template_repo.py, xls_to_bapi.py, sap_router.py)
   - npm scripts available (package.json: seed, template, csv:check)
-  - karpathy-guidelines skill present in .Codex/skills/ (mandatory wrapper)
+  - karpathy-guidelines skill present in .agents/skills/ (mandatory wrapper)
 ---
 
 # SAP Codex Custom Skills — Templates and System Instructions

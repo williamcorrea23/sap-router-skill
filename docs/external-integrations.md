@@ -6,13 +6,14 @@ checked out under `bundled/` with a pinned revision, indexed by
 
 ## Imported skills
 
-The current canonical catalog contains 162 skills. The additions and refreshes in this
+The current canonical catalog contains 203 skills. The additions and refreshes in this
 release come from:
 
 | Source | Scope | License observed | Status |
 |---|---|---|---|
 | `likweitan/abap-skills` | ABAP, RAP, CDS, OData, Clean Core | MIT | Imported and refreshed |
-| `adam0thman/sap-basis-ops` | Basis, DB, SAPRouter and operational runbooks | MIT | Imported |
+| `adam0thman/sap-basis-ops` | Basis, DB, SAPRouter and operational runbooks | MIT | Pinned at `6ae551f6ec2ef4c554b606fcdef5a04599e4ab11`; 21 new skills and 12 refreshed |
+| `kts982/sap-odata-explorer` | SAP OData CLI usage guidance | MIT | `sap-odata-cli` imported as skill-only; CLI and MCP runtime are not installed |
 | `SAP/ai-skills-library` | SAP Fiori guidance | Apache-2.0 | Imported |
 | `UI5/plugins-coding-agents` | UI5 best practices, modernization and fixes | Apache-2.0 | Imported |
 | `SAP/ui-theme-designer-plugins-for-coding-agents` | Theme Designer and design tokens | Apache-2.0 | Imported |
@@ -30,7 +31,7 @@ python scripts/source_catalog.py search "UI5 table modernization"
 
 ## MCPs and libraries
 
-The following requested projects are bundled and indexed as fail-closed candidates:
+The following requested MCP projects are registered as fail-closed candidates. Some have pointer-only snapshots and no runnable source; registry status does not imply that a runtime can be started:
 
 | ID | Repository | Classification | Default |
 |---|---|---|---|
@@ -40,6 +41,9 @@ The following requested projects are bundled and indexed as fail-closed candidat
 | `hochfrequenz-sapgui-mcp` | `Hochfrequenz/sapgui.mcp` | SAP GUI/WebGUI MCP | Disabled candidate |
 | `gavdilabs-cap-mcp-plugin` | `gavdilabs/cap-mcp-plugin` | CAP plugin that exposes services as MCP | Disabled candidate |
 | `arc-mcp-xsuaa-auth` | `arc-mcp/xsuaa-auth` | XSUAA auth library for HTTP MCP hosts | Library only |
+| `odata-mcp-go` | `oisee/odata_mcp_go` | Go SAP OData MCP | Disabled candidate; runtime and safety review required |
+| `gutjahrai-sap-odata-mcp-py` | `GutjahrAI/sap-odata-mcp-py` | Python SAP OData MCP | Disabled candidate; pointer-only snapshot, no runtime |
+| `nicohern-abapilot-mcp` | `NicoHern/abapilot-mcp` | ABAP development MCP | Disabled candidate; selected target profile is blocked DEV |
 
 Candidates are searchable with:
 
@@ -51,6 +55,21 @@ python scripts/mcp_launcher.py search --query "SuccessFactors employee data"
 Promotion requires a reviewed entry in `.agents/registries/mcps.json`, a runtime
 probe, declared environment references, and approval semantics for writes. Do not put
 credentials in this repository or enable all candidates at once.
+
+### ABAPilot DEV trial profile
+
+`.agents/registries/mcp-target-profiles.json` records the requested `nicohern-abapilot-mcp-dev`
+target. The connector is pinned to upstream commit `25639b76f6d3f53ae029af73913370af56a1e980`
+and package `abapilot@1.0.6`; its runtime is not installed or fetched. The profile remains
+`blocked`, and the MCP candidate remains disabled and absent from active server configuration.
+Its proposed default-deny read allowlist is restricted to code/object metadata and syntax
+checks; write, program execution, transaction, variant, translation, and note-upload tools
+are explicitly denied. This client-side filter does not replace server-side SAP authorization.
+
+Activation still requires the licensed ABAPilot backend installed on the exact DEV system,
+system ID/client/release and HTTPS endpoint, credentials held outside the repository, a
+captured `tools/list` schema review, and verified DEV authorization/audit behavior. No live
+SAP check has run. See `.agents/registries/mcp-target-profiles.json` for machine-readable gates.
 
 ## Global availability
 

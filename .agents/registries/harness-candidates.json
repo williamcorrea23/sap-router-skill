@@ -1,0 +1,128 @@
+{
+  "schema_version": 1,
+  "policy": {
+    "status": "disabled_candidate",
+    "runtime_fetch": false,
+    "runtime_execution": false,
+    "promotion_requires": ["license_review", "security_review", "tests", "explicit_registry_change"]
+  },
+  "candidates": [
+    {
+      "id": "aliulashayir-sap-dev-toolkit",
+      "repository": "https://github.com/aliulashayir/sap-dev-toolkit",
+      "revision": "21a5c676dac7d45bcd2ef7398409b7fe4da87b55",
+      "kind": "skill",
+      "license": "MIT",
+      "license_evidence": "LICENSE file at audited revision",
+      "utility": "SAP OData and RAP integration guidance, EDMX handling, pagination, and error patterns; strong overlap with existing OData and Cloud SDK skills.",
+      "blockers": ["No automated tests found", "POST hooks and required-field behavior need independent review"],
+      "status": "disabled_candidate",
+      "runtime_fetch": false,
+      "runtime_execution": false
+    },
+    {
+      "id": "logalitech-sap-mdk-skills",
+      "repository": "https://github.com/logalitech/sap-mdk-skills",
+      "revision": "89b30b96607d88e3b008e1aaa26369779f1e37cf",
+      "kind": "skill",
+      "license": "Apache-2.0",
+      "license_evidence": "LICENSE file at audited revision",
+      "utility": "SAP Mobile Development Kit metadata, client API, offline and synchronization guidance; fills a distinct MDK domain gap.",
+      "blockers": ["No runtime or automated tests found", "Review MDK API/version claims before promotion"],
+      "status": "disabled_candidate",
+      "runtime_fetch": false,
+      "runtime_execution": false
+    },
+    {
+      "id": "etavioxy-sap-skills",
+      "repository": "https://github.com/Etavioxy/sap-skills",
+      "revision": "2928904fdf6b30cd33ccd1bfb8e5002c2bc08dd0",
+      "kind": "methodology",
+      "license": "MIT",
+      "license_evidence": "LICENSE file at audited revision",
+      "utility": "Start A Project methodology with Spec Kit, loops, TDD, and review guidance; repository is a project starter, not SAP ERP domain material.",
+      "blockers": ["High overlap with local Spec Kit and loop procedures", "Do not copy commit or authorization policy wholesale"],
+      "status": "disabled_candidate",
+      "runtime_fetch": false,
+      "runtime_execution": false
+    },
+    {
+      "id": "shrek-abaper-sap-functional-skill",
+      "repository": "https://github.com/shrek-abaper/sap-functional-skill",
+      "revision": "a51ff7a454b179dd9c54bdd679f3d29595f517c7",
+      "kind": "skill-and-tool",
+      "license": "MIT",
+      "license_evidence": "Project license at audited revision; SAP JCo/runtime licensing is separate",
+      "utility": "SAP functional skills and stock-availability workflow; current HEAD adds an offline-guarded RFC_READ_TABLE path.",
+      "blockers": ["Earlier revision is already bundled and locked; keep new SHA separate", "STO token scope and failure paths need repair", "Some verification defaults are disabled", "One helper installs packages automatically"],
+      "status": "disabled_candidate",
+      "runtime_fetch": false,
+      "runtime_execution": false
+    },
+    {
+      "id": "manoj-iflowdev-sap-cloud-integration-odata-api-v2-clients",
+      "repository": "https://github.com/manoj-iflowdev/sap-cloud-integration-odata-api-v2-clients",
+      "revision": "adfdba5c515b9dcc00da8d533cc2a3a43149bad7",
+      "kind": "generated-client",
+      "license": "unverified",
+      "license_evidence": "package.json declares MIT; no LICENSE file at audited revision",
+      "utility": "Generated SAP Cloud Integration OData API v2 clients; possible reference for existing CPI client and ZIP workflows.",
+      "blockers": ["License needs confirmation", "Repository provenance differs from package homepage", "No tests found; beta API surface needs review"],
+      "status": "disabled_candidate",
+      "runtime_fetch": false,
+      "runtime_execution": false
+    },
+    {
+      "id": "rameshvaranganti-sap-integration-assistant",
+      "repository": "https://github.com/rameshvaranganti/sap-integration-assistant",
+      "revision": "589b94346835629b9778e3dfeefdfec5e2d1fbd7",
+      "kind": "skill",
+      "license": "MIT",
+      "license_evidence": "LICENSE file at audited revision",
+      "utility": "Integration diagnosis and evidence grading that separates confirmed facts, likely causes, and hypotheses.",
+      "blockers": ["Strong overlap with local incident and integration advisor skills", "No runtime MCP or test evidence found"],
+      "status": "disabled_candidate",
+      "runtime_fetch": false,
+      "runtime_execution": false
+    },
+    {
+      "id": "pietromezzaroba-sap-cpi-iflow",
+      "repository": "https://github.com/PietroMezzaroba/sap-cpi-iflow",
+      "revision": "c7e3e48dd18ae88ccf7beb0fea281bfd8d02e435",
+      "kind": "reference-and-recipes",
+      "license": "MIT",
+      "license_evidence": "LICENSE file at audited revision",
+      "utility": "CPI iFlow recipes, Groovy examples, checklists, incident guidance, and go-live templates.",
+      "blockers": ["GitHub workflow checks lexical consistency only; it does not compile against SAP runtime", "Review every recipe before adopting"],
+      "status": "disabled_candidate",
+      "runtime_fetch": false,
+      "runtime_execution": false
+    },
+    {
+      "id": "carlosribeirodev-sap-skill-integrationsuite-zip-generation",
+      "repository": "https://github.com/carlosribeirodev/sap-skill-integrationsuite-zip-generation",
+      "revision": "74e6a3e0a01a1e68983ccb2397253ed5418a0778",
+      "kind": "skill",
+      "license": "Apache-2.0",
+      "license_evidence": "LICENSE file at audited revision",
+      "utility": "Integration Suite ZIP generation guidance; useful archive rules include POSIX paths, one manifest, and source-file digests.",
+      "blockers": ["No executable skill or MCP server found", "Do not apply project metadata rules to unrelated artifact types"],
+      "status": "disabled_candidate",
+      "runtime_fetch": false,
+      "runtime_execution": false
+    },
+    {
+      "id": "aztun-neru-hermes-pm-skill",
+      "repository": "https://github.com/aztun-neru/hermes-pm-skill",
+      "revision": "cca20494dd717f0296b18fb5bfbf8a0639935401",
+      "kind": "skill-and-server",
+      "license": "absent",
+      "license_evidence": "No LICENSE file at audited revision",
+      "utility": "CPM/EVM/PM process concepts that may inform future maintenance-agent scenarios.",
+      "blockers": ["No license", "Server does not implement MCP JSON-RPC initialize/tools/call", "Unauthenticated token endpoint, wildcard CORS, shell interpolation, and unsafe rollback path handling"],
+      "status": "disabled_candidate",
+      "runtime_fetch": false,
+      "runtime_execution": false
+    }
+  ]
+}

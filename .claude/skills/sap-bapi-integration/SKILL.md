@@ -6,7 +6,7 @@ trigger: bapi, BAPI, rfc, RFC, transaction commit, BAPIRET2, BAPI_TRANSACTION, g
 
 # SAP BAPI Integration — 9 Modules, 29 BAPIs
 
-> **Prerequisites:** SAP RFC connection, ZROUTER_DISPATCH_FM (or direct BAPI), Python 3.8+.
+> **Prerequisites:** SAP RFC connection, ZROUTER_DISPATCH_FM (or direct BAPI), Python 3.11+ for repository scripts.
 > Full BAPI tables: [reference.md](reference.md)
 
 ## When to use

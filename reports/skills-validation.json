@@ -1,0 +1,1017 @@
+{
+  "status": "PASS",
+  "count": 168,
+  "metadata_passed": 168,
+  "skills_with_unresolved_links": 0,
+  "validation_scope": "metadata and local Markdown links; not live behavioral proof",
+  "skills": [
+    {
+      "skill": "abap",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "abap-cloud",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "abap-cloud-migration",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "abap-code-patterns",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "abap-code-review",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "abap-docs-reference",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "abap-snippet",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "abap-sql-amdp",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "abap-system-info",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "abap-unit-testing",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "abapgit",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "arc-1-skills",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "atc-cloudification",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "authorization-iam",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "automation-pilot-catalog-explorer",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "automation-pilot-command-generation",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "automation-pilot-command-review",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "automation-pilot-content-management-via-api",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "automation-pilot-debugger",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "automation-pilot-executions-api",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "automation-pilot-executor-executescript",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "automation-pilot-executor-httprequest",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "automation-pilot-mcp-server-generation",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "automation-pilot-scheduled-executions-api",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "badi-enhancement",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "btp-abap-environment",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "btp-best-practices",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "btp-build-work-zone",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "btp-business-application-studio",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "btp-cias",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "btp-cloud-foundry",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "btp-cloud-identity",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "btp-cloud-logging",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "btp-cloud-platform",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "btp-cloud-transport-management",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "btp-connectivity",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "btp-developer-guide",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "btp-diagram-generator",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "btp-integration-suite",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "btp-job-scheduling",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "btp-master-data-integration",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "btp-service-manager",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "cap-add-remote-service",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "cap-developer",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "cap-trivia",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "cap-upgrade",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "capture-answer",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "cds-view-entities",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "claude-abap-skills",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "claude-mem",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "clean-abap",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "context-mode",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "cpi-iflow-development",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "fix-bootstrap-params",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "fix-component-async",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "fix-control-renderer",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "fix-csp-compliance",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "fix-cyclic-deps",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "fix-deprecated-controls",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "fix-fiori-elements-extensions",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "fix-js-globals",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "fix-library-init",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "fix-linter-blind-spots",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "fix-manifest-json",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "fix-partially-deprecated-apis",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "fix-pseudo-modules",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "fix-table-row-mode",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "fix-xml-globals",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "fix-xml-native-html",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "ingest-l0",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "ingest-l1",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "karpathy-guidelines",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "lint-audit",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "loop-specification",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "modernize-flp-sandbox",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "modernize-test-starter",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "modernize-ui5-app",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "odata",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "odata-abap",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "query",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "rap",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "rap-business-events",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "released-abap-classes",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "research-l2",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "rtk-token-optimizer",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "run-sap-router-skill",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-abap-automated-documentation",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-ai-core",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-api-policy",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-api-style",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-apim-channel",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-backup-recovery",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-bapi-integration",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-btp-audit-log",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-btp-credential-store",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-btp-devops",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-btp-document-mgmt",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-btp-feature-flags",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-btp-html5-repo",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-btp-kyma",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-btp-launchpad",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-btp-saas",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-build",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-cap",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-claude-skills",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-cloud-connector",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-cloud-sdk-ai",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-code-agents-analysis",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-code-search",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-commerce-skill",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-cpi-flowpilot",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-crew-analysis",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-datasphere",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-datasphere-plugin",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-db-command-reference",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-dependency-security",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-fiori-apps-reference",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-fiori-guidelines",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-fiori-ios",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-fiori-tools",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-fiori-url-generator",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-gui-scripting",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-gui-web-enrich",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-hana-cli",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-hana-cloud-data-intelligence",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-hana-ml",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-hana-sqlscript",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-health-triage",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-housekeeping",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-incident-resolution",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-kernel-patch",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-llm-engineering",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-log-reference",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-rap-gen",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-router-skill",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-rpt1",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-sac-custom-widget",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-sac-planning",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-sac-scripting",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-sac-test-automation",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-saprouter",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-security-patch",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-self-learn",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-skills",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-smartform-generator",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-system-lifecycle",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-transport-gate",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-transport-management",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-transport-mgmt",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-web-dispatcher",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sap-workflow-pipeline",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "sapui5-framework",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "slice-init",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "superclaude-for-sap",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "ui-theme-designer-design-tokens",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "ui-theme-designer-help",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "ui-ux-pro-max",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "ui5-best-practices",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "ui5-best-practices-accessibility",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "ui5-best-practices-integration-cards",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "ui5-best-practices-mdc",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "ui5-best-practices-opa5",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "ui5-best-practices-qunit",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "ui5-best-practices-smart-controls",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "ui5-best-practices-tables",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "ui5-typescript-conversion",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "understand-anything",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    },
+    {
+      "skill": "vaibe-sap-developer",
+      "metadata_valid": true,
+      "errors": [],
+      "unresolved_links": []
+    }
+  ]
+}

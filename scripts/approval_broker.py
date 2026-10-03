@@ -12,11 +12,12 @@ import json
 import getpass
 import sys
 import uuid
+import os
 from datetime import datetime, timedelta, UTC
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-STORE = ROOT / ".sap-router" / "actions"
+STORE = Path(os.environ.get("SAP_ROUTER_STATE_DIR", str(ROOT / ".sap-router"))) / "actions"
 
 
 def now() -> str:
@@ -78,6 +79,8 @@ def approval_signature(data: dict) -> str:
 
 
 def plan_file(action_id: str) -> Path:
+    if not action_id or any(c not in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_' for c in action_id):
+        raise ValueError('invalid-action-id')
     return STORE / f"{action_id}.json"
 
 
@@ -151,6 +154,7 @@ def check_spendable(
     plan_hash_arg: str | None = None,
     argument_hash_arg: str | None = None,
     precondition_hash_arg: str | None = None,
+    allow_inflight: bool = False,
 ) -> dict:
     """Every check `consume` makes, without spending the approval.
 
@@ -167,6 +171,8 @@ def check_spendable(
         return {"status": "ERROR", "error": "approval-already-consumed", "action_id": action_id}
     if data.get("status") != "APPROVED":
         return {"status": "ERROR", "error": "approval-not-approved", "action_id": action_id, "current_status": data.get("status")}
+    if datetime.now(UTC) > parse_time(data['expires_at']):
+        return {"status": "ERROR", "error": "approval-expired", "action_id": action_id}
     if data.get("effect") in {"mutating", "destructive"} and not plan_hash_arg:
         return {"status": "ERROR", "error": "plan-hash-required", "action_id": action_id, "plan_hash": data.get("plan_hash")}
     if plan_hash_arg and plan_hash_arg != data.get("plan_hash"):
@@ -178,6 +184,21 @@ def check_spendable(
     expected_signature = approval_signature(data)
     if data.get("approval_signature") != expected_signature:
         return {"status": "ERROR", "error": "approval-signature-mismatch", "action_id": action_id}
+    if not allow_inflight and plan_file(action_id).with_suffix('.execution').exists():
+        return {"status": "ERROR", "error": "reconciliation-required", "action_id": action_id}
+    return data
+
+
+def begin(action_id, plan_hash_arg=None, argument_hash_arg=None, precondition_hash_arg=None):
+    data = check_spendable(action_id, plan_hash_arg, argument_hash_arg, precondition_hash_arg)
+    if data.get('status') == 'ERROR':
+        return data
+    try:
+        # Atomic reservation prevents concurrent calls and uncertain-outcome replay.
+        with plan_file(action_id).with_suffix('.execution').open('x', encoding='utf-8') as handle:
+            json.dump({'started_at': now(), 'state': 'IN_FLIGHT'}, handle)
+    except FileExistsError:
+        return {'status': 'ERROR', 'error': 'reconciliation-required', 'action_id': action_id}
     return data
 
 
@@ -187,7 +208,7 @@ def consume(
     argument_hash_arg: str | None = None,
     precondition_hash_arg: str | None = None,
 ) -> dict:
-    data = check_spendable(action_id, plan_hash_arg, argument_hash_arg, precondition_hash_arg)
+    data = check_spendable(action_id, plan_hash_arg, argument_hash_arg, precondition_hash_arg, allow_inflight=True)
     if data.get("status") == "ERROR":
         return data
     data["status"] = "CONSUMED"
@@ -221,6 +242,11 @@ def main() -> int:
     verify_p.add_argument("--plan-hash")
     verify_p.add_argument("--argument-hash")
     verify_p.add_argument("--precondition-hash")
+    begin_p = sub.add_parser('begin', help='Reserve approved execution; uncertain outcomes cannot replay.')
+    begin_p.add_argument('action_id')
+    begin_p.add_argument('--plan-hash')
+    begin_p.add_argument('--argument-hash')
+    begin_p.add_argument('--precondition-hash')
     consume_p = sub.add_parser("consume")
     consume_p.add_argument("action_id")
     consume_p.add_argument("--plan-hash")
@@ -228,7 +254,23 @@ def main() -> int:
     consume_p.add_argument("--precondition-hash")
     status_p = sub.add_parser("status")
     status_p.add_argument("action_id")
+    for command_parser in (verify_p, begin_p, consume_p):
+        command_parser.add_argument('--arguments-json')
+        command_parser.add_argument('--preconditions-json')
     args = parser.parse_args()
+
+    if args.command in {'verify', 'begin', 'consume'}:
+        try:
+            for field, raw_field in [('argument_hash', 'arguments_json'), ('precondition_hash', 'preconditions_json')]:
+                raw = getattr(args, raw_field)
+                if raw is not None:
+                    actual = json_hash(raw)
+                    if getattr(args, field) and getattr(args, field) != actual:
+                        raise ValueError(field.replace('_', '-') + '-mismatch')
+                    setattr(args, field, actual)
+        except ValueError as exc:
+            print(json.dumps({'status': 'ERROR', 'error': str(exc)}))
+            return 1
 
     if args.command == "plan":
         try:
@@ -252,6 +294,8 @@ def main() -> int:
         result = hash_document(args.json)
     elif args.command == "verify":
         result = check_spendable(args.action_id, args.plan_hash, args.argument_hash, args.precondition_hash)
+    elif args.command == 'begin':
+        result = begin(args.action_id, args.plan_hash, args.argument_hash, args.precondition_hash)
     elif args.command == "consume":
         result = consume(args.action_id, args.plan_hash, args.argument_hash, args.precondition_hash)
     elif args.command == "status":

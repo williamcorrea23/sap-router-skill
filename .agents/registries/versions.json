@@ -1,7 +1,15 @@
 {
   "schema_version": 1,
-  "release_target": "7.0.0",
-  "skill_count_target": 165,
+  "release_target": "7.1.0",
+  "skill_count_target": 203,
+  "skill_count_components": {
+    "tracked_baseline": 168,
+    "github_spec_kit": 11,
+    "preexisting_local_engine_cap_development": 1,
+    "verification_loop": 1,
+    "sap_basis_ops_new_skills": 21,
+    "sap_odata_cli_skill_only": 1
+  },
   "profile_count_target": 38,
   "caveman_workers": 3,
   "official_mcp_versions": {
@@ -9,5 +17,8 @@
     "ui5-mcp-server": "0.2.14",
     "cap-mcp-server": "0.0.5",
     "playwright-mcp": "0.0.78"
+  },
+  "official_skill_versions": {
+    "github-spec-kit": "1.0.6"
   }
 }

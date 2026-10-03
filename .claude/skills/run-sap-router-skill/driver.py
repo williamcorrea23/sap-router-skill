@@ -32,13 +32,13 @@ failed = 0
 
 def run(args):
     return subprocess.run(
-        [PY] + args, capture_output=True, text=True, cwd=UNIT_ROOT
+        [PY] + args, capture_output=True, text=True, cwd=UNIT_ROOT, timeout=45
     )
 
 
 def run_raw(args, input_text=None):
     return subprocess.run(
-        args, input=input_text, capture_output=True, text=True, cwd=UNIT_ROOT
+        args, input=input_text, capture_output=True, text=True, cwd=UNIT_ROOT, timeout=45
     )
 
 
@@ -54,6 +54,8 @@ def check(name, cond, detail=""):
 
 def main():
     work = tempfile.mkdtemp(prefix="zrouter_smoke_")
+    os.environ["SAP_ROUTER_OFFLINE"] = "1"
+    os.environ["SAP_ROUTER_STATE_DIR"] = work
     mem = os.path.join(work, "MEMORY.md")
     pipe_mem = os.path.join(work, "pipe_mem.md")
     # Hermetic ZROUTER opt-in state: keep the persisted decision inside the temp
@@ -455,7 +457,7 @@ def main():
     r = run_raw(["node", "scripts/web_ui_mcp_bridge.mjs", "--product", "cpi"], webui_payload)
     check("web UI MCP tools/list", r.returncode == 0 and "capture_evidence" in r.stdout, r.stderr or r.stdout)
 
-    r = run(["scripts/healthcheck.py", "--quiet", "--json", "--v6"])
+    r = run(["scripts/healthcheck.py", "--quiet", "--json", "--v6", "--offline", "--read-only"])
     check("healthcheck v6 readiness present", '"readiness_v6"' in r.stdout, r.stderr or r.stdout)
 
     r = run(["scripts/sap_router.py", "cpi-live", "--help"])

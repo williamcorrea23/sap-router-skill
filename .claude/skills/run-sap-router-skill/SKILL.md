@@ -15,10 +15,10 @@ trigger:
 # Run: sap-router-skill
 
 > **Multi-IDE:** Same `driver.py` works on Claude, Codex, Gemini Antigravity, and Cursor.
-> Codex → this file. Antigravity → `.gemini/skills/run-sap-router-skill/SKILL.md`.
-> Codex → `AGENTS.md` at unit root. All point to the same driver.
+> Canonical driver: `.agents/skills/run-sap-router-skill/driver.py`.
+> IDE wrappers and generated mirrors point to this canonical procedure.
 
-The repository now contains 40 Python operational scripts under `scripts/`.
+The repository contains Python operational scripts under `scripts/`.
 The core smoke gate remains self-contained: **no live SAP system, network,
 or credentials needed** — routing is a static lookup table, `memory_manager`
 is local file I/O, `xls_to_bapi` parses CSV/XLSX. Everything runs offline.
@@ -51,27 +51,26 @@ All paths below are relative to the unit root (`sap-router-skill/`).
 
 ## Prerequisites
 
-- Python 3.8+ (verified on 3.14.4). On Windows the interpreter is `python`.
+- Python 3.11+ for the router and controlled harness. On Windows the interpreter is `python`.
 - No third-party packages required for CSV. **XLSX support is optional** —
   `pip install openpyxl` only if you pass `.xlsx` files; `.csv` always works.
 
 ## Run (agent path) — smoke driver
 
 ```bash
-python .Codex/skills/run-sap-router-skill/driver.py
+python .agents/skills/run-sap-router-skill/driver.py
 ```
 
-Exit `0` = all 78 checks passed; `1` = a check failed (offending line printed).
+Exit `0` = all checks reported by the driver passed; `1` = a check failed
+(offending line printed). The final output reports the current check count.
 The driver creates and deletes its own temp workspace — it touches no project
 files (ZROUTER opt-in state is redirected to a temp file via
 `SAP_ROUTER_OPTIN_FILE`, so the smoke run never mutates the real decision).
 Use it as the regression gate after editing any script in `scripts/`.
 
-Verified output this session:
-
-```text
-78 passed, 0 failed
-```
+Record the command, exit status and final counts from the actual run as
+verification evidence. Driver success covers its offline smoke checks;
+live SAP acceptance requires a response for the requested target and operation.
 
 ## Run (manual, individual CLIs)
 

@@ -5,6 +5,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from isolated_runtime import run as isolated_run
 from pathlib import Path
 from unittest import mock
 
@@ -19,6 +20,17 @@ from sap_router_core.registry import classify_task, resolve_servers_for_capabili
 
 
 class CpiCollectionContractTest(unittest.TestCase):
+    def test_connection_proves_a_bounded_collection_read(self):
+        with mock.patch.object(cpi_client, 'query_cpi_odata', return_value={'d': {'results': []}}) as query:
+            self.assertEqual(cpi_client.test_connection()['status'], 'OK')
+        query.assert_called_once_with('/api/v1/IntegrationPackages', params={'$top': 1})
+
+    def test_connection_rejects_login_or_unrelated_payloads(self):
+        for payload in ['<html>Login</html>', {}, {'status': 'OK'}]:
+            with mock.patch.object(cpi_client, 'query_cpi_odata', return_value=payload):
+                with self.assertRaisesRegex(ValueError, 'OData collection'):
+                    cpi_client.test_connection()
+
     def test_collection_result_has_stable_pagination_shape(self):
         payload = {"d": {"results": [{"Id": "A"}, {"Id": "B"}], "__count": "5"}}
         result = cpi_client.collection_result(payload, source="fixture", limit=2, offset=0)
@@ -90,13 +102,13 @@ class CpiLocalSafetyTest(unittest.TestCase):
         self.assertIn("No download", result["error"])
 
     def test_external_tool_runs_argument_vector_without_shell(self):
-        os.environ["CPILINT_CMD"] = sys.executable
+        os.environ["CPILINT_CMD"] = f'"{sys.executable}"'
         result = cpi_client.run_external("cpilint", ["-c", "print('adapter-ok')"])
         self.assertEqual(result["status"], "OK", result)
         self.assertEqual(result["stdout"].strip(), "adapter-ok")
 
     def test_external_tool_timeout_is_actionable(self):
-        os.environ["CPILINT_CMD"] = sys.executable
+        os.environ["CPILINT_CMD"] = f'"{sys.executable}"'
         result = cpi_client.run_external("cpilint", ["-c", "import time; time.sleep(2)"], timeout=1)
         self.assertEqual(result["status"], "ERROR")
         self.assertIn("timed out", result["error"])
@@ -131,12 +143,21 @@ class CpiApprovalContractTest(unittest.TestCase):
             action_id="action-1", plan_hash="plan-hash",
             argument_hash="argument-hash", precondition_hash="precondition-hash",
         )
-        with mock.patch.object(cpi_client, "run_approval_broker") as broker:
-            cpi_client.consume_plan(args, {"a": 1}, {"ready": True})
-        command = broker.call_args.args[0]
+        arguments, preconditions = {"a": 1}, {"ready": True}
+        args.argument_hash = cpi_client.json_sha256(arguments)
+        args.precondition_hash = cpi_client.json_sha256(preconditions)
+        def broker_reply(command):
+            if command[0] == "show":
+                return {"argument_hash": args.argument_hash}
+            return {"status": "APPROVED"}
+        with mock.patch.object(cpi_client, "run_approval_broker", side_effect=broker_reply) as broker:
+            result = cpi_client.with_approval(args, arguments, preconditions, lambda: {"status": "OK"})
+        self.assertEqual(result['approval'], 'spent')
+        self.assertEqual([item.args[0][0] for item in broker.call_args_list], ['show', 'verify', 'begin', 'consume'])
+        command = broker.call_args_list[-1].args[0]
         self.assertEqual(command[:3], ["consume", "action-1", "--plan-hash"])
-        self.assertIn("argument-hash", command)
-        self.assertIn("precondition-hash", command)
+        self.assertIn(args.argument_hash, command)
+        self.assertIn(args.precondition_hash, command)
 
 
 class CpiMcpContractTest(unittest.TestCase):
@@ -178,7 +199,7 @@ class CpiMcpContractTest(unittest.TestCase):
             {"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}},
             {"jsonrpc": "2.0", "id": 3, "method": "tools/call", "params": {"name": "cpi_external_tools_status", "arguments": {}}},
         ]
-        proc = subprocess.run(
+        proc = isolated_run(
             [sys.executable, "scripts/sap_integration_mcp.py", "--product", "cpi"],
             cwd=ROOT,
             input="".join(json.dumps(item) + "\n" for item in requests),

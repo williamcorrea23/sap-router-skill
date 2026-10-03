@@ -14,7 +14,7 @@
     "codex_openai": "AGENTS.md"
   },
   "prerequisites": {
-    "runtime": "python>=3.8",
+    "runtime": "python>=3.11",
     "packages": { "required": [], "optional": ["openpyxl (for .xlsx files)"] }
   },
   "scripts": {

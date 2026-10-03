@@ -4,7 +4,7 @@
       "type": "stdio",
       "command": "node",
       "args": [
-        "bundled/tools/context-mode/start.mjs"
+        "scripts/context_mode_safe.mjs"
       ],
       "env": {
         "CONTEXT_MODE_PLATFORM": "codex"
@@ -13,8 +13,11 @@
     },
     "arc-1": {
       "type": "stdio",
-      "command": "npx",
+      "command": "python",
       "args": [
+        "scripts/mcp_launcher.py",
+        "run",
+        "--server",
         "arc-1"
       ],
       "env": {
@@ -133,33 +136,50 @@
     },
     "ui5-mcp": {
       "type": "stdio",
-      "command": "npx",
+      "command": "python",
       "args": [
-        "-y",
-        "@ui5/mcp-server@0.2.14"
+        "scripts/mcp_launcher.py",
+        "run",
+        "--server",
+        "ui5-mcp"
       ],
       "env": {},
       "description": "SAPUI5 tooling MCP. Project validation, UI5 linter, API reference and Web Components rendering guidance."
     },
     "fiori-mcp": {
       "type": "stdio",
-      "command": "npx",
+      "command": "python",
       "args": [
-        "-y",
-        "@sap-ux/fiori-mcp-server@1.8.1"
+        "scripts/mcp_launcher.py",
+        "run",
+        "--server",
+        "fiori-mcp"
       ],
       "env": {},
       "description": "SAP Fiori tools MCP. Fiori Elements app generation, manifest inspection and application modification."
     },
     "cap-mcp": {
       "type": "stdio",
-      "command": "npx",
+      "command": "python",
       "args": [
-        "-y",
-        "@cap-js/mcp-server@0.0.5"
+        "scripts/mcp_launcher.py",
+        "run",
+        "--server",
+        "cap-mcp"
       ],
       "env": {},
       "description": "SAP CAP MCP. CDS model search and CAP project build."
+    },
+    "engine-cap-devops": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "tools/engine-cap-devops/dist/index.js"
+      ],
+      "env": {
+        "ENGINE_CAP_CONFIG": "tools/engine-cap-devops/config.local.json"
+      },
+      "description": "Local Engine CAP DevOps MCP. Read-only by default; writes require local allowWrites=true, immutable revisions, DEV_ONLY guard, and journal reconciliation."
     }
   },
   "plannedServers": {
@@ -953,6 +973,86 @@
       "repository": "https://github.com/mario-andreschak/mcp-sap-gui",
       "description": "mario-andreschak/mcp-sap-gui - SAP GUI automation MCP (alternative to mcp-sap-gui).",
       "blockedBy": "Upstream source not vendored; bundled/mcps/<id>/ holds a pointer README only."
+    },
+    "syntaai-sap-security-mcp": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "dist/index.js"
+      ],
+      "env": {},
+      "description": "SYNTAAI/sap-security-mcp — SAP security analysis and compliance auditing via MCP (19 read-only tools for user access reviews, SoD violation checks, critical authorizations, SOX, GDPR, ISO 27001, RFC security).",
+      "_status": "planned",
+      "_reason": "not promoted from mcp-candidates.json"
+    },
+    "kts982-sap-odata-explorer": {
+      "type": "stdio",
+      "command": "python",
+      "args": [
+        "-m",
+        "sap_odata_explorer.server"
+      ],
+      "env": {},
+      "description": "kts982/sap-odata-explorer — Desktop app and CLI for SAP Gateway OData service discovery, entity metadata with decoded SAP/UI5 annotations, test queries, and Fiori-readiness lint.",
+      "_status": "planned",
+      "_reason": "not promoted from mcp-candidates.json"
+    },
+    "nicohern-abapilot-mcp": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "dist/index.js"
+      ],
+      "env": {},
+      "description": "NicoHern/abapilot-mcp — ABAPilot MCP Connector, stdio bridge to the in-system ABAPilot backend for ECC 6.0 and on-premise S/4HANA without requiring ADT or BTP.",
+      "_status": "planned",
+      "_reason": "not promoted from mcp-candidates.json"
+    },
+    "arc-mcp-hub": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "dist/index.js"
+      ],
+      "env": {},
+      "description": "arc-mcp/mcp-hub — Thin deterministic multi-system MCP hub fronting multiple ARC-1 instances (DEV/QA/PROD) behind one BTP front door with single sign-on.",
+      "_status": "planned",
+      "_reason": "not promoted from mcp-candidates.json"
+    },
+    "sap-btp-admin-mcp": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "dist/index.js"
+      ],
+      "env": {},
+      "description": "Official SAP-hosted remote MCP service for BTP account administration, security, services, and connectivity management with SSO.",
+      "_status": "planned",
+      "_reason": "not promoted from mcp-candidates.json"
+    },
+    "sap-joule-a2a-toolkit": {
+      "type": "stdio",
+      "command": "python",
+      "args": [
+        "-m",
+        "joule_a2a_toolkit.server"
+      ],
+      "env": {},
+      "description": "SAP-samples/joule-a2a-agent-toolkit — Skills and tooling for BTP/CF/Joule CLIs and building/deploying custom Joule A2A (agent-to-agent) agents on SAP BTP.",
+      "_status": "planned",
+      "_reason": "not promoted from mcp-candidates.json"
+    },
+    "dnic-bw-modeling-mcp": {
+      "type": "stdio",
+      "command": "python",
+      "args": [
+        "-m",
+        "bw_modeling_mcp.server"
+      ],
+      "env": {},
+      "description": "dnic-dev/bw-modeling-mcp — BW Modeling MCP Server for SAP BW/4HANA objects via internal BWMT REST API.",
+      "_status": "planned",
+      "_reason": "not promoted from mcp-candidates.json"
     }
   },
   "_plannedServersNote": "Entries here are NOT launched. They are either candidates from .agents/registries/mcp-candidates.json that were never promoted (the fail-closed policy scripts/mcp_launcher.py enforces), or reviewed servers whose declared entrypoint does not exist on disk. Promote one by installing its entrypoint, adding it to .agents/registries/mcps.json, then moving the block back into mcpServers.",
