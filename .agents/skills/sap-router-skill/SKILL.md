@@ -3,9 +3,10 @@ name: sap-router-skill
 description: >-
   SAP development orchestrator v7.1.0 — Karpathy command format (Think→Simplify→
   Surgical→Verify), healthcheck guardian, self-learning router, caveman-compressed
-  output default. Delegates small-scope work to the cavecrew subagents automatically:
-  find/search/locate → cavecrew-investigator, fix/edit/rename/typo → cavecrew-builder,
-  review/audit/diff → cavecrew-reviewer.
+  output default. Classifies small-scope work for available host agents:
+  find/search/locate → investigator, fix/edit/rename/typo → builder,
+  review/audit/diff → reviewer. Requires bounded loops and independent verification
+  before reporting an execution outcome.
   Multi-protocol: HTTP/OData/RFC/SOAP RFC/BDC. ZROUTER v5 REST gateway. Install pipeline: YDOWN→ZABAPGIT→ZSAPLINK. BDC engine: YFG_SBDC. Test suites: ZODATA_TEST_AUTOMATION_FGR.
   Use for any SAP task.
 ---
@@ -27,30 +28,52 @@ configured or invalid; never assume the user's current project is the router rep
 
 ---
 
-## Principle -1 — Delegate Before You Work (RUN FIRST)
+## Required agent execution protocol
 
-**Before doing anything else, classify the request and delegate.** Small-scope work must
-NOT be done in the main context — it goes to a cavecrew subagent via the `Agent` tool.
-This is the single largest token saving in the whole router; skipping it wastes the
-main context on work a cheaper agent handles better.
+Before dispatch or a delegated turn, load
+`../karpathy-guidelines/SKILL.md`, `../loop-specification/SKILL.md`, and
+`../verification-loop/SKILL.md`. The selected canonical profile's
+`execution_protocols` applies to the maker, checker, and any delegated agent.
+Every agent inherits the requested goal, target, allowed scope, capability
+policy, limits, and evidence requirements; delegation cannot expand them.
 
-Match the request against this table. On a match, **immediately call the `Agent` tool**
-with the given `subagent_type` and stop — do not pre-read files, do not pre-search, do
-not "just check something first". The subagent does the reading.
+Define an observable goal, named domain skills, independent verifier, durable
+state, and stopping rules. Each iteration makes one accepted change. Default
+limits are eight iterations, 900 seconds total, 120 seconds per call, and three
+stagnant iterations. Maker and model checker use separate fresh processes.
+Record `PASS`, `FAIL`, or `NOT_RUN` with level, command/tool, requested target,
+observed result, and evidence reference. A missing check needs a reason.
+
+Finish with `Success`, `No-Op`, `Blocked`, `Stalled`, or `Exhausted`.
+`PENDING_APPROVAL` is a resumable checkpoint for a concrete guarded action.
+Use the approval broker for canonical gated capabilities; preserve exact target
+and arguments, and reconcile any uncertain mutation before retry or fallback.
+Report `Success` only when required goal checks pass. Field SAP acceptance
+requires the actual requested target's response; offline fixtures, tool listings,
+generated plans, and model judgments cannot supply that evidence.
+
+## Principle -1 — Delegate a bounded scope
+
+Classify the request and use an available host agent for independent work when
+it helps. The route command returns suggested agent names; it does not launch
+them. Verify the host exposes the requested agent/tool before dispatch. If a
+suggested cavecrew agent is unavailable, use a supported equivalent with explicit
+ownership or execute the bounded scope in the current agent context.
 
 | Request looks like | `subagent_type` | Why |
 |---|---|---|
-| find, search, locate, "where is", look up, grep, scan for | `cavecrew-investigator` | read-only lookup, runs on haiku |
+| find, search, locate, "where is", look up, grep, scan for | `cavecrew-investigator` | read-only lookup |
 | fix, edit, change, rename, remove, add method/field, typo, "single file", "small change" | `cavecrew-builder` | surgical 1-2 file edit |
 | review, audit, "check diff", "review this", PR review, merge request | `cavecrew-reviewer` | severity-tagged findings |
 
 Rules:
 
 1. **Builder before investigator.** If the request is to *change* something, send it
-   straight to `cavecrew-builder` — it does its own locating. Do not run an
+   to an available builder — it does its own locating. Do not run an
    investigator pass first.
-2. **One agent, one call.** Pass the user's request plus the concrete file paths you
-   already know. Never paste file contents into the prompt — the agent reads them.
+2. **Explicit ownership.** Pass the user's request, concrete file paths, execution
+   protocol, and verification goal. Tell the agent it shares the workspace and must
+   preserve concurrent edits. The agent reads its files directly.
 3. **Honour the refusal.** `cavecrew-builder` returns `REFUSE: <reason>` when the change
    exceeds 2 files, adds a feature, or spans a refactor. That is a correct outcome:
    take the work back into the main context and proceed with the full flow below.
@@ -68,8 +91,8 @@ To confirm the routing decision programmatically:
 python scripts/sap_router.py route --action "<the user request>"
 ```
 
-A `strategy` of `caveman-surgical`, `caveman-readonly`, or `caveman-diff-review` means
-delegate; the `agent_type` field names the exact `subagent_type` to pass.
+A `strategy` of `caveman-surgical`, `caveman-readonly`, or `caveman-diff-review`
+suggests delegation; the `agent_type` field names the intended host agent.
 
 ---
 
@@ -129,10 +152,10 @@ User Request
     │
     ▼
 1. CAVEMAN scope? (find/fix/review, 1-2 files)
-    │ YES → call Agent tool NOW, subagent_type=
+    │ YES → verify host agent availability, then delegate to
     │       cavecrew-investigator | cavecrew-builder | cavecrew-reviewer
-    │ STOP here — do not read/search first. See Principle -1.
-    │ 60% token savings. Caveman-compressed output.
+    │ Carry goal, ownership, limits and verification. See Principle -1.
+    │ Caveman-compressed output.
     ▼
 2. ADT available? (read_source, search, syntax_check, activate)
     │ YES → arc-1 (primary) or aibap (secondary)
@@ -158,7 +181,9 @@ User Request
     │   ONLY if the user opted in (zrouter accept). Never the default.
     ▼
 6. Spec → code? (implement specification, full workflow)
-    │ YES → sap_router.py pipeline → 8 stages
+    │ Check sap_router.py spec-kit --task "<request>"
+    │ broad change or explicit request → sap-spec-kit → Spec Kit artifacts
+    │ then sap_router.py pipeline → 8 stages
     │ Stage 1: Spec Analysis → Stage 8: Transport Gate
     ▼
 7. LLM optimization? (prompt engineering, eval harness)
@@ -201,7 +226,7 @@ SAP-specific surgical rules:
 - If you notice unrelated dead code → mention it, don't delete
 
 Caveman compression is the SURGICAL default:
-- Drop articles/filler → 60% fewer tokens
+- Drop articles/filler while retaining evidence and limitations
 - Code blocks preserved exactly
 - Security warnings use full clarity
 
@@ -209,15 +234,20 @@ Caveman compression is the SURGICAL default:
 
 ## Principle 4 — Goal-Driven Execution
 
-**Define success criteria. Loop until verified.**
+**Define success criteria. Execute the bounded loop and report its observed state.**
+
+Follow the required agent execution protocol and `verification-loop` above.
+The domain checklist below defines evidence to collect when its operation is
+authorized and in scope. Mark checks `NOT_RUN` when their target or tooling is
+unavailable; state the reason and keep required acceptance incomplete.
 
 Every SAP operation follows this pattern:
 
 ```
 1. [Spec Analysis]     → verify: module identified, BAPIs listed
-2. [Technical Proposal] → verify: reviewed by sap-crew-analysis (7 agents)
+2. [Technical Proposal] → verify: applicable independent review completed
 3. [Implementation]     → verify: syntax OK, abaplint pass, unit tests green
-4. [Peer Review]        → verify: 9-dimension score >= 70/100
+4. [Peer Review]        → verify: current canonical reviewer acceptance criteria met
 5. [Transport]          → verify: transport gate GO, objects in task
 ```
 
@@ -228,9 +258,9 @@ Every SAP operation follows this pattern:
 [ ] aibap syntax_check → no errors
 [ ] npm run abap:lint → pass
 [ ] aibap run_unit_tests → all green
-[ ] sap-crew-analysis (quick mode) → score >= 70
-[ ] abap-code-review (9 dimensions) → GO
-[ ] sap-transport-gate (10 dimensions) → GO
+[ ] sap-crew-analysis → current review contract met
+[ ] abap-code-review → GO under current canonical rubric
+[ ] sap-transport-gate → GO under current canonical contract
 ```
 
 **BAPI/Material Create:**
@@ -296,13 +326,14 @@ npm run learn:ctx
 | "create material/order" (functional) | BAPI dispatch (--functional) | BAPI → BAPIRET2 check → MM03/VA03 verify. ZROUTER only if opted in. |
 | functional write w/o --functional | needs-functional-context | classify only — no BAPI fired out of context |
 | "call BAPI without JCo" / "BAPI via HTTP" | SOAP RFC | HTTP POST /sap/bc/soap/rfc → parse SOAP response → verify |
-| "run stages in parallel" / big spec | dispatch-plan / crew-dispatch | emit wave plan; same-wave agents launch concurrently |
+| "run stages in parallel" / big spec | dispatch-plan / crew-dispatch | emit wave plan; available host execution must be observed separately |
 | "SPRO / SM30 / SU01 / MM01 / VA01..." | GUI IMMEDIATE | mcp-sap-gui navigate → execute → verify |
 | "GUI data missing for tcode X" | GUI + web enrich | WebSearch SAP Help → build BDC → cache |
-| "find/where is X" | `Agent(subagent_type="cavecrew-investigator")` | delegate immediately → 60% token savings |
+| "find/where is X" | available investigator host agent | bounded read-only lookup with returned evidence |
 | "fix typo in ZCL_X line 42" | `Agent(subagent_type="cavecrew-builder")` | 1-2 file surgical edit; honour `REFUSE:` |
-| "review diff/PR" | `Agent(subagent_type="cavecrew-reviewer")` | severity-tagged findings, read-only |
+| "review diff/PR" | available reviewer host agent | severity-tagged findings, read-only |
 | "implement spec" | Pipeline 8-stage | spec → proposal → implement → lint → review → transport |
+| new feature / API or data contract / integration | sap-spec-kit | specify → plan → tasks → router pipeline → converge |
 | "healthcheck" | healthcheck.py | .env check → MCP probes → missing prompt |
 | "learn from this" | self_learn.py | record outcome → adapt routing → persist |
 | "RAG search for X" | RAG connector | Pinecone/Supabase/Azure → retrieve → generate |
@@ -312,10 +343,12 @@ npm run learn:ctx
 
 ## Project inventory
 
-Canonical source: `.agents/`. There are 165 skills and 11 enabled MCP servers.
-The 62 disabled candidates plus the planned SmartForms entry are not launchable.
-Use `python scripts/validate_catalog.py --strict` and
-`python scripts/source_catalog.py search "task description"` for current inventory.
+Canonical source: `.agents/`. Query the local registries for current inventory;
+fixed skill/MCP counts in narrative documentation are not authoritative.
+Use `python scripts/validate_catalog.py --strict`,
+`python scripts/source_catalog.py search "task description"`, and
+`python scripts/mcp_launcher.py search --query "task description"`.
+Disabled candidates and planned entries are not launchable.
 Regenerate IDE assets rather than copying edited skill bodies.
 For Python runtime requirements, follow each executable's actual version constraint.
 

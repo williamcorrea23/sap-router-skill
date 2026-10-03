@@ -7,9 +7,9 @@
 > action: ADT direct, SAP GUI fallback, SOAP RFC, or ZROUTER batch. Writes are
 > gated behind an explicit `--functional` flag, so no BAPI fires by accident.
 >
-> **165 skills | 11 active MCPs + 63 fail-closed candidates | 44 CLIs | 8-stage pipeline | ZROUTER Remote FS**
+> **203 skills | 12 active MCPs + 70 fail-closed candidates | 44 CLIs | 8-stage pipeline | ZROUTER Remote FS**
 
-> **Status, honestly.** 11 MCP servers launch from a clean clone. The other 63
+> **Status, honestly.** 12 MCP servers launch from a clean clone. The other 70
 > reviewed entries sit under `plannedServers` in `.mcp.json` because their entrypoint is
 > not installed, or their upstream source was never vendored — `bundled/mcps/<id>/` holds a
 > pointer README, not code. A server in `plannedServers` **never routes**: capability
@@ -288,11 +288,14 @@ Testing a proxy executes whatever sits behind it, so `apim_test_proxy` only issu
 
 ---
 
-## Complete Skill Catalog (165 skills)
+## Skill Catalog (203 skills)
+
+The canonical inventory is .agents/skills. This table contains selected examples by domain;
+use scripts/source_catalog.py search "<task>" to discover the full catalog.
 
 ### Skill Categories
 
-| Domain | Count | Skills |
+| Domain | Listed examples | Skills |
 |---|---|---|
 | **ABAP Core** | 15 | `abap`, `abap-cloud`, `abap-cloud-migration`, `abap-code-patterns`, `abap-sql-amdp`, `abap-unit-testing`, `abapgit`, `atc-cloudification`, `authorization-iam`, `badi-enhancement`, `clean-abap`, `rap`, `rap-business-events`, `cds-view-entities`, `released-abap-classes` |
 | **SAP BTP Platform** | 18 | `btp-abap-environment`, `btp-best-practices`, `btp-build-work-zone`, `btp-business-application-studio`, `btp-cias`, `btp-cloud-identity`, `btp-cloud-logging`, `btp-cloud-platform`, `btp-cloud-transport-management`, `btp-connectivity`, `btp-developer-guide`, `btp-diagram-generator`, `btp-integration-suite`, `btp-job-scheduling`, `btp-master-data-integration`, `btp-service-manager`, `sap-btp-audit-log`, `sap-btp-credential-store` |
@@ -303,12 +306,13 @@ Testing a proxy executes whatever sits behind it, so `apim_test_proxy` only issu
 | **Router / Tooling** | 8 | `run-sap-router-skill`, `sap-transport-management`, `sap-crew-analysis`, `sap-rap-gen`, `sap-rpt1`, `sap-sac-test-automation`, `sap-api-policy`, `sap-workflow-pipeline` |
 | **v4.5.0 NEW** | 5 | **`karpathy-guidelines`**, **`sap-gui-scripting`**, **`sap-gui-web-enrich`**, **`sap-self-learn`**, **`sap-llm-engineering`** |
 | **Shared** | 1 | `abap-code-review` (GitHub: `shrek-abaper/sap-engineering-skill`) |
+| **Agent workflow / Spec Kit** | 13 | karpathy-guidelines, loop-specification, verification-loop, engine-cap-development, sap-spec-kit, speckit-analyze, speckit-checklist, speckit-clarify, speckit-constitution, speckit-converge, speckit-implement, speckit-plan, speckit-specify |
 
 ---
 
 ## MCP Server Reference
 
-### Active — 11 servers that launch from a clean clone
+### Active — 12 servers that launch from a clean clone
 
 These are the entries in `.mcp.json` `mcpServers`. Only these can be selected by capability
 routing.
@@ -326,8 +330,9 @@ routing.
 | 9 | `fiori-mcp` | stdio (npx) | LOW | SAP Fiori tools — Fiori Elements generation, app modification |
 | 10 | `cap-mcp` | stdio (npx) | LOW | SAP CAP — CDS model search, project build |
 | 11 | `context-mode` | stdio (node) | LOW | Sandboxed execution + context compression |
+| 12 | `engine-cap-devops` | stdio (local) | LOW | CAP project audit and pipeline preview |
 
-### Planned — 63 reviewed candidates, none launchable
+### Planned — 70 reviewed candidates, none launchable
 
 Listed under `plannedServers` in `.mcp.json` and described in
 `.agents/registries/mcp-candidates.json`. Each carries an explicit `blockedBy` / `reason`.
@@ -418,12 +423,12 @@ sap-router-skill/
 ├── SKILL.md                     ← Master dispatch (Karpathy wrapper)
 ├── COMPARISON.md                ← 72-repo cross-reference analysis
 ├── CHANGELOG.md                 ← Version history
-├── .mcp.json                    ← 11 active servers + 63 under plannedServers
+├── .mcp.json                    ← 12 active servers + 70 under plannedServers
 ├── .env.template                ← 40+ env vars grouped by domain
 ├── .abaplint.json               ← 60+ ABAP lint rules
 ├── package.json                 ← 90 npm scripts
 │
-├── .claude/skills/              ← 165 skills (generated from .agents/skills)
+├── .claude/skills/              ← 203 skills (generated from .agents/skills)
 │   ├── karpathy-guidelines/     ← v4.0: Think→Simplify→Surgical→Verify
 │   ├── sap-gui-scripting/       ← SAP GUI automation + BDC + ALV
 │   ├── sap-gui-web-enrich/      ← Web-search fill missing nav data

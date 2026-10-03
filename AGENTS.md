@@ -1,18 +1,48 @@
+# SAP Router Skill for Codex
+
+Canonical source: `.agents/`.
+Karpathy wrapper: mandatory. Caveman compression: default.
+Do not copy or fork skill bodies here; regenerate from canonical source.
+
+Runtime root:
+- `SAP_ROUTER_ROOT` must point to the canonical sap-router-skill repository.
+- change the working directory to `SAP_ROUTER_ROOT` before relative commands.
+- fail closed if `scripts/source_catalog.py` is not present there.
+
+Dynamic local discovery:
+- search skills: `python scripts/source_catalog.py search "task description"`
+- search MCPs: `python scripts/mcp_launcher.py search --query "task description"`
+- bundled MCPs are disabled candidates until reviewed; no runtime GitHub lookup.
+
+Local optimization:
+- prefer `rtk` for supported verbose CLI commands.
+- use Context Mode for large outputs, indexed fetches, and session checkpoints.
+
+Parity proof:
+- skills: 203 sha256:046f6d52886520160ec0c76373806fd76f42ea8b489ebbe57b54e61fd29919fd
+- profiles: 38 sha256:e746d5f5374f567c00e178b16645e378521476723efc61383bdc562f25d9c827
+- registries: 14 sha256:e98ac633c7685dfb67cb878c1ae16833b0dcfccac5865035f5862c5fde42caf5
+
+Run:
+`python scripts/generate_ide_assets.py check`
+
+--- project-doc ---
+
 # SAP Router Skill & Harness — Multi-IDE Agent Instructions
 
-> **164 skills mirrored across Claude, Codex, Gemini Antigravity, and Cursor.**
+> **203 canonical skills available across Claude, Codex, Gemini Antigravity, and Cursor.**
 >
 > | IDE | Skill Directory | Entry Point |
 > |---|---|---|
-> | **Claude Code** | `.claude/skills/` (164 skills) | `.claude/skills/run-sap-router-skill/SKILL.md` |
-> | **Antigravity (Gemini)** | `.gemini/skills/` (164 skills) | `.gemini/skills/run-sap-router-skill/SKILL.md` |
-> | **Codex / OpenAI** | `.codex/skills/` (164 skills) | `.codex/AGENTS.md` |
-> | **Cursor** | `.cursor/skills/` (164 skills) | `.cursor/skills/run-sap-router-skill/SKILL.md` |
+> | **Claude Code** | .claude/skills/ (203 generated skills) | .claude/skills/run-sap-router-skill/SKILL.md |
+> | **Antigravity (Gemini)** | .gemini/skills/ (203 generated skills) | .gemini/skills/run-sap-router-skill/SKILL.md |
+> | **Codex / OpenAI** | .codex/AGENTS.md (shared canonical instructions) | .codex/AGENTS.md |
+> | **Cursor** | .cursor/AGENTS.md (shared canonical instructions) | .cursor/AGENTS.md |
 >
 > All skills auto-trigger by file context and keyword. See SKILL.md for master dispatch.
-> **New (v7.0.0):** `sap_harness.py` (Multi-Agent Autonomous Runtime + Eval Suite) + ZROUTER Remote FileSystem adapter + Automation Pilot & Skill-Share pipelines.
+> **Current (v7.1.0):** `sap_harness.py` (controlled agent execution + eval suite) + ZROUTER Remote FileSystem adapter + Automation Pilot & Skill-Share pipelines.
 
-## SAP Harness v7.0 (Autonomous Multi-Agent & Eval Engine)
+## SAP Harness v7.1 (Controlled Multi-Agent & Eval Engine)
 
 ```bash
 # Autonomous mission execution
@@ -86,7 +116,7 @@ credentials required. Everything runs offline:
 | `scripts/abap_serializer.py` | Multi-format ABAP packer: .nugg, abapGit, ZDOWNLOAD XML |
 | `scripts/cpi_iflow_packager.py` | CPI iFlow ZIP create/validate/extract |
 | `scripts/fallback_engine.py` | 6-tier cascading fallback with retry, verification, 36 mapped actions |
-| `scripts/healthcheck.py` | Probes the 11 configured MCPs (+63 planned candidates), validates .env, generates interactive prompts |
+| `scripts/healthcheck.py` | Probes 12 configured MCPs (+70 fail-closed planned candidates), validates .env, generates interactive prompts |
 | `scripts/self_learn.py` | Hermes-style context adaptation — tracks MCP latency/reliability, adapts routing |
 | `scripts/zrouter_bootstrap.py` | ZROUTER probe + install (ADT/GUI/Offline) + fallback mapping |
 | `scripts/btp_diagram.py` | BTP architecture diagram generator from skill references |
@@ -99,10 +129,10 @@ credentials required. Everything runs offline:
 
 ```bash
 python .claude/skills/run-sap-router-skill/driver.py
-# Exit 0 = all 62 checks passed. No project files modified.
+# Exit 0 = all 78 checks passed. No project files modified.
 ```
 
-Requires Python 3.8+. No packages needed for CSV; `pip install openpyxl`
+Requires Python 3.11+ for the router and controlled harness. No packages needed for CSV; `pip install openpyxl`
 for XLSX support only.
 
 ## Routing rules (v4.2.0 — ADT-first, GUI-fallback, caveman-optimized)

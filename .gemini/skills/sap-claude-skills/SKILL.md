@@ -6,7 +6,7 @@ trigger:
   intent: Using or authoring custom Codex skill templates and system instructions so SAP tasks are phrased, dispatched, and executed consistently through the router
 prerequisites:
   - sap-router-skill repo cloned with scripts/ directory intact
-  - Python 3.10+ on PATH (template_repo.py, xls_to_bapi.py, sap_router.py)
+  - Python 3.11+ on PATH (template_repo.py, xls_to_bapi.py, sap_router.py)
   - npm scripts available (package.json: seed, template, csv:check)
   - karpathy-guidelines skill present in .agents/skills/ (mandatory wrapper)
 ---

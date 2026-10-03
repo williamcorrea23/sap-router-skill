@@ -27,7 +27,11 @@ python scripts/sync_codex_config.py
 
 The offline healthcheck returns `DEGRADED`/exit 1 by design: no semantic execution occurred. This is not a claim that every integration is broken. Exit 0 requires actual readiness; exit 2 means a blocking policy/configuration condition.
 
-The smoke suite has passed 78/78 checks. Skill validation has passed 165/165 metadata and local Markdown resource checks. These checks do not prove every skill's behavior on a live SAP system.
+On 2026-10-03, the router skill driver passed 78/78 CLI checks. An earlier snapshot
+recorded 165/165 skill metadata checks. The controlled-harness verification passes 148
+unit tests on Python 3.11.15 and 3.14, 33/33 offline evaluation checks, strict catalog
+validation, 203-skill IDE parity, ABAP review, and secret audit with zero findings. These
+local checks do not prove every skill's behavior on a live SAP system.
 
 ## Operational evidence and remaining dependencies
 
@@ -53,7 +57,7 @@ The template intentionally fails closed. It needs system/client, isolated object
 
 ## Candidate review — static evidence only
 
-`reports/mcp-candidates-review.json` inventories 63 planned entries (62 candidates plus SmartForms). Twenty-seven entries have a mapped local snapshot. All 63 remain pending evidence; zero promoted or approved for pilot. Missing security, dependency, maintenance and semantic/approval tests are listed per candidate. This is an evidence inventory, not a completed security certification or blanket rejection.
+The earlier `reports/mcp-candidates-review.json` snapshot inventories 63 planned entries (62 candidates plus SmartForms), with 27 mapped to local snapshots. The current MCP configuration has 70 planned entries; none can launch or route. Missing security, dependency, maintenance and semantic/approval tests remain promotion blockers. This is an evidence inventory, not a completed security certification or blanket rejection.
 
 ## Backups
 

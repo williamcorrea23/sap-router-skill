@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "created": "2026-10-02",
+  "goal": "Gerar 14 checklists, 84 critérios pendentes, índice e loop com acompanhamento por item.",
+  "run_state": "Success",
+  "scope": "documentation_generation_only",
+  "counts": {
+    "files": 14,
+    "criteria": 84,
+    "checked": 0,
+    "traceable": 84,
+    "links": 107
+  },
+  "corrections_completed": 0,
+  "candidates_imported_or_promoted": 0,
+  "checks": [
+    {
+      "check": "checklist_structure_and_traceability",
+      "status": "PASS",
+      "verification_level": 1,
+      "command_or_tool": "rtk proxy python -X utf8 -B - (validador estrutural read-only executado nesta sessão)",
+      "target": "14 checklists e artefatos relacionados",
+      "observed_result": {
+        "status": "PASS",
+        "counts": {
+          "files": 14,
+          "criteria": 84,
+          "checked": 0,
+          "traceable": 84,
+          "links": 107
+        },
+        "state_items": 14,
+        "errors": []
+      },
+      "artifact_or_reference": "review-remediation.md"
+    },
+    {
+      "check": "durable_state_schema",
+      "status": "PASS",
+      "verification_level": 2,
+      "command_or_tool": "Mesmo validador: JSON, schema de evidência, checks NOT_RUN, zero alterações aceitas e checkpoint PLANNED por item",
+      "target": "verification/peer-review-state.json",
+      "observed_result": "14 itens; execution_state nulo; reasons presentes em NOT_RUN; zero achados fechados.",
+      "artifact_or_reference": "verification/peer-review-state.json"
+    },
+    {
+      "check": "secret_audit_of_generated_artifacts",
+      "status": "PASS",
+      "verification_level": 2,
+      "command_or_tool": "rtk proxy python -X utf8 -B scripts/secret_audit.py --strict --json specs/001-controlled-agent-execution/checklists specs/001-controlled-agent-execution/review-remediation.md specs/001-controlled-agent-execution/verification",
+      "target": "artefatos documentais criados",
+      "observed_result": {
+        "exit_code": 0,
+        "status": "PASS",
+        "findings_count": 0
+      },
+      "artifact_or_reference": "verification/checklist-generation-report.json"
+    },
+    {
+      "check": "requirements_quality_review",
+      "status": "NOT_RUN",
+      "verification_level": 5,
+      "command_or_tool": "Reviewer evaluation",
+      "target": "84 critérios customizados",
+      "observed_result": null,
+      "artifact_or_reference": "checklists/",
+      "reason": "Pedido foi criar checklists; os critérios pertencem ao reviewer e não foram avaliados/marcados."
+    },
+    {
+      "check": "runtime_regressions_and_external_project_tests",
+      "status": "NOT_RUN",
+      "verification_level": 1,
+      "command_or_tool": null,
+      "target": "runtime do router e sete projetos externos",
+      "observed_result": null,
+      "artifact_or_reference": "verification/peer-review-loop.md",
+      "reason": "Nenhuma correção, importação ou promoção foi executada. Esta mudança cria somente documentação; os testes específicos do loop continuam pendentes."
+    },
+    {
+      "check": "sap_field_outcome",
+      "status": "NOT_RUN",
+      "verification_level": 3,
+      "command_or_tool": null,
+      "target": null,
+      "observed_result": null,
+      "artifact_or_reference": null,
+      "reason": "Nenhuma chamada SAP, tenant, GUI ou backend de candidato foi realizada."
+    }
+  ],
+  "artifact_hashes": [
+    {
+      "path": "checklists/c1-credential-json.md",
+      "sha256": "8cfc3cbbfc594580735b53b5e424ae5b2fa5d9aeb4a346ff1ccdbe1387a4f5ab"
+    },
+    {
+      "path": "checklists/c2-mcp-transport-deadline.md",
+      "sha256": "2363065b46b6b8b88e267d0d5a933e452ae1ed0537acc51538efa65c6a6afd35"
+    },
+    {
+      "path": "checklists/c3-strict-tool-contracts.md",
+      "sha256": "547fc3adba4656b0132a6cbfda413118d9e3820d0f4796e8f073fe4474f8dc56"
+    },
+    {
+      "path": "checklists/c4-total-run-budget.md",
+      "sha256": "8368080e1a58ca06531a437cbbb09333ef957612c135332d0605abed2fd4e940"
+    },
+    {
+      "path": "checklists/c5-unknown-capability.md",
+      "sha256": "55745758eee900285dd959e6db57a6061a6b40470a02ad6c75877518f0683082"
+    },
+    {
+      "path": "checklists/d1-python-support.md",
+      "sha256": "1a9662ac9453bdce2faae14491103f58f81fa259135c58bd921e943a7d1b7b26"
+    },
+    {
+      "path": "checklists/e1-abapilot.md",
+      "sha256": "db5c0cf85004624992dbed3b0d77fe74a9b24e56ac3825ac9675491d9078cd8e"
+    },
+    {
+      "path": "checklists/e2-odata-go.md",
+      "sha256": "317251d0f75e372020bc7960f6a0091a882c061ef68cd688ff07c95262055961"
+    },
+    {
+      "path": "checklists/e3-odata-python.md",
+      "sha256": "addb6011228265b8d7b4bec790a55f327c471f7f2d78d6c97a497c50b8cbe2f0"
+    },
+    {
+      "path": "checklists/e4-sapgui-provider.md",
+      "sha256": "87508799a3a7586d6e0d274dd91223d36a983339ba6e6b5f596c9bd26f308510"
+    },
+    {
+      "path": "checklists/e5-successfactors-credentials.md",
+      "sha256": "c2ebfd7f1a033d1a8431b08d8b5a894a05a256541826e168e4a8300a228b8218"
+    },
+    {
+      "path": "checklists/e6-odata-cli-skill.md",
+      "sha256": "dbd52dce8c96efb4b7e70eadf4b2fbe2f60d4cd1555ef658b2721808f9504390"
+    },
+    {
+      "path": "checklists/e7-basis-skill-refresh.md",
+      "sha256": "63c4ac6b51ff8db38c11d671a7c565c177739b158c9c46a0137196af86e733a5"
+    },
+    {
+      "path": "checklists/u1-run-state-expiry.md",
+      "sha256": "5394c6b623c4b2a1a84740e2e4bdd098febd9a6a9552bec5c3fbaefb19f72117"
+    },
+    {
+      "path": "review-remediation.md",
+      "sha256": "18a3dcc70ae61902b5c8614b31c6026d6619c3b4ebe718a1830a64981fb462a8"
+    },
+    {
+      "path": "verification/peer-review-loop.md",
+      "sha256": "01b8fb163d66dc0ecb667760a9efc79b7d905c3a287d2ad7ae9fcfa6777d48b2"
+    },
+    {
+      "path": "verification/peer-review-state.json",
+      "sha256": "6cbceb468afe19b1af8a5a46c767910b434e514e47c098ffd1fdfc2cb995c5a6"
+    }
+  ],
+  "next_action": "Reviewer avaliar requisitos do item escolhido; preparar regressão/documentação e seguir o loop antes da correção ou integração."
+}
+

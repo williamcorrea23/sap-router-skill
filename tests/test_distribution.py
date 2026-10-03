@@ -11,6 +11,34 @@ import sync_codex_config as config
 
 
 class DistributionTest(unittest.TestCase):
+    def test_copy_tree_skips_identical_files_and_updates_differences(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            source = root / 'source'
+            destination = root / 'destination'
+            (source / 'same').mkdir(parents=True)
+            (source / 'changed').mkdir()
+            (source / 'same/file.txt').write_text('same')
+            (source / 'changed/file.txt').write_text('new')
+            (destination / 'same').mkdir(parents=True)
+            (destination / 'changed').mkdir()
+            (destination / 'same/file.txt').write_text('same')
+            (destination / 'changed/file.txt').write_text('old')
+
+            original_copy2 = assets.shutil.copy2
+            copied = []
+
+            def record_copy(src, dst, *args, **kwargs):
+                copied.append(Path(dst).name)
+                return original_copy2(src, dst, *args, **kwargs)
+
+            with mock.patch.object(assets.shutil, 'copy2', side_effect=record_copy):
+                assets.copy_tree(source, destination)
+
+            self.assertEqual(copied, ['file.txt'])
+            self.assertEqual((destination / 'same/file.txt').read_text(), 'same')
+            self.assertEqual((destination / 'changed/file.txt').read_text(), 'new')
+
     def test_scoped_sync_preserves_unowned_files_and_global_instructions(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)

@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "feature": "001-controlled-agent-execution",
+  "updated": "2026-10-03",
+  "overall_status": "LOCAL_IMPLEMENTATION_COMPLETE_WITH_EXTERNAL_GATES_BLOCKED",
+  "decision": "ABAPilot MCP selected for DEV preparation; keep all remote/runtime execution fail-closed until the recorded prerequisites are satisfied.",
+  "selected_target": {
+    "candidate_id": "nicohern-abapilot-mcp",
+    "profile_id": "nicohern-abapilot-mcp-dev",
+    "environment": "DEV",
+    "profile_status": "blocked",
+    "candidate_status": "disabled_candidate",
+    "active_mcp_registration": false,
+    "runtime_installed": false,
+    "runtime_fetched": false,
+    "live_sap_validation": "NOT_RUN"
+  },
+  "unselected_alternatives": [
+    {
+      "peer_review_item": "E2",
+      "candidate_id": "odata-mcp-go",
+      "status": "disabled_candidate",
+      "decision": "Not selected for this DEV trial; no runtime was installed or promoted by this change."
+    },
+    {
+      "peer_review_item": "E3",
+      "candidate_id": "gutjahrai-sap-odata-mcp-py",
+      "status": "disabled_candidate",
+      "decision": "Not selected for this DEV trial; pointer-only source and no runtime promotion by this change."
+    },
+    {
+      "peer_review_item": "E4",
+      "candidate_id": "hochfrequenz-sapgui-mcp",
+      "status": "disabled_candidate",
+      "decision": "Not selected for this DEV trial; no desktop/WebGUI runtime promoted by this change."
+    },
+    {
+      "peer_review_item": "E5",
+      "candidate_id": "aiadiguru2025-sf-mcp",
+      "status": "disabled_candidate",
+      "decision": "Not selected for this DEV trial; no SuccessFactors runtime promoted by this change."
+    }
+  ],
+  "items": [
+    {
+      "id": "E1",
+      "repository": "https://github.com/NicoHern/abapilot-mcp",
+      "revision": "25639b76f6d3f53ae029af73913370af56a1e980",
+      "package": "abapilot@1.0.6",
+      "license": "MIT",
+      "package_sha256": "5fb547f9edff2d2454716cb2bdf1a1544e171373c395a25efccaea56bf905a87",
+      "local_status": "PASS",
+      "runtime_status": "BLOCKED",
+      "read_allowlist": [
+        "sap_read_code",
+        "sap_read_includes",
+        "sap_read_object_details",
+        "sap_read_object_info",
+        "sap_read_table_structure",
+        "sap_check_type_exists",
+        "sap_read_domain_values",
+        "sap_read_field_domain_values",
+        "sap_read_foreign_keys",
+        "sap_read_where_used",
+        "sap_get_enhancements",
+        "sap_list_package_objects",
+        "sap_syntax_check"
+      ],
+      "blocked_prerequisites": [
+        "Licensed ABAPilot backend installation on the selected DEV system is not evidenced.",
+        "Exact SAP system ID, client, release, backend version, and HTTPS endpoint are not identified.",
+        "Required credentials must be configured outside this repository and outside model context.",
+        "The connector runtime is not installed and no pinned local execution command is available.",
+        "MCP tools/list schemas and server-side authorization behavior have not been observed or reviewed.",
+        "No SAP-side audit or field test has run."
+      ],
+      "local_checks": [
+        "Strict catalog validation passes with zero errors.",
+        "21 consistency regressions pass, including write-tool and installer policy rejection."
+      ]
+    },
+    {
+      "id": "E6",
+      "repository": "https://github.com/kts982/sap-odata-explorer",
+      "revision": "146e3b8de0764e4cfecc5cba1643fe61b40cb4ee",
+      "imported_skill": ".agents/skills/sap-odata-cli/SKILL.md",
+      "skill_sha256": "034fb515d7594f4fa166793abb310354b4db394a3e4a7b1eae53b6cc219f6ee4",
+      "license": "MIT",
+      "license_sha256": "b715bd0b0e4b630e5bbc92315206326f42ab0547a8e30149eacd55fc1f8dc1d3",
+      "classification": "skill_only",
+      "cli_installed": false,
+      "mcp_registered": false,
+      "validation": "Source pin, license, skill metadata, package validation, and no-runtime/no-MCP contract pass."
+    },
+    {
+      "id": "E7",
+      "repository": "https://github.com/adam0thman/sap-basis-ops",
+      "revision": "6ae551f6ec2ef4c554b606fcdef5a04599e4ab11",
+      "license": "MIT",
+      "skills": {
+        "new": 21,
+        "refreshed": 12,
+        "total": 33
+      },
+      "source_sync": {
+        "declared_sources": 76,
+        "synced_sources": 76,
+        "indexed_assets": 759,
+        "missing_sources": 0,
+        "pinned_snapshot_files_compared": 76,
+        "snapshot_matches_pin": true
+      },
+      "runtime_or_operations_executed": false,
+      "validation": "Imported documentation remains subject to target-specific authorization and approval gates; operational commands were not executed."
+    }
+  ],
+  "verification": {
+    "strict_catalog": "PASS: zero errors; existing planned capability warnings and unreachable-provider gaps remain fail-closed.",
+    "ide_parity": "PASS: 203 skills across Claude/Gemini; Codex, Cursor, Kiro, and manifest have no diffs.",
+    "source_catalog": "PASS: 76/76 synced sources; 759 indexed assets; no missing sources.",
+    "consistency_regressions": "PASS: 21 tests.",
+    "full_unit_suite": "PASS: 148 tests on Python 3.11.15 (103.494 seconds) and Python 3.14.",
+    "harness_offline_evaluation": "PASS: 5/5 scenarios and 33/33 checks.",
+    "skill_packager_sap_odata_cli": "PASS.",
+    "router_skill_driver": "PASS: 78 checks, 0 failures.",
+    "secret_audit": "PASS: 0 findings in the scanner's default high-risk configuration scope; local .env values were not included.",
+    "diff_check": "PASS: exit code 0; Git emitted existing line-ending normalization warnings.",
+    "checklist_review": "NOT_RUN: all 14 reviewer-owned checklists and their 84 criteria remain unmarked."
+  },
+  "artifacts": {
+    "target_profile": ".agents/registries/mcp-target-profiles.json",
+    "candidate_registry": ".agents/registries/mcp-candidates.json",
+    "skill_import_registry": ".agents/registries/skill-imports.json",
+    "implementation_plan": "../plan.md",
+    "task_list": "../tasks.md",
+    "peer_review_state": "peer-review-state.json",
+    "peer_review_loop": "peer-review-loop.md"
+  }
+}

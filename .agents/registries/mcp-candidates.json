@@ -1122,13 +1122,21 @@
     {
       "id": "nicohern-abapilot-mcp",
       "status": "disabled_candidate",
-      "reason": "Catalog candidate from marianfoo/sap-ai-mcp-servers; promote only after runtime and safety review.",
+      "reason": "Selected for the DEV trial profile only; remains disabled until licensed backend, exact tenant, credentials, transport schema, and server-side authorization are verified.",
+      "revision": "25639b76f6d3f53ae029af73913370af56a1e980",
       "runtime": {
         "type": "stdio",
         "command": null,
         "args": []
       },
-      "env_refs": [],
+      "env_refs": [
+        "ABAPILOT_URL",
+        "ABAPILOT_USER",
+        "ABAPILOT_PASSWORD",
+        "ABAPILOT_TOKEN",
+        "ABAPILOT_CLIENT",
+        "ABAPILOT_TOOLS"
+      ],
       "repository": "https://github.com/NicoHern/abapilot-mcp",
       "declared_capabilities": [
         "sap.abap.backend.query"

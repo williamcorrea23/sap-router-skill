@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 import queue
+import re
 import shutil
 import subprocess
 import sys
@@ -323,6 +324,126 @@ def probe_server(server_id: str, execute: bool = False, timeout: int = 10) -> di
     return finish()
 
 
+def validate_harness_candidates(servers: dict[str, dict[str, Any]]) -> list[str]:
+    errors: list[str] = []
+    path = REGISTRIES / "harness-candidates.json"
+    if not path.exists():
+        return ["harness candidates: registry is missing"]
+    data = load_json(path)
+    if not isinstance(data, dict) or type(data.get("schema_version")) is not int or data.get("schema_version") != 1:
+        return ["harness candidates: schema_version must be 1"]
+    policy = data.get("policy", {})
+    if not isinstance(policy, dict):
+        return ["harness candidates: invalid policy"]
+    for field, expected in (("status", "disabled_candidate"), ("runtime_fetch", False),
+                            ("runtime_execution", False)):
+        if (expected is False and policy.get(field) is not False) or (expected is not False and policy.get(field) != expected):
+            errors.append(f"harness candidates: policy {field} must be {expected}")
+    promotion = policy.get("promotion_requires", [])
+    required_review = {"license_review", "security_review", "tests", "explicit_registry_change"}
+    if not isinstance(promotion, list) or not all(isinstance(item, str) for item in promotion) or not required_review.issubset(promotion):
+        errors.append("harness candidates: promotion requires license/security review, tests and explicit registry change")
+    candidates = data.get("candidates", [])
+    if not isinstance(candidates, list):
+        return errors + ["harness candidates: candidates must be a list"]
+    if not candidates:
+        errors.append("harness candidates: no audited candidate records")
+    seen: set[str] = set()
+    enabled = {sid for sid, server in servers.items() if server.get("status") == "enabled"}
+    def normalize_repository(value: Any) -> str:
+        return value.rstrip("/").removesuffix(".git").casefold() if isinstance(value, str) else ""
+    enabled_repositories = {normalize_repository(server.get("source", {}).get("repository")) for server in servers.values()
+                            if server.get("status") == "enabled"}
+    config_path = ROOT / ".mcp.json"
+    configured = set(load_json(config_path).get("mcpServers", {})) if config_path.exists() else set()
+    for candidate in candidates:
+        if not isinstance(candidate, dict):
+            errors.append("harness candidate: record must be an object")
+            continue
+        sid = candidate.get("id")
+        if not isinstance(sid, str) or not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", sid):
+            errors.append("harness candidate: id must be a nonempty canonical identifier")
+            sid = "invalid-id"
+        elif sid in seen:
+            errors.append(f"harness candidate {sid}: duplicate id")
+        seen.add(sid)
+        revision = candidate.get("revision", "")
+        if not isinstance(revision, str) or not re.fullmatch(r"[0-9a-f]{40}", revision):
+            errors.append(f"harness candidate {sid}: revision must be a full lowercase SHA40")
+        repository = candidate.get("repository", "")
+        if not isinstance(repository, str) or not re.fullmatch(r"https://github\.com/[^/\s]+/[^/\s]+", repository):
+            errors.append(f"harness candidate {sid}: repository must be a GitHub repository URL")
+        for field in ("license", "license_evidence", "utility", "kind"):
+            if not isinstance(candidate.get(field), str) or not candidate[field].strip():
+                errors.append(f"harness candidate {sid}: {field} must state audited evidence or an explicit unresolved value")
+        if not isinstance(candidate.get("license"), str) or candidate.get("license") not in {"MIT", "Apache-2.0", "unverified", "absent"}:
+            errors.append(f"harness candidate {sid}: license must be reviewed SPDX metadata or explicitly unverified/absent")
+        for field, expected in (("status", "disabled_candidate"), ("runtime_fetch", False),
+                                ("runtime_execution", False)):
+            if (expected is False and candidate.get(field) is not False) or (expected is not False and candidate.get(field) != expected):
+                errors.append(f"harness candidate {sid}: {field} must be {expected}")
+        blockers = candidate.get("blockers")
+        if not isinstance(blockers, list) or not blockers or not all(isinstance(item, str) and item.strip() for item in blockers):
+            errors.append(f"harness candidate {sid}: blockers must record pending review")
+        if sid in enabled or sid in configured or normalize_repository(repository) in enabled_repositories:
+            errors.append(f"harness candidate {sid}: disabled candidate cannot be an enabled MCP")
+    return errors
+
+
+def validate_execution_protocol(profile_id: str, profile: dict[str, Any]) -> list[str]:
+    errors: list[str] = []
+    prefix = f"profile {profile_id}: execution_protocols"
+    protocol = profile.get("execution_protocols")
+    if not isinstance(protocol, dict) or type(protocol.get("schema_version")) is not int or protocol.get("schema_version") != 1:
+        return [f"{prefix} schema_version must be 1"]
+    skills = protocol.get("required_skills", [])
+    required_skills = {"karpathy-guidelines", "loop-specification", "verification-loop"}
+    if not isinstance(skills, list) or not all(isinstance(skill, str) for skill in skills) or not required_skills.issubset(skills):
+        errors.append(f"{prefix} must require Karpathy, loop specification and verification loop")
+    else:
+        for skill in skills:
+            if not (AGENTS / "skills" / skill / "SKILL.md").is_file():
+                errors.append(f"{prefix} references missing skill {skill}")
+    loop = protocol.get("loop", {})
+    verification = protocol.get("verification", {})
+    if not isinstance(loop, dict) or not isinstance(verification, dict):
+        return errors + [f"{prefix} loop and verification must be objects"]
+    for field, ceiling in (("max_iterations", 8), ("max_seconds", 900),
+                           ("call_timeout_seconds", 120), ("max_stagnant_iterations", 3)):
+        value = loop.get(field)
+        if type(value) is not int or not 0 < value <= ceiling:
+            errors.append(f"{prefix} {field} must be an integer in 1..{ceiling}")
+    if type(loop.get("max_iterations")) is int and type(loop.get("max_stagnant_iterations")) is int:
+        if loop["max_stagnant_iterations"] > loop["max_iterations"]:
+            errors.append(f"{prefix} stagnation limit exceeds iteration limit")
+    if type(loop.get("max_seconds")) is int and type(loop.get("call_timeout_seconds")) is int:
+        if loop["call_timeout_seconds"] > loop["max_seconds"]:
+            errors.append(f"{prefix} call timeout exceeds total duration")
+    def matches_list(value: Any, expected: set[Any]) -> bool:
+        return isinstance(value, list) and all(type(item) in (str, int) for item in value) and set(value) == expected
+    for field, expected in (("terminal_states", {"Success", "No-Op", "Blocked", "Stalled", "Exhausted"}),
+                            ("checkpoint_states", {"PENDING_APPROVAL"})):
+        if not matches_list(loop.get(field), expected):
+            errors.append(f"{prefix} invalid {field}")
+    for field, expected in (("maker_checker", "fresh_process"), ("uncertain_mutation", "reconcile_before_retry"),
+                            ("durable_state", "harness_run_state_or_named_local_artifact")):
+        if loop.get(field) != expected:
+            errors.append(f"{prefix} {field} must be {expected}")
+    if not matches_list(verification.get("statuses"), {"PASS", "FAIL", "NOT_RUN"}):
+        errors.append(f"{prefix} verification statuses must be PASS/FAIL/NOT_RUN")
+    if not matches_list(verification.get("levels"), {1, 2, 3, 4, 5}):
+        errors.append(f"{prefix} verification levels must be 1..5")
+    evidence = {"check", "status", "verification_level", "command_or_tool", "target", "observed_result", "artifact_or_reference"}
+    if not matches_list(verification.get("required_evidence"), evidence):
+        errors.append(f"{prefix} verification evidence is incomplete")
+    for field, expected in (("not_run_requires", "reason"),
+                            ("success_requires", "all_required_checks_pass_with_goal_evidence"),
+                            ("live_sap_requires", "field_response_for_requested_target")):
+        if verification.get(field) != expected:
+            errors.append(f"{prefix} verification {field} must be {expected}")
+    return errors
+
+
 def validate_catalog() -> dict[str, Any]:
     errors: list[str] = []
     warnings: list[str] = []
@@ -346,7 +467,13 @@ def validate_catalog() -> dict[str, Any]:
             errors.append(f"route {route.get('match')}: unknown capability {cap}")
         if profile not in profiles:
             errors.append(f"route {route.get('match')}: unknown profile {profile}")
+        elif cap in capabilities:
+            profile_caps = profiles[profile].get("capabilities", {})
+            allowed = set(profile_caps.get("allow", [])) | set(profile_caps.get("gated", []))
+            if cap not in allowed:
+                errors.append(f"route permission missing: profile {profile} does not allow or gate {cap}")
     for profile_id, profile in profiles.items():
+        errors.extend(validate_execution_protocol(profile_id, profile))
         profile_caps = profile.get("capabilities", {})
         for bucket in ("allow", "gated", "deny"):
             for cap in profile_caps.get(bucket, []):
@@ -404,6 +531,13 @@ def validate_catalog() -> dict[str, Any]:
         for capability, spec in mcp_specs.items():
             if capability not in capabilities:
                 errors.append(f"MCP capability {capability}: missing from capabilities.json")
+            else:
+                effect = capabilities[capability].get("effect", "read")
+                expected_mutation = effect != "read"
+                if bool(spec.get("mutation", False)) != expected_mutation:
+                    errors.append(f"MCP capability {capability}: effect mismatch (canonical {effect})")
+                if expected_mutation and not spec.get("requires_approval", False):
+                    errors.append(f"MCP capability {capability}: mutating effect requires approval")
             # A capability may declare status="planned" to say, on the record,
             # that it has no launchable provider yet. That is reported as a
             # warning; routing still fails closed because the server is not in
@@ -422,6 +556,7 @@ def validate_catalog() -> dict[str, Any]:
             primary = spec.get("primary")
             if primary in servers and capability not in servers[primary].get("capabilities", []):
                 errors.append(f"MCP capability {capability}: primary {primary} does not advertise the capability")
+    errors.extend(validate_harness_candidates(servers))
     return {
         "status": "PASS" if not errors else "FAIL",
         "checked_at": now_iso(),

@@ -20,6 +20,8 @@ import json
 import argparse
 import subprocess
 import logging
+import shutil
+import unicodedata
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
@@ -319,6 +321,113 @@ CAVEMAN_DELEGATION = {
     },
 }
 
+SPEC_KIT_VERSION = "1.0.6"
+SPEC_KIT_EXPLICIT_TERMS = (
+    "use spec kit", "using spec kit", "run spec kit", "with spec kit",
+    "usar spec kit", "use o spec kit", "execute spec kit", "com spec kit",
+    "spec kit implement", "spec kit implemente", "spec kit executar",
+    "specification driven development", "desenvolvimento orientado a especificacao",
+)
+SPEC_KIT_STRUCTURAL_TERMS = (
+    "new feature", "add feature", "implement a new", "create a new", "nova funcionalidade",
+    "adicionar funcionalidade", "implementar nova", "criar novo", "criar nova",
+    "public api", "api contract", "contract change", "change contract", "mudanca de contrato",
+    "alterar contrato", "data model", "database schema", "modelo de dados", "esquema de dados",
+    "multi component", "cross service", "varios componentes", "multiplos componentes",
+)
+SPEC_KIT_INTEGRATION_TERMS = (
+    "integration", "integrate", "integracao", "integrar",
+)
+SPEC_KIT_READONLY_TERMS = (
+    "where is", "find", "search", "locate", "read", "show", "explain", "what is",
+    "onde esta", "encontre", "buscar", "procure", "localize", "ler", "leia", "mostrar",
+    "mostre", "explique", "o que e", "qual e", "quais sao",
+)
+SPEC_KIT_LIGHT_TERMS = (
+    "fix", "bug", "typo", "rename", "single file", "one file", "small change",
+    "corrija", "corrigir", "erro", "pequeno", "pequena", "arquivo unico", "renomear",
+)
+
+
+def _normalized_task(task):
+    text = unicodedata.normalize("NFKD", str(task or ""))
+    text = "".join(char for char in text if not unicodedata.combining(char)).lower()
+    return " ".join(re.findall(r"[a-z0-9]+", text))
+
+
+def _matching_terms(text, terms):
+    padded = f" {text} "
+    return [term for term in terms if f" {term} " in padded]
+
+
+def spec_kit_scope(task):
+    """Classify whether a task needs the Spec Kit background workflow.
+
+    This intentionally classifies only. It never scaffolds a feature or invokes
+    Spec Kit skills, so asking for a route remains read-only.
+    """
+    normalized = _normalized_task(task)
+    explicit_terms = _matching_terms(normalized, SPEC_KIT_EXPLICIT_TERMS)
+    readonly_terms = _matching_terms(normalized, SPEC_KIT_READONLY_TERMS)
+    structural_terms = _matching_terms(normalized, SPEC_KIT_STRUCTURAL_TERMS)
+    integration_terms = _matching_terms(normalized, SPEC_KIT_INTEGRATION_TERMS)
+    light_terms = _matching_terms(normalized, SPEC_KIT_LIGHT_TERMS)
+
+    if readonly_terms:
+        mode = "none"
+        reason = "read-only discovery or question"
+    elif explicit_terms or structural_terms:
+        mode = "full"
+        reason = ("explicit Spec Kit request" if explicit_terms
+                  else "broad change: " + ", ".join(structural_terms))
+    elif light_terms:
+        mode = "light"
+        reason = "localized change: " + ", ".join(light_terms)
+    elif integration_terms:
+        mode = "full"
+        reason = "broad change: " + ", ".join(integration_terms)
+    else:
+        mode = "none"
+        reason = "no broad-change signal"
+
+    return {
+        "mode": mode,
+        "enabled": mode == "full",
+        "reason": reason,
+        "required_cli_version": SPEC_KIT_VERSION,
+        "commands": (["$speckit-constitution", "$speckit-specify", "$speckit-clarify",
+                      "$speckit-plan", "$speckit-checklist", "$speckit-tasks",
+                      "$speckit-analyze", "$speckit-implement", "$speckit-converge"]
+                     if mode == "full" else []),
+    }
+
+
+def spec_kit_cli_status():
+    """Return a local, non-mutating Specify CLI readiness check."""
+    executable = shutil.which("specify")
+    if not executable:
+        return {
+            "ready": False,
+            "installed": False,
+            "required": SPEC_KIT_VERSION,
+            "repair": "uv tool install --force specify-cli --from git+https://github.com/github/spec-kit.git@v1.0.6",
+        }
+    try:
+        result = subprocess.run([executable, "version"], capture_output=True, timeout=15)
+        output = (result.stdout or b"").decode("utf-8", errors="replace")
+        output += (result.stderr or b"").decode("utf-8", errors="replace")
+        match = re.search(r"CLI Version\s+([0-9]+(?:\.[0-9]+){2})", output)
+        version = match.group(1) if match else None
+        return {
+            "ready": result.returncode == 0 and version == SPEC_KIT_VERSION,
+            "installed": result.returncode == 0,
+            "version": version,
+            "required": SPEC_KIT_VERSION,
+            "repair": "uv tool install --force specify-cli --from git+https://github.com/github/spec-kit.git@v1.0.6",
+        }
+    except (OSError, subprocess.SubprocessError) as exc:
+        return {"ready": False, "installed": True, "required": SPEC_KIT_VERSION, "error": str(exc)}
+
 # Pipeline stage definitions.
 # 'wave' groups stages for PARALLEL dispatch: stages sharing a wave can run
 # concurrently (same-wave agents are launched in ONE batch by the orchestrator).
@@ -425,7 +534,8 @@ class SapRouter:
         import glob as _glob
         for path in _glob.glob(os.path.join(agents_dir, "*.md")):
             try:
-                text = open(path, encoding="utf-8").read()
+                with open(path, encoding="utf-8") as agent_file:
+                    text = agent_file.read()
                 if not text.startswith("---"):
                     continue
                 fm_raw = text.split("---")[1]
@@ -563,6 +673,8 @@ class SapRouter:
         # v5.0 Complexity model routing
         complexity = self._assess_complexity(action)
         route["model"] = self.decide_model(complexity)
+        scope = spec_kit_scope(action)
+        route["spec_kit"] = scope
 
         # v5.0 RAG Context Integration (P3.3)
         try:
@@ -577,6 +689,28 @@ class SapRouter:
                     route["rag_context"] = [h["doc"] for h in filtered_hits]
         except Exception as e:
             logger.warning(f"RAG search failed: {e}")
+
+        if scope["mode"] == "full":
+            cli = spec_kit_cli_status()
+            scope = dict(scope, cli=cli)
+            route["spec_kit"] = scope
+            if not cli.get("ready"):
+                return {
+                    "destination": "none",
+                    "strategy": "spec-kit-dependency-pending",
+                    "details": (f"Specify CLI {SPEC_KIT_VERSION} is required before the "
+                                "background specification workflow can run."),
+                    "spec_kit": scope,
+                    "implementation_route": route,
+                }
+            return {
+                "destination": "sap-spec-kit",
+                "strategy": "spec-kit-background",
+                "details": ("Run the Spec Kit artifact workflow, then dispatch implementation "
+                            "through the preserved SAP Router route."),
+                "spec_kit": scope,
+                "implementation_route": route,
+            }
 
         return route
 
@@ -1556,6 +1690,11 @@ def main():
     classify_parser.add_argument('--task', required=True, help='Natural-language SAP task')
     classify_parser.add_argument('--memory-file', default='MEMORY.md')
 
+    # spec-kit - decide background SDD scope without writing artifacts
+    spec_kit_parser = subparsers.add_parser('spec-kit', help='Classify Spec Kit scope and verify Specify CLI readiness')
+    spec_kit_parser.add_argument('--task', required=True, help='Natural-language task description')
+    spec_kit_parser.add_argument('--memory-file', default='MEMORY.md')
+
     # catalog - validate canonical catalog
     catalog_parser = subparsers.add_parser('catalog', help='Validate canonical SAP Router catalog')
     catalog_parser.add_argument('--output', help='Write validation JSON to this path')
@@ -1724,6 +1863,11 @@ def main():
             decision["risk"] = cap.get("effect")
             decision["domain"] = cap.get("domain")
             decision["confirmation_required"] = cap.get("effect") in ("mutating", "destructive")
+        print(json.dumps(decision, indent=2))
+
+    elif args.command == 'spec-kit':
+        decision = spec_kit_scope(args.task)
+        decision["cli"] = spec_kit_cli_status()
         print(json.dumps(decision, indent=2))
 
     elif args.command == 'catalog':

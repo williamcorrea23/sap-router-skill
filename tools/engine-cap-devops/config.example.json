@@ -1,0 +1,13 @@
+{
+  "organization": "https://dev.azure.com/EngineBR",
+  "project": "Projeto APPA - Porto Operações",
+  "roots": ["C:/Users/William Correa/Downloads/QM", "C:/Users/William Correa/Downloads/QM/.engine-cap-work"],
+  "stateDir": "C:/Users/William Correa/Downloads/QM/.engine-cap-state",
+  "azurePython": "C:/Program Files/Microsoft SDKs/Azure/CLI2/python.exe",
+  "allowWrites": false,
+  "quickstartId": 128,
+  "projects": [{"repository":"btp-appa-qm-rnc","ci":32,"cd":33,"devEnvironment":"cockpit-dev","devApi":"https://api.cf.br10.hana.ondemand.com","devOrg":"ENGINE_BR TECNOLOGIA S.A._0x8x8s8ynv4qj9c9","devSpace":"dev"}]
+}
+
+
+

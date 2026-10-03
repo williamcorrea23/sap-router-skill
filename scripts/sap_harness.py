@@ -9,9 +9,9 @@ What this tool does:
 - runs the evaluation suite offline (hermetic) or live
 - inspects the MCP catalog and packages skills for distribution
 
-What it does not do: execute the resolved plan. There is no agent dispatcher
-wired into this repository yet, so `run` produces a plan and says so. It never
-reports work as done that it did not do.
+Execution requires an explicit backend/model and a reviewed tool contract.
+Planning stays the default. Every field operation passes a fresh checker and
+deterministic verification before a terminal result is reported.
 """
 
 from __future__ import annotations
@@ -27,7 +27,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT / "python"))
 
 from harness_eval_suite import SCENARIO_MAP, run_all_evals
-import approval_broker
+from harness_executor import HarnessExecutor, REQUIRED_SKILLS
 import mcp_launcher
 import skill_packager
 import source_catalog
@@ -39,6 +39,7 @@ SPECIALIZED_AGENTS = {
     "cpi": {
         "name": "sap-cpi-flowpilot",
         "domain": "Cloud Integration & Integration Suite",
+        "profile": "sap-cpi-developer",
         "skills": ["sap-cpi-flowpilot", "cpi-iflow-development", "btp-integration-suite"],
         "capabilities": ["sap.cpi.artifact.read", "sap.cpi.message.read", "sap.cpi.bundle.package"],
         "primary_mcp": "sap-cpi-mcp",
@@ -46,28 +47,32 @@ SPECIALIZED_AGENTS = {
     "abap": {
         "name": "sap-abap-engineer",
         "domain": "ABAP Development & Clean Core",
-        "skills": ["sap-abap", "clean-abap", "cds-view-entities"],
+        "profile": "sap-abap-developer",
+        "skills": ["abap", "clean-abap", "cds-view-entities"],
         "capabilities": ["sap.abap.source.read", "sap.abap.source.modify", "sap.remotefs.file.read"],
         "primary_mcp": "arc-1",
     },
     "fiori": {
         "name": "sap-fiori-ux-architect",
         "domain": "Fiori Elements, UI5 & Theme Designer",
-        "skills": ["sap-fiori", "sapui5-framework", "sap-ui-theme-designer-plugins"],
+        "profile": "sap-fiori-developer",
+        "skills": ["sap-fiori-tools", "sapui5-framework", "ui-theme-designer-design-tokens"],
         "capabilities": ["sap.fiori.app.generate", "sap.ui5.project.validate", "sap.ui5.webcomponents.render"],
         "primary_mcp": "fiori-mcp",
     },
     "bdc": {
         "name": "sap-bdc-automation-bot",
         "domain": "Classic SAP GUI & BDC Automation",
-        "skills": ["sap-gui-scripting", "sap-bdc-plugin", "sap-report-automation-workflow"],
+        "profile": "sap-basis-consultant",
+        "skills": ["sap-gui-scripting", "sap-code-agents-analysis", "sap-transport-management"],
         "capabilities": ["sap.gui.transaction.run"],
         "primary_mcp": "mcp-sap-gui",
     },
     "sre": {
         "name": "sap-incident-resolution-agent",
         "domain": "SRE, ST22 Triage & Self-Healing",
-        "skills": ["sap-incident-resolution", "sap-health-triage", "sap-automation-pilot-agent-skills"],
+        "profile": "sap-basis-consultant",
+        "skills": ["sap-incident-resolution", "sap-health-triage", "automation-pilot-executions-api"],
         "capabilities": ["sap.incident.resolution.diagnose", "sap.incident.resolution.remediate"],
         "primary_mcp": "arc-1",
     },
@@ -101,6 +106,11 @@ def cmd_run(args: argparse.Namespace) -> int:
         return 1
 
     capability = classification.get("capability")
+    if agent:
+        if capability not in agent["capabilities"]:
+            print("\nSelected agent does not cover this capability. Fail-closed: nothing will run.")
+            return 1
+        classification["profile"] = agent["profile"]
     server = classification.get("selected_server")
     print("Capability:      {0}".format(capability or "unresolved"))
     print("Selected server: {0}".format(server or "none"))
@@ -112,6 +122,8 @@ def cmd_run(args: argparse.Namespace) -> int:
         return 1
 
     readiness = mcp_launcher.list_capability(capability).get(capability, {})
+    server = readiness.get("selected")
+    classification["selected_server"] = server
     print("Ready servers:   {0}".format([r["server"] for r in readiness.get("ready", [])] or "none"))
     for blocked in readiness.get("blocked", []):
         print("  blocked: {0} ({1})".format(blocked["server"], blocked["reason"]))
@@ -120,23 +132,44 @@ def cmd_run(args: argparse.Namespace) -> int:
         print("\nNo launchable provider for {0}. Fail-closed: nothing will run.".format(capability))
         return 1
 
-    if readiness.get("requires_approval"):
-        plan = approval_broker.write_plan({
-            "capability": capability,
-            "effect": "mutating",
-            "target": args.target or task,
-            "summary": task,
-        })
-        print("\nMutating capability. Approval plan registered, NOT approved:")
-        print("  action_id: {0}".format(plan["action_id"]))
-        print("  plan_hash: {0}".format(plan["plan_hash"]))
-        print("  expires:   {0}".format(plan["expires_at"]))
-        print("  approve:   python scripts/approval_broker.py approve --action-id {0}".format(plan["action_id"]))
-
     if args.execute:
-        print("\nRefusing --execute: no agent dispatcher is wired into this harness.")
-        print("The plan above is complete; run it through the MCP client or a skill.")
-        return 2
+        if not args.backend or not args.model:
+            print("\nExecution needs an explicit backend and model: --backend codex|claude --model NAME")
+            return 2
+        if not agent:
+            try:
+                import contextlib
+                import io
+                capture = io.StringIO()
+                with contextlib.redirect_stdout(capture):
+                    search_status = source_catalog.search(task, "skill", capability, 10)
+                assets = json.loads(capture.getvalue()).get("results", [])
+                skills = [item.get("name") for item in assets
+                          if item.get("trust") == "canonical" and item.get("status") == "enabled"][:3]
+                if search_status and not skills:
+                    raise ValueError("No canonical domain skill matched the routed capability")
+            except (ValueError, json.JSONDecodeError, OSError) as exc:
+                print("\nSkill resolution failed closed: {0}".format(exc))
+                return 1
+        else:
+            skills = list(agent["skills"])
+        try:
+            executor = HarnessExecutor(args.backend, args.model)
+            result = executor.run(task, classification, skills, args.target or "")
+        except (ValueError, OSError) as exc:
+            print("\nExecution setup failed closed: {0}".format(exc))
+            return 1
+        print("\nExecution: {0}".format(result.get("state")))
+        print("Run ID:    {0}".format(result.get("run_id")))
+        print("Reason:    {0}".format(result.get("reason")))
+        if result.get("approval"):
+            approval = result["approval"]
+            print("Approval:  python scripts/approval_broker.py approve {0}".format(approval["action_id"]))
+            print("Resume:    python scripts/sap_harness.py resume --run-id {0} --backend {1} --model {2}".format(
+                result["run_id"], args.backend, args.model))
+        for evidence in result.get("evidence", []):
+            print("Evidence:  L{0} {1} — {2}".format(evidence.get("level"), evidence.get("status"), evidence.get("summary")))
+        return 0 if result.get("state") in {"Success", "No-Op", "PENDING_APPROVAL"} else 1
 
     print("\nPlan resolved. Nothing was executed (planning is this command's whole job).")
     return 0
@@ -292,6 +325,23 @@ def cmd_share(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_harness_state(args: argparse.Namespace) -> int:
+    executor = HarnessExecutor(getattr(args, "backend", None) or "codex",
+                               getattr(args, "model", None) or "status-only")
+    try:
+        record = (executor.resume(args.run_id) if args.command == "resume"
+                  else executor.status(args.run_id))
+    except (ValueError, OSError, KeyError) as exc:
+        print("Run unavailable or blocked: {0}".format(exc))
+        return 1
+    summary = {key: record.get(key) for key in (
+        "run_id", "state", "backend", "model", "capability", "reason", "approval",
+        "checkpoint", "evidence", "created_at", "updated_at")}
+    summary["capability"] = record.get("classification", {}).get("capability")
+    print(json.dumps(summary, indent=2))
+    return 0 if record.get("state") in {"Success", "No-Op", "PENDING_APPROVAL"} else 1
+
+
 # ---------------------------------------------------------------------------
 # test-remote-fs
 # ---------------------------------------------------------------------------
@@ -336,12 +386,21 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--version", action="version", version="%(prog)s {0}".format(__version__))
     sub = parser.add_subparsers(dest="command")
 
-    p_run = sub.add_parser("run", help="Resolve a task into an executable plan")
+    p_run = sub.add_parser("run", help="Plan a task, or execute through a reviewed backend and contract")
     p_run.add_argument("--task", required=True, help="Task description or goal")
     p_run.add_argument("--agent", choices=list(SPECIALIZED_AGENTS), help="Target specialized agent")
     p_run.add_argument("--target", help="Object the plan will act on (used for strong confirmation)")
-    p_run.add_argument("--live", action="store_true", help="Resolve against live backends")
-    p_run.add_argument("--execute", action="store_true", help="Attempt execution (refused: no dispatcher wired)")
+    p_run.add_argument("--live", action="store_true", help="Resolve against configured local backends")
+    p_run.add_argument("--execute", action="store_true", help="Execute one bounded structured operation")
+    p_run.add_argument("--backend", choices=("codex", "claude"), help="Required with --execute")
+    p_run.add_argument("--model", help="Explicit model identifier, pinned through approval and resume")
+
+    p_status = sub.add_parser("status", help="Inspect a durable run by opaque ID")
+    p_status.add_argument("--run-id", required=True)
+    p_resume = sub.add_parser("resume", help="Resume a pending approved run")
+    p_resume.add_argument("--run-id", required=True)
+    p_resume.add_argument("--backend", required=True, choices=("codex", "claude"))
+    p_resume.add_argument("--model", required=True)
 
     p_eval = sub.add_parser("eval", help="Run evaluation scenarios")
     p_eval.add_argument("--suite", default="all", help="Scenario name or 'all'")
@@ -389,6 +448,8 @@ def main() -> int:
 
     handlers = {
         "run": cmd_run,
+        "status": cmd_harness_state,
+        "resume": cmd_harness_state,
         "eval": cmd_eval,
         "benchmark": cmd_benchmark,
         "agents": cmd_agents,

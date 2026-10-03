@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "imports": [
+    {
+      "id": "sap-odata-cli",
+      "kind": "skill_only",
+      "repository": "https://github.com/kts982/sap-odata-explorer",
+      "revision": "146e3b8de0764e4cfecc5cba1643fe61b40cb4ee",
+      "source_path": "skills/sap-odata-cli/SKILL.md",
+      "source_skill_sha256": "034fb515d7594f4fa166793abb310354b4db394a3e4a7b1eae53b6cc219f6ee4",
+      "license": "MIT",
+      "license_path": ".agents/skills/sap-odata-cli/LICENSE",
+      "canonical_skill_path": ".agents/skills/sap-odata-cli/SKILL.md",
+      "cli_runtime_installed": false,
+      "mcp_server_registered": false,
+      "reason": "The upstream repository provides a read-only CLI and agent guidance. This import adds only the reviewed skill guidance; it does not install or invent an MCP server."
+    }
+  ]
+}

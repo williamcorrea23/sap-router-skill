@@ -57,23 +57,49 @@ def list_capability(capability: str | None = None) -> dict:
     registry = load_json(REGISTRY)
     config = load_json(MCP_CONFIG)
     caps = registry.get("capabilities", {})
+    if capability and capability not in caps:
+        return {capability: {"selected": None, "ready": [], "blocked": [],
+                             "mutation": False, "requires_approval": False,
+                             "error": "unknown-capability"}}
     selected = {capability: caps[capability]} if capability else caps
+    canonical = load_json(ROOT / ".agents" / "registries" / "capabilities.json")
+    effects = {item["id"]: item.get("effect", "read") for item in canonical.get("capabilities", [])}
     result = {}
     for cap, spec in selected.items():
-        candidates = [spec["primary"]] + spec.get("fallbacks", [])
+        candidates = ([spec["primary"]] if spec.get("primary") else []) + spec.get("fallbacks", [])
         ready = []
         blocked = []
         for server in candidates:
             ok, reason = server_ready(server, config)
             (ready if ok else blocked).append({"server": server, "reason": reason})
+        effect = effects.get(cap, "read")
+        mutation = effect != "read"
+        requires_approval = bool(spec.get("requires_approval", mutation)) or mutation
+        if not candidates:
+            blocked.append({"server": None, "reason": "no-reviewed-provider"})
         result[cap] = {
             "selected": ready[0]["server"] if ready else None,
             "ready": ready,
             "blocked": blocked,
-            "mutation": spec.get("mutation", False),
-            "requires_approval": spec.get("requires_approval", False),
+            "mutation": mutation,
+            "requires_approval": requires_approval,
         }
     return result
+
+
+def _server_environment(server: dict, runtime: dict) -> dict[str, str]:
+    """Pass only platform variables, configured runtime values, and this MCP's auth refs."""
+    inherited = {"PATH", "PATHEXT", "SYSTEMROOT", "WINDIR", "COMSPEC", "TEMP", "TMP",
+                 "HOME", "USERPROFILE", "APPDATA", "LOCALAPPDATA", "LANG", "LC_ALL",
+                 "SSL_CERT_FILE", "SSL_CERT_DIR", "NODE_EXTRA_CA_CERTS", "SAP_ROUTER_STATE_DIR"}
+    names = inherited | set(server.get("auth", {}).get("env_refs", [])) | set(runtime.get("env", {}))
+    if server.get("id") == "arc-1":
+        names |= {"SAP_URL", "SAP_USER", "SAP_PASSWORD", "SAP_CLIENT"}
+    env = {name: os.environ[name] for name in names if name in os.environ}
+    env.update({key: str(value) for key, value in runtime.get("env", {}).items()})
+    env.update(ARC_SAP_SSL_VERIFY="true", SAP_ALLOW_UNAUTHORIZED="false",
+               WEB_ALLOW_UNAUTHORIZED="false", NODE_TLS_REJECT_UNAUTHORIZED="1")
+    return env
 
 
 def probe(server_id: str) -> dict:
@@ -112,8 +138,7 @@ def run_server(server_id: str) -> int:
         if missing:
             print(json.dumps({"error": "server-not-ready", "server": server_id, "reason": "missing-env:" + ",".join(missing)}), file=sys.stderr)
             return 2
-        from sap_router_core.local_runtime import runtime_environment
-        env = runtime_environment(server_id, runtime)
+        env = _server_environment(server, runtime)
         raw_cwd = runtime.get("cwd")
         cwd = (ROOT / raw_cwd).resolve() if raw_cwd else ROOT
         if ROOT not in cwd.parents and cwd != ROOT:

@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "kind": "peer_review_remediation_implementation",
+  "generated_at_utc": "2026-10-03T03:37:43Z",
+  "feature": "001-controlled-agent-execution",
+  "scope": "C1-C5/U1/D1 local corrections only",
+  "runtime": {
+    "python": "3.11.15",
+    "executable": "C:\\Users\\William Correa\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\python.exe"
+  },
+  "items": [
+    {
+      "id": "C1",
+      "status": "Success",
+      "accepted_changes": 1,
+      "iteration": 2,
+      "elapsed_seconds": 82,
+      "files": [
+        "scripts/harness_executor.py",
+        "tests/test_harness_executor.py"
+      ],
+      "red": "Antes da correção, credencial JSON textual chegou ao checker e o hash foi calculado sobre a resposta sem sanitização.",
+      "command": "python -m unittest discover -s tests -p test_harness_executor.py -q",
+      "result": "A regressão verifica campos estruturados e textuais, JSON escapado/aninhado, ausência no ambiente, no checker e no estado persistido; passou na suíte final."
+    },
+    {
+      "id": "C2",
+      "status": "Success",
+      "accepted_changes": 1,
+      "iteration": 2,
+      "elapsed_seconds": null,
+      "files": [
+        "scripts/harness_mcp_client.py",
+        "tests/test_harness_transport.py"
+      ],
+      "red": "Antes da correção, uma escrita grande para MCP que parou de consumir stdin excedia o prazo e exigia limpeza externa.",
+      "command": "python -m unittest discover -s tests -p test_harness_transport.py -q",
+      "result": "Deadline cobre escrita e resposta; timeout fecha o transporte e termina explicitamente o job de processos no Windows. O teste verifica o processo filho."
+    },
+    {
+      "id": "C3",
+      "status": "Success",
+      "accepted_changes": 1,
+      "iteration": 2,
+      "elapsed_seconds": null,
+      "files": [
+        "scripts/validate_catalog.py",
+        "tests/test_consistency_regressions.py"
+      ],
+      "red": "Antes da correção, a validação estrita não validava o registry de contratos MCP; schema hash e efeito incompatíveis podiam passar.",
+      "command": "python -m unittest discover -s tests -p test_consistency_regressions.py -q",
+      "result": "17 regressões de consistência passaram; scripts/validate_catalog.py --strict passou com contratos, capacidades, efeitos, servidores e políticas validados."
+    },
+    {
+      "id": "C4",
+      "status": "Success",
+      "accepted_changes": 1,
+      "iteration": 2,
+      "elapsed_seconds": null,
+      "files": [
+        "scripts/harness_executor.py",
+        "scripts/harness_mcp_client.py",
+        "tests/test_harness_executor.py"
+      ],
+      "red": "Antes da correção, o broker recebia begin/reserva após o orçamento total expirar; a regressão observou uma chamada onde esperava zero.",
+      "command": "python -m unittest discover -s tests -p test_harness_executor.py -q",
+      "result": "A verificação pós-fase MCP e imediatamente antes do broker/despacho bloqueia reserva e chamadas após o prazo; regressão passou na suíte final."
+    },
+    {
+      "id": "C5",
+      "status": "Success",
+      "accepted_changes": 1,
+      "iteration": 2,
+      "elapsed_seconds": null,
+      "files": [
+        "scripts/harness_executor.py",
+        "tests/test_harness_executor.py"
+      ],
+      "red": "Antes da correção, capacidade ausente gerava AttributeError e deixava o estado Running sem despacho de ferramenta.",
+      "command": "python -m unittest discover -s tests -p test_harness_executor.py -q",
+      "result": "Capacidade desconhecida agora cria resultado Blocked persistido e zero chamadas; regressão passou na suíte final."
+    },
+    {
+      "id": "U1",
+      "status": "Success",
+      "accepted_changes": 1,
+      "iteration": 2,
+      "elapsed_seconds": null,
+      "files": [
+        "scripts/harness_executor.py",
+        "tests/test_harness_executor.py",
+        "specs/001-controlled-agent-execution/spec.md",
+        "specs/001-controlled-agent-execution/plan.md"
+      ],
+      "red": "Antes da correção, o contrato não definia TTL nem transição local para execução expirada.",
+      "command": "python -m unittest discover -s tests -p test_harness_executor.py -q",
+      "result": "TTL de 24h UTC, fronteira exata, aprovação pendente, consulta histórica e resume local verificados com relógio controlado; nenhuma chamada externa após expiração."
+    },
+    {
+      "id": "D1",
+      "status": "Success",
+      "accepted_changes": 1,
+      "iteration": 2,
+      "elapsed_seconds": null,
+      "files": [
+        "AGENTS.md",
+        ".agents/skills/run-sap-router-skill/SKILL.md",
+        ".agents/skills/run-sap-router-skill/MANIFEST.json",
+        ".agents/skills/sap-bapi-integration/SKILL.md",
+        ".agents/skills/sap-claude-skills/SKILL.md",
+        ".agents/skills/sap-workflow-pipeline/SKILL.md",
+        ".agents/skills/superclaude-for-sap/SKILL.md",
+        "tests/test_consistency_regressions.py"
+      ],
+      "red": "A regressão documental falhou inicialmente em sete declarações de piso Python incompatíveis com o harness.",
+      "command": "python -m unittest discover -s tests -p test_harness_cli.py -q; Python 3.11.15 --version",
+      "result": "Documentação alinhada a Python 3.11+; intérprete 3.11.15 executou os testes e o gerador confirmou paridade de assets."
+    }
+  ],
+  "gates": [
+    {
+      "name": "full_unit_suite",
+      "status": "PASS",
+      "exit_code": 0,
+      "command": "C:\\Users\\William Correa\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\python.exe -m unittest discover -s tests -q",
+      "result": "Exit 0; Ran 143 tests in 53.967 seconds; OK."
+    },
+    {
+      "name": "strict_catalog",
+      "status": "PASS",
+      "exit_code": 0,
+      "result": "181 skills; 12 MCPs; 70 planned; 55 capabilities; 4 profiles. Planned-only SmartForm, BTP account, SuccessFactors, documentation and SmartForm capabilities remain fail-closed."
+    },
+    {
+      "name": "ide_asset_parity",
+      "status": "PASS",
+      "exit_code": 0,
+      "result": "181 canonical skills and 38 profiles; no diffs for Claude, Gemini, Codex, Cursor, Kiro or manifest."
+    },
+    {
+      "name": "secret_audit",
+      "status": "PASS",
+      "exit_code": 0,
+      "result": "Zero actionable or review-only findings in affected source, test and feature files."
+    },
+    {
+      "name": "tracked_diff_check",
+      "status": "PASS",
+      "exit_code": 0,
+      "command": "git diff --check on affected tracked files."
+    },
+    {
+      "name": "checklist_criteria_integrity",
+      "status": "PASS",
+      "result": "14 checklist files; 84 criteria; zero checked markers. Reviewer-owned markers preserved."
+    },
+    {
+      "name": "offline_harness_evaluation",
+      "status": "PASS",
+      "exit_code": 0,
+      "command": "rtk python scripts/sap_harness.py eval --suite all",
+      "result": "Offline mode; 5/5 scenarios; 33/33 checks; average latency 251.45 ms."
+    }
+  ],
+  "requirements_quality_review": {
+    "status": "NOT_RUN",
+    "owner": "independent reviewer",
+    "note": "Custom checklist markers remain unchanged."
+  },
+  "sap_field_validation": {
+    "status": "NOT_RUN",
+    "note": "No SAP tenant/system operation was attempted."
+  },
+  "candidate_adoption": {
+    "status": "NOT_RUN",
+    "note": "E1-E7 remain PLANNED; no upstream repository was imported or promoted."
+  },
+  "limitations": [
+    "Strict catalog reports known planned-provider gaps; fail-closed routing remains active.",
+    "Local fixtures and unit tests do not establish SAP runtime behavior.",
+    "Total per-item editing/review time and token use were not instrumented."
+  ]
+}

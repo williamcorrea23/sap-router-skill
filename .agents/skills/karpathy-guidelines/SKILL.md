@@ -117,11 +117,23 @@ KARPATHY WRAPPER (this skill)
     │ 3. Surgical: only touch requested objects, match existing style
     │ 4. Goal-verify: define criteria, loop until pass
     ▼
+SPEC KIT SCOPE (sap-spec-kit)
+    │ broad change or explicit Spec Kit → full SDD workflow
+    │ localized fix → light Karpathy workflow
+    │ question/discovery → no specification artifact
+    ▼
 SAP Router Dispatch (sap-router-skill)
     │ Route to: ADT / GUI / RFC / Pipeline / Caveman
     ▼
 Execute + Verify + Self-Learn
 ```
+
+For every requested change, run `python scripts/sap_router.py spec-kit --task
+"<request>"`. A `full` decision requires the Spec Kit sequence before
+implementation. A `light` decision keeps this Karpathy workflow and records a
+goal plus verification. A `none` decision creates no specification artifact.
+Spec Kit never bypasses the Router's functional-context, approval, or transport
+controls.
 
 ## Caveman Compression as Default Output
 

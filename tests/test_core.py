@@ -2,7 +2,10 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
 import unittest
+import zipfile
+from unittest.mock import patch
 from isolated_runtime import run as isolated_run
 from pathlib import Path
 
@@ -14,6 +17,7 @@ import sap_router
 from sap_router import SapRouter
 from sap_router_core.registry import classify_task, load_servers, validate_catalog
 from source_catalog import INDEX_FILE, load, score_asset
+from skill_packager import package_skill
 
 
 class FunctionalWriteGateTest(unittest.TestCase):
@@ -251,6 +255,71 @@ class RouterContractsTest(unittest.TestCase):
         payload = json.loads(proc.stdout)
         self.assertIn(payload["overall_status"], {"PASS", "DEGRADED", "BLOCKED"})
         self.assertEqual(proc.stderr, "")
+
+
+class SpecKitRoutingTest(unittest.TestCase):
+    def test_broad_changes_are_detected_in_english_and_portuguese(self):
+        tasks = (
+            "implement a new ABAP report",
+            "adicionar uma nova funcionalidade com mudança de contrato e modelo de dados",
+            "criar integração entre CAP e CPI",
+        )
+        for task in tasks:
+            with self.subTest(task=task):
+                self.assertEqual(sap_router.spec_kit_scope(task)["mode"], "full")
+
+    def test_read_only_intent_wins_over_broad_topic_words(self):
+        tasks = (
+            "find integration config",
+            "explain integration architecture",
+            "explique a integração CPI",
+            "please specify the field name",
+            "o que é Spec Kit?",
+        )
+        for task in tasks:
+            with self.subTest(task=task):
+                self.assertEqual(sap_router.spec_kit_scope(task)["mode"], "none")
+
+    def test_localized_integration_fix_stays_light(self):
+        self.assertEqual(
+            sap_router.spec_kit_scope("corrija um bug pequeno na integração CPI")["mode"],
+            "light",
+        )
+
+    def test_full_route_is_wrapped_before_implementation(self):
+        ready = {"ready": True, "installed": True, "version": "1.0.6", "required": "1.0.6"}
+        with patch("sap_router.spec_kit_cli_status", return_value=ready):
+            route = SapRouter().get_route("add new feature with API contract")
+        self.assertEqual(route["strategy"], "spec-kit-background")
+        self.assertEqual(route["destination"], "sap-spec-kit")
+        self.assertIn("implementation_route", route)
+
+    def test_full_route_fails_closed_when_cli_is_not_ready(self):
+        missing = {"ready": False, "installed": False, "required": "1.0.6"}
+        with patch("sap_router.spec_kit_cli_status", return_value=missing):
+            route = SapRouter().get_route("add new feature with API contract")
+        self.assertEqual(route["strategy"], "spec-kit-dependency-pending")
+        self.assertEqual(route["destination"], "none")
+
+    def test_full_command_sequence_includes_quality_gates(self):
+        commands = sap_router.spec_kit_scope("use Spec Kit to implement this")["commands"]
+        for command in ("$speckit-clarify", "$speckit-checklist", "$speckit-analyze"):
+            self.assertIn(command, commands)
+
+    def test_explicit_product_request_is_not_confused_with_ordinary_specify(self):
+        self.assertEqual(sap_router.spec_kit_scope("Spec Kit: implement this change")["mode"], "full")
+        self.assertEqual(sap_router.spec_kit_scope("please specify the field name")["mode"], "none")
+
+    def test_sap_spec_kit_package_is_self_contained(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output = Path(temp_dir) / "sap-spec-kit.zip"
+            package_skill(ROOT / ".agents" / "skills" / "sap-spec-kit", output)
+            with zipfile.ZipFile(output) as archive:
+                names = set(archive.namelist())
+        self.assertIn("sap-spec-kit/SKILL.md", names)
+        self.assertIn("speckit-specify/SKILL.md", names)
+        self.assertIn("speckit-converge/SKILL.md", names)
+        self.assertIn(".specify/templates/spec-template.md", names)
 
 
 class ApimProxyPackagerTest(unittest.TestCase):

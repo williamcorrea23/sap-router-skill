@@ -102,13 +102,13 @@ class CpiLocalSafetyTest(unittest.TestCase):
         self.assertIn("No download", result["error"])
 
     def test_external_tool_runs_argument_vector_without_shell(self):
-        os.environ["CPILINT_CMD"] = sys.executable
+        os.environ["CPILINT_CMD"] = f'"{sys.executable}"'
         result = cpi_client.run_external("cpilint", ["-c", "print('adapter-ok')"])
         self.assertEqual(result["status"], "OK", result)
         self.assertEqual(result["stdout"].strip(), "adapter-ok")
 
     def test_external_tool_timeout_is_actionable(self):
-        os.environ["CPILINT_CMD"] = sys.executable
+        os.environ["CPILINT_CMD"] = f'"{sys.executable}"'
         result = cpi_client.run_external("cpilint", ["-c", "import time; time.sleep(2)"], timeout=1)
         self.assertEqual(result["status"], "ERROR")
         self.assertIn("timed out", result["error"])

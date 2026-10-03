@@ -2,6 +2,14 @@
   "version": "6.1.0",
   "default_policy": "fail_closed",
   "capabilities": {
+    "engine.cap.project.inspect": {"primary":"engine-cap-devops","fallbacks":[],"mutation":false},
+    "engine.cap.project.audit": {"primary":"engine-cap-devops","fallbacks":[],"mutation":false},
+    "engine.cap.pipeline.preview": {"primary":"engine-cap-devops","fallbacks":[],"mutation":false},
+    "engine.cap.project.plan": {"primary":"engine-cap-devops","fallbacks":[],"mutation":false},
+    "engine.cap.quickstart.create": {"primary":"engine-cap-devops","fallbacks":[],"mutation":true,"requires_approval":true},
+    "engine.cap.ci.run": {"primary":"engine-cap-devops","fallbacks":[],"mutation":true,"requires_approval":true},
+    "engine.cap.dev.deploy": {"primary":"engine-cap-devops","fallbacks":[],"mutation":true,"requires_approval":true},
+    "engine.cap.run.diagnose": {"primary":"engine-cap-devops","fallbacks":[],"mutation":false},
     "sap.abap.source.read": {
       "primary": "arc-1",
       "fallbacks": [
@@ -16,6 +24,35 @@
       ],
       "mutation": true,
       "requires_approval": true
+    },
+    "sap.adt.source.read": {
+      "primary": "arc-1",
+      "fallbacks": ["aibap"],
+      "mutation": false
+    },
+    "sap.gui.transaction.execute": {
+      "primary": "mcp-sap-gui",
+      "fallbacks": [],
+      "mutation": true,
+      "requires_approval": true
+    },
+    "sap.btp.account.read": {
+      "primary": null,
+      "fallbacks": [],
+      "mutation": false,
+      "status": "planned"
+    },
+    "sap.successfactors.data.read": {
+      "primary": null,
+      "fallbacks": [],
+      "mutation": false,
+      "status": "planned"
+    },
+    "sap.documentation.search": {
+      "primary": null,
+      "fallbacks": [],
+      "mutation": false,
+      "status": "planned"
     },
     "sap.gui.transaction.run": {
       "primary": "mcp-sap-gui",
@@ -183,7 +220,8 @@
     "sap.cap.project.build": {
       "primary": "cap-mcp",
       "fallbacks": [],
-      "mutation": false
+      "mutation": true,
+      "requires_approval": true
     },
     "sap.smartform.analyze": {
       "primary": "smartform-ai-generator",

@@ -75,6 +75,7 @@ def text_body(target: str) -> str:
         f"# SAP Router Skill for {label}\n\n"
         "Canonical source: `.agents/`.\n"
         "Karpathy wrapper: mandatory. Caveman compression: default.\n"
+        "Spec Kit background workflow: automatic for broad changes; `python scripts/sap_router.py spec-kit --task \"...\"`.\n"
         "Do not copy or fork skill bodies here; regenerate from canonical source.\n\n"
         "Runtime root:\n"
         "- `SAP_ROUTER_ROOT` must point to the canonical sap-router-skill repository.\n"
@@ -115,7 +116,18 @@ def safe_rmtree(path: Path) -> None:
 def copy_tree(src: Path, dst: Path) -> None:
     if dst.is_symlink():
         raise ValueError(f'Refusing symlink destination: {dst}')
-    shutil.copytree(src, dst, dirs_exist_ok=True)
+    if not src.is_dir():
+        raise FileNotFoundError(f'Skill source directory not found: {src}')
+    dst.mkdir(parents=True, exist_ok=True)
+    for item in src.rglob('*'):
+        relative = item.relative_to(src)
+        target = dst / relative
+        if item.is_dir():
+            target.mkdir(parents=True, exist_ok=True)
+        elif item.is_file():
+            target.parent.mkdir(parents=True, exist_ok=True)
+            if not target.is_file() or not filecmp.cmp(item, target, shallow=False):
+                shutil.copy2(item, target)
 
 
 def compare_dirs(left: Path, right: Path) -> list[str]:

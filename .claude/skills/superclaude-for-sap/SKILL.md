@@ -7,7 +7,7 @@ trigger:
 prerequisites:
   - SAP_ROUTER_ROOT points to the sap-router-skill repository
   - Node.js + npm — all macros run from the sap-router-skill repo root
-  - Python 3.10+ (scripts/ directory: sap_router.py, fallback_engine.py, healthcheck.py)
+  - Python 3.11+ (scripts/ directory: sap_router.py, fallback_engine.py, healthcheck.py)
   - .env configured — run `npm run hc:prompt` once before first macro use
   - Optional for GUI fallback tiers: SAPGUI installed with scripting enabled (`npm run gui:check`)
 ---

@@ -318,10 +318,9 @@ def eval_zrouter_fs_contract(live: bool = False) -> dict[str, Any]:
     check.expect("SOAP parser tolerates namespace prefixes", "[A-Za-z_][\\\\w.-]*:" in client)
 
     if live:
-        details["live_dispatch"] = "requires a ZROUTER-enabled system; run npm run zrouter:http:test"
-        check.expect("live ZROUTER endpoint configured",
-                     bool(__import__("os").environ.get("ZROUTER_BASE_URL")),
-                     "ZROUTER_BASE_URL is unset")
+        details["live_dispatch"] = "NOT_RUN: configured URL is not field-response evidence"
+        check.expect("live ZROUTER field response verified", False,
+                     "NOT_RUN: this suite has no live request verifier")
     else:
         details["live_dispatch"] = "skipped - offline mode does not contact SAP"
 

@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "profiles": [
+    {
+      "id": "nicohern-abapilot-mcp-dev",
+      "candidate_id": "nicohern-abapilot-mcp",
+      "status": "blocked",
+      "target": {
+        "environment": "DEV",
+        "system_id": null,
+        "client_env_ref": "ABAPILOT_CLIENT"
+      },
+      "source": {
+        "repository": "https://github.com/NicoHern/abapilot-mcp",
+        "revision": "25639b76f6d3f53ae029af73913370af56a1e980",
+        "license": "MIT",
+        "npm_package": "abapilot@1.0.6",
+        "npm_tarball_sha256": "5fb547f9edff2d2454716cb2bdf1a1544e171373c395a25efccaea56bf905a87"
+      },
+      "runtime": {
+        "transport": "stdio",
+        "command": null,
+        "args": [],
+        "expected_entrypoint": "node_modules/abapilot/dist/index.js",
+        "installed": false,
+        "runtime_fetch": false,
+        "runtime_execution": false
+      },
+      "auth": {
+        "url_env_ref": "ABAPILOT_URL",
+        "username_env_ref": "ABAPILOT_USER",
+        "password_env_ref": "ABAPILOT_PASSWORD",
+        "token_env_ref": "ABAPILOT_TOKEN",
+        "tls_insecure_env_ref": "ABAPILOT_TLS_INSECURE",
+        "tls_insecure_allowed": false,
+        "https_required": true,
+        "allowed_modes": [
+          "user_password",
+          "bearer_token"
+        ]
+      },
+      "tool_policy": {
+        "filter_env_ref": "ABAPILOT_TOOLS",
+        "default_deny": true,
+        "server_side_authorization_required": true,
+        "allowlist": [
+          "sap_read_code",
+          "sap_read_includes",
+          "sap_read_object_details",
+          "sap_read_object_info",
+          "sap_read_table_structure",
+          "sap_check_type_exists",
+          "sap_read_domain_values",
+          "sap_read_field_domain_values",
+          "sap_read_foreign_keys",
+          "sap_read_where_used",
+          "sap_get_enhancements",
+          "sap_list_package_objects",
+          "sap_syntax_check"
+        ],
+        "explicitly_denied": [
+          "sap_write_code",
+          "sap_write_code_safe",
+          "sap_patch_code",
+          "sap_run_program",
+          "sap_run_transaction",
+          "sap_save_variant",
+          "sap_call_function",
+          "sap_write_translations",
+          "sap_translate",
+          "sap_upload_note_v2"
+        ]
+      },
+      "blockers": [
+        "ABAPilot backend license and installation on the selected DEV system are not evidenced.",
+        "Exact SAP system ID, client, release, backend version, and HTTPS endpoint are not configured.",
+        "No ABAPilot credentials or token are configured in the process environment; secret values must remain outside this repository.",
+        "The connector package is not installed locally and no pinned local runtime command is available.",
+        "The selected backend tool catalog and input schemas have not been observed through MCP tools/list.",
+        "DEV authorization boundaries and endpoint audit behavior have not been verified on SAP."
+      ],
+      "live_sap_validation": "NOT_RUN"
+    }
+  ]
+}

@@ -1,0 +1,1195 @@
+{
+  "schema_version": 1,
+  "kind": "peer_review_worklist",
+  "created": "2026-10-02",
+  "feature": "specs/001-controlled-agent-execution",
+  "goal": "Acompanhar requisitos, correções e adequações dos 14 itens com evidência por item.",
+  "scope": "Checklist generation, source assessment, and local correction runs; external candidates remain disabled pending explicit adoption.",
+  "protocols": {
+    "profile": ".agents/profiles/sap-code-reviewer.json",
+    "required_skills": [
+      "karpathy-guidelines",
+      "loop-specification",
+      "verification-loop"
+    ],
+    "loop": "verification/peer-review-loop.md",
+    "limits": {
+      "max_iterations": 8,
+      "max_seconds": 900,
+      "call_timeout_seconds": 120,
+      "max_stagnant_iterations": 3
+    },
+    "terminal_states": [
+      "Success",
+      "No-Op",
+      "Blocked",
+      "Stalled",
+      "Exhausted"
+    ],
+    "checkpoint_states": [
+      "PLANNED",
+      "EXECUTING",
+      "PENDING_APPROVAL",
+      "COMPLETED"
+    ]
+  },
+  "generation": {
+    "state": "Success",
+    "checklists": 14,
+    "criteria": 84,
+    "report": "verification/checklist-generation-report.json",
+    "goal": "Gerar 14 checklists, 84 critérios pendentes, índice e loop com acompanhamento por item.",
+    "observed_result": "14 arquivos e 84 critérios; nenhum marcado; todos rastreáveis; links locais, JSON e estado pendente validados; detalhes no relatório da geração."
+  },
+  "items": [
+    {
+      "id": "C1",
+      "kind": "correction",
+      "priority": "HIGH",
+      "checkpoint": "COMPLETED",
+      "execution_state": "Success",
+      "iteration": 2,
+      "elapsed_seconds": 82,
+      "goal": "Nenhuma credencial das respostas MCP chega ao contexto de modelos ou aos registros persistidos.",
+      "requirements": [
+        "FR-005",
+        "FR-013",
+        "FR-016"
+      ],
+      "original_tasks": [
+        "T020",
+        "T021",
+        "T033"
+      ],
+      "checklist": "checklists/c1-credential-json.md",
+      "loop_section": "verification/peer-review-loop.md#c1",
+      "source_revision": null,
+      "action_fingerprint": "2390f3525af31a85735d63b1b0e3d8a87dfbb68844fe0407aea665fd957e8a8a",
+      "approval_reference": null,
+      "limits": {
+        "max_iterations": 8,
+        "max_seconds": 900,
+        "call_timeout_seconds": 120,
+        "max_stagnant_iterations": 3
+      },
+      "remaining_limits": {
+        "max_iterations": 6,
+        "max_seconds": 818,
+        "call_timeout_seconds": 120,
+        "max_stagnant_iterations": 3
+      },
+      "verification_plan": "Adicionar regressão com structuredContent e content textual, conteúdo somente textual, JSON aninhado, caracteres escapados e valor ausente do ambiente; ausência do valor nos prompts e arquivos é obrigatória.",
+      "focused_command": "python -m unittest discover -s tests -p 'test_harness_executor.py' -q",
+      "requires_sap_field_evidence_for_promotion": false,
+      "accepted_changes": 1,
+      "token_usage": null,
+      "checks": [
+        {
+          "check": "requirements_quality_review",
+          "status": "NOT_RUN",
+          "verification_level": 2,
+          "command_or_tool": "Reviewer evaluation of c1-credential-json.md",
+          "target": "feature requirements",
+          "observed_result": null,
+          "artifact_or_reference": "checklists/c1-credential-json.md",
+          "reason": "Critérios gerados desmarcados; ainda não avaliados pelo reviewer."
+        },
+        {
+          "check": "correction_or_adoption_verification",
+          "status": "PASS",
+          "verification_level": 1,
+          "command_or_tool": "rtk python -m unittest discover -s tests -p 'test_harness_executor.py' -q",
+          "target": "local/offline",
+          "observed_result": "PASS: 23 tests. The new red regression failed before the fix for textual credential exposure and raw-result hashing; it passed after the fix.",
+          "artifact_or_reference": "tests/test_harness_executor.py; scripts/harness_executor.py"
+        },
+        {
+          "check": "sap_field_outcome",
+          "status": "NOT_RUN",
+          "verification_level": 3,
+          "command_or_tool": null,
+          "target": null,
+          "observed_result": null,
+          "artifact_or_reference": null,
+          "reason": "Item local/offline; nenhuma validação SAP foi realizada nem é inferida das fixtures."
+        },
+        {
+          "check": "red_regression_before_fix",
+          "status": "PASS",
+          "verification_level": 1,
+          "command_or_tool": "rtk python -m unittest discover -s tests -p 'test_harness_executor.py' -k credentials -v",
+          "target": "local/offline",
+          "observed_result": "Expected pre-fix failure observed: nested token in MCP text reached checker; result hash used unsanitized response.",
+          "artifact_or_reference": "tests/test_harness_executor.py#test_credentials_in_structured_and_text_results_never_reach_checker_or_state"
+        },
+        {
+          "check": "full_unit_suite",
+          "status": "PASS",
+          "verification_level": 1,
+          "command_or_tool": "C:\\Users\\William Correa\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\python.exe -m unittest discover -s tests -q",
+          "target": "local/offline",
+          "observed_result": "Exit 0; Ran 143 tests in 53.967 seconds; OK.",
+          "artifact_or_reference": "verification/remediation-implementation-report.json"
+        }
+      ],
+      "next_action": "C1 corrigido e verificado localmente; checklist de qualidade permanece sob revisão independente.",
+      "elapsed_time_note": "Sum of observed command wall times; editing and review time not measured."
+    },
+    {
+      "id": "C2",
+      "kind": "correction",
+      "priority": "HIGH",
+      "checkpoint": "COMPLETED",
+      "execution_state": "Success",
+      "iteration": 2,
+      "elapsed_seconds": null,
+      "goal": "Uma operação MCP inteira termina dentro do prazo documentado, inclusive quando o servidor deixa de consumir a entrada.",
+      "requirements": [
+        "FR-004",
+        "FR-012",
+        "FR-022"
+      ],
+      "original_tasks": [
+        "T018",
+        "T019",
+        "T033"
+      ],
+      "checklist": "checklists/c2-mcp-transport-deadline.md",
+      "loop_section": "verification/peer-review-loop.md#c2",
+      "source_revision": null,
+      "action_fingerprint": "a4f73cf8de2756c1ba0f4f8a8839962b91a3400e1043ec95556d7629701c538e",
+      "approval_reference": null,
+      "limits": {
+        "max_iterations": 8,
+        "max_seconds": 900,
+        "call_timeout_seconds": 120,
+        "max_stagnant_iterations": 3
+      },
+      "remaining_limits": {
+        "max_iterations": 6,
+        "max_seconds": null,
+        "call_timeout_seconds": 120,
+        "max_stagnant_iterations": 3
+      },
+      "verification_plan": "Adicionar processo MCP falso que negocia e depois deixa de ler stdin; enviar carga limitada, medir o prazo e comprovar encerramento da árvore de processos. O watchdog é proteção do teste, não substitui o timeout verificado.",
+      "focused_command": "python -m unittest discover -s tests -p 'test_harness_transport.py' -q",
+      "requires_sap_field_evidence_for_promotion": false,
+      "accepted_changes": 1,
+      "token_usage": null,
+      "checks": [
+        {
+          "check": "requirements_quality_review",
+          "status": "NOT_RUN",
+          "verification_level": 2,
+          "command_or_tool": "Reviewer evaluation of c2-mcp-transport-deadline.md",
+          "target": "feature requirements",
+          "observed_result": null,
+          "artifact_or_reference": "checklists/c2-mcp-transport-deadline.md",
+          "reason": "Critérios gerados desmarcados; ainda não avaliados pelo reviewer."
+        },
+        {
+          "check": "sap_field_outcome",
+          "status": "NOT_RUN",
+          "verification_level": 3,
+          "command_or_tool": null,
+          "target": null,
+          "observed_result": null,
+          "artifact_or_reference": null,
+          "reason": "Item local/offline; nenhuma validação SAP foi realizada nem é inferida das fixtures."
+        },
+        {
+          "check": "red_regression_before_fix",
+          "status": "PASS",
+          "verification_level": 1,
+          "command_or_tool": "Focused regression run against pre-fix behavior",
+          "target": "local/offline",
+          "observed_result": "Antes da correção, uma escrita grande para MCP que parou de consumir stdin excedia o prazo e exigia limpeza externa.",
+          "artifact_or_reference": "scripts/harness_mcp_client.py; tests/test_harness_transport.py"
+        },
+        {
+          "check": "correction_or_adoption_verification",
+          "status": "PASS",
+          "verification_level": 1,
+          "command_or_tool": "python -m unittest discover -s tests -p test_harness_transport.py -q",
+          "target": "local/offline",
+          "observed_result": "Deadline cobre escrita e resposta; timeout fecha o transporte e termina explicitamente o job de processos no Windows. O teste verifica o processo filho.",
+          "artifact_or_reference": "verification/remediation-implementation-report.json"
+        },
+        {
+          "check": "full_unit_suite",
+          "status": "PASS",
+          "verification_level": 1,
+          "command_or_tool": "C:\\Users\\William Correa\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\python.exe -m unittest discover -s tests -q",
+          "target": "local/offline",
+          "observed_result": "Exit 0; Ran 143 tests in 53.967 seconds; OK.",
+          "artifact_or_reference": "verification/remediation-implementation-report.json"
+        }
+      ],
+      "next_action": "Correção local implementada e verificada; revisão de qualidade do checklist permanece NOT_RUN. Nenhuma verificação SAP é inferida.",
+      "elapsed_time_note": "Tempo total da correção não foi instrumentado; não inferir duração a partir do tempo dos comandos."
+    },
+    {
+      "id": "C3",
+      "kind": "correction",
+      "priority": "MEDIUM",
+      "checkpoint": "COMPLETED",
+      "execution_state": "Success",
+      "iteration": 2,
+      "elapsed_seconds": null,
+      "goal": "O catálogo estrito rejeita qualquer contrato incompatível com esquema, servidor, capacidade, efeito ou política.",
+      "requirements": [
+        "FR-006",
+        "FR-007",
+        "FR-017"
+      ],
+      "original_tasks": [
+        "T006",
+        "T019",
+        "T025"
+      ],
+      "checklist": "checklists/c3-strict-tool-contracts.md",
+      "loop_section": "verification/peer-review-loop.md#c3",
+      "source_revision": null,
+      "action_fingerprint": "edcf2a5d815ce42e3159cd220685b22c67add9361593604cd02613c1956f86db",
+      "approval_reference": null,
+      "limits": {
+        "max_iterations": 8,
+        "max_seconds": 900,
+        "call_timeout_seconds": 120,
+        "max_stagnant_iterations": 3
+      },
+      "remaining_limits": {
+        "max_iterations": 6,
+        "max_seconds": null,
+        "call_timeout_seconds": 120,
+        "max_stagnant_iterations": 3
+      },
+      "verification_plan": "Adicionar casos negativos sobre cópias temporárias do catálogo: hash, efeito, capacidade, servidor, contrato duplicado e política de fixtures; cada inconsistência deve produzir FAIL e diagnóstico localizado.",
+      "focused_command": "python -m unittest discover -s tests -p 'test_consistency_regressions.py' -q",
+      "requires_sap_field_evidence_for_promotion": false,
+      "accepted_changes": 1,
+      "token_usage": null,
+      "checks": [
+        {
+          "check": "requirements_quality_review",
+          "status": "NOT_RUN",
+          "verification_level": 2,
+          "command_or_tool": "Reviewer evaluation of c3-strict-tool-contracts.md",
+          "target": "feature requirements",
+          "observed_result": null,
+          "artifact_or_reference": "checklists/c3-strict-tool-contracts.md",
+          "reason": "Critérios gerados desmarcados; ainda não avaliados pelo reviewer."
+        },
+        {
+          "check": "sap_field_outcome",
+          "status": "NOT_RUN",
+          "verification_level": 3,
+          "command_or_tool": null,
+          "target": null,
+          "observed_result": null,
+          "artifact_or_reference": null,
+          "reason": "Item local/offline; nenhuma validação SAP foi realizada nem é inferida das fixtures."
+        },
+        {
+          "check": "red_regression_before_fix",
+          "status": "PASS",
+          "verification_level": 1,
+          "command_or_tool": "Focused regression run against pre-fix behavior",
+          "target": "local/offline",
+          "observed_result": "Antes da correção, a validação estrita não validava o registry de contratos MCP; schema hash e efeito incompatíveis podiam passar.",
+          "artifact_or_reference": "scripts/validate_catalog.py; tests/test_consistency_regressions.py"
+        },
+        {
+          "check": "correction_or_adoption_verification",
+          "status": "PASS",
+          "verification_level": 1,
+          "command_or_tool": "python -m unittest discover -s tests -p test_consistency_regressions.py -q",
+          "target": "local/offline",
+          "observed_result": "17 regressões de consistência passaram; scripts/validate_catalog.py --strict passou com contratos, capacidades, efeitos, servidores e políticas validados.",
+          "artifact_or_reference": "verification/remediation-implementation-report.json"
+        },
+        {
+          "check": "full_unit_suite",
+          "status": "PASS",
+          "verification_level": 1,
+          "command_or_tool": "C:\\Users\\William Correa\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\python.exe -m unittest discover -s tests -q",
+          "target": "local/offline",
+          "observed_result": "Exit 0; Ran 143 tests in 53.967 seconds; OK.",
+          "artifact_or_reference": "verification/remediation-implementation-report.json"
+        }
+      ],
+      "next_action": "Correção local implementada e verificada; revisão de qualidade do checklist permanece NOT_RUN. Nenhuma verificação SAP é inferida.",
+      "elapsed_time_note": "Tempo total da correção não foi instrumentado; não inferir duração a partir do tempo dos comandos."
+    },
+    {
+      "id": "C4",
+      "kind": "correction",
+      "priority": "MEDIUM",
+      "checkpoint": "COMPLETED",
+      "execution_state": "Success",
+      "iteration": 2,
+      "elapsed_seconds": null,
+      "goal": "Não ocorre reserva de aprovação nem despacho depois de esgotado o orçamento total da execução.",
+      "requirements": [
+        "FR-009",
+        "FR-012",
+        "FR-013"
+      ],
+      "original_tasks": [
+        "T018",
+        "T019",
+        "T024"
+      ],
+      "checklist": "checklists/c4-total-run-budget.md",
+      "loop_section": "verification/peer-review-loop.md#c4",
+      "source_revision": null,
+      "action_fingerprint": "a1cc9254680c7be4963321fed7db206b9d836e3850267eb0ac1218aafa0f9a14",
+      "approval_reference": null,
+      "limits": {
+        "max_iterations": 8,
+        "max_seconds": 900,
+        "call_timeout_seconds": 120,
+        "max_stagnant_iterations": 3
+      },
+      "remaining_limits": {
+        "max_iterations": 6,
+        "max_seconds": null,
+        "call_timeout_seconds": 120,
+        "max_stagnant_iterations": 3
+      },
+      "verification_plan": "Adicionar fixture em que inicialização e tools/list consomem o orçamento; observar zero chamadas e, na variante mutante, nenhuma reserva de aprovação. O estado final deve ser Exhausted.",
+      "focused_command": "python -m unittest discover -s tests -p 'test_harness_executor.py' -q",
+      "requires_sap_field_evidence_for_promotion": false,
+      "accepted_changes": 1,
+      "token_usage": null,
+      "checks": [
+        {
+          "check": "requirements_quality_review",
+          "status": "NOT_RUN",
+          "verification_level": 2,
+          "command_or_tool": "Reviewer evaluation of c4-total-run-budget.md",
+          "target": "feature requirements",
+          "observed_result": null,
+          "artifact_or_reference": "checklists/c4-total-run-budget.md",
+          "reason": "Critérios gerados desmarcados; ainda não avaliados pelo reviewer."
+        },
+        {
+          "check": "sap_field_outcome",
+          "status": "NOT_RUN",
+          "verification_level": 3,
+          "command_or_tool": null,
+          "target": null,
+          "observed_result": null,
+          "artifact_or_reference": null,
+          "reason": "Item local/offline; nenhuma validação SAP foi realizada nem é inferida das fixtures."
+        },
+        {
+          "check": "red_regression_before_fix",
+          "status": "PASS",
+          "verification_level": 1,
+          "command_or_tool": "Focused regression run against pre-fix behavior",
+          "target": "local/offline",
+          "observed_result": "Antes da correção, o broker recebia begin/reserva após o orçamento total expirar; a regressão observou uma chamada onde esperava zero.",
+          "artifact_or_reference": "scripts/harness_executor.py; scripts/harness_mcp_client.py; tests/test_harness_executor.py"
+        },
+        {
+          "check": "correction_or_adoption_verification",
+          "status": "PASS",
+          "verification_level": 1,
+          "command_or_tool": "python -m unittest discover -s tests -p test_harness_executor.py -q",
+          "target": "local/offline",
+          "observed_result": "A verificação pós-fase MCP e imediatamente antes do broker/despacho bloqueia reserva e chamadas após o prazo; regressão passou na suíte final.",
+          "artifact_or_reference": "verification/remediation-implementation-report.json"
+        },
+        {
+          "check": "full_unit_suite",
+          "status": "PASS",
+          "verification_level": 1,
+          "command_or_tool": "C:\\Users\\William Correa\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\python.exe -m unittest discover -s tests -q",
+          "target": "local/offline",
+          "observed_result": "Exit 0; Ran 143 tests in 53.967 seconds; OK.",
+          "artifact_or_reference": "verification/remediation-implementation-report.json"
+        }
+      ],
+      "next_action": "Correção local implementada e verificada; revisão de qualidade do checklist permanece NOT_RUN. Nenhuma verificação SAP é inferida.",
+      "elapsed_time_note": "Tempo total da correção não foi instrumentado; não inferir duração a partir do tempo dos comandos."
+    },
+    {
+      "id": "C5",
+      "kind": "correction",
+      "priority": "MEDIUM",
+      "checkpoint": "COMPLETED",
+      "execution_state": "Success",
+      "iteration": 2,
+      "elapsed_seconds": null,
+      "goal": "Capacidade inexistente produz erro estruturado e estado Blocked sem chamar ferramentas.",
+      "requirements": [
+        "FR-003",
+        "FR-017",
+        "FR-021"
+      ],
+      "original_tasks": [
+        "T005",
+        "T006",
+        "T019",
+        "T021"
+      ],
+      "checklist": "checklists/c5-unknown-capability.md",
+      "loop_section": "verification/peer-review-loop.md#c5",
+      "source_revision": null,
+      "action_fingerprint": "b4493b0ec8aeb7ccf4f0d05d3a77ce85996bdc2acf98d86268d02d3d33b6298b",
+      "approval_reference": null,
+      "limits": {
+        "max_iterations": 8,
+        "max_seconds": 900,
+        "call_timeout_seconds": 120,
+        "max_stagnant_iterations": 3
+      },
+      "remaining_limits": {
+        "max_iterations": 6,
+        "max_seconds": null,
+        "call_timeout_seconds": 120,
+        "max_stagnant_iterations": 3
+      },
+      "verification_plan": "Adicionar caso de capacidade ausente na resolução de catálogo do executor; observar erro estruturado, estado Blocked persistido, zero chamadas e ausência de substituição silenciosa.",
+      "focused_command": "python -m unittest discover -s tests -p 'test_harness_executor.py' -q",
+      "requires_sap_field_evidence_for_promotion": false,
+      "accepted_changes": 1,
+      "token_usage": null,
+      "checks": [
+        {
+          "check": "requirements_quality_review",
+          "status": "NOT_RUN",
+          "verification_level": 2,
+          "command_or_tool": "Reviewer evaluation of c5-unknown-capability.md",
+          "target": "feature requirements",
+          "observed_result": null,
+          "artifact_or_reference": "checklists/c5-unknown-capability.md",
+          "reason": "Critérios gerados desmarcados; ainda não avaliados pelo reviewer."
+        },
+        {
+          "check": "sap_field_outcome",
+          "status": "NOT_RUN",
+          "verification_level": 3,
+          "command_or_tool": null,
+          "target": null,
+          "observed_result": null,
+          "artifact_or_reference": null,
+          "reason": "Item local/offline; nenhuma validação SAP foi realizada nem é inferida das fixtures."
+        },
+        {
+          "check": "red_regression_before_fix",
+          "status": "PASS",
+          "verification_level": 1,
+          "command_or_tool": "Focused regression run against pre-fix behavior",
+          "target": "local/offline",
+          "observed_result": "Antes da correção, capacidade ausente gerava AttributeError e deixava o estado Running sem despacho de ferramenta.",
+          "artifact_or_reference": "scripts/harness_executor.py; tests/test_harness_executor.py"
+        },
+        {
+          "check": "correction_or_adoption_verification",
+          "status": "PASS",
+          "verification_level": 1,
+          "command_or_tool": "python -m unittest discover -s tests -p test_harness_executor.py -q",
+          "target": "local/offline",
+          "observed_result": "Capacidade desconhecida agora cria resultado Blocked persistido e zero chamadas; regressão passou na suíte final.",
+          "artifact_or_reference": "verification/remediation-implementation-report.json"
+        },
+        {
+          "check": "full_unit_suite",
+          "status": "PASS",
+          "verification_level": 1,
+          "command_or_tool": "C:\\Users\\William Correa\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\python.exe -m unittest discover -s tests -q",
+          "target": "local/offline",
+          "observed_result": "Exit 0; Ran 143 tests in 53.967 seconds; OK.",
+          "artifact_or_reference": "verification/remediation-implementation-report.json"
+        }
+      ],
+      "next_action": "Correção local implementada e verificada; revisão de qualidade do checklist permanece NOT_RUN. Nenhuma verificação SAP é inferida.",
+      "elapsed_time_note": "Tempo total da correção não foi instrumentado; não inferir duração a partir do tempo dos comandos."
+    },
+    {
+      "id": "U1",
+      "kind": "correction",
+      "priority": "MEDIUM",
+      "checkpoint": "COMPLETED",
+      "execution_state": "Success",
+      "iteration": 2,
+      "elapsed_seconds": null,
+      "goal": "Expiração do estado tem regra definida e status/resume recusam registros expirados sem ações externas.",
+      "requirements": [
+        "FR-010",
+        "FR-012",
+        "FR-014"
+      ],
+      "original_tasks": [
+        "T021",
+        "T024",
+        "T033"
+      ],
+      "checklist": "checklists/u1-run-state-expiry.md",
+      "loop_section": "verification/peer-review-loop.md#u1",
+      "source_revision": null,
+      "action_fingerprint": "800f474d936d480d67e1e8baf48fa933491d5a598d0fdfb5413186beb11a841b",
+      "approval_reference": null,
+      "limits": {
+        "max_iterations": 8,
+        "max_seconds": 900,
+        "call_timeout_seconds": 120,
+        "max_stagnant_iterations": 3
+      },
+      "remaining_limits": {
+        "max_iterations": 6,
+        "max_seconds": null,
+        "call_timeout_seconds": 120,
+        "max_stagnant_iterations": 3
+      },
+      "verification_plan": "Definir a política de expiração primeiro; acrescentar regressões com relógio controlado, limite exato, estado pendente de aprovação e retomada, sem inferir TTL da aprovação ou do orçamento de execução.",
+      "focused_command": "python -m unittest discover -s tests -p 'test_harness_executor.py' -q",
+      "requires_sap_field_evidence_for_promotion": false,
+      "accepted_changes": 1,
+      "token_usage": null,
+      "checks": [
+        {
+          "check": "requirements_quality_review",
+          "status": "NOT_RUN",
+          "verification_level": 2,
+          "command_or_tool": "Reviewer evaluation of u1-run-state-expiry.md",
+          "target": "feature requirements",
+          "observed_result": null,
+          "artifact_or_reference": "checklists/u1-run-state-expiry.md",
+          "reason": "Critérios gerados desmarcados; ainda não avaliados pelo reviewer."
+        },
+        {
+          "check": "sap_field_outcome",
+          "status": "NOT_RUN",
+          "verification_level": 3,
+          "command_or_tool": null,
+          "target": null,
+          "observed_result": null,
+          "artifact_or_reference": null,
+          "reason": "Item local/offline; nenhuma validação SAP foi realizada nem é inferida das fixtures."
+        },
+        {
+          "check": "red_regression_before_fix",
+          "status": "PASS",
+          "verification_level": 1,
+          "command_or_tool": "Focused regression run against pre-fix behavior",
+          "target": "local/offline",
+          "observed_result": "Antes da correção, o contrato não definia TTL nem transição local para execução expirada.",
+          "artifact_or_reference": "scripts/harness_executor.py; tests/test_harness_executor.py; specs/001-controlled-agent-execution/spec.md; specs/001-controlled-agent-execution/plan.md"
+        },
+        {
+          "check": "correction_or_adoption_verification",
+          "status": "PASS",
+          "verification_level": 1,
+          "command_or_tool": "python -m unittest discover -s tests -p test_harness_executor.py -q",
+          "target": "local/offline",
+          "observed_result": "TTL de 24h UTC, fronteira exata, aprovação pendente, consulta histórica e resume local verificados com relógio controlado; nenhuma chamada externa após expiração.",
+          "artifact_or_reference": "verification/remediation-implementation-report.json"
+        },
+        {
+          "check": "full_unit_suite",
+          "status": "PASS",
+          "verification_level": 1,
+          "command_or_tool": "C:\\Users\\William Correa\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\python.exe -m unittest discover -s tests -q",
+          "target": "local/offline",
+          "observed_result": "Exit 0; Ran 143 tests in 53.967 seconds; OK.",
+          "artifact_or_reference": "verification/remediation-implementation-report.json"
+        }
+      ],
+      "next_action": "Correção local implementada e verificada; revisão de qualidade do checklist permanece NOT_RUN. Nenhuma verificação SAP é inferida.",
+      "elapsed_time_note": "Tempo total da correção não foi instrumentado; não inferir duração a partir do tempo dos comandos."
+    },
+    {
+      "id": "D1",
+      "kind": "correction",
+      "priority": "MEDIUM",
+      "checkpoint": "COMPLETED",
+      "execution_state": "Success",
+      "iteration": 2,
+      "elapsed_seconds": null,
+      "goal": "As instruções de instalação e execução declaram o piso Python compatível com o harness e seu plano.",
+      "requirements": [
+        "SC-006"
+      ],
+      "original_tasks": [
+        "T003",
+        "T029",
+        "T032"
+      ],
+      "checklist": "checklists/d1-python-support.md",
+      "loop_section": "verification/peer-review-loop.md#d1",
+      "source_revision": null,
+      "action_fingerprint": "c7d6a81de7e9aef2b4a5dd94b45c9ddca60aad57a7936defbc9070e3af2780f3",
+      "approval_reference": null,
+      "limits": {
+        "max_iterations": 8,
+        "max_seconds": 900,
+        "call_timeout_seconds": 120,
+        "max_stagnant_iterations": 3
+      },
+      "remaining_limits": {
+        "max_iterations": 6,
+        "max_seconds": null,
+        "call_timeout_seconds": 120,
+        "max_stagnant_iterations": 3
+      },
+      "verification_plan": "Alinhar a documentação e revisar todos os pontos de entrada afetados; registrar a versão usada. Validar o piso Python 3.11 quando houver intérprete disponível; ausência desse intérprete permanece NOT_RUN.",
+      "focused_command": "python -m unittest discover -s tests -p 'test_harness_cli.py' -q",
+      "requires_sap_field_evidence_for_promotion": false,
+      "accepted_changes": 1,
+      "token_usage": null,
+      "checks": [
+        {
+          "check": "requirements_quality_review",
+          "status": "NOT_RUN",
+          "verification_level": 2,
+          "command_or_tool": "Reviewer evaluation of d1-python-support.md",
+          "target": "feature requirements",
+          "observed_result": null,
+          "artifact_or_reference": "checklists/d1-python-support.md",
+          "reason": "Critérios gerados desmarcados; ainda não avaliados pelo reviewer."
+        },
+        {
+          "check": "sap_field_outcome",
+          "status": "NOT_RUN",
+          "verification_level": 3,
+          "command_or_tool": null,
+          "target": null,
+          "observed_result": null,
+          "artifact_or_reference": null,
+          "reason": "Item local/offline; nenhuma validação SAP foi realizada nem é inferida das fixtures."
+        },
+        {
+          "check": "red_regression_before_fix",
+          "status": "PASS",
+          "verification_level": 1,
+          "command_or_tool": "Focused regression run against pre-fix behavior",
+          "target": "local/offline",
+          "observed_result": "A regressão documental falhou inicialmente em sete declarações de piso Python incompatíveis com o harness.",
+          "artifact_or_reference": "AGENTS.md; .agents/skills/run-sap-router-skill/SKILL.md; .agents/skills/run-sap-router-skill/MANIFEST.json; .agents/skills/sap-bapi-integration/SKILL.md; .agents/skills/sap-claude-skills/SKILL.md; .agents/skills/sap-workflow-pipeline/SKILL.md; .agents/skills/superclaude-for-sap/SKILL.md; tests/test_consistency_regressions.py"
+        },
+        {
+          "check": "correction_or_adoption_verification",
+          "status": "PASS",
+          "verification_level": 1,
+          "command_or_tool": "python -m unittest discover -s tests -p test_harness_cli.py -q; Python 3.11.15 --version",
+          "target": "local/offline",
+          "observed_result": "Documentação alinhada a Python 3.11+; intérprete 3.11.15 executou os testes e o gerador confirmou paridade de assets.",
+          "artifact_or_reference": "verification/remediation-implementation-report.json"
+        },
+        {
+          "check": "full_unit_suite",
+          "status": "PASS",
+          "verification_level": 1,
+          "command_or_tool": "C:\\Users\\William Correa\\AppData\\Roaming\\uv\\python\\cpython-3.11.15-windows-x86_64-none\\python.exe -m unittest discover -s tests -q",
+          "target": "local/offline",
+          "observed_result": "Exit 0; Ran 143 tests in 53.967 seconds; OK.",
+          "artifact_or_reference": "verification/remediation-implementation-report.json"
+        }
+      ],
+      "next_action": "Correção local implementada e verificada; revisão de qualidade do checklist permanece NOT_RUN. Nenhuma verificação SAP é inferida.",
+      "elapsed_time_note": "Tempo total da correção não foi instrumentado; não inferir duração a partir do tempo dos comandos."
+    },
+    {
+      "id": "E1",
+      "kind": "candidate",
+      "priority": "CONDITIONAL",
+      "checkpoint": "COMPLETED",
+      "execution_state": "Blocked",
+      "iteration": 1,
+      "elapsed_seconds": null,
+      "goal": "Uma eventual integração ABAPilot possui backend identificado, runtime fixado e contratos restritos às ferramentas autorizadas.",
+      "requirements": [
+        "FR-005",
+        "FR-006",
+        "FR-009",
+        "FR-018"
+      ],
+      "original_tasks": [],
+      "checklist": "checklists/e1-abapilot.md",
+      "loop_section": "verification/peer-review-loop.md#e1",
+      "source_revision": "25639b76f6d3f53ae029af73913370af56a1e980",
+      "action_fingerprint": null,
+      "approval_reference": null,
+      "limits": {
+        "max_iterations": 8,
+        "max_seconds": 900,
+        "call_timeout_seconds": 120,
+        "max_stagnant_iterations": 3
+      },
+      "remaining_limits": {
+        "max_iterations": 8,
+        "max_seconds": null,
+        "call_timeout_seconds": 120,
+        "max_stagnant_iterations": 3
+      },
+      "verification_plan": "Antes de promoção, obter snapshot e licença, revisar a versão 1.0.6/Node >=18, aplicar allowlist e provas negativas de schemas/permissões em fixtures; SAP real exige versão e endpoint do backend identificados.",
+      "focused_command": "python scripts/source_catalog.py search \"ABAPilot\"",
+      "requires_sap_field_evidence_for_promotion": true,
+      "accepted_changes": 1,
+      "token_usage": null,
+      "checks": [
+        {
+          "check": "requirements_quality_review",
+          "status": "NOT_RUN",
+          "verification_level": 2,
+          "command_or_tool": "Reviewer evaluation of e1-abapilot.md",
+          "target": "feature requirements",
+          "observed_result": null,
+          "artifact_or_reference": "checklists/e1-abapilot.md",
+          "reason": "Critérios gerados desmarcados; ainda não avaliados pelo reviewer."
+        },
+        {
+          "check": "correction_or_adoption_verification",
+          "status": "PASS",
+          "verification_level": 1,
+          "command_or_tool": "python scripts/validate_catalog.py --strict --json; python -m unittest discover -s tests -p test_consistency_regressions.py -q",
+          "target": "local/offline",
+          "observed_result": "Strict catalog validation passed with no errors; 21 consistency regressions pass, including rejection of write-tool and installer policy drift. The DEV profile remains disabled and fail-closed; no backend endpoint, tools/list schema, or SAP authorization was exercised.",
+          "artifact_or_reference": "verification/external-candidate-implementation-report.json"
+        },
+        {
+          "check": "sap_field_outcome",
+          "status": "NOT_RUN",
+          "verification_level": 3,
+          "command_or_tool": null,
+          "target": "SAP DEV",
+          "observed_result": null,
+          "artifact_or_reference": null,
+          "reason": "Selected DEV backend/license, exact system and client, credentials, runtime, observed MCP schemas, and SAP-side authorization evidence remain unavailable. The target profile remains blocked and no live SAP call was made."
+        }
+      ],
+      "next_action": "Keep the MCP disabled until the licensed DEV backend, endpoint/system identity, external credentials, observed tools/list schemas, and authorization evidence are supplied; independent checklist review remains open."
+    },
+    {
+      "id": "E2",
+      "kind": "candidate",
+      "priority": "HIGH_VALUE",
+      "checkpoint": "PLANNED",
+      "execution_state": null,
+      "iteration": 0,
+      "elapsed_seconds": 0,
+      "goal": "Uma eventual ponte OData Go possui versão e destino fixados, leitura estrita e operação efetiva validada pelo contrato.",
+      "requirements": [
+        "FR-006",
+        "FR-007",
+        "FR-008",
+        "FR-018"
+      ],
+      "original_tasks": [],
+      "checklist": "checklists/e2-odata-go.md",
+      "loop_section": "verification/peer-review-loop.md#e2",
+      "source_revision": "9fd9d0f06746c228c5e56a7e61061ad83e525aaa",
+      "action_fingerprint": null,
+      "approval_reference": null,
+      "limits": {
+        "max_iterations": 8,
+        "max_seconds": 900,
+        "call_timeout_seconds": 120,
+        "max_stagnant_iterations": 3
+      },
+      "remaining_limits": {
+        "max_iterations": 8,
+        "max_seconds": 900,
+        "call_timeout_seconds": 120,
+        "max_stagnant_iterations": 3
+      },
+      "verification_plan": "Revisar binário e serviço, iniciar em stdio com --read-only e testar metadata OData v2/v4 em fixture. Negativas devem cobrir escrita e function/action na ferramenta universal e no catálogo por entidade.",
+      "focused_command": "python scripts/mcp_launcher.py search --query \"OData Go\"",
+      "requires_sap_field_evidence_for_promotion": true,
+      "accepted_changes": 0,
+      "token_usage": null,
+      "checks": [
+        {
+          "check": "requirements_quality_review",
+          "status": "NOT_RUN",
+          "verification_level": 2,
+          "command_or_tool": "Reviewer evaluation of e2-odata-go.md",
+          "target": "feature requirements",
+          "observed_result": null,
+          "artifact_or_reference": "checklists/e2-odata-go.md",
+          "reason": "Critérios gerados desmarcados; ainda não avaliados pelo reviewer."
+        },
+        {
+          "check": "correction_or_adoption_verification",
+          "status": "NOT_RUN",
+          "verification_level": 1,
+          "command_or_tool": "python scripts/mcp_launcher.py search --query \"OData Go\"",
+          "target": "local/offline",
+          "observed_result": null,
+          "artifact_or_reference": "verification/peer-review-loop.md#e2",
+          "reason": "Correção/integração e verificadores adicionais não executados nesta entrega documental."
+        },
+        {
+          "check": "sap_field_outcome",
+          "status": "NOT_RUN",
+          "verification_level": 3,
+          "command_or_tool": null,
+          "target": null,
+          "observed_result": null,
+          "artifact_or_reference": null,
+          "reason": "Nenhuma operação no backend/tenant SAP ou promoção de MCP foi realizada."
+        }
+      ],
+      "next_action": "Decidir adoção, atualizar escopo Spec Kit aplicável e resolver os bloqueios antes de importação/promoção."
+    },
+    {
+      "id": "E3",
+      "kind": "candidate",
+      "priority": "HOLD",
+      "checkpoint": "PLANNED",
+      "execution_state": null,
+      "iteration": 0,
+      "elapsed_seconds": 0,
+      "goal": "Antes de qualquer adoção, a fonte OData Python tem licença esclarecida, snapshot real e efeitos de todas as ferramentas classificados.",
+      "requirements": [
+        "FR-005",
+        "FR-006",
+        "FR-008",
+        "FR-009"
+      ],
+      "original_tasks": [],
+      "checklist": "checklists/e3-odata-python.md",
+      "loop_section": "verification/peer-review-loop.md#e3",
+      "source_revision": "5e2cce5978bcdf0b9dc8ba58456b08293a430780",
+      "action_fingerprint": null,
+      "approval_reference": null,
+      "limits": {
+        "max_iterations": 8,
+        "max_seconds": 900,
+        "call_timeout_seconds": 120,
+        "max_stagnant_iterations": 3
+      },
+      "remaining_limits": {
+        "max_iterations": 8,
+        "max_seconds": 900,
+        "call_timeout_seconds": 120,
+        "max_stagnant_iterations": 3
+      },
+      "verification_plan": "Esclarecer licença antes de importar código; obter snapshot real, inventariar ferramentas e fechar escrita por política/contrato. Testar protocolo e resultados com fixture sem SAP ou credenciais reais.",
+      "focused_command": "python scripts/source_catalog.py search \"GutjahrAI OData Python\"",
+      "requires_sap_field_evidence_for_promotion": true,
+      "accepted_changes": 0,
+      "token_usage": null,
+      "checks": [
+        {
+          "check": "requirements_quality_review",
+          "status": "NOT_RUN",
+          "verification_level": 2,
+          "command_or_tool": "Reviewer evaluation of e3-odata-python.md",
+          "target": "feature requirements",
+          "observed_result": null,
+          "artifact_or_reference": "checklists/e3-odata-python.md",
+          "reason": "Critérios gerados desmarcados; ainda não avaliados pelo reviewer."
+        },
+        {
+          "check": "correction_or_adoption_verification",
+          "status": "NOT_RUN",
+          "verification_level": 1,
+          "command_or_tool": "python scripts/source_catalog.py search \"GutjahrAI OData Python\"",
+          "target": "local/offline",
+          "observed_result": null,
+          "artifact_or_reference": "verification/peer-review-loop.md#e3",
+          "reason": "Correção/integração e verificadores adicionais não executados nesta entrega documental."
+        },
+        {
+          "check": "sap_field_outcome",
+          "status": "NOT_RUN",
+          "verification_level": 3,
+          "command_or_tool": null,
+          "target": null,
+          "observed_result": null,
+          "artifact_or_reference": null,
+          "reason": "Nenhuma operação no backend/tenant SAP ou promoção de MCP foi realizada."
+        }
+      ],
+      "next_action": "Decidir adoção, atualizar escopo Spec Kit aplicável e resolver os bloqueios antes de importação/promoção."
+    },
+    {
+      "id": "E4",
+      "kind": "candidate",
+      "priority": "MEDIUM",
+      "checkpoint": "PLANNED",
+      "execution_state": null,
+      "iteration": 0,
+      "elapsed_seconds": 0,
+      "goal": "Os candidatos SAP GUI identificam o runtime selecionado e a política de ações antes de qualquer promoção.",
+      "requirements": [
+        "FR-006",
+        "FR-009",
+        "FR-012",
+        "FR-018"
+      ],
+      "original_tasks": [],
+      "checklist": "checklists/e4-sapgui-provider.md",
+      "loop_section": "verification/peer-review-loop.md#e4",
+      "source_revision": "95b0226dfa4d36647f993e64627dfc416c85127d",
+      "action_fingerprint": null,
+      "approval_reference": null,
+      "limits": {
+        "max_iterations": 8,
+        "max_seconds": 900,
+        "call_timeout_seconds": 120,
+        "max_stagnant_iterations": 3
+      },
+      "remaining_limits": {
+        "max_iterations": 8,
+        "max_seconds": 900,
+        "call_timeout_seconds": 120,
+        "max_stagnant_iterations": 3
+      },
+      "verification_plan": "Revisar delta e runtime escolhido, testar negociação com backend simulado e política das ações; promoção exige prova no ambiente GUI/WebGUI identificado e reconciliação de mutações incertas.",
+      "focused_command": "python scripts/mcp_launcher.py search --query \"Hochfrequenz SAP GUI\"",
+      "requires_sap_field_evidence_for_promotion": true,
+      "accepted_changes": 0,
+      "token_usage": null,
+      "checks": [
+        {
+          "check": "requirements_quality_review",
+          "status": "NOT_RUN",
+          "verification_level": 2,
+          "command_or_tool": "Reviewer evaluation of e4-sapgui-provider.md",
+          "target": "feature requirements",
+          "observed_result": null,
+          "artifact_or_reference": "checklists/e4-sapgui-provider.md",
+          "reason": "Critérios gerados desmarcados; ainda não avaliados pelo reviewer."
+        },
+        {
+          "check": "correction_or_adoption_verification",
+          "status": "NOT_RUN",
+          "verification_level": 1,
+          "command_or_tool": "python scripts/mcp_launcher.py search --query \"Hochfrequenz SAP GUI\"",
+          "target": "local/offline",
+          "observed_result": null,
+          "artifact_or_reference": "verification/peer-review-loop.md#e4",
+          "reason": "Correção/integração e verificadores adicionais não executados nesta entrega documental."
+        },
+        {
+          "check": "sap_field_outcome",
+          "status": "NOT_RUN",
+          "verification_level": 3,
+          "command_or_tool": null,
+          "target": null,
+          "observed_result": null,
+          "artifact_or_reference": null,
+          "reason": "Nenhuma operação no backend/tenant SAP ou promoção de MCP foi realizada."
+        }
+      ],
+      "next_action": "Decidir adoção, atualizar escopo Spec Kit aplicável e resolver os bloqueios antes de importação/promoção."
+    },
+    {
+      "id": "E5",
+      "kind": "candidate",
+      "priority": "HIGH",
+      "checkpoint": "PLANNED",
+      "execution_state": null,
+      "iteration": 0,
+      "elapsed_seconds": 0,
+      "goal": "A integração SuccessFactors mantém credenciais no provedor e fornece ao modelo somente argumentos de negócio autorizados.",
+      "requirements": [
+        "FR-005",
+        "FR-006",
+        "FR-007",
+        "FR-022"
+      ],
+      "original_tasks": [],
+      "checklist": "checklists/e5-successfactors-credentials.md",
+      "loop_section": "verification/peer-review-loop.md#e5",
+      "source_revision": "b17ada8caf81b2edc1014a15353a6522a71657b5",
+      "action_fingerprint": null,
+      "approval_reference": null,
+      "limits": {
+        "max_iterations": 8,
+        "max_seconds": 900,
+        "call_timeout_seconds": 120,
+        "max_stagnant_iterations": 3
+      },
+      "remaining_limits": {
+        "max_iterations": 8,
+        "max_seconds": 900,
+        "call_timeout_seconds": 120,
+        "max_stagnant_iterations": 3
+      },
+      "verification_plan": "Revisar/adaptar o provedor para injetar credenciais fora do modelo; schemas públicos e snapshots não podem exigir senha. Testar configuração por data center/instance, isolamento, erros e autorização antes de qualquer tenant.",
+      "focused_command": "python scripts/mcp_launcher.py search --query \"SuccessFactors\"",
+      "requires_sap_field_evidence_for_promotion": true,
+      "accepted_changes": 0,
+      "token_usage": null,
+      "checks": [
+        {
+          "check": "requirements_quality_review",
+          "status": "NOT_RUN",
+          "verification_level": 2,
+          "command_or_tool": "Reviewer evaluation of e5-successfactors-credentials.md",
+          "target": "feature requirements",
+          "observed_result": null,
+          "artifact_or_reference": "checklists/e5-successfactors-credentials.md",
+          "reason": "Critérios gerados desmarcados; ainda não avaliados pelo reviewer."
+        },
+        {
+          "check": "correction_or_adoption_verification",
+          "status": "NOT_RUN",
+          "verification_level": 1,
+          "command_or_tool": "python scripts/mcp_launcher.py search --query \"SuccessFactors\"",
+          "target": "local/offline",
+          "observed_result": null,
+          "artifact_or_reference": "verification/peer-review-loop.md#e5",
+          "reason": "Correção/integração e verificadores adicionais não executados nesta entrega documental."
+        },
+        {
+          "check": "sap_field_outcome",
+          "status": "NOT_RUN",
+          "verification_level": 3,
+          "command_or_tool": null,
+          "target": null,
+          "observed_result": null,
+          "artifact_or_reference": null,
+          "reason": "Nenhuma operação no backend/tenant SAP ou promoção de MCP foi realizada."
+        }
+      ],
+      "next_action": "Decidir adoção, atualizar escopo Spec Kit aplicável e resolver os bloqueios antes de importação/promoção."
+    },
+    {
+      "id": "E6",
+      "kind": "candidate",
+      "priority": "HIGH_VALUE",
+      "checkpoint": "COMPLETED",
+      "execution_state": "Success",
+      "iteration": 1,
+      "elapsed_seconds": null,
+      "goal": "A skill SAP OData CLI é classificada como skill/CLI e suas operações são controladas sem inventar um servidor MCP nativo.",
+      "requirements": [
+        "FR-005",
+        "FR-015",
+        "FR-018"
+      ],
+      "original_tasks": [],
+      "checklist": "checklists/e6-odata-cli-skill.md",
+      "loop_section": "verification/peer-review-loop.md#e6",
+      "source_revision": "146e3b8de0764e4cfecc5cba1643fe61b40cb4ee",
+      "action_fingerprint": null,
+      "approval_reference": null,
+      "limits": {
+        "max_iterations": 8,
+        "max_seconds": 900,
+        "call_timeout_seconds": 120,
+        "max_stagnant_iterations": 3
+      },
+      "remaining_limits": {
+        "max_iterations": 8,
+        "max_seconds": null,
+        "call_timeout_seconds": 120,
+        "max_stagnant_iterations": 3
+      },
+      "verification_plan": "Revisar/importar a skill por SHA com licença e dependências; validar metadados/lint em EDMX offline. Separar comandos de leitura SAP das alterações locais; se houver adapter, provar schemas, timeouts e proteção do keyring.",
+      "focused_command": "python scripts/source_catalog.py search \"sap-odata-cli\"",
+      "requires_sap_field_evidence_for_promotion": true,
+      "accepted_changes": 1,
+      "token_usage": null,
+      "checks": [
+        {
+          "check": "requirements_quality_review",
+          "status": "NOT_RUN",
+          "verification_level": 2,
+          "command_or_tool": "Reviewer evaluation of e6-odata-cli-skill.md",
+          "target": "feature requirements",
+          "observed_result": null,
+          "artifact_or_reference": "checklists/e6-odata-cli-skill.md",
+          "reason": "Critérios gerados desmarcados; ainda não avaliados pelo reviewer."
+        },
+        {
+          "check": "correction_or_adoption_verification",
+          "status": "PASS",
+          "verification_level": 1,
+          "command_or_tool": "python scripts/validate_catalog.py --strict --json; python scripts/skill_packager.py validate --skill sap-odata-cli --validate-only; python -m unittest discover -s tests -p test_consistency_regressions.py -q",
+          "target": "local/offline",
+          "observed_result": "The pinned MIT skill passes source/hash and skill-packager validation; 21 consistency regressions pass. The import is guidance-only; no CLI binary, dependency install, or MCP server was added.",
+          "artifact_or_reference": "verification/external-candidate-implementation-report.json"
+        },
+        {
+          "check": "sap_field_outcome",
+          "status": "NOT_RUN",
+          "verification_level": 3,
+          "command_or_tool": null,
+          "target": "SAP field validation",
+          "observed_result": null,
+          "artifact_or_reference": null,
+          "reason": "This implementation imports guidance only. No CLI or MCP runtime was enabled, so there was no SAP service call or live OData validation; any future runtime adapter requires a separate reviewed scope."
+        }
+      ],
+      "next_action": "Keep CLI/MCP runtime disabled; independent checklist review remains open. Scope any future executable adapter separately with schema, timeout, keyring, and target tests."
+    },
+    {
+      "id": "E7",
+      "kind": "candidate",
+      "priority": "HIGH_VALUE",
+      "checkpoint": "COMPLETED",
+      "execution_state": "Success",
+      "iteration": 1,
+      "elapsed_seconds": null,
+      "goal": "Uma atualização Basis preserva a fonte canônica, revisa 21 novas skills e atualiza as 12 existentes com paridade e políticas.",
+      "requirements": [
+        "FR-015",
+        "FR-016",
+        "SC-004"
+      ],
+      "original_tasks": [],
+      "checklist": "checklists/e7-basis-skill-refresh.md",
+      "loop_section": "verification/peer-review-loop.md#e7",
+      "source_revision": "6ae551f6ec2ef4c554b606fcdef5a04599e4ab11",
+      "action_fingerprint": null,
+      "approval_reference": null,
+      "limits": {
+        "max_iterations": 8,
+        "max_seconds": 900,
+        "call_timeout_seconds": 120,
+        "max_stagnant_iterations": 3
+      },
+      "remaining_limits": {
+        "max_iterations": 8,
+        "max_seconds": null,
+        "call_timeout_seconds": 120,
+        "max_stagnant_iterations": 3
+      },
+      "verification_plan": "Revisar delta, conflitos de nomes e referências; importar somente conteúdo aceito e gerar mirrors. Validar catálogo e paridade; operações OS/DB/SAP precisam de capacidades, limites, target e aprovação conforme efeito.",
+      "focused_command": "python scripts/source_catalog.py search \"SAP Basis operations\"",
+      "requires_sap_field_evidence_for_promotion": true,
+      "accepted_changes": 1,
+      "token_usage": null,
+      "checks": [
+        {
+          "check": "requirements_quality_review",
+          "status": "NOT_RUN",
+          "verification_level": 2,
+          "command_or_tool": "Reviewer evaluation of e7-basis-skill-refresh.md",
+          "target": "feature requirements",
+          "observed_result": null,
+          "artifact_or_reference": "checklists/e7-basis-skill-refresh.md",
+          "reason": "Critérios gerados desmarcados; ainda não avaliados pelo reviewer."
+        },
+        {
+          "check": "correction_or_adoption_verification",
+          "status": "PASS",
+          "verification_level": 1,
+          "command_or_tool": "python scripts/source_catalog.py status; python scripts/generate_ide_assets.py check",
+          "target": "local/offline",
+          "observed_result": "The pinned source sync reports 76/76 sources and 759 indexed assets with zero missing sources; the 76-file Basis snapshot matches the pinned upstream revision. IDE parity passes with 203 canonical skills; the operational commands in imported references were reviewed as documentation only and never executed.",
+          "artifact_or_reference": "verification/external-candidate-implementation-report.json"
+        },
+        {
+          "check": "sap_field_outcome",
+          "status": "NOT_RUN",
+          "verification_level": 3,
+          "command_or_tool": null,
+          "target": "SAP field validation",
+          "observed_result": null,
+          "artifact_or_reference": null,
+          "reason": "This change imports skill documentation only; no Basis command was run against an SAP, OS, or database target. Field validation remains required before any operational execution capability is promoted."
+        }
+      ],
+      "next_action": "Keep imported operational guidance subject to its explicit target and approval gates; independent checklist review remains open."
+    }
+  ]
+}

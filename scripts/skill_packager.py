@@ -93,11 +93,19 @@ def package_skill(skill_dir: Path, output_zip: Path | None = None) -> Path:
     else:
         output_zip.parent.mkdir(parents=True, exist_ok=True)
 
+    sources = [(skill_dir, skill_dir.parent)]
+    if skill_dir.resolve() == (SKILLS_DIR / "sap-spec-kit").resolve():
+        sources.extend((path, SKILLS_DIR) for path in sorted(SKILLS_DIR.glob("speckit-*")) if path.is_dir())
+        sources.append((ROOT / ".specify", ROOT))
+
     with zipfile.ZipFile(output_zip, "w", zipfile.ZIP_DEFLATED) as archive:
-        for file_path in skill_dir.rglob("*"):
-            if file_path.is_file():
-                rel_path = file_path.relative_to(skill_dir.parent)
-                archive.write(file_path, arcname=str(rel_path))
+        for source_dir, relative_root in sources:
+            if not source_dir.is_dir():
+                raise ValueError(f"Required package component is missing: {source_dir}")
+            for file_path in source_dir.rglob("*"):
+                if file_path.is_file() and "__pycache__" not in file_path.parts:
+                    rel_path = file_path.relative_to(relative_root)
+                    archive.write(file_path, arcname=rel_path.as_posix())
 
     return output_zip
 

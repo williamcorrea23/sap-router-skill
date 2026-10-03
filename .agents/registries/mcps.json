@@ -581,6 +581,19 @@
       "owner": "sap-api-management-consultant"
     },
     {
+      "id": "engine-cap-devops",
+      "display_name": "Engine CAP DevOps MCP",
+      "status": "enabled",
+      "source": {"repository": "local/tools/engine-cap-devops", "license": "MIT", "version": "0.1.0"},
+      "runtime": {"command": "node", "args": ["tools/engine-cap-devops/dist/index.js"], "transport": "stdio", "platforms": ["windows", "linux", "macos"]},
+      "auth": {"mode": "azure_cli_local", "env_refs": []},
+      "capabilities": ["engine.cap.project.inspect", "engine.cap.project.audit", "engine.cap.pipeline.preview", "engine.cap.project.plan", "engine.cap.quickstart.create", "engine.cap.ci.run", "engine.cap.dev.deploy", "engine.cap.run.diagnose"],
+      "safety": {"default_mode": "read_only", "mutations": "explicit_journal_reconcile", "secrets": "never_return"},
+      "probes": {"initialize": true, "tools_list": true, "domain_probe": "jsonrpc_tools"},
+      "routing": {"priority": 20, "fallback_group": "engine-cap"},
+      "owner": "engine-platform"
+    },
+    {
       "id": "smartform-ai-generator",
       "display_name": "Smart Form AI Generator MCP",
       "status": "planned",

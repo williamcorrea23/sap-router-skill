@@ -29,11 +29,13 @@ Usage:
 
 import argparse
 import os
+import re
 import sys
 import json
 import zipfile
 import tempfile
 import shutil
+import stat
 from datetime import datetime, timezone
 from pathlib import Path
 from xml.dom import minidom
@@ -285,7 +287,9 @@ def cmd_validate(args):
     warnings = []
 
     with zipfile.ZipFile(input_path, "r") as zf:
-        names = set(zf.namelist())
+        entries = zf.infolist()
+        names = {info.filename for info in entries}
+        errors.extend(_zip_entry_errors(entries))
 
         # Check required files
         for required in REQUIRED_FILES:
@@ -318,13 +322,13 @@ def cmd_validate(args):
                     warnings.append(f"Unrecognized mapping extension: {name}")
 
         # Check for empty files
-        for info in zf.infolist():
+        for info in entries:
             if info.file_size == 0:
                 warnings.append(f"Empty file: {info.filename}")
 
     # Print report
     print(f"iFlow ZIP validation: {input_path}")
-    print(f"  Files: {len(names)}")
+    print(f"  Files: {len(entries)}")
     print(f"  Required OK: {sum(1 for r in REQUIRED_FILES if r in names)}/{len(REQUIRED_FILES)}")
 
     if errors:
@@ -351,18 +355,53 @@ def cmd_extract(args):
     output_dir.mkdir(parents=True, exist_ok=True)
 
     with zipfile.ZipFile(input_path, "r") as zf:
-        for info in zf.infolist():
-            # Prevent zip-slip path traversal
-            member_path = os.path.normpath(output_dir / info.filename)
-            if not str(member_path).startswith(str(output_dir)):
-                print(f"WARNING: Skipping suspicious path: {info.filename}", file=sys.stderr)
+        entries = zf.infolist()
+        errors = _zip_entry_errors(entries)
+        if errors:
+            for error in errors:
+                print(f"ERROR: {error}", file=sys.stderr)
+            return 1
+        for info in entries:
+            parts = tuple(part for part in info.filename.replace("\\", "/").split("/") if part not in ("", "."))
+            destination = (output_dir / Path(*parts)).resolve()
+            try:
+                destination.relative_to(output_dir)
+            except ValueError:
+                print(f"ERROR: Skipping suspicious path: {info.filename}", file=sys.stderr)
+                return 1
+            if stat.S_ISLNK(info.external_attr >> 16):
+                print(f"ERROR: Symbolic link entry is not allowed: {info.filename}", file=sys.stderr)
+                return 1
+            if info.is_dir():
+                destination.mkdir(parents=True, exist_ok=True)
                 continue
-            zf.extract(info, output_dir)
-        file_count = len(zf.namelist())
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            with zf.open(info, "r") as source, destination.open("wb") as target:
+                shutil.copyfileobj(source, target)
+        file_count = len(entries)
 
     print(f"Extracted {input_path} -> {output_dir}")
     print(f"  Files extracted: {file_count}")
     return 0
+
+
+def _zip_entry_errors(entries):
+    """Reject duplicate names and paths that can escape or alias on Windows."""
+    errors = []
+    seen = set()
+    for info in entries:
+        raw_name = info.filename
+        normalized = raw_name.replace("\\", "/")
+        parts = [part for part in normalized.split("/") if part not in ("", ".")]
+        key = "/".join(parts).casefold()
+        if key in seen:
+            errors.append(f"Duplicate ZIP entry: {raw_name}")
+        seen.add(key)
+        if (not normalized or normalized.startswith("/") or re.match(r"^[A-Za-z]:", normalized)
+                or "\x00" in normalized or ":" in normalized
+                or any(part == ".." for part in normalized.split("/"))):
+            errors.append(f"Unsafe ZIP path: {raw_name}")
+    return errors
 
 
 def cmd_list(args):
